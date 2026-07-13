@@ -202,7 +202,17 @@ function summarizeMapData(mapData) {
     log("Git push error: " + e.message);
   }
 
-  log("\n=== Refresh Complete ===");
+  log("\n=== FourVenues Refresh Complete ===");
   const booked = results.filter(r => r.totalRevenue > 0);
   booked.forEach(r => log(`  ${r.venue} | ${r.date} | ${r.dj} | $${r.totalRevenue.toLocaleString()} committed`));
+
+  // --- Also run Toast BS Actual update ---
+  log("\n--- Running Toast BS Actual update ---");
+  try {
+    execSync(`node "C:\\Cursor\\toast-mcp-server\\toast-bs-update.cjs"`, { stdio: "inherit", shell: "cmd.exe" });
+  } catch (e) {
+    log("Toast BS update error: " + e.message.split("\n")[0]);
+  }
+
+  log("\n=== Refresh Complete ===");
 })();
