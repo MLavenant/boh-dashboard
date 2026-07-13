@@ -46,6 +46,21 @@ const CUSTOM_REPORT_IDS = {
   ava_coconut_grove:"24a8abfa-3b5a-48ec-8169-881f13a25f56",
 };
 
+// Toast restaurant location GUIDs (from /restaurantaccess/populateAccessibleRestaurants)
+const FULFILLMENT_VENUE_GUIDS = {
+  claudie:           "380f8195-ef88-495e-b144-6e3202ccc569",
+  ava_coconut_grove: "1c653447-0a27-4f29-8e7c-d9141a8dc66c",
+  ava_winter_park:   "0a365c66-d2b9-42ab-8f45-94ea26d50716",
+  casa_neos:         "c3f36849-5105-44ab-9168-62be1f89a59e",
+  mila:              "38e76bee-b844-427c-b078-260aa025f556",
+};
+
+const TOAST_WEB_TOKEN_FILE = "C:\\Cursor\\toast-mcp-server\\toast-web-token.json";
+// Organization-wide restaurant-set GUID (constant for RDG across all venues)
+const TOAST_RESTAURANT_SET_GUID = "96e8e2b8-d95d-4432-b574-ceee10cf17d5";
+// Panel output name for the MENU_ITEM_NAME table in all fulfillment custom reports
+const FULFILLMENT_TABLE_PANEL = "e2a4e62f-a9a2-4389-b8c5-e15f935f2c3a";
+
 const OT_VENUES = [
   "claudie", "casa_neos", "ava_coconut_grove", "ava_winter_park", "mila", "mila_omakase",
 ];
@@ -103,6 +118,63 @@ function getSessionCookies() {
     .filter(c => c.domain.includes("toasttab.com"))
     .map(c => `${c.name}=${c.value}`)
     .join("; ");
+}
+
+/** Extract msGuid (management-set GUID) from the TOAST_SESSION cookie value */
+function getMsGuid() {
+  const session = JSON.parse(fs.readFileSync(SESSION_FILE, "utf8"));
+  const toastCookie = session.cookies.find(c => c.name === "TOAST_SESSION");
+  if (!toastCookie) throw new Error("TOAST_SESSION cookie not found");
+  const decoded = decodeURIComponent(toastCookie.value);
+  const m = decoded.match(/msGuid=([a-f0-9-]{36})/);
+  if (!m) throw new Error("msGuid not found in TOAST_SESSION cookie");
+  return m[1];
+}
+
+async function refreshToastWebToken() {
+  const { chromium } = await import("playwright");
+  const browser = await chromium.launch({ channel: "msedge", headless: true });
+  const context = await browser.newContext({ storageState: SESSION_FILE });
+  const page = await context.newPage();
+  let capturedToken = null;
+  context.on("response", async resp => {
+    if (resp.url().includes("auth.toasttab.com/oauth/token") && resp.status() === 200) {
+      try { const b = await resp.json(); if (b.access_token) capturedToken = b.access_token; } catch {}
+    }
+  });
+  await page.goto("https://www.toasttab.com/restaurants/admin/reports/home", {
+    waitUntil: "domcontentloaded", timeout: 30000,
+  }).catch(() => {});
+  await page.waitForTimeout(8000);
+  await context.storageState({ path: SESSION_FILE });
+  await browser.close();
+  if (!capturedToken) throw new Error("No OAuth token captured during browser refresh");
+  const record = { token: capturedToken, capturedAt: new Date().toISOString() };
+  fs.writeFileSync(TOAST_WEB_TOKEN_FILE, JSON.stringify(record, null, 2));
+  return capturedToken;
+}
+
+async function getToastWebToken() {
+  if (fs.existsSync(TOAST_WEB_TOKEN_FILE)) {
+    const s = JSON.parse(fs.readFileSync(TOAST_WEB_TOKEN_FILE, "utf8"));
+    const ageMins = (Date.now() - new Date(s.capturedAt).getTime()) / 60000;
+    if (ageMins < 50 && s.token) return s.token;
+  }
+  return refreshToastWebToken();
+}
+
+/** Build the required headers for Toast's report-generator API */
+function getReportHeaders(token, venueLocationGuid, reportGuid) {
+  return {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    Accept: "application/json",
+    Referer: `https://www.toasttab.com/restaurants/admin/reports/custom-reports/${reportGuid}`,
+    "toast-restaurant-external-id": venueLocationGuid,
+    "toast-management-set-guid": getMsGuid(),
+    "toast-restaurant-set-guid": TOAST_RESTAURANT_SET_GUID,
+  };
 }
 
 // ── CSV parser ──────────────────────────────────────────────────────────────
@@ -168,65 +240,77 @@ async function fetchKitchenTiming(venueKey) {
 
 // ── Item fulfillment custom report fetch ────────────────────────────────────
 
-async function fetchItemFulfillment(venueKey, reportUuid) {
-  console.log(`  [toast] Fetching item fulfillment custom report for ${venueKey} (${reportUuid})...`);
-  const cookies = getSessionCookies();
-  const headers = {
-    Cookie: cookies,
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-    Accept: "*/*",
-    "X-Requested-With": "XMLHttpRequest",
-    Referer: "https://www.toasttab.com/restaurants/admin/reports/home",
+async function fetchItemFulfillment(venueKey, reportUuid, startDate, endDate) {
+  console.log(`  [toast] Fetching item fulfillment for ${venueKey} via report-generator API...`);
+  const locationGuid = FULFILLMENT_VENUE_GUIDS[venueKey];
+  if (!locationGuid) throw new Error(`[${venueKey}] No location GUID configured`);
+
+  let token = await getToastWebToken();
+  const headers = () => getReportHeaders(token, locationGuid, reportUuid);
+
+  const startYMD = startDate.replace(/-/g, "");
+  const endYMD = endDate.replace(/-/g, "");
+
+  const body = {
+    renderer: "JSON",
+    locations: [[{ locationGuid, locationType: "RESTAURANT" }]],
+    dateRanges: { customDateRanges: [{ startDateYYYYMMDD: startYMD, endDateYYYYMMDD: endYMD }] },
+    panels: [{
+      outputName: FULFILLMENT_TABLE_PANEL,
+      type: "TABLE",
+      source: {
+        type: "metrics",
+        metrics: ["AVERAGE_ITEM_FULFILLMENT_TIME"],
+        groupBy: ["MENU_ITEM_NAME"],
+        filters: [],
+        comparisons: [],
+      },
+    }],
+    parameters: { customReportGuid: reportUuid },
   };
 
-  const triggerRes = await axios.get(
-    `${TOAST_ADMIN}/restaurants/admin/reports/custom-reports/${reportUuid}?reportDateRange=lastWeek&excel=true`,
-    { headers, validateStatus: () => true }
+  // Generate the report — retry once with refreshed token on 401
+  let genRes = await axios.post(
+    `${TOAST_ADMIN}/api/service/report-generator/v1/customReports/generate`,
+    body,
+    { headers: headers(), validateStatus: () => true }
   );
-  const s3Url = triggerRes.headers["location"];
-  if (!s3Url) throw new Error(`[${venueKey}] No S3 URL for item fulfillment (status ${triggerRes.status})`);
+  if (genRes.status === 401) {
+    token = await refreshToastWebToken();
+    genRes = await axios.post(
+      `${TOAST_ADMIN}/api/service/report-generator/v1/customReports/generate`,
+      body,
+      { headers: headers(), validateStatus: () => true }
+    );
+  }
+  if (genRes.status !== 200) {
+    throw new Error(`[${venueKey}] generate API ${genRes.status}: ${JSON.stringify(genRes.data).slice(0, 200)}`);
+  }
 
+  const { reportRequestGuid, status: initStatus } = genRes.data;
+  if (!reportRequestGuid) throw new Error(`[${venueKey}] No reportRequestGuid in generate response`);
+  if (initStatus === "ERROR") throw new Error(`[${venueKey}] Report generation error: ${genRes.data.errorMessage}`);
+
+  // Poll for results — usually COMPLETED immediately, but may be PROCESSING
+  const resultsUrl = `${TOAST_ADMIN}/api/service/report-generator/v1/reportRequest/${reportRequestGuid}/results`;
   for (let i = 0; i < 20; i++) {
-    await new Promise(r => setTimeout(r, 3000));
-    const s3Res = await axios.get(s3Url, { validateStatus: () => true });
-    const d = s3Res.data;
-    if (d.downloadUrl) {
-      const csvRes = await axios.get(d.downloadUrl, { responseType: "arraybuffer", validateStatus: () => true });
-      const csvText = Buffer.from(csvRes.data).toString("latin1");
-      const rows = parseCSV(csvText);
-      // Parse into {menuItem, count, avgSeconds}
-      const items = rows
-        .filter(r => r["Menu Item"] || r["Item"] || r["item"])
-        .map(r => {
-          const menuItem = r["Menu Item"] || r["Item"] || r["item"] || "";
-          const count = parseInt(r["Count"] || r["count"] || r["Quantity"] || "0") || 0;
-          const avgStr = r["Avg Fulfillment Time"] || r["Average Fulfillment Time"] || r["avg_fulfillment_time"] || "";
-          let avgSeconds = null;
-          if (typeof avgStr === "number") {
-            avgSeconds = avgStr;
-          } else {
-            const m = String(avgStr).match(/(\d+)\s*minute[^0-9]*(\d+)\s*second/);
-            if (m) avgSeconds = parseInt(m[1]) * 60 + parseInt(m[2]);
-            else {
-              const m2 = String(avgStr).match(/(\d+)\s*minute/);
-              if (m2) avgSeconds = parseInt(m2[1]) * 60;
-              else {
-                const m3 = String(avgStr).match(/^(\d+):(\d+)$/);
-                if (m3) avgSeconds = parseInt(m3[1]) * 60 + parseInt(m3[2]);
-                else {
-                  const m4 = String(avgStr).match(/(\d+)\s*second/);
-                  if (m4) avgSeconds = parseInt(m4[1]);
-                }
-              }
-            }
-          }
-          return { menuItem, count, avgSeconds };
-        })
-        .filter(r => r.menuItem && r.avgSeconds != null);
+    await new Promise(r => setTimeout(r, i === 0 && initStatus === "COMPLETED" ? 0 : 3000));
+    const r = await axios.get(resultsUrl, { headers: headers(), validateStatus: () => true });
+    if (r.status === 200) {
+      const panelData = r.data[FULFILLMENT_TABLE_PANEL];
+      if (!panelData) throw new Error(`[${venueKey}] No panel data in results`);
+      const items = panelData
+        .filter(row => row.MENU_ITEM_NAME && row.AVERAGE_ITEM_FULFILLMENT_TIME != null)
+        .map(row => ({
+          menuItem: row.MENU_ITEM_NAME,
+          count: row.COUNT || 0,
+          avgSeconds: Math.round(row.AVERAGE_ITEM_FULFILLMENT_TIME),
+        }));
       console.log(`  [toast] ${venueKey}: ${items.length} menu items from custom report`);
       return items;
     }
-    if (d.status === "ERROR" || d.status === "FAILED") throw new Error(`[${venueKey}] Custom report error: ${d.message}`);
+    if (r.status === 202 || r.status === 404) continue; // still processing
+    throw new Error(`[${venueKey}] Results fetch ${r.status}: ${JSON.stringify(r.data).slice(0, 200)}`);
   }
   throw new Error(`[${venueKey}] Item fulfillment custom report timed out`);
 }
@@ -395,7 +479,7 @@ async function main() {
   console.log("\n─── Item Fulfillment Custom Reports ───");
   for (const [venue, uuid] of Object.entries(CUSTOM_REPORT_IDS)) {
     try {
-      const items = await fetchItemFulfillment(venue, uuid);
+      const items = await fetchItemFulfillment(venue, uuid, startDate, endDate);
       const outPath = path.join(weekDir, `item-fulfillment-${venue}.json`);
       saveJSON(outPath, { weekLabel, startDate, endDate, venue, items });
       if (!weekEntry.venues[venue]) weekEntry.venues[venue] = {};

@@ -551,6 +551,17 @@ server.tool(
 // ═══════════════════════════════════════════════════════════
 
 const TOAST_WEB_TOKEN_FILE = "C:\\Cursor\\toast-mcp-server\\toast-web-token.json";
+const TOAST_RESTAURANT_SET_GUID = "96e8e2b8-d95d-4432-b574-ceee10cf17d5";
+
+function getMsGuid() {
+  const session = JSON.parse(fs.readFileSync(SESSION_FILE, "utf8"));
+  const toastCookie = session.cookies.find(c => c.name === "TOAST_SESSION");
+  if (!toastCookie) throw new Error("TOAST_SESSION cookie not found");
+  const decoded = decodeURIComponent(toastCookie.value);
+  const m = decoded.match(/msGuid=([a-f0-9-]{36})/);
+  if (!m) throw new Error("msGuid not found in TOAST_SESSION cookie");
+  return m[1];
+}
 
 async function refreshToastWebToken() {
   const { chromium } = await import("playwright");
@@ -654,12 +665,21 @@ async function fetchItemFulfillmentReport(dateRange, venue = "all", startDateOpt
   const token = await getToastWebToken();
   const { startDate, endDate } = dateRangeToYYYYMMDD(dateRange, startDateOpt, endDateOpt);
 
+  // Use the first venue's location GUID for the restaurant-external-id header
+  // (org-wide headers work across all venues for this RDG account)
+  const primaryLocationGuid = venue === "all"
+    ? Object.values(FULFILLMENT_VENUE_GUIDS)[0]
+    : FULFILLMENT_VENUE_GUIDS[venue];
+
   const headers = {
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     Accept: "application/json",
     Referer: "https://www.toasttab.com/restaurants/admin/reports/custom-reports/348049c9-17de-45f8-8417-326b31dabf6a",
+    "toast-restaurant-external-id": primaryLocationGuid,
+    "toast-management-set-guid": getMsGuid(),
+    "toast-restaurant-set-guid": TOAST_RESTAURANT_SET_GUID,
   };
 
   // Build locations array — all venues in one inner array for aggregation
@@ -700,27 +720,38 @@ async function fetchItemFulfillmentReport(dateRange, venue = "all", startDateOpt
     parameters: { customReportGuid: "348049c9-17de-45f8-8417-326b31dabf6a" },
   };
 
-  const res = await axios.post(
+  let genRes = await axios.post(
     "https://www.toasttab.com/api/service/report-generator/v1/customReports/generate",
     body,
     { headers, validateStatus: () => true }
   );
 
-  if (res.status === 401) {
-    // Token expired — refresh and retry once
+  if (genRes.status === 401) {
     const freshToken = await refreshToastWebToken();
-    headers.Authorization = `Bearer ${freshToken.token}`;
-    const retry = await axios.post(
+    headers.Authorization = `Bearer ${freshToken}`;
+    genRes = await axios.post(
       "https://www.toasttab.com/api/service/report-generator/v1/customReports/generate",
       body,
       { headers, validateStatus: () => true }
     );
-    if (retry.status !== 200) throw new Error(`Report generator API ${retry.status}: ${JSON.stringify(retry.data).slice(0, 200)}`);
-    return retry.data;
   }
 
-  if (res.status !== 200) throw new Error(`Report generator API ${res.status}: ${JSON.stringify(res.data).slice(0, 200)}`);
-  return res.data;
+  if (genRes.status !== 200) throw new Error(`Report generator API ${genRes.status}: ${JSON.stringify(genRes.data).slice(0, 200)}`);
+
+  const { reportRequestGuid, status: initStatus } = genRes.data;
+  if (!reportRequestGuid) throw new Error("No reportRequestGuid in generate response");
+  if (initStatus === "ERROR") throw new Error(`Report generation error: ${genRes.data.errorMessage}`);
+
+  // Poll for results
+  const resultsUrl = `https://www.toasttab.com/api/service/report-generator/v1/reportRequest/${reportRequestGuid}/results`;
+  for (let i = 0; i < 20; i++) {
+    await new Promise(r => setTimeout(r, i === 0 && initStatus === "COMPLETED" ? 0 : 3000));
+    const r = await axios.get(resultsUrl, { headers, validateStatus: () => true });
+    if (r.status === 200) return r.data;
+    if (r.status === 202 || r.status === 404) continue;
+    throw new Error(`Results fetch ${r.status}: ${JSON.stringify(r.data).slice(0, 200)}`);
+  }
+  throw new Error("Item fulfillment report timed out waiting for results");
 }
 
 server.tool(
