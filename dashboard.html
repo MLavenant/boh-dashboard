@@ -179,7 +179,7 @@ table.menu-tbl tr:hover td{background:#1e2533}
   </div>
   <div class="card">
     <h2>Visual 3 — Load vs Performance</h2>
-    <p class="note">Bucketed view (10-ticket steps): avg fulfillment time per band.</p>
+    <p class="note">Bucketed view (10-ticket steps): avg fulfillment time per band. <span style="color:#9aa0aa;font-size:11px">Buckets group all concurrent ticket counts in that range.</span></p>
     <canvas id="cLoadPerf" style="max-height:260px"></canvas>
     <div class="legend">
       <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
@@ -259,29 +259,6 @@ table.menu-tbl tr:hover td{background:#1e2533}
       <span><span class="sw" style="background:#1a1d24"></span>No data</span>
     </div>
   </div>
-</div>
-
-<div class="card" id="serviceSplitCard">
-  <h2>🌞 Lunch vs 🌙 Dinner — Service Comparison</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-    <div style="background:#1a1e28;border-radius:8px;padding:16px;border-left:3px solid #f59e0b">
-      <div style="color:#f59e0b;font-weight:700;margin-bottom:10px">🌞 LUNCH (11am–3pm)</div>
-      <div class="kpis">
-        <div class="kpi"><div class="v" id="ssLunchFul">—</div><div class="l">Avg fulfillment</div></div>
-        <div class="kpi"><div class="v" id="ssLunchGuests">—</div><div class="l">Total guests</div></div>
-        <div class="kpi"><div class="v" id="ssLunchPeak">—</div><div class="l">Peak hour</div></div>
-      </div>
-    </div>
-    <div style="background:#1a1e28;border-radius:8px;padding:16px;border-left:3px solid #ef4444">
-      <div style="color:#ef4444;font-weight:700;margin-bottom:10px">🌙 DINNER (5pm–11pm)</div>
-      <div class="kpis">
-        <div class="kpi"><div class="v" id="ssDinnerFul">—</div><div class="l">Avg fulfillment</div></div>
-        <div class="kpi"><div class="v" id="ssDinnerGuests">—</div><div class="l">Total guests</div></div>
-        <div class="kpi"><div class="v" id="ssDinnerPeak">—</div><div class="l">Peak hour</div></div>
-      </div>
-    </div>
-  </div>
-  <canvas id="lunchDinnerChart" height="120"></canvas>
 </div>
 
 </section>
@@ -1516,17 +1493,20 @@ function renderStations() {
     const topItems = items.slice(0, 20);
     let itemsHtml = '';
     if (topItems.length > 0) {
-      const maxSec = Math.max(...topItems.map(i=>i.avg_sec), s.exp_sec||0, 900);
+      const maxSec = Math.max(...topItems.map(i=>i.avgFulSec||0), s.exp_sec||0, 900);
       itemsHtml = '<table class="items-table"><thead><tr><th>Menu Item</th><th>Count</th><th>Avg Time</th><th>vs Target</th><th style="min-width:120px">Bar</th></tr></thead><tbody>';
       topItems.forEach(it => {
-        const over = it.avg_sec > (s.exp_sec||900);
-        const delta = s.exp_sec ? it.avg_sec - s.exp_sec : it.avg_sec - 900;
+        const avg = it.avgFulSec || 0;
+        const name = it.menuItem || '—';
+        const cnt = it.qty || 0;
+        const over = avg > (s.exp_sec||900);
+        const delta = s.exp_sec ? avg - s.exp_sec : avg - 900;
         const deltaStr = s.exp_sec
           ? (delta>0?'<span style="color:#e2706a">+'+fmtSec(delta)+'</span>':'<span style="color:#74d39a">'+fmtSec(-delta)+' under</span>')
           : '—';
-        const pct = Math.min(100, (it.avg_sec / maxSec) * 100);
+        const pct = Math.min(100, (avg / maxSec) * 100);
         const barColor = over ? '#ef4444' : '#22c55e';
-        itemsHtml += '<tr><td>'+(over?'<span style="color:#e2706a">'+it.item+'</span>':it.item)+'</td><td style="color:#9aa0aa">'+it.count+'</td><td style="font-weight:600">'+fmtSec(it.avg_sec)+'</td><td>'+deltaStr+'</td><td><div class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div><span style="font-size:10px;color:#9aa0aa;white-space:nowrap">'+fmtSec(it.avg_sec)+'</span></div></td></tr>';
+        itemsHtml += '<tr><td>'+(over?'<span style="color:#e2706a">'+name+'</span>':name)+'</td><td style="color:#9aa0aa">'+cnt+'</td><td style="font-weight:600">'+fmtSec(avg)+'</td><td>'+deltaStr+'</td><td><div class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div><span style="font-size:10px;color:#9aa0aa;white-space:nowrap">'+fmtSec(avg)+'</span></div></td></tr>';
       });
       itemsHtml += '</tbody></table>';
       if (items.length > 20) itemsHtml += '<p style="font-size:11px;color:#9aa0aa;margin:6px 0 0">+'+(items.length-20)+' more items</p>';
@@ -1560,7 +1540,7 @@ function renderStations() {
       '<details style="margin-top:16px;cursor:pointer"><summary style="font-size:13px;font-weight:600;color:#d9a441;outline:none">❓ WHY is this station slow? (top 3 items)</summary>' +
       '<div style="margin-top:8px;background:#1a1d25;border-radius:8px;padding:10px;border:1px solid #2d3448">' +
       (items.length > 0 ? '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;color:#9aa0aa;padding:4px 8px">Item</th><th style="text-align:right;color:#9aa0aa;padding:4px 8px">Avg Time</th><th style="text-align:right;color:#9aa0aa;padding:4px 8px">Tickets</th></tr></thead><tbody>' +
-        items.slice(0,3).map(it => '<tr><td style="padding:4px 8px;color:#e8eaed">' + it.item + '</td><td style="padding:4px 8px;text-align:right;font-weight:600;color:' + (it.avg_sec > (s.exp_sec||900) ? '#ef4444' : '#22c55e') + '">' + fmtSec(it.avg_sec) + '</td><td style="padding:4px 8px;text-align:right;color:#9aa0aa">' + it.count + '</td></tr>').join('') +
+        items.slice(0,3).map(it => '<tr><td style="padding:4px 8px;color:#e8eaed">' + (it.menuItem||'—') + '</td><td style="padding:4px 8px;text-align:right;font-weight:600;color:' + ((it.avgFulSec||0) > (s.exp_sec||900) ? '#ef4444' : '#22c55e') + '">' + fmtSec(it.avgFulSec||0) + '</td><td style="padding:4px 8px;text-align:right;color:#9aa0aa">' + (it.qty||0) + '</td></tr>').join('') +
         '</tbody></table>'
       : '<p style="color:#9aa0aa;font-size:12px;margin:0">No item data available.</p>') +
       '</div></details>';
@@ -1612,7 +1592,7 @@ function renderMenuItems() {
   Object.entries(STATION_ITEMS).forEach(([station, items]) => {
     if (!isFoodStation(station)) return;
     (items || []).forEach(it => {
-      if (!itemStationMap[it.item]) itemStationMap[it.item] = station;
+      if (!itemStationMap[it.menuItem]) itemStationMap[it.menuItem] = station;
     });
   });
 
@@ -1641,9 +1621,8 @@ function renderMenuItems() {
     const stnData = STATIONS_DATA.find(s => s.station === station);
     const stnExpSec = stnData ? stnData.exp_sec : 0;
     (items || []).forEach(it => {
-      // Use item's own exp_sec if available (from summary), else use station target
-      if (!itemExpSecMap[it.item] && stnExpSec > 0) {
-        itemExpSecMap[it.item] = stnExpSec;
+      if (!itemExpSecMap[it.menuItem] && stnExpSec > 0) {
+        itemExpSecMap[it.menuItem] = stnExpSec;
       }
     });
   });
@@ -2060,67 +2039,6 @@ function renderKPIs() {
   }
 }
 
-// ============================================================
-// VISUAL: Lunch vs Dinner Service Split
-// ============================================================
-function renderServiceSplit() {
-  const HMF = getD().hmFul || {};
-  const HMG = getD().hmGuests || {};
-  const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  const LUNCH_HRS = ['11','12','13','14'];
-  const DINNER_HRS = ['17','18','19','20','21','22'];
-
-  function serviceStats(hrs) {
-    let fulSum=0, fulCount=0, guestSum=0;
-    let peakHr='—', peakVal=0;
-    DAYS.forEach(day => {
-      hrs.forEach(hr => {
-        const f = HMF[day]&&HMF[day][hr]!=null ? HMF[day][hr] : null;
-        const g = HMG[day]&&HMG[day][hr] ? HMG[day][hr] : 0;
-        if (f!=null) { fulSum+=f; fulCount++; if(f>peakVal){peakVal=f;peakHr=hr+':00';} }
-        guestSum += g;
-      });
-    });
-    return { ful: fulCount>0?(fulSum/fulCount).toFixed(1)+'min':'—', guests: guestSum, peak: peakHr };
-  }
-
-  const lunch = serviceStats(LUNCH_HRS);
-  const dinner = serviceStats(DINNER_HRS);
-
-  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
-  set('ssLunchFul', lunch.ful); set('ssLunchGuests', lunch.guests); set('ssLunchPeak', lunch.peak);
-  set('ssDinnerFul', dinner.ful); set('ssDinnerGuests', dinner.guests); set('ssDinnerPeak', dinner.peak);
-
-  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const fullDays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  const lunchData = fullDays.map(day => {
-    const vals = LUNCH_HRS.map(hr => HMF[day]&&HMF[day][hr]!=null?HMF[day][hr]:null).filter(v=>v!=null);
-    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
-  });
-  const dinnerData = fullDays.map(day => {
-    const vals = DINNER_HRS.map(hr => HMF[day]&&HMF[day][hr]!=null?HMF[day][hr]:null).filter(v=>v!=null);
-    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
-  });
-
-  const thrLine = {id:'thr2',afterDraw(chart){const{ctx,chartArea:a,scales}=chart;if(!a||!scales.y)return;const yy=scales.y.getPixelForValue(15);if(yy<a.top||yy>a.bottom)return;ctx.save();ctx.strokeStyle='#e2706a';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(a.left,yy);ctx.lineTo(a.right,yy);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#e2706a';ctx.font='11px sans-serif';ctx.fillText('15 min target',a.left+6,yy-4);ctx.restore();}};
-
-  const el = document.getElementById('lunchDinnerChart');
-  if (el) {
-    if (el._chart) el._chart.destroy();
-    el._chart = new Chart(el, {
-      type:'bar',
-      data:{ labels:days, datasets:[
-        {label:'🌞 Lunch',data:lunchData,backgroundColor:'rgba(245,158,11,0.7)',borderRadius:4},
-        {label:'🌙 Dinner',data:dinnerData,backgroundColor:'rgba(239,68,68,0.7)',borderRadius:4}
-      ]},
-      options:{plugins:{legend:{labels:{color:'#9aa0aa'}}},scales:{
-        x:{grid:{display:false},ticks:{color:'#9aa0aa'}},
-        y:{title:{display:true,text:'Avg fulfillment (min)'},grid:{color:'#262a33'},ticks:{color:'#9aa0aa'},suggestedMax:20}
-      }},
-      plugins:[thrLine]
-    });
-  }
-}
 
 // ============================================================
 // RENDER ALL
@@ -2132,7 +2050,6 @@ function renderAll() {
   renderLoadPerf();
   render3D();
   renderHeatmaps();
-  renderServiceSplit();
   renderStationBreaking();
   renderStationWoW();
   renderStations();
