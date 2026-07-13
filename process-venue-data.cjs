@@ -16,7 +16,21 @@ try {
   STATION_TARGETS = allTargets[configKey] || {};
 } catch(e) { /* targets file optional */ }
 
-const DATA_DIR = path.join(__dirname, 'data', '2026-W27');
+// Use explicit week arg (e.g. 2026-W28) or auto-detect latest week directory
+const weekArg = process.argv[3];
+let weekDir;
+if (weekArg) {
+  weekDir = weekArg;
+} else {
+  const dataRoot = path.join(__dirname, 'data');
+  const entries = fs.readdirSync(dataRoot)
+    .filter(d => /^\d{4}-W\d{2}$/.test(d))
+    .sort();
+  if (!entries.length) { console.error('No week directories found in data/'); process.exit(1); }
+  weekDir = entries[entries.length - 1];
+  console.log(`Auto-detected week: ${weekDir}`);
+}
+const DATA_DIR = path.join(__dirname, 'data', weekDir);
 const ktPath = path.join(DATA_DIR, `kitchen-timing-${venueArg}.json`);
 const coversPath = path.join(DATA_DIR, `covers-${venueArg}.json`);
 

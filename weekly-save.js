@@ -446,6 +446,21 @@ async function main() {
     console.error("ERROR building dashboard data:", err.message);
   }
 
+  // ── Step 4b: Process per-venue data into venue JSON files ─────────────────
+  console.log("\n─── Processing venue data files ───");
+  const PROCESS_VENUES = ["casa_neos", "ava_coconut_grove", "ava_winter_park", "mila", "claudie"];
+  for (const v of PROCESS_VENUES) {
+    try {
+      const { stdout: sv, stderr: ev } = await exec(
+        `node C:\\Cursor\\toast-mcp-server\\process-venue-data.cjs ${v} ${weekLabel}`
+      );
+      if (sv) console.log(sv.trim());
+      if (ev) console.error(ev.trim());
+    } catch (err) {
+      console.error(`ERROR processing venue data for ${v}:`, err.message);
+    }
+  }
+
   // ── Step 5: Rebuild the HTML dashboard ───────────────────────────────────
   console.log("\n─── Rebuilding HTML dashboard ───");
   try {
