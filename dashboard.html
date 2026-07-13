@@ -518,11 +518,13 @@ function computeBreakingPoint() {
   const curve = getD().curve || [];
   let bpEntry = null;
   for (let i = 0; i < curve.length; i++) {
-    // Skip first 10 load levels (index 0-9, i.e. 1-10 concurrent tickets)
     if (i < 10) continue;
     const d = curve[i];
     if (d.occ < 5) continue;
-    if (d.ful >= getThreshold()) { bpEntry = d; break; }
+    // Require 2 consecutive load levels above threshold
+    if (d.ful >= getThreshold() && curve[i+1] && curve[i+1].ful >= getThreshold()) {
+      bpEntry = d; break;
+    }
   }
   if (!bpEntry) return { tickets: null, guests: null };
   return { tickets: bpEntry.conc, guests: Math.round(bpEntry.guests) };
