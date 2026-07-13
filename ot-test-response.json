@@ -1,0 +1,12 @@
+{
+  "status": 401,
+  "data": {
+    "timestamp": "2026-07-06T18:51:56.144Z",
+    "path": "/gateway/proxies/restaurant-reporting/reportingBiDatasources/api/v5/reservations/",
+    "status": 401,
+    "error": "Unauthorized",
+    "requestId": "71f2ee2c",
+    "message": "Missing authorization token for request",
+    "exception": "org.springframework.web.server.ResponseStatusException"
+  }
+}

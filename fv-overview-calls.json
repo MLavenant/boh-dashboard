@@ -1,0 +1,58 @@
+{
+  "https://api.fourvenues.com/sesion/?query={}&options={%22disableCache%22:true}": {
+    "status": 200,
+    "body": "{\"data\":{\"sesion_id\":\"Amrgwu1hg08ci018v999199g0DyFnYlV\",\"usuario\":{\"_id\":\"Xmip4ribu017o017cewvjhixlVTrVIVx\",\"email\":\"matthias@rivieradininggroup.com\",\"telefono\":\"\",\"username\":\"matthias-lavenant\",\"profile\":{\"nombre\":\"Matthias\",\"apellidos\":\"Lavenant\",\"genero\":\"\",\"imagen\":\"\"},\"negocios\":[\"Mmgkyvi0903mo01cm3vxg0phrtTEPpSM\",\"ted9ver3qjyf4qwdi9qj1573f8gqgumq\",\"lah0f2isk8qmsg0zapu016rarffvp0xz\",\"q7rdej92lcyptxq5ojdp77jdzf984jj8\",\"mrph20a941lojvdykvq598p0b8j3576j\",\"fdtlrv54sqvbokh698xi5smj8ieytx9t\"],\"anfitriones\":[\"Mmgkyvi0903mo01cm3vxg0phrtTEPpSM\",\"mrph20a941lojvdykvq598p0b8j3576j\",\"lah0f2isk8qmsg0zapu016rarffvp0xz\"],\"proveedores\":[],\"archivados\":[],\"favoritos\":[],\"ultimo_acceso\":1783807750,\"language\":{\"code\":\"en-GB\"},\"created_at\":1764713348491,\"created_by\":\"imhdrsw2a01vd01930hr9d082aJSIyL5\",\"updated_at\":1783807750031,\"updated_by\":\"\",\"removed_at\":0,\"last_hs_sync_at\":1783803750,\"is_superuser\":false}},\"process_time\":\"493ms\"}"
+  },
+  "https://api.fourvenues.com/no-auth/featuresflags/notices?environment=production&userSlug=matthias-lavenant": {
+    "status": 200,
+    "body": "{\"data\":{\"key\":\"notices\",\"active\":false},\"process_time\":\"7ms\"}"
+  },
+  "https://api.fourvenues.com/announcements/latest": {
+    "status": 200,
+    "body": "{\"data\":{\"_id\":\"zhqjir79nffb887u72v8sujz285dizkn\",\"notion_link_es\":\"https://fourvenues.notion.site/ebd//b68f3660287d4f5290471d43155b8fa0\",\"notion_link_en\":\"https://fourvenues.notion.site/ebd//0a7d223ae21641f69a1847a063b4e0eb\",\"title\":\"Whats' New\",\"user_permissions\":[\"all\"],\"read\":false},\"process_time\":\"5ms\"}"
+  },
+  "https://api.fourvenues.com/notificaciones_info/?query={}&options={}": {
+    "status": 200,
+    "body": "{\"data\":{\"sin_leer\":1201,\"sin_visitar\":1201},\"process_time\":\"7ms\"}"
+  },
+  "https://api.fourvenues.com/notificaciones/?query={}&options={%22skip%22:0,%22limit%22:20,%22sort%22:{%22created_at%22:-1}}": {
+    "status": 200,
+    "body": "{\"data\":[{\"_id\":\"s0nvvnsem0xp71npvnbxd1d0kzxji05g\",\"usuario_id\":\"Xmip4ribu017o017cewvjhixlVTrVIVx\",\"negocio_id\":\"Mmgkyvi0903mo01cm3vxg0phrtTEPpSM\",\"enlace\":\"https://pro.fourvenues.com/mila1/x5lwmea9jt6kmi3zx1xoo93d5mjqc70r/sales/bookings?res=ez894auiz6egzltctb2vt2bocetbb59z\",\"imagen\":\"https://fourvenues.com/cdn-cgi/imagedelivery/kWuoTchaMsk7Xnc_FNem7A/ac7c8862-4344-4a08-4294-a8822dbf6200/w=100,h=100\",\"titulo\":\"Pending reservation at MILA LOUNGE.\",\"mensaje\":\"Shane Thakrar of $2,500.00 at SAMANTHA LOVERIDGE.\",\"mensajeObj\":{\"lng\":\"en-GB\",\"precio\":\"$2,500.00\",\"negocio\":\"MILA LOUNGE\",\"cuando\":\"SAMANTHA LOVERIDGE\",\"reserva\":\"Shane Thakrar\",\"slug\":\"notificaciones_profesionales:reservado-pendiente-mensaje\",\"interpolation\":{\"escapeValue\":false}},\"leida\":0,\"visitada\":0,\"tag\":\"reservado-pendiente\",\"app\":\"profesionales\",\"created_at\":1783804666671,\"created_by\":\"\",\"updated_at\":1783804666671,\"updated_by\":\"\",\"removed_at\":0,\"id\":\"s0nvvnsem0xp71npvnbxd1d0kzxji05g\"},{\"_id\":\"v131qaf9x1dmvdy0txs2pg1fz0s0896b\",\"usuario_id\":\"Xmip4ribu017o017cewvjhixlVTrVIVx\",\"negocio_id\":\"lah0f2isk8qmsg0zapu016rarffvp0xz\",\"enlace\":\"https://pro.fourvenues.com/casa-neos1/f8dpai5r3qb9fzumitl4ljt30d3e0s5v/sales/bookings?res=kqtleb0ypl7rys4zh5fudp83o4kl2y7g\",\"imagen\":\"https://fourvenues.com/cdn-cgi/imagedelivery/kWuoTchaMsk7Xnc_FNem7A/0fb1bb06-277c-4b6c-1c53-e7859e74b600/w=100,h=100\",\"titulo\":\"Pending reservation at CASA NEOS BEACH CLUB.\",\"mensaje\":\"Jordan Malonga of $3,000.00 at AMOG.\",\"mensajeObj\":{\"lng\":\"en-GB\",\"precio\":\"$3,000.00\",\"negocio\":\"CASA NEOS BEACH CLUB\",\"cuando\":\"AMOG\",\"reserva\":\"Jordan Malonga\",\"slug\":\"notificaciones_profesionales:reservado-pendiente-mensaje\",\"interpolation\":{\"escapeValue\":false}},\"leida\":0,\"visitada\":0,\"tag\":\"reservado-pendiente\",\"app\":\"profesionales\",\"created_at\":1783799957994,\"created_by\":\"\",\"updated_at\":1783799957994,\"updated_by\":\"\",\"removed_at\":0,\"id\":\"v131qaf9x1dmvdy0txs2pg1fz0s0896b\"},{\"_id\":\"pn0b12o0wqbierxos196midpskquipha\",\"usuario_id\":\"Xmip4ribu017o017cewvjhixlVTrVIVx"
+  },
+  "https://api.fourvenues.com/pantallas_negocios/?query={%22slug%22:%22mila1%22}&options={}": {
+    "status": 200,
+    "body": "{\"data\":[{\"_id\":\"Mmgkyvi0903mo01cm3vxg0phrtTEPpSM\",\"tipo\":\"lounge\",\"estado\":\"activo\",\"activo\":true,\"nombre\":\"MILA LOUNGE\",\"slug\":\"mila1\",\"anfitriones\":[],\"comercial_id\":\"Omabhw8q101h0019p4b0tf8jdemMsojo\",\"account_managers\":[\"Ll0qolqaw2h8a01d99edv2ytdoG0VK6y\"],\"primeros_pasos\":[],\"autonomo\":false,\"payments_provider\":\"adyen\",\"merchant_name\":\"FourvenuesMKPL_BANK_USD_ECOM\",\"currency\":\"USD\",\"countryCode\":\"US\",\"regla_tarifa\":{\"_id\":\"Klh63q5a3002w016l3s1p6hyaOV4HeBR\",\"slug\":\"usd_usa_default\",\"descripcion\":\"usd_70e_70r_015\",\"planes\":{\"0\":{\"fijo\":{\"mensual\":0,\"anual\":0},\"ggdd\":{\"entradas\":0.07,\"reservas\":0.07},\"sms\":0.15,\"cambio_nombre\":0.5,\"marketing\":{\"email\":0.05,\"email_incluidos\":0,\"sms\":0.15,\"sms_incluidos\":0}},\"1\":{\"fijo\":{\"mensual\":100,\"anual\":80},\"ggdd\":{\"entradas\":0.07,\"reservas\":0.07},\"sms\":0.15,\"cambio_nombre\":0.5,\"marketing\":{\"email\":0.05,\"email_incluidos\":1000,\"sms\":0.15,\"sms_incluidos\":0}},\"2\":{\"fijo\":{\"mensual\":200,\"anual\":160},\"ggdd\":{\"entradas\":0.07,\"reservas\":0.07},\"sms\":0.15,\"cambio_nombre\":0.5,\"marketing\":{\"email\":0.05,\"email_incluidos\":5000,\"sms\":0.15,\"sms_incluidos\":0}},\"3\":{\"fijo\":{\"mensual\":350,\"anual\":280},\"ggdd\":{\"entradas\":0.07,\"reservas\":0.07},\"sms\":0.15,\"cambio_nombre\":0.5,\"marketing\":{\"email\":0.05,\"email_incluidos\":100000,\"sms\":0.15,\"sms_incluidos\":0}}},\"divisa\":\"USD\",\"default\":true,\"created_at\":1683021801531,\"created_by\":\"\",\"updated_at\":1683021801531,\"updated_by\":\"\",\"removed_at\":0},\"usa_dias\":false,\"show_imagen_plano\":false,\"is_onboarding_completed\":true,\"created_at\":1760108027625,\"updated_at\":1769469346926,\"removed_at\":0,\"imagen\":\"https://fourvenues.com/cdn-cgi/imagedelivery/kWuoTchaMsk7Xnc_FNem7A/ac7c8862-4344-4a08-4294-a8822dbf6200/w=100,h=100\",\"portada\":\"https://fourvenues.com/cdn-cgi/imagedelivery/kWuoTchaMsk7Xnc_FNem7A/ba0412d0-73ad-4046-5bc6-010f2e7ea500/w=550\",\"nombre_sms\":\"\",\"imagen_plano\":\"\",\"is_pos_enabled\":null,\"gateway_account_id\":null,\"permisos\":[\"admin\"],\"grupos_jefe\":[],\"plan\":3,\"next_plan\":3,\"razon\":\"Mila Miami LLC\",\"nif\":\"82-3"
+  },
+  "https://api.fourvenues.com/no-auth/featuresflags/new-sales-report?environment=production&userSlug=matthias-lavenant&organizationSlug=mila1": {
+    "status": 200,
+    "body": "{\"data\":{\"key\":\"new-sales-report\",\"active\":true},\"process_time\":\"1ms\"}"
+  },
+  "https://api.fourvenues.com/no-auth/featuresflags/commissions-on?environment=production&userSlug=matthias-lavenant&organizationSlug=mila1": {
+    "status": 200,
+    "body": "{\"data\":{\"key\":\"commissions-on\",\"active\":false},\"process_time\":\"3ms\"}"
+  },
+  "https://api.fourvenues.com/no-auth/featuresflags/season-passes?environment=production&userSlug=matthias-lavenant&organizationSlug=mila1": {
+    "status": 200,
+    "body": "{\"data\":{\"key\":\"season-passes\",\"active\":false},\"process_time\":\"2ms\"}"
+  },
+  "https://api.fourvenues.com/no-auth/featuresflags/rollout-siae?environment=production&userSlug=matthias-lavenant&organizationSlug=mila1": {
+    "status": 200,
+    "body": "{\"data\":{\"key\":\"rollout-siae\",\"active\":false},\"process_time\":\"3ms\"}"
+  },
+  "https://api.fourvenues.com/no-auth/featuresflags/restrict-service-fees-button?environment=production&userSlug=matthias-lavenant&organizationSlug=mila1": {
+    "status": 200,
+    "body": "{\"data\":{\"key\":\"restrict-service-fees-button\",\"active\":false},\"process_time\":\"2ms\"}"
+  },
+  "https://api.fourvenues.com/event_calendars/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM": {
+    "status": 200,
+    "body": "{\"data\":[{\"_id\":\"edpczxq0920xndsafmq9ef7vetdxj0x5\",\"name\":\"Miami Art Week\",\"description\":null,\"color\":\"orange\",\"code\":\"hyyoi\",\"totalEvents\":6,\"event_ids\":[\"c65w2tjxzrj2c9dglh5wul8wlpo273ea\",\"i4isqhoes2bqx7qdq2mmxhesuqcf3ohd\",\"jptufksfr8foaioaz6hahk2o497bgf06\",\"kqafwvbun33bbwanebvw5ok128dk3kfz\",\"kua22vemv05xqmodl1dwp9peebp9uw8q\",\"m7sk03aaln02mutp9bn2n3d5l5pxmt5y\"]},{\"_id\":\"y13p22xh1igwx3g0x0gytmuywm3jcred\",\"name\":\"NYE WEEK\",\"description\":null,\"color\":\"red\",\"code\":\"kaerz\",\"totalEvents\":6,\"event_ids\":[\"cndnucvsqvx2ybi18f959oov8ivajlq9\",\"doll815okrh58cebjl3k6f7fuoivfvvv\",\"kfb0i5fr6symqmku0teuz0ql8mobw4kv\",\"ku1uo93zwcna3wkkvcit7q5ftdq5g5g6\",\"rfbkhy4k6aujstvmj8ujpwnt5jsbklif\",\"t6bzcudk0s5ztwzfcebzmmshblgn06e0\"]}],\"process_time\":\"17ms\"}"
+  },
+  "https://api.fourvenues.com/reports/sales-report": {
+    "status": 200,
+    "body": "{\"data\":{\"currency\":\"USD\",\"summary\":{\"totalSales\":45,\"totalAmount\":{\"amount\":66000,\"currency\":\"USD\"},\"averageTicket\":{\"amount\":1466.6666666666667,\"currency\":\"USD\"}},\"previousPeriod\":{\"totalSales\":35,\"totalAmount\":{\"amount\":33500,\"currency\":\"USD\"},\"averageTicket\":{\"amount\":957.1428571428571,\"currency\":\"USD\"},\"comparison\":{\"totalAmountChange\":97.01492537313433,\"totalSalesChange\":28.57142857142857}},\"byPeriod\":[{\"date\":\"2026-07-04T04:00:00.000Z\",\"service\":\"bookings\",\"totalSales\":2,\"totalAmount\":{\"amount\":6000,\"currency\":\"USD\"}},{\"date\":\"2026-07-06T04:00:00.000Z\",\"service\":\"bookings\",\"totalSales\":2,\"totalAmount\":{\"amount\":3500,\"currency\":\"USD\"}},{\"date\":\"2026-07-07T04:00:00.000Z\",\"service\":\"bookings\",\"totalSales\":2,\"totalAmount\":{\"amount\":0,\"currency\":\"USD\"}},{\"date\":\"2026-07-08T04:00:00.000Z\",\"service\":\"bookings\",\"totalSales\":7,\"totalAmount\":{\"amount\":12500,\"currency\":\"USD\"}},{\"date\":\"2026-07-09T04:00:00.000Z\",\"service\":\"bookings\",\"totalSales\":14,\"totalAmount\":{\"amount\":13000,\"currency\":\"USD\"}},{\"date\":\"2026-07-10T04:00:00.000Z\",\"service\":\"bookings\",\"totalSales\":11,\"totalAmount\":{\"amount\":24000,\"currency\":\"USD\"}},{\"date\":\"2026-07-11T04:00:00.000Z\",\"service\":\"bookings\",\"totalSales\":7,\"totalAmount\":{\"amount\":7000,\"currency\":\"USD\"}}],\"byService\":[{\"service\":\"bookings\",\"totalSales\":45,\"totalAmount\":{\"amount\":66000,\"currency\":\"USD\"},\"percentage\":100}],\"byEvent\":[{\"eventId\":\"cp426pd314wlc3esi896l9x4lmis0uv3\",\"eventName\":\"ONOMA\",\"eventDate\":1783656000,\"eventImage\":\"https://fourvenues.com/cdn-cgi/imagedelivery/kWuoTchaMsk7Xnc_FNem7A/363ea41e-b6bd-494a-6530-8cc0ee2a6f00/w=1350\",\"totalSales\":15,\"totalAmount\":{\"amount\":28000,\"currency\":\"USD\"},\"percentage\":42.42424242424242},{\"eventId\":\"x5lwmea9jt6kmi3zx1xoo93d5mjqc70r\",\"eventName\":\"SAMANTHA LOVERIDGE\",\"eventDate\":1783742400,\"eventImage\":\"https://fourvenues.com/cdn-cgi/imagedelivery/kWuoTchaMsk7Xnc_FNem7A/7d053a00-10e6-4fae-8545-6b32ac1bdc00/w=1350\",\"totalSales\":10,\"totalAmount\":{\"amount\":14000,\"currency\":\"USD\"},\"percentage\":21.21"
+  },
+  "https://api.fourvenues.com/organizations-hosts/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM": {
+    "status": 200,
+    "body": "{\"data\":[],\"process_time\":\"13ms\"}"
+  }
+}

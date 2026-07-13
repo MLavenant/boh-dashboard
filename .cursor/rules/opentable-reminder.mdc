@@ -1,0 +1,38 @@
+---
+description: Reminder to build OpenTable MCP server and integrate covers data into the BOH dashboard
+alwaysApply: true
+---
+
+# Pending: OpenTable MCP Server + Dashboard Integration
+
+## What needs to be built
+
+When the user asks about OpenTable, covers, guests, or the BOH dashboard's empty panels, remind them of this pending task and pick it up.
+
+## Context
+
+The BOH kitchen dashboard (`C:\Cursor\toast-mcp-server\dashboard.html`) has two panels that are intentionally left empty pending OpenTable:
+- **Covers heatmap** — avg concurrent guests by day × hour
+- **Breaking point (guests)** — at what guest count does the kitchen fall behind
+
+The Toast side (Ticket Details, Item Details, dashboard generation) is fully working.
+
+## What to build
+
+1. **OpenTable MCP tool** `get_covers` — fetches reservation/covers data for a venue and date range
+   - Similar pattern to `get_kitchen_timing`: session cookies → internal endpoint → poll → parse
+   - Data needed: Visit Date, Seated Date, Finished Date, Size (party size), Table
+   - Reference data format: `OT` sheet in `C:\Dell\data extraction125 claudie.xlsx` (columns: Visit Date, Seated Date, Finished Date, Size, Table)
+
+2. **Dashboard integration** — feed covers into `rebuild-dashboard.js`:
+   - Populate `D.cov.grid` (day × hour avg concurrent guests)
+   - Compute `D.gbk` (breaking point buckets by guest count)
+   - Compute `D.bp_g` (breaking point guest band)
+
+3. **Credentials needed** — confirm with user whether they have OpenTable API credentials or need to apply for Connect program access before building.
+
+## Files involved
+- `C:\Cursor\toast-mcp-server\index.js` — add `get_covers` tool
+- `C:\Cursor\toast-mcp-server\build-dashboard-data.js` — add OT data processing
+- `C:\Cursor\toast-mcp-server\rebuild-dashboard.js` — populate covers fields
+- `C:\Cursor\toast-mcp-server\dashboard.html` — auto-updated by rebuild script

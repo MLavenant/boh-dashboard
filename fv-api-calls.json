@@ -1,0 +1,26 @@
+[
+  {
+    "url": "https://pro.fourvenues.com/casa-neos1/reports/dashboard-sales",
+    "status": 200,
+    "bodyLen": 13809,
+    "body": "<!doctype html>\n<html class=\"bg-zinc-50 dark:bg-zinc-900\" data-critters-container>\n\n<head>\n\n  <!-- Google Tag Manager -->\n  <script defer>(function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'd"
+  },
+  {
+    "url": "https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js",
+    "status": 200,
+    "bodyLen": 301022,
+    "body": "/*! For license information please see tableau.embedding.3.15.0-pre.6.min.js.LICENSE.txt */\nvar e={1808:e=>{!function(){var t=new RegExp(\"^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$\",\"i\");function r(e){for(var t=\"\",r=0;r<e;r++)t+=(65536*(1+Math.random())|0).toString(16).substring(1);return t}function i(e){if(!e)throw new TypeError(\"Invalid argument; `value` has no value.\");this.value=i.EMPTY,e&&e instanceof i?this.value=e.toString():e&&\"[object String]\"===Object.prototype.toSt"
+  },
+  {
+    "url": "https://api.fourvenues.com/authorization/?query={%22type%22:%22page%22,%22redirect_url%22:%22https://pro.fourvenues.com/casa-neos1/reports/dashboard-s",
+    "status": 200,
+    "bodyLen": 0,
+    "body": ""
+  },
+  {
+    "url": "https://sse.devcycle.com/event-stream?key=azZpGQ.64zbWw:RXCvOj0NO8V5CwpiNhiImhd1n7zsiS0QXgcOWElBxg4&v=1.2&channels=dvc_client_4d31723f0a11e09c31ad5db7",
+    "status": 200,
+    "bodyLen": 0,
+    "body": ""
+  }
+]

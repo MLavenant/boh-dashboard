@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claudie · BOH Dashboard — Page 2: Stations & Menu Items</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0f1115;color:#e8eaed;font:15px/1.5 -apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:24px 20px 64px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:20px}
+h1{font-size:23px;margin:0}
+.sub{color:#9aa0aa}
+.badge{margin-left:auto;color:#9aa0aa;font-size:13px}
+.card{background:#181b22;border:1px solid #262a33;border-radius:12px;padding:18px;margin-bottom:18px}
+.card h2{font-size:16px;margin:0 0 3px;color:#e8eaed}
+.card p.note{color:#9aa0aa;font-size:12px;margin:0 0 14px}
+.legend{display:flex;gap:14px;font-size:12px;color:#9aa0aa;margin-top:10px;flex-wrap:wrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+canvas{width:100%!important}
+.nav{display:flex;gap:10px;margin-bottom:18px}
+.nav a{padding:7px 16px;border-radius:8px;background:#181b22;border:1px solid #262a33;color:#9aa0aa;text-decoration:none;font-size:13px}
+.nav a:hover,.nav a.active{background:#262a33;color:#e8eaed}
+.section-title{font-size:18px;font-weight:700;color:#d9a441;margin:28px 0 12px;padding-bottom:6px;border-bottom:1px solid #262a33}
+footer{color:#9aa0aa;font-size:12px;margin-top:30px;text-align:center}
+.expand-btn{background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:12px;margin-left:10px}
+.expand-btn:hover{color:#e8eaed}
+.detail-row{display:none}
+.detail-row.open{display:table-row}
+table.menu-tbl{width:100%;border-collapse:collapse;font-size:13px}
+table.menu-tbl th{background:#1e2533;color:#9aa0aa;padding:7px 10px;text-align:left;font-weight:600}
+table.menu-tbl td{padding:6px 10px;border-bottom:1px solid #1e2533}
+table.menu-tbl tr:hover td{background:#1e2533}
+.over{color:#e2706a;font-weight:600}
+.ok{color:#74d39a}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Claudie · BOH Dashboard <span style="color:#9aa0aa;font-weight:400;font-size:17px">— Page 2: Stations &amp; Menu Items</span></h1>
+  <span class="badge">Week of Jun 29 – Jul 5, 2026 · Updated Jul 6, 2026</span>
+</header>
+<div class="nav">
+  <a href="dashboard-page1.html">← Page 1: Kitchen Workload</a>
+  <a href="dashboard-page2.html" class="active">Page 2: Stations &amp; Menu Items</a>
+</div>
+
+<!-- ============================================================
+     SECTION A — Station Deep Dive Bar Charts
+     ============================================================ -->
+<div class="section-title">A — Station Deep Dive</div>
+<div class="card">
+  <h2>Station Performance — Actual vs Target</h2>
+  <p class="note">Avg fulfillment time per station (orange bar) vs expected target (grey line). Stations with no target shown in blue. Sorted by avg fulfillment descending. Click a bar to jump to hourly breakdown below.</p>
+  <canvas id="cStations" style="max-height:420px"></canvas>
+  <div class="legend">
+    <span><span class="sw" style="background:#22c55e"></span>On target</span>
+    <span><span class="sw" style="background:#f59e0b"></span>Up to +15% over</span>
+    <span><span class="sw" style="background:#ef4444"></span>&gt;+15% over target</span>
+    <span><span class="sw" style="background:#5aa9e6"></span>No target set</span>
+    <span><span class="sw" style="background:#555;border:1px solid #888"></span>Target line</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION B — Hourly Station Heatmap (detailed)
+     ============================================================ -->
+<div class="section-title">B — Hourly Station Heatmap</div>
+<div class="card">
+  <h2>Station × Hour Fulfillment Heatmap</h2>
+  <p class="note">Avg fulfillment time per station per hour, aggregated across all days of the week. Click a station row to expand day-by-day detail. Color: <strong style="color:#22c55e">green</strong> ≤ target, <strong style="color:#f59e0b">amber</strong> up to +30%, <strong style="color:#ef4444">red</strong> &gt;+30% (absolute scale for no-target stations).</p>
+  <div style="overflow-x:auto">
+    <table id="hmTable" style="border-collapse:collapse;font-size:11.5px;min-width:760px;width:100%"></table>
+  </div>
+  <div class="legend" style="margin-top:10px">
+    <span><span class="sw" style="background:#22c55e"></span>At/below target</span>
+    <span><span class="sw" style="background:#f59e0b"></span>Up to +30% over</span>
+    <span><span class="sw" style="background:#ef4444"></span>&gt;+30% over</span>
+    <span><span class="sw" style="background:#1e2533"></span>No data</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION C — Menu Item Performance
+     ============================================================ -->
+<div class="section-title">C — Menu Item Performance</div>
+<div class="card">
+  <h2>Menu Items — Ranked by Avg Fulfillment Time (slowest first)</h2>
+  <p class="note">Items over 15 min (900 s) are highlighted in red. Source: Summary sheet. No per-item target available — using 15-min absolute threshold.</p>
+  <div style="margin-bottom:12px;display:flex;gap:10px;align-items:center">
+    <label style="color:#9aa0aa;font-size:13px">Show top <select id="menuLimit" style="background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:6px;padding:2px 6px;font-size:13px"><option value="20">20</option><option value="50">50</option><option value="999" selected>All</option></select></label>
+    <label style="color:#9aa0aa;font-size:13px"><input type="checkbox" id="overOnly" style="margin-right:5px">Show over 15 min only</label>
+  </div>
+  <div style="overflow-x:auto">
+    <table class="menu-tbl" id="menuTable">
+      <thead><tr>
+        <th>#</th><th>Menu Item</th><th>Count</th>
+        <th>Avg Time</th><th>Avg Seconds</th><th>vs 15 min</th>
+      </tr></thead>
+      <tbody id="menuBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<footer>Source: <em>Week 20cl2.xlsx</em> (Stations, Station_* tabs, Summary) · Fulfillment = Fired Date → Fulfilled Date</footer>
+</div>
+
+<script>
+const gc = '#262a33';
+Chart.defaults.color = '#9aa0aa';
+Chart.defaults.borderColor = gc;
+Chart.defaults.font.family = 'inherit';
+
+// ===================== DATA =====================
+
+const STATIONS = [
+  {"station":"Back Kitchen","count":213,"avg_sec":645.62,"exp_sec":611.83},
+  {"station":"CL Bar POS 1","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"CL Bar POS 2","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"CL Bar POS 3","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"CL Bar POS 4","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"CL Champagne POS 1","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"CL Champagne POS 2","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"CL Champagne POS 3","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"Cold Expo","count":2015,"avg_sec":417.43,"exp_sec":359.64},
+  {"station":"Crudo","count":527,"avg_sec":594.28,"exp_sec":488.20},
+  {"station":"Fryer","count":216,"avg_sec":638.81,"exp_sec":239.17},
+  {"station":"Garde Manger","count":551,"avg_sec":543.19,"exp_sec":365.88},
+  {"station":"Grill Fish","count":139,"avg_sec":866.34,"exp_sec":627.19},
+  {"station":"Grill Meat","count":104,"avg_sec":838.65,"exp_sec":549.81},
+  {"station":"Hot Expo","count":513,"avg_sec":831.57,"exp_sec":596.02},
+  {"station":"No Print","count":596,"avg_sec":224.87,"exp_sec":233.15},
+  {"station":"Pasta","count":173,"avg_sec":867.95,"exp_sec":669.36},
+  {"station":"Pastry","count":393,"avg_sec":335.49,"exp_sec":432.82},
+  {"station":"SP Claudie Bar","count":127,"avg_sec":431.69,"exp_sec":0},
+  {"station":"SP Claudie Champagne Service","count":273,"avg_sec":406.39,"exp_sec":0},
+  {"station":"Sauté","count":139,"avg_sec":874.65,"exp_sec":703.60},
+  {"station":"Wine BTG","count":383,"avg_sec":376.56,"exp_sec":0}
+];
+
+const SUMMARY = [
+  {"item":"A-Add-on Bread","count":18,"avg_sec":242.11},
+  {"item":"C-Add-on 10gr Caviar","count":1,"avg_sec":954},
+  {"item":"C-Zucchini Carpaccio","count":39,"avg_sec":569.97},
+  {"item":"CL-1/2 Rack of Lamb","count":10,"avg_sec":976.2},
+  {"item":"CL-12oz Entrecote","count":35,"avg_sec":1032.4},
+  {"item":"CL-6 Oysters","count":38,"avg_sec":590.11},
+  {"item":"CL-7oz Tenderloin","count":7,"avg_sec":908},
+  {"item":"CL-8oz Wagyu Skirt Steak","count":18,"avg_sec":833.83},
+  {"item":"CL-Add Black Truffle","count":2,"avg_sec":941},
+  {"item":"CL-Add Butter","count":18,"avg_sec":331.67},
+  {"item":"CL-Amuse Bouche","count":47,"avg_sec":451.94},
+  {"item":"CL-Apple Sorbet","count":6,"avg_sec":353.33},
+  {"item":"CL-Apple Tart Fine","count":50,"avg_sec":320.86},
+  {"item":"CL-Bearnaise Sauce","count":4,"avg_sec":300.75},
+  {"item":"CL-Beef Tartare","count":61,"avg_sec":495.26},
+  {"item":"CL-Bouillabaisse","count":23,"avg_sec":955.13},
+  {"item":"CL-Branzino Carpaccio","count":79,"avg_sec":595.08},
+  {"item":"CL-Branzino Grilled","count":31,"avg_sec":893.16},
+  {"item":"CL-Bread Basket","count":579,"avg_sec":224.2},
+  {"item":"CL-Broccolini","count":45,"avg_sec":1031.07},
+  {"item":"CL-Brussels Sprouts","count":27,"avg_sec":909.44},
+  {"item":"CL-Burrata","count":123,"avg_sec":494.59},
+  {"item":"CL-Caviar Pasta Petrossian","count":2,"avg_sec":799.5},
+  {"item":"CL-Caviar Pasta Trading","count":9,"avg_sec":1190.22},
+  {"item":"CL-Cheesecake","count":71,"avg_sec":268.62},
+  {"item":"CL-Chocolate Mousse","count":54,"avg_sec":289.15},
+  {"item":"CL-Claudie Seafood Tower","count":8,"avg_sec":996},
+  {"item":"CL-Colossal Prawns","count":23,"avg_sec":683.87},
+  {"item":"CL-Crab Croquettes","count":94,"avg_sec":556.31},
+  {"item":"CL-Creme Brulee","count":100,"avg_sec":322.09},
+  {"item":"CL-Daurade Royal","count":14,"avg_sec":352.21},
+  {"item":"CL-Dover Sole","count":24,"avg_sec":979.04},
+  {"item":"CL-Escargots","count":144,"avg_sec":614.98},
+  {"item":"CL-French Fries","count":42,"avg_sec":529.71},
+  {"item":"CL-Gazpacho","count":34,"avg_sec":457.71},
+  {"item":"CL-Gratin Dauphinois","count":30,"avg_sec":887.37},
+  {"item":"CL-Ice Cream (1 scoop)","count":21,"avg_sec":264.33},
+  {"item":"CL-Lettuce","count":66,"avg_sec":521.14},
+  {"item":"CL-Lobster Pasta","count":57,"avg_sec":982.35},
+  {"item":"CL-Mushroom","count":22,"avg_sec":908.64},
+  {"item":"CL-Nicoise","count":27,"avg_sec":620.33},
+  {"item":"CL-Olive Tapenade","count":8,"avg_sec":627.88},
+  {"item":"CL-Plain Pasta","count":4,"avg_sec":1176},
+  {"item":"CL-Poached Maine Lobster","count":5,"avg_sec":929},
+  {"item":"CL-Prawns","count":33,"avg_sec":868.85},
+  {"item":"CL-Ratatouille","count":17,"avg_sec":801.35},
+  {"item":"CL-Salmon","count":38,"avg_sec":954.63},
+  {"item":"CL-Smoked Salmon","count":6,"avg_sec":457.67},
+  {"item":"CL-Pistachio Ice Cream","count":51,"avg_sec":550.02},
+  {"item":"CL-Truffle Macaroni","count":22,"avg_sec":897.73},
+  {"item":"CL-Truffle Purée","count":35,"avg_sec":836.91},
+  {"item":"CL-Truffle Risotto","count":40,"avg_sec":873.3},
+  {"item":"CL-Tuna Tartare","count":110,"avg_sec":539.92},
+  {"item":"CL-Turbot","count":5,"avg_sec":659.6},
+  {"item":"CLPFL-Caesar","count":51,"avg_sec":633.71},
+  {"item":"CLPFL-Chicken Paillard","count":11,"avg_sec":791.91},
+  {"item":"CLPFL-Crab Croquettes","count":26,"avg_sec":551.73},
+  {"item":"CLPFL-Creme Brulee","count":32,"avg_sec":460.19},
+  {"item":"CLPFL-Gazpacho","count":31,"avg_sec":570.06},
+  {"item":"CLPFL-Hanger Frites","count":15,"avg_sec":814.87},
+  {"item":"CLPFL-Rigatoni Pasta","count":9,"avg_sec":824},
+  {"item":"CLPFL-Salmon","count":8,"avg_sec":845.62},
+  {"item":"CLPFL-Tropezienne","count":25,"avg_sec":436.68},
+  {"item":"CLPFL-Zucchini Carpaccio","count":32,"avg_sec":520.59},
+  {"item":"Colette's Caress","count":6,"avg_sec":661},
+  {"item":"Eau de Coco","count":166,"avg_sec":459.56},
+  {"item":"GL Benoit Chauveau Sancerre","count":74,"avg_sec":427.49},
+  {"item":"GL Heathen Chardonnay","count":29,"avg_sec":551.86},
+  {"item":"GL Michel Juillot Mercurey Chardonnay","count":6,"avg_sec":828.17},
+  {"item":"GL PJ Blason Rose","count":9,"avg_sec":934.89},
+  {"item":"Hemingway's Hilltop","count":27,"avg_sec":401.89},
+  {"item":"Matisse's Muse","count":37,"avg_sec":366.38},
+  {"item":"Paloma","count":59,"avg_sec":383.41},
+  {"item":"Picabia's Provocation","count":86,"avg_sec":351.01}
+];
+
+const HM_HOURS = ['11-12','12-13','13-14','14-15','15-16','16-17','17-18','18-19','19-20','20-21','21-22','22-23','23-24','0-1'];
+const HM_TARGETS = {
+  "Back Kitchen":611.83,"Cold Expo":359.64,"Crudo":488.20,"Fryer":239.17,
+  "Garde Manger":365.88,"Grill Fish":627.19,"Grill Meat":549.81,"Hot Expo":596.02,
+  "No Print":233.15,"Pasta":669.36,"Pastry":432.82,"Sauté":703.60
+};
+const HM = {
+  "Back Kitchen":    {"12-13":907.89,"13-14":381,"14-15":679.75,"15-16":791,"17-18":677,"18-19":764.04,"19-20":639.87,"20-21":577.44,"21-22":566.99,"22-23":588.35,"23-24":691.73},
+  "Cold Expo":       {"11-12":386,"12-13":495.26,"13-14":477.57,"14-15":417.76,"15-16":371,"16-17":728.5,"17-18":490.25,"18-19":399.86,"19-20":433.62,"20-21":376.40,"21-22":397.71,"22-23":382.42,"23-24":347.38,"0-1":534.06},
+  "Crudo":           {"12-13":599.60,"13-14":542.53,"14-15":557.98,"15-16":562,"17-18":645.5,"18-19":657.07,"19-20":616.40,"20-21":481.40,"21-22":528.71,"22-23":503.66,"23-24":522.66},
+  "Fryer":           {"11-12":386,"12-13":563,"13-14":652.60,"14-15":804.31,"15-16":981,"18-19":511.32,"19-20":506.08,"20-21":781.39,"21-22":479.36,"22-23":728.39,"23-24":797.39},
+  "Garde Manger":    {"11-12":386,"12-13":595.03,"13-14":576.68,"14-15":512.07,"15-16":415.88,"17-18":555.17,"18-19":517.33,"19-20":529.64,"20-21":481.93,"21-22":500.87,"22-23":540.07,"23-24":432.56,"0-1":334},
+  "Grill Fish":      {"11-12":380,"12-13":1212,"13-14":598,"14-15":857.50,"18-19":819.67,"19-20":725.85,"20-21":939.50,"21-22":589.21,"22-23":814.09,"23-24":725.10},
+  "Grill Meat":      {"12-13":1045,"13-14":886.10,"14-15":949.25,"17-18":1024,"18-19":355.70,"19-20":803.60,"20-21":894.57,"21-22":641.73,"22-23":865.30,"23-24":1020.50},
+  "Hot Expo":        {"11-12":380,"12-13":822.43,"13-14":696.15,"14-15":863.97,"15-16":764.50,"17-18":955.34,"18-19":484.65,"19-20":738.54,"20-21":919.04,"21-22":629.99,"22-23":948.06,"23-24":819.08,"0-1":524},
+  "No Print":        {"12-13":304.47,"13-14":307.45,"14-15":328.95,"15-16":587.50,"17-18":267.67,"18-19":177.07,"19-20":210.98,"20-21":151.60,"21-22":236.16,"22-23":233.80,"23-24":416.50,"0-1":903},
+  "Pasta":           {"12-13":914.25,"13-14":590.19,"14-15":795.50,"15-16":892,"18-19":529.33,"19-20":793.79,"20-21":982.02,"21-22":691.35,"22-23":1069.02,"23-24":1035.49},
+  "Pastry":          {"12-13":891.33,"13-14":442.94,"14-15":389.23,"15-16":329.69,"16-17":728.5,"17-18":917,"18-19":273.42,"19-20":328.11,"20-21":402.81,"21-22":373.76,"22-23":238.68,"23-24":263.43,"0-1":494.17},
+  "Sauté":           {"14-15":1072,"17-18":886.67,"18-19":780.39,"19-20":791.02,"20-21":927,"21-22":724.45,"22-23":798.82,"23-24":623.78,"0-1":524},
+  "SP Claudie Bar":  {"12-13":1133,"13-14":509,"17-18":405.50,"18-19":293.37,"19-20":538.61,"20-21":386.42,"21-22":600.97,"22-23":494.11,"23-24":750.89},
+  "SP Claudie Champ":{"12-13":284,"13-14":491.19,"14-15":492.55,"15-16":739.43,"18-19":449.61,"19-20":311.12,"20-21":303.21,"21-22":615.85,"22-23":299.09,"23-24":224.50},
+  "Wine BTG":        {"12-13":401,"13-14":811.14,"14-15":325.31,"15-16":667.35,"16-17":1648,"17-18":282.50,"18-19":313.24,"19-20":360.58,"20-21":320.74,"21-22":552.19,"22-23":424.49,"23-24":296.19,"0-1":237},
+  "CL Bar (×4)":     {"12-13":708.50,"13-14":473.98,"14-15":492.55,"15-16":739.43,"17-18":405.50,"18-19":450.24,"19-20":379.95,"20-21":348.52,"21-22":644.60,"22-23":377.99,"23-24":400.40,"0-1":378.72},
+  "CL Champagne (×3)":{"12-13":708.50,"13-14":473.98,"14-15":492.55,"15-16":739.43,"17-18":405.50,"18-19":450.24,"19-20":379.95,"20-21":348.52,"21-22":644.60,"22-23":377.99,"23-24":400.40,"0-1":378.72}
+};
+
+// Day-by-day detail data (Station_* tabs)
+const HM_DAY = {
+  "Back Kitchen": {
+    "Friday":   {"12-13":859,"18-19":1089,"19-20":778,"20-21":707,"21-22":720,"22-23":576,"23-24":795},
+    "Saturday": {"19-20":599,"20-21":565,"21-22":508,"22-23":650,"23-24":625},
+    "Sunday":   {"18-19":780,"19-20":535,"20-21":497,"21-22":479,"22-23":546,"23-24":656}
+  },
+  "Grill Meat": {
+    "Friday":   {"12-13":1437,"13-14":1007,"14-15":1063,"19-20":1066,"20-21":893,"22-23":878},
+    "Saturday": {"13-14":830,"20-21":884,"21-22":775,"22-23":897,"23-24":967},
+    "Sunday":   {"18-19":326,"19-20":660,"20-21":893,"21-22":509,"23-24":1074}
+  }
+};
+
+// ===================== SECTION A: Station Bar Chart =====================
+(function() {
+  const sorted = [...STATIONS].sort((a,b) => b.avg_sec - a.avg_sec);
+  const labels = sorted.map(s => s.station.replace('SP Claudie ','').replace(' Service','').replace('Champagne','Champ.'));
+  const fmt = sec => `${Math.floor(sec/60)}:${String(Math.round(sec%60)).padStart(2,'0')}`;
+  const THRESHOLD_SEC = 15 * 60;
+
+  function barColor(s) {
+    if (!s.exp_sec) return '#5aa9e6';
+    const r = s.avg_sec / s.exp_sec;
+    if (r <= 1.0) return '#22c55e';
+    if (r <= 1.15) return '#f59e0b';
+    return '#ef4444';
+  }
+
+  const thrPlugin = {
+    id: 'targetLines',
+    afterDatasetsDraw(chart) {
+      const {ctx, chartArea: a, scales} = chart;
+      if (!a) return;
+      sorted.forEach((s, i) => {
+        if (!s.exp_sec) return;
+        const x = scales.x.getPixelForValue(i);
+        const y = scales.y.getPixelForValue(s.exp_sec / 60);
+        const hw = (scales.x.getPixelForValue(1) - scales.x.getPixelForValue(0)) * 0.3;
+        ctx.save();
+        ctx.strokeStyle = '#888';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x - hw, y);
+        ctx.lineTo(x + hw, y);
+        ctx.stroke();
+        ctx.restore();
+      });
+    }
+  };
+
+  new Chart(document.getElementById('cStations'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Avg fulfillment (min)',
+        data: sorted.map(s => +(s.avg_sec / 60).toFixed(2)),
+        backgroundColor: sorted.map(barColor),
+        borderRadius: 4
+      }]
+    },
+    options: {
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxRotation: 45, minRotation: 30 } },
+        y: {
+          title: { display: true, text: 'Avg fulfillment time (min)' },
+          grid: { color: gc },
+          min: 0,
+          afterTickToLabelConversion(ctx) {
+            ctx.ticks.forEach(t => { t.label = t.value + ' min'; });
+          }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label(ctx) {
+              const s = sorted[ctx.dataIndex];
+              const lines = [`Avg: ${fmt(s.avg_sec)} (${ctx.parsed.y.toFixed(1)} min)`, `Count: ${s.count}`];
+              if (s.exp_sec) {
+                lines.push(`Target: ${fmt(s.exp_sec)}`);
+                lines.push(`Ratio: ${(s.avg_sec/s.exp_sec*100).toFixed(1)}%`);
+              } else {
+                lines.push('No target');
+              }
+              return lines;
+            }
+          }
+        }
+      }
+    },
+    plugins: [thrPlugin]
+  });
+})();
+
+// ===================== SECTION B: Heatmap =====================
+(function() {
+  const stationNames = Object.keys(HM);
+
+  function fmtSec(s) {
+    if (s == null) return '';
+    const m = Math.floor(s/60), sec = Math.round(s%60);
+    return `${m}:${String(sec).padStart(2,'0')}`;
+  }
+  function lerpColor(a, b, t) {
+    t = Math.max(0, Math.min(1, t));
+    const hex = s => parseInt(s.replace('#',''), 16);
+    const ha = hex(a), hb = hex(b);
+    const r1=(ha>>16)&255, g1=(ha>>8)&255, b1=ha&255;
+    const r2=(hb>>16)&255, g2=(hb>>8)&255, b2=hb&255;
+    const r=Math.round(r1+(r2-r1)*t), g=Math.round(g1+(g2-g1)*t), bl=Math.round(b1+(b2-b1)*t);
+    return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${bl.toString(16).padStart(2,'0')}`;
+  }
+  function hmColor(sec, target) {
+    if (sec == null) return '#1a1d24';
+    const ref = target || 600;
+    const ratio = sec / ref;
+    if (ratio <= 1.0) return lerpColor('#133d22','#22c55e', ratio);
+    if (ratio <= 1.15) return lerpColor('#22c55e','#f59e0b', (ratio-1)/0.15);
+    if (ratio <= 1.30) return lerpColor('#f59e0b','#ef4444', (ratio-1.15)/0.15);
+    return '#ef4444';
+  }
+  function textColor(bg) {
+    const hex = parseInt(bg.replace('#',''), 16);
+    const r=(hex>>16)&255, g=(hex>>8)&255, b=hex&255;
+    return (r*299+g*587+b*114)/1000 > 100 ? '#111' : '#ddd';
+  }
+
+  const table = document.getElementById('hmTable');
+
+  let html = '<thead><tr><th style="text-align:left;padding:5px 8px;background:#1e2533;color:#9aa0aa;white-space:nowrap;position:sticky;left:0;z-index:2">Station</th><th style="background:#1e2533;padding:5px 6px;color:#9aa0aa;text-align:center;min-width:38px">Target</th>';
+  HM_HOURS.forEach(h => {
+    html += `<th style="padding:5px 5px;background:#1e2533;color:#9aa0aa;text-align:center;min-width:42px">${h.replace('-','–')}</th>`;
+  });
+  html += '<th style="background:#1e2533;padding:5px 6px;color:#9aa0aa;text-align:center">▾ Expand</th></tr></thead><tbody>';
+
+  stationNames.forEach((st, idx) => {
+    const tgt = HM_TARGETS[st] || null;
+    const hasDay = !!HM_DAY[st];
+    html += `<tr style="cursor:${hasDay?'pointer':'default'}" onclick="${hasDay?`toggleDay('day_${idx}')`:''}">`;
+    html += `<td style="padding:5px 8px;white-space:nowrap;background:#181b22;color:#e8eaed;position:sticky;left:0;font-weight:500;border-right:1px solid #262a33">${st}</td>`;
+    html += `<td style="padding:5px 6px;text-align:center;color:#9aa0aa;font-size:10px;background:#181b22">${tgt ? fmtSec(tgt) : '—'}</td>`;
+    HM_HOURS.forEach(h => {
+      const sec = HM[st][h] ?? null;
+      const bg = hmColor(sec, tgt);
+      const fg = textColor(bg);
+      const tip = sec != null ? `${st} · ${h}: ${fmtSec(sec)} (${sec.toFixed(0)}s)${tgt ? ' · tgt '+fmtSec(tgt) : ''}` : `${st} · ${h}: no data`;
+      html += `<td title="${tip}" style="padding:4px 4px;background:${bg};color:${fg};text-align:center;font-size:11px">${sec != null ? fmtSec(sec) : ''}</td>`;
+    });
+    html += `<td style="text-align:center;background:#181b22;padding:4px">${hasDay ? '<span style="color:#9aa0aa;font-size:12px">▸</span>' : ''}</td>`;
+    html += '</tr>';
+
+    // Day-by-day expansion rows
+    if (hasDay) {
+      const days = Object.keys(HM_DAY[st]);
+      days.forEach(day => {
+        html += `<tr class="detail-row" id="day_${idx}" style="background:#13161c">`;
+        html += `<td colspan="2" style="padding:3px 8px 3px 20px;color:#9aa0aa;font-size:11px;position:sticky;left:0;background:#13161c;border-right:1px solid #262a33">${day}</td>`;
+        HM_HOURS.forEach(h => {
+          const sec = HM_DAY[st][day] ? (HM_DAY[st][day][h] ?? null) : null;
+          const bg = hmColor(sec, tgt);
+          const fg = textColor(bg);
+          html += `<td style="padding:3px 4px;background:${bg};color:${fg};text-align:center;font-size:10px">${sec != null ? fmtSec(sec) : ''}</td>`;
+        });
+        html += '<td style="background:#13161c"></td></tr>';
+      });
+    }
+  });
+
+  html += '</tbody>';
+  table.innerHTML = html;
+})();
+
+function toggleDay(id) {
+  const rows = document.querySelectorAll(`#${id}`);
+  rows.forEach(r => r.classList.toggle('open'));
+}
+
+// ===================== SECTION C: Menu Items =====================
+(function() {
+  const THRESHOLD_SEC = 900;
+  const sorted = [...SUMMARY].sort((a,b) => b.avg_sec - a.avg_sec);
+
+  function fmtSec(s) {
+    if (s == null) return '—';
+    const m = Math.floor(s/60), sec = Math.round(s%60);
+    return `${m}:${String(sec).padStart(2,'0')}`;
+  }
+
+  function renderTable(data) {
+    const tbody = document.getElementById('menuBody');
+    tbody.innerHTML = data.map((d, i) => {
+      const over = d.avg_sec >= THRESHOLD_SEC;
+      const diff = d.avg_sec - THRESHOLD_SEC;
+      const diffStr = diff > 0 ? `<span class="over">+${fmtSec(diff)}</span>` : `<span class="ok">${fmtSec(-diff)} under</span>`;
+      return `<tr>
+        <td style="color:#9aa0aa">${i+1}</td>
+        <td style="${over ? 'color:#e2706a;font-weight:600' : ''}">${d.item}</td>
+        <td style="color:#9aa0aa">${d.count}</td>
+        <td style="${over ? 'color:#e2706a;font-weight:700' : ''}">${fmtSec(d.avg_sec)}</td>
+        <td style="color:#9aa0aa">${d.avg_sec.toFixed(0)}</td>
+        <td>${diffStr}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function applyFilters() {
+    const limit = parseInt(document.getElementById('menuLimit').value);
+    const overOnly = document.getElementById('overOnly').checked;
+    let data = sorted;
+    if (overOnly) data = data.filter(d => d.avg_sec >= THRESHOLD_SEC);
+    if (limit < 999) data = data.slice(0, limit);
+    renderTable(data);
+  }
+
+  document.getElementById('menuLimit').addEventListener('change', applyFilters);
+  document.getElementById('overOnly').addEventListener('change', applyFilters);
+  applyFilters();
+})();
+</script>
+</body>
+</html>

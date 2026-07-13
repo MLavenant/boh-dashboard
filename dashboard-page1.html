@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claudie · BOH Dashboard — Page 1</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0f1115;color:#e8eaed;font:15px/1.5 -apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:24px 20px 64px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:20px}
+h1{font-size:23px;margin:0}
+.sub{color:#9aa0aa}
+.badge{margin-left:auto;color:#9aa0aa;font-size:13px}
+.card{background:#181b22;border:1px solid #262a33;border-radius:12px;padding:18px;margin-bottom:18px}
+.card h2{font-size:16px;margin:0 0 3px;color:#e8eaed}
+.card p.note{color:#9aa0aa;font-size:12px;margin:0 0 14px}
+.row{display:grid;gap:18px}
+.row.two{grid-template-columns:1fr 1fr}
+.row.three{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:820px){.row.two,.row.three{grid-template-columns:1fr}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:#181b22;border:1px solid #262a33;border-radius:12px;padding:13px 15px}
+.kpi .v{font-size:24px;font-weight:700;color:#d9a441}
+.kpi .l{color:#9aa0aa;font-size:12px;margin-top:2px}
+.kpi.alert .v{color:#e2706a}
+.bpbox{background:#13161c;border:1px solid #2d323c;border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.bpbox .big{font-size:28px;font-weight:700;color:#e2706a}
+.bpbox .l{color:#9aa0aa;font-size:12px}
+.legend{display:flex;gap:14px;font-size:12px;color:#9aa0aa;margin-top:10px;flex-wrap:wrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px}
+.warn{background:#3a2417;color:#e8a06a}
+.ok{background:#1d3324;color:#74d39a}
+canvas{width:100%!important}
+#big-canvas{max-height:380px}
+footer{color:#9aa0aa;font-size:12px;margin-top:30px;text-align:center}
+.annotation-box{background:#1a2436;border:1px solid #2d4a6a;border-radius:8px;padding:8px 12px;font-size:12px;color:#7ec8e3;margin-top:8px;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Claudie · BOH Dashboard <span style="color:#9aa0aa;font-weight:400;font-size:17px">— Page 1: Kitchen Workload</span></h1>
+  <span class="badge">Week of Jun 29 – Jul 5, 2026 · Updated Jul 6, 2026</span>
+</header>
+
+<div class="kpis">
+  <div class="kpi"><div class="v">22,927</div><div class="l">Food tickets (week)</div></div>
+  <div class="kpi alert"><div class="v">57</div><div class="l">Peak concurrent tickets</div></div>
+  <div class="kpi alert"><div class="v">26</div><div class="l">Breaking point (tickets)</div></div>
+  <div class="kpi alert"><div class="v">141</div><div class="l">Breaking point (guests)</div></div>
+  <div class="kpi"><div class="v">39.4</div><div class="l">Peak avg conc. (Sat 20–21)</div></div>
+  <div class="kpi"><div class="v">15 min</div><div class="l">Fulfillment target</div></div>
+</div>
+
+<!-- Visual 1: Kitchen Pressure Curve -->
+<div class="card">
+  <h2>Visual 1 — Kitchen Pressure Curve: Load Distribution &amp; Performance Degradation</h2>
+  <p class="note">X-axis = concurrent tickets open (load level). Left Y = number of occurrences at that load (bars). Right Y = avg fulfillment time in minutes (line). Red dashed line = 15-min target. Crossing point (concurrent ≥ 26) is where kitchen falls behind. Source: Workload_Overall.</p>
+  <canvas id="cPressure" style="max-height:400px"></canvas>
+  <div class="legend">
+    <span><span class="sw" style="background:#5aa9e6"></span>Occurrences (left axis)</span>
+    <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment time · min (right axis)</span>
+    <span><span class="sw" style="background:#e2706a"></span>15-min target</span>
+  </div>
+  <div class="annotation-box">⚡ Breaking point at <strong>26 concurrent tickets</strong> — avg fulfillment jumps to 16.0 min (first breach of 15-min target). Load ≥26 tickets occurs <strong>695 times</strong> per week.</div>
+</div>
+
+<!-- Visual 2 + 3 side-by-side -->
+<div class="row two">
+
+  <!-- Visual 2: Breaking Point — Linear Graph -->
+  <div class="card">
+    <h2>Visual 2 — Breaking Point</h2>
+    <p class="note">Left Y = avg fulfillment time (min) · Right Y = avg guests seated (OpenTable). Both plotted against concurrent ticket load. Vertical dashed red = <strong>26 tickets</strong> (fulfillment first exceeds 15 min). Horizontal dashed blue = <strong>141 guests</strong> (first guest bucket &gt;15 min). Source: Workload_Overall.</p>
+    <div class="row two" style="margin-bottom:12px;gap:8px">
+      <div class="bpbox"><div class="big">26</div><div class="l">tickets → kitchen falls behind</div></div>
+      <div class="bpbox"><div class="big">141</div><div class="l">guests → kitchen falls behind</div></div>
+    </div>
+    <canvas id="cBreaking" style="max-height:280px"></canvas>
+  </div>
+
+  <!-- Visual 3: Concurrent Load vs Performance -->
+  <div class="card">
+    <h2>Visual 3 — Load vs Performance</h2>
+    <p class="note">Bucketed view (10-ticket steps): avg fulfillment time per concurrent ticket band. Shows performance degradation above 20 concurrent tickets. 15-min target line in red. Source: Workload_Overall bucket table (Tickets Open).</p>
+    <canvas id="cLoadPerf" style="max-height:280px"></canvas>
+    <div class="legend">
+      <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
+      <span><span class="sw" style="background:#e2706a"></span>15-min target</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Visual 4: 3D Station View -->
+<div class="card">
+  <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap">
+    <h2 style="margin:0">Visual 4 — 3D Station View</h2>
+    <span style="margin-left:auto;text-align:right">
+      <span style="font-size:28px;font-weight:700;color:#d9a441" id="kTotal">—</span>
+      <span style="color:#9aa0aa;font-size:12px;display:block;margin-top:-4px">stations with targets: % over target</span>
+    </span>
+  </div>
+  <p class="note">Each block = a station. Height ∝ avg fulfillment time. Colour = performance vs target: <strong style="color:#2e8b57">green</strong> ≤ target, <strong style="color:#c99a2e">amber</strong> up to +15%, <strong style="color:#c0392b">red</strong> &gt;+15%. No target = grey. Drag to rotate, scroll to zoom, <strong>click a block</strong> for detail.</p>
+  <div id="kitchen" style="height:480px;border-radius:10px;overflow:hidden;background:#0c0e13;cursor:grab"></div>
+  <div class="legend">
+    <span><span class="sw" style="background:#2e8b57"></span>On target (≤100%)</span>
+    <span><span class="sw" style="background:#c99a2e"></span>Up to +15% over</span>
+    <span><span class="sw" style="background:#c0392b"></span>&gt;15% over target</span>
+    <span><span class="sw" style="background:#6b7280"></span>No target set</span>
+  </div>
+  <div id="kDetail" style="margin-top:14px"></div>
+</div>
+
+<!-- Visual 5: Fulfillment Time Heatmap by Station × Hour -->
+<div class="card">
+  <h2>Visual 5 — Station Fulfillment Heatmap (Hour × Station)</h2>
+  <p class="note">Avg fulfillment time per station per hour window, aggregated across all days. Color scale: <strong style="color:#22c55e">green</strong> = at/below target, <strong style="color:#f59e0b">amber</strong> = up to +30% over, <strong style="color:#ef4444">red</strong> = &gt;+30% over target (or &gt;900s absolute for no-target stations). Hover cells for exact values. Source: Station_* tabs.</p>
+  <div style="overflow-x:auto">
+    <table id="hmTable" style="border-collapse:collapse;font-size:11px;min-width:700px;width:100%"></table>
+  </div>
+  <div class="legend" style="margin-top:10px">
+    <span><span class="sw" style="background:#22c55e"></span>At/below target</span>
+    <span><span class="sw" style="background:#f59e0b"></span>Up to +30% over</span>
+    <span><span class="sw" style="background:#ef4444"></span>&gt;+30% over (or slow)</span>
+    <span><span class="sw" style="background:#1e2533"></span>No data</span>
+  </div>
+</div>
+
+<footer>Source: <em>Week 20cl2.xlsx</em> (Workload_Overall, Workload_DayHourly, Stations, Station_* sheets) · Fulfillment = Fired Date → Fulfilled Date · Workload = sweep-line concurrent open tickets (food stations only)</footer>
+</div>
+
+<script>
+// ============================================================
+// EMBEDDED DATA (extracted from Week 20cl2.xlsx)
+// ============================================================
+const THRESHOLD = 15;
+const gc = '#262a33';
+Chart.defaults.color = '#9aa0aa';
+Chart.defaults.borderColor = gc;
+Chart.defaults.font.family = 'inherit';
+
+// Workload_Overall: per-concurrent-count (food tickets only)
+const CURVE = [{"conc":1,"occ":130,"ful":11.55,"guests":27.89},{"conc":2,"occ":174,"ful":11.8,"guests":41.4},{"conc":3,"occ":224,"ful":11.62,"guests":49.35},{"conc":4,"occ":248,"ful":11.64,"guests":60.58},{"conc":5,"occ":253,"ful":11.82,"guests":63.72},{"conc":6,"occ":251,"ful":12.02,"guests":73.74},{"conc":7,"occ":256,"ful":11.89,"guests":82.13},{"conc":8,"occ":229,"ful":11.81,"guests":90.23},{"conc":9,"occ":228,"ful":11.9,"guests":94.92},{"conc":10,"occ":224,"ful":11.6,"guests":107.14},{"conc":11,"occ":232,"ful":12.04,"guests":109.74},{"conc":12,"occ":219,"ful":12.75,"guests":112.16},{"conc":13,"occ":202,"ful":12.9,"guests":113.13},{"conc":14,"occ":202,"ful":13.32,"guests":119.01},{"conc":15,"occ":211,"ful":13.22,"guests":124.33},{"conc":16,"occ":205,"ful":13.71,"guests":122.65},{"conc":17,"occ":212,"ful":13.64,"guests":123.15},{"conc":18,"occ":196,"ful":13.11,"guests":125.78},{"conc":19,"occ":182,"ful":13.69,"guests":124.49},{"conc":20,"occ":146,"ful":13.86,"guests":136.52},{"conc":21,"occ":132,"ful":13.94,"guests":132.29},{"conc":22,"occ":105,"ful":13.77,"guests":136.47},{"conc":23,"occ":81,"ful":14.12,"guests":140.01},{"conc":24,"occ":62,"ful":14.61,"guests":144.67},{"conc":25,"occ":64,"ful":14.17,"guests":144.02},{"conc":26,"occ":76,"ful":16.01,"guests":142.09},{"conc":27,"occ":67,"ful":16.51,"guests":143.94},{"conc":28,"occ":54,"ful":15.93,"guests":140.59},{"conc":29,"occ":46,"ful":15.79,"guests":146.69},{"conc":30,"occ":43,"ful":16.14,"guests":145.55},{"conc":31,"occ":39,"ful":16,"guests":152.65},{"conc":32,"occ":33,"ful":16.79,"guests":160.87},{"conc":33,"occ":30,"ful":17.7,"guests":161.91},{"conc":34,"occ":27,"ful":16.1,"guests":166.18},{"conc":35,"occ":27,"ful":17.3,"guests":159.34},{"conc":36,"occ":22,"ful":16.93,"guests":161.95},{"conc":37,"occ":26,"ful":18.38,"guests":167.98},{"conc":38,"occ":26,"ful":17.43,"guests":169.37},{"conc":39,"occ":35,"ful":16.97,"guests":168.63},{"conc":40,"occ":36,"ful":18.46,"guests":167.38},{"conc":41,"occ":29,"ful":18.15,"guests":165.71},{"conc":42,"occ":30,"ful":19.06,"guests":167.82},{"conc":43,"occ":28,"ful":18.98,"guests":166.54},{"conc":44,"occ":25,"ful":18.47,"guests":167.61},{"conc":45,"occ":21,"ful":18.73,"guests":167.4},{"conc":46,"occ":10,"ful":16.43,"guests":173.2},{"conc":47,"occ":7,"ful":17.07,"guests":172.48},{"conc":48,"occ":6,"ful":17.6,"guests":172.24},{"conc":49,"occ":11,"ful":20.04,"guests":172.18},{"conc":50,"occ":12,"ful":18.38,"guests":171.96},{"conc":51,"occ":10,"ful":16.28,"guests":170.76},{"conc":52,"occ":5,"ful":16.72,"guests":170},{"conc":53,"occ":2,"ful":16.64,"guests":170},{"conc":54,"occ":4,"ful":16.28,"guests":170.52},{"conc":55,"occ":5,"ful":16.32,"guests":170.36},{"conc":56,"occ":5,"ful":16.06,"guests":170.06},{"conc":57,"occ":1,"ful":15.91,"guests":170}];
+
+// Ticket buckets (10-count steps)
+const TBK = [{"bucket":"1–10","ful":11.78},{"bucket":"11–20","ful":13.18},{"bucket":"21–30","ful":14.86},{"bucket":"31–40","ful":17.19},{"bucket":"41–50","ful":18.52},{"bucket":"51–60","ful":16.33}];
+
+// Guest buckets
+const GBK = [{"bucket":"21–30","ful":11.55},{"bucket":"41–50","ful":11.7},{"bucket":"61–70","ful":11.82},{"bucket":"71–80","ful":12.02},{"bucket":"81–90","ful":11.89},{"bucket":"91–100","ful":11.9},{"bucket":"101–110","ful":11.82},{"bucket":"111–120","ful":12.98},{"bucket":"121–130","ful":13.47},{"bucket":"131–140","ful":13.86},{"bucket":"141–150","ful":15.52},{"bucket":"151–160","ful":16.53},{"bucket":"161–170","ful":17.92},{"bucket":"171–180","ful":18.05}];
+
+// Pressure data: avg concurrent tickets per (day, hour), occurrence-weighted from Workload_DayHourly
+const HOURS = ["0-1","1-2","11-12","12-13","13-14","14-15","15-16","16-17","17-18","18-19","19-20","20-21","21-22","22-23","23-24"];
+const PRESSURE = {"Monday":{"0-1":3.82,"11-12":3,"12-13":4.03,"13-14":2.32,"14-15":3.57,"15-16":2.6,"18-19":6.02,"19-20":14.39,"20-21":10.88,"21-22":5.99,"22-23":3.41,"23-24":1.83},"Tuesday":{"12-13":4.73,"13-14":7.79,"14-15":3.94,"15-16":1.83,"16-17":2,"18-19":5.95,"19-20":13.3,"20-21":13.34,"21-22":9,"22-23":7.91,"23-24":2.74},"Wednesday":{"0-1":1.33,"12-13":10.06,"13-14":4.94,"14-15":3.58,"15-16":1.25,"18-19":4.6,"19-20":12.87,"20-21":14.59,"21-22":12.58,"22-23":6.23,"23-24":3.54},"Thursday":{"12-13":6.69,"13-14":8.84,"14-15":5.26,"15-16":1.33,"17-18":2.63,"18-19":5.58,"19-20":14.45,"20-21":15.08,"21-22":15.48,"22-23":12.74,"23-24":6.19},"Friday":{"0-1":1,"12-13":10.53,"13-14":8.76,"14-15":16.47,"15-16":12.24,"16-17":1.8,"17-18":3.65,"18-19":4.88,"19-20":17.43,"20-21":28.86,"21-22":14.9,"22-23":21.17,"23-24":11.32},"Saturday":{"0-1":1.33,"1-2":1,"17-18":4.29,"18-19":7.85,"19-20":29.66,"20-21":39.42,"21-22":15.83,"22-23":34.1,"23-24":14.69},"Sunday":{"0-1":2.12,"1-2":1,"16-17":1,"18-19":13.52,"19-20":15.33,"20-21":13.52,"21-22":17.21,"22-23":18.14,"23-24":10.59}};
+const WEEK_AVG = {"0-1":1.92,"1-2":1,"11-12":3,"12-13":7.21,"13-14":6.53,"14-15":6.56,"15-16":3.85,"16-17":1.6,"17-18":3.52,"18-19":6.91,"19-20":16.78,"20-21":19.38,"21-22":13,"22-23":14.81,"23-24":7.27};
+
+// Stations data (from Stations sheet, Week 20cl2.xlsx)
+const STATIONS = [
+  {"station":"Back Kitchen","count":213,"avg_sec":645.62,"exp_sec":611.83},
+  {"station":"CL Bar POS 1","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"CL Bar POS 2","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"CL Bar POS 3","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"CL Bar POS 4","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"CL Champagne POS 1","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"CL Champagne POS 2","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"CL Champagne POS 3","count":400,"avg_sec":414.42,"exp_sec":0},
+  {"station":"Cold Expo","count":2015,"avg_sec":417.43,"exp_sec":359.64},
+  {"station":"Crudo","count":527,"avg_sec":594.28,"exp_sec":488.20},
+  {"station":"Fryer","count":216,"avg_sec":638.81,"exp_sec":239.17},
+  {"station":"Garde Manger","count":551,"avg_sec":543.19,"exp_sec":365.88},
+  {"station":"Grill Fish","count":139,"avg_sec":866.34,"exp_sec":627.19},
+  {"station":"Grill Meat","count":104,"avg_sec":838.65,"exp_sec":549.81},
+  {"station":"Hot Expo","count":513,"avg_sec":831.57,"exp_sec":596.02},
+  {"station":"No Print","count":596,"avg_sec":224.87,"exp_sec":233.15},
+  {"station":"Pasta","count":173,"avg_sec":867.95,"exp_sec":669.36},
+  {"station":"Pastry","count":393,"avg_sec":335.49,"exp_sec":432.82},
+  {"station":"SP Claudie Bar","count":127,"avg_sec":431.69,"exp_sec":0},
+  {"station":"SP Claudie Champagne Service","count":273,"avg_sec":406.39,"exp_sec":0},
+  {"station":"Sauté","count":139,"avg_sec":874.65,"exp_sec":703.60},
+  {"station":"Wine BTG","count":383,"avg_sec":376.56,"exp_sec":0}
+];
+
+// ============================================================
+// VISUAL 1: Kitchen Pressure Curve — Load Distribution + Performance Degradation
+// ============================================================
+(function() {
+  const labels = CURVE.map(d => d.conc);
+  const occurrences = CURVE.map(d => d.occ);
+  const fulfillment = CURVE.map(d => d.ful);
+  const BP = 26;
+
+  const bpPlugin = {
+    id: 'bpZone',
+    beforeDraw(chart) {
+      const {ctx, chartArea: a, scales} = chart;
+      if (!a || !scales.x) return;
+      const bpIdx = labels.indexOf(BP);
+      if (bpIdx < 0) return;
+      const xBp = scales.x.getPixelForValue(bpIdx);
+      ctx.save();
+      // shade right of BP
+      ctx.fillStyle = 'rgba(226,112,106,0.07)';
+      ctx.fillRect(xBp, a.top, a.right - xBp, a.height);
+      // threshold line on right y-axis
+      const yThr = scales.y1.getPixelForValue(THRESHOLD);
+      if (yThr >= a.top && yThr <= a.bottom) {
+        ctx.strokeStyle = '#e2706a'; ctx.lineWidth = 1.5;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath(); ctx.moveTo(a.left, yThr); ctx.lineTo(a.right, yThr); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#e2706a'; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText('15 min target', a.left + 4, yThr - 4);
+      }
+      // BP vertical line
+      ctx.strokeStyle = '#e2706a'; ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(xBp, a.top); ctx.lineTo(xBp, a.bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#e2706a'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('⚡ BP: 26', xBp, a.top + 14);
+      ctx.restore();
+    }
+  };
+
+  new Chart(document.getElementById('cPressure'), {
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Occurrences',
+          data: occurrences,
+          backgroundColor: labels.map(l => l >= BP ? 'rgba(226,112,106,0.55)' : 'rgba(90,169,230,0.55)'),
+          borderColor: labels.map(l => l >= BP ? '#e2706a' : '#5aa9e6'),
+          borderWidth: 1,
+          yAxisID: 'y',
+          order: 2,
+          borderRadius: 2
+        },
+        {
+          type: 'line',
+          label: 'Avg fulfillment (min)',
+          data: fulfillment,
+          borderColor: '#d9a441',
+          backgroundColor: 'rgba(217,164,65,0.0)',
+          tension: 0.3,
+          pointRadius: 2,
+          pointHoverRadius: 5,
+          borderWidth: 2.5,
+          yAxisID: 'y1',
+          order: 1
+        }
+      ]
+    },
+    options: {
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: { title: { display: true, text: 'Concurrent tickets open' }, grid: { color: gc } },
+        y: { position: 'left', title: { display: true, text: 'Occurrences (count)' }, grid: { color: gc }, min: 0 },
+        y1: { position: 'right', title: { display: true, text: 'Avg fulfillment (min)' }, grid: { display: false }, min: 0, suggestedMax: 24 }
+      },
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } }
+    },
+    plugins: [bpPlugin]
+  });
+})();
+
+// ============================================================
+// VISUAL 2: Breaking Point — Linear Graph
+// ============================================================
+(function() {
+  const labels = CURVE.map(d => d.conc);
+  const bpTickets = 26; // first conc where ful > 15 (conc=26, ful=16.01)
+  const bpGuests = 141; // first guest bucket > 15 min = 141-150
+
+  // Reference line plugins
+  const refLines = {
+    id: 'refLines',
+    afterDraw(chart) {
+      const {ctx, chartArea: a, scales} = chart;
+      if (!a) return;
+
+      // Ticket breaking point vertical line
+      const bpIdx = labels.indexOf(bpTickets);
+      if (bpIdx >= 0) {
+        const xBp = scales.x.getPixelForValue(bpIdx);
+        ctx.save();
+        ctx.strokeStyle = '#e2706a';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath(); ctx.moveTo(xBp, a.top); ctx.lineTo(xBp, a.bottom); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#e2706a';
+        ctx.font = '11px sans-serif';
+        ctx.fillText('BP: 26 tickets', xBp + 4, a.top + 14);
+        ctx.restore();
+      }
+
+      // Threshold line on fulfillment axis (y)
+      const yThr = scales.y.getPixelForValue(THRESHOLD);
+      if (yThr >= a.top && yThr <= a.bottom) {
+        ctx.save();
+        ctx.strokeStyle = '#e2706a';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath(); ctx.moveTo(a.left, yThr); ctx.lineTo(a.right, yThr); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#e2706a';
+        ctx.font = '11px sans-serif';
+        ctx.fillText('15 min target', a.left + 4, yThr - 4);
+        ctx.restore();
+      }
+
+      // Guest BP line at y1 scale
+      const yGBp = scales.y1.getPixelForValue(bpGuests);
+      if (yGBp >= a.top && yGBp <= a.bottom) {
+        ctx.save();
+        ctx.strokeStyle = '#5aa9e6';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath(); ctx.moveTo(a.left, yGBp); ctx.lineTo(a.right, yGBp); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#5aa9e6';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText('BP: 141 guests', a.right - 4, yGBp - 4);
+        ctx.restore();
+      }
+    }
+  };
+
+  new Chart(document.getElementById('cBreaking'), {
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'line',
+          label: 'Avg fulfillment (min)',
+          data: CURVE.map(d => d.ful),
+          borderColor: '#d9a441',
+          backgroundColor: 'rgba(217,164,65,0.12)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          yAxisID: 'y',
+          order: 1
+        },
+        {
+          type: 'line',
+          label: 'Avg guests seated',
+          data: CURVE.map(d => d.guests),
+          borderColor: '#5aa9e6',
+          backgroundColor: 'rgba(90,169,230,0.08)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          yAxisID: 'y1',
+          order: 2
+        }
+      ]
+    },
+    options: {
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: { title: { display: true, text: 'Concurrent tickets open' }, grid: { color: gc } },
+        y: { position: 'left', title: { display: true, text: 'Avg fulfillment (min)' }, grid: { color: gc }, suggestedMax: 22 },
+        y1: { position: 'right', title: { display: true, text: 'Avg guests seated' }, grid: { display: false }, suggestedMax: 200 }
+      },
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } }
+    },
+    plugins: [refLines]
+  });
+})();
+
+// ============================================================
+// VISUAL 3: Concurrent Load vs Performance (bucketed)
+// ============================================================
+(function() {
+  const thrLine = {
+    id: 'thr',
+    afterDraw(chart) {
+      const { ctx, chartArea: a, scales } = chart;
+      if (!a || !scales.y) return;
+      const yy = scales.y.getPixelForValue(THRESHOLD);
+      if (yy < a.top || yy > a.bottom) return;
+      ctx.save();
+      ctx.strokeStyle = '#e2706a'; ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath(); ctx.moveTo(a.left, yy); ctx.lineTo(a.right, yy); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#e2706a'; ctx.font = '11px sans-serif';
+      ctx.fillText(THRESHOLD + ' min target', a.left + 6, yy - 4);
+      ctx.restore();
+    }
+  };
+
+  new Chart(document.getElementById('cLoadPerf'), {
+    type: 'bar',
+    data: {
+      labels: TBK.map(b => b.bucket),
+      datasets: [{
+        label: 'Avg fulfillment (min)',
+        data: TBK.map(b => b.ful),
+        backgroundColor: TBK.map(b => b.ful > THRESHOLD ? '#8a3f1a' : '#d9a441'),
+        borderRadius: 4
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { title: { display: true, text: 'Concurrent tickets open (bucket)' }, grid: { display: false } },
+        y: { title: { display: true, text: 'Avg fulfillment (min)' }, grid: { color: gc }, suggestedMax: 22 }
+      }
+    },
+    plugins: [thrLine]
+  });
+})();
+
+// ============================================================
+// VISUAL 4: 3D Station View (Three.js)
+// ============================================================
+(function() {
+  const host = document.getElementById('kitchen');
+  if (!window.THREE) {
+    host.innerHTML = '<p class="note" style="padding:20px">3D view needs an internet connection (Three.js CDN).</p>';
+    return;
+  }
+
+  // Station floor positions [x, z] — preserved from dashboard.html
+  const LAYOUT = {
+    'Grill Meat':     [-6,   -4.5],
+    'Grill Fish':     [-4,   -4.5],
+    'Sauté':          [-2,   -4.5],
+    'Fryer':          [0,    -4.5],
+    'Pasta':          [2,    -4.5],
+    'Back Kitchen':   [5,    -4.5],
+    'Hot Expo':       [0,    -2],
+    'No Print':       [2.6,  -2],
+    'Cold Expo':      [-6.5, -1.5],
+    'Garde Manger':   [-6.5,  0.3],
+    'Crudo':          [-6.5,  2.1],
+    'Pastry':         [-6.5,  3.9],
+    'CL Bar POS 1':   [-3.2,  4.7],
+    'CL Bar POS 2':   [-1.7,  4.7],
+    'CL Bar POS 3':   [-0.2,  4.7],
+    'CL Bar POS 4':   [ 1.3,  4.7],
+    'SP Claudie Bar': [ 2.8,  4.7],
+    'CL Champagne POS 1':         [5.2,  2.4],
+    'CL Champagne POS 2':         [5.2,  0.9],
+    'CL Champagne POS 3':         [5.2, -0.6],
+    'SP Claudie Champagne Service':[5.2, -2.1],
+    'Wine BTG':       [5.2,  4.2],
+  };
+  const ZONES = [
+    ['HOT LINE',  -2,   -5.6],
+    ['COLD LINE', -6.5, -3],
+    ['PASS',       1.3, -2.9],
+    ['BAR',       -0.5,  5.9],
+    ['CHAMPAGNE',  5.2, -3.4],
+    ['WINE',       5.2,  5.4],
+  ];
+
+  function perfColor(s) {
+    if (!s.exp_sec || s.exp_sec === 0) return 0x6b7280;
+    const r = s.avg_sec / s.exp_sec;
+    if (r <= 1.0)  return 0x2e8b57;
+    if (r <= 1.15) return 0xc99a2e;
+    return 0xc0392b;
+  }
+  function shortName(n) {
+    return n.replace('SP Claudie ','').replace('Service','Svc')
+            .replace('Champagne','Champ.').replace(' POS ',' ');
+  }
+  function tSprite(t, sub, color, big) {
+    const c = document.createElement('canvas');
+    c.width = 256; c.height = sub ? 80 : 48;
+    const g = c.getContext('2d');
+    g.font = 'bold ' + (big ? 24 : 20) + 'px sans-serif';
+    g.fillStyle = color || '#fff';
+    g.textAlign = 'center';
+    g.fillText(t, 128, sub ? 30 : 32);
+    if (sub) {
+      g.font = '20px sans-serif';
+      g.fillStyle = '#ffd479';
+      g.fillText(sub, 128, 62);
+    }
+    return new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true }));
+  }
+
+  let W = host.clientWidth || 900, H = 480;
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0c0e13);
+  const camera = new THREE.PerspectiveCamera(45, W/H, 0.1, 200);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio || 1);
+  renderer.setSize(W, H);
+  host.appendChild(renderer.domElement);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.82));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.6);
+  dl.position.set(6, 14, 8); scene.add(dl);
+
+  const kitchen = new THREE.Group(); scene.add(kitchen);
+  const FW = 17, FD = 15;
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(FW, 0.2, FD), new THREE.MeshLambertMaterial({ color: 0x161a21 }));
+  floor.position.y = -0.1; kitchen.add(floor);
+  const grid = new THREE.GridHelper(Math.max(FW, FD), 16, 0x2a2f3a, 0x1e222a);
+  grid.position.y = 0.02; kitchen.add(grid);
+
+  const wallMat = new THREE.MeshLambertMaterial({ color: 0x222831 });
+  function wall(w, d, x, z) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, 1.6, d), wallMat);
+    m.position.set(x, 0.8, z); kitchen.add(m);
+  }
+  wall(FW, 0.25, 0, -FD/2); wall(FW, 0.25, 0, FD/2);
+  wall(0.25, FD, -FW/2, 0);  wall(0.25, FD, FW/2, 0);
+
+  const countMat = new THREE.MeshLambertMaterial({ color: 0x2c333d });
+  function counter(w, d, x, z) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.35, d), countMat);
+    m.position.set(x, 0.17, z); kitchen.add(m);
+  }
+  counter(9.5, 1.6, -1, -4.5);
+  counter(1.6, 7.0, -6.5, 1.2);
+  counter(7.5, 1.4, -0.7, 4.7);
+  counter(1.6, 5.6, 5.2, 0.2);
+
+  ZONES.forEach(([t, x, z]) => {
+    const sp = tSprite(t, null, '#7f8794', false);
+    sp.scale.set(3.0, 0.6, 1); sp.position.set(x, 0.25, z); kitchen.add(sp);
+  });
+
+  // Determine % over target for KPI
+  const withTargets = STATIONS.filter(s => s.exp_sec > 0);
+  const overTarget = withTargets.filter(s => s.avg_sec > s.exp_sec).length;
+  document.getElementById('kTotal').textContent = overTarget + '/' + withTargets.length + ' over target';
+
+  const boxes = []; let gi = 0;
+  STATIONS.forEach(s => {
+    let pos = LAYOUT[s.station];
+    if (!pos) { const col = gi % 5, row = Math.floor(gi / 5); pos = [(col-2)*1.8, 6.8 + row*1.8]; gi++; }
+    const [x, z] = pos;
+    const mins = s.avg_sec ? s.avg_sec / 60 : 0;
+    const h = Math.max(0.4, Math.min(6, mins * 0.32));
+    const box = new THREE.Mesh(
+      new THREE.BoxGeometry(1.4, h, 1.4),
+      new THREE.MeshLambertMaterial({ color: perfColor(s) })
+    );
+    box.position.set(x, 0.35 + h/2, z);
+    box.userData = s; kitchen.add(box); boxes.push(box);
+    const label = tSprite(shortName(s.station), (mins ? mins.toFixed(1) : '–') + ' min', '#fff', true);
+    label.scale.set(2.8, 0.88, 1);
+    label.position.set(x, 0.35 + h + 0.85, z); kitchen.add(label);
+  });
+
+  let rotY = 0.7, rotX = 0.7, dist = 22;
+  function place() {
+    camera.position.set(dist * Math.sin(rotY) * Math.cos(rotX), dist * Math.sin(rotX), dist * Math.cos(rotY) * Math.cos(rotX));
+    camera.lookAt(0, 0.6, 0);
+  }
+  place();
+
+  let drag = false, px = 0, py = 0, moved = 0, spin = true;
+  const dom = renderer.domElement;
+  dom.addEventListener('pointerdown', e => { drag = true; moved = 0; px = e.clientX; py = e.clientY; spin = false; host.style.cursor = 'grabbing'; });
+  window.addEventListener('pointerup', e => { if (drag && moved < 6) pick(e); drag = false; host.style.cursor = 'grab'; });
+  window.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dx = e.clientX - px, dy = e.clientY - py;
+    moved += Math.abs(dx) + Math.abs(dy);
+    rotY -= dx * 0.008; rotX = Math.max(0.2, Math.min(1.45, rotX + dy * 0.006));
+    px = e.clientX; py = e.clientY; place();
+  });
+  dom.addEventListener('wheel', e => { e.preventDefault(); dist = Math.max(9, Math.min(46, dist + (e.deltaY > 0 ? 1.4 : -1.4))); place(); }, { passive: false });
+
+  const ray = new THREE.Raycaster(), m2 = new THREE.Vector2();
+  function pick(e) {
+    const r = dom.getBoundingClientRect();
+    m2.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    m2.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    ray.setFromCamera(m2, camera);
+    const hit = ray.intersectObjects(boxes, false);
+    if (hit.length) selectStation(hit[0].object.userData);
+  }
+
+  function selectStation(s) {
+    const fmt = sec => sec == null ? '—' : `${Math.floor(sec/60)}:${String(Math.round(sec%60)).padStart(2,'0')}`;
+    const over = s.exp_sec > 0 && s.avg_sec > s.exp_sec;
+    const ratio = s.exp_sec > 0 ? (s.avg_sec / s.exp_sec * 100).toFixed(1) + '%' : 'no target';
+    let statusColor = '#74d39a', statusText = 'On target';
+    if (s.exp_sec === 0) { statusColor = '#9aa0aa'; statusText = 'No target'; }
+    else if (s.avg_sec / s.exp_sec > 1.15) { statusColor = '#e2706a'; statusText = 'Over target'; }
+    else if (s.avg_sec > s.exp_sec) { statusColor = '#c99a2e'; statusText = 'Slightly over'; }
+
+    document.getElementById('kDetail').innerHTML = `
+      <div style="border-top:1px solid #262a33;padding-top:14px">
+        <h2 style="font-size:15px;margin:0 0 10px">${s.station}</h2>
+        <div class="kpis" style="margin-bottom:8px">
+          <div class="kpi"><div class="v" style="font-size:19px">${s.count}</div><div class="l">Tickets</div></div>
+          <div class="kpi"><div class="v" style="font-size:19px">${fmt(s.avg_sec)}</div><div class="l">Avg time</div></div>
+          <div class="kpi"><div class="v" style="font-size:19px">${s.exp_sec > 0 ? fmt(s.exp_sec) : '—'}</div><div class="l">Target</div></div>
+          <div class="kpi"><div class="v" style="font-size:19px;color:${statusColor}">${ratio}</div><div class="l">${statusText}</div></div>
+        </div>
+      </div>`;
+  }
+
+  function loop() { requestAnimationFrame(loop); if (spin) kitchen.rotation.y += 0.0022; renderer.render(scene, camera); }
+  loop();
+  window.addEventListener('resize', () => { W = host.clientWidth || W; renderer.setSize(W, H); camera.aspect = W/H; camera.updateProjectionMatrix(); });
+})();
+
+// ============================================================
+// VISUAL 5: Station Fulfillment Heatmap
+// ============================================================
+(function() {
+  const HM_HOURS = ['11-12','12-13','13-14','14-15','15-16','16-17','17-18','18-19','19-20','20-21','21-22','22-23','23-24','0-1'];
+  const HM_TARGETS = {
+    "Back Kitchen":611.83,"Cold Expo":359.64,"Crudo":488.20,"Fryer":239.17,
+    "Garde Manger":365.88,"Grill Fish":627.19,"Grill Meat":549.81,"Hot Expo":596.02,
+    "No Print":233.15,"Pasta":669.36,"Pastry":432.82,"Sauté":703.60
+  };
+  const HM = {
+    "Back Kitchen":    {"12-13":907.89,"13-14":381,"14-15":679.75,"15-16":791,"17-18":677,"18-19":764.04,"19-20":639.87,"20-21":577.44,"21-22":566.99,"22-23":588.35,"23-24":691.73},
+    "Cold Expo":       {"11-12":386,"12-13":495.26,"13-14":477.57,"14-15":417.76,"15-16":371,"16-17":728.5,"17-18":490.25,"18-19":399.86,"19-20":433.62,"20-21":376.40,"21-22":397.71,"22-23":382.42,"23-24":347.38,"0-1":534.06},
+    "Crudo":           {"12-13":599.60,"13-14":542.53,"14-15":557.98,"15-16":562,"17-18":645.5,"18-19":657.07,"19-20":616.40,"20-21":481.40,"21-22":528.71,"22-23":503.66,"23-24":522.66},
+    "Fryer":           {"11-12":386,"12-13":563,"13-14":652.60,"14-15":804.31,"15-16":981,"18-19":511.32,"19-20":506.08,"20-21":781.39,"21-22":479.36,"22-23":728.39,"23-24":797.39},
+    "Garde Manger":    {"11-12":386,"12-13":595.03,"13-14":576.68,"14-15":512.07,"15-16":415.88,"17-18":555.17,"18-19":517.33,"19-20":529.64,"20-21":481.93,"21-22":500.87,"22-23":540.07,"23-24":432.56,"0-1":334},
+    "Grill Fish":      {"11-12":380,"12-13":1212,"13-14":598,"14-15":857.50,"18-19":819.67,"19-20":725.85,"20-21":939.50,"21-22":589.21,"22-23":814.09,"23-24":725.10},
+    "Grill Meat":      {"12-13":1045,"13-14":886.10,"14-15":949.25,"17-18":1024,"18-19":355.70,"19-20":803.60,"20-21":894.57,"21-22":641.73,"22-23":865.30,"23-24":1020.50},
+    "Hot Expo":        {"11-12":380,"12-13":822.43,"13-14":696.15,"14-15":863.97,"15-16":764.50,"17-18":955.34,"18-19":484.65,"19-20":738.54,"20-21":919.04,"21-22":629.99,"22-23":948.06,"23-24":819.08,"0-1":524},
+    "No Print":        {"12-13":304.47,"13-14":307.45,"14-15":328.95,"15-16":587.50,"17-18":267.67,"18-19":177.07,"19-20":210.98,"20-21":151.60,"21-22":236.16,"22-23":233.80,"23-24":416.50,"0-1":903},
+    "Pasta":           {"12-13":914.25,"13-14":590.19,"14-15":795.50,"15-16":892,"18-19":529.33,"19-20":793.79,"20-21":982.02,"21-22":691.35,"22-23":1069.02,"23-24":1035.49},
+    "Pastry":          {"12-13":891.33,"13-14":442.94,"14-15":389.23,"15-16":329.69,"16-17":728.5,"17-18":917,"18-19":273.42,"19-20":328.11,"20-21":402.81,"21-22":373.76,"22-23":238.68,"23-24":263.43,"0-1":494.17},
+    "Sauté":           {"14-15":1072,"17-18":886.67,"18-19":780.39,"19-20":791.02,"20-21":927,"21-22":724.45,"22-23":798.82,"23-24":623.78,"0-1":524},
+    "Hot Expo (Pass)": null,
+    "SP Claudie Bar":  {"12-13":1133,"13-14":509,"17-18":405.50,"18-19":293.37,"19-20":538.61,"20-21":386.42,"21-22":600.97,"22-23":494.11,"23-24":750.89},
+    "SP Claudie Champ":{"12-13":284,"13-14":491.19,"14-15":492.55,"15-16":739.43,"18-19":449.61,"19-20":311.12,"20-21":303.21,"21-22":615.85,"22-23":299.09,"23-24":224.50},
+    "Wine BTG":        {"12-13":401,"13-14":811.14,"14-15":325.31,"15-16":667.35,"16-17":1648,"17-18":282.50,"18-19":313.24,"19-20":360.58,"20-21":320.74,"21-22":552.19,"22-23":424.49,"23-24":296.19,"0-1":237},
+    "CL Bar (×4)":     {"12-13":708.50,"13-14":473.98,"14-15":492.55,"15-16":739.43,"17-18":405.50,"18-19":450.24,"19-20":379.95,"20-21":348.52,"21-22":644.60,"22-23":377.99,"23-24":400.40,"0-1":378.72},
+    "CL Champagne (×3)":{"12-13":708.50,"13-14":473.98,"14-15":492.55,"15-16":739.43,"17-18":405.50,"18-19":450.24,"19-20":379.95,"20-21":348.52,"21-22":644.60,"22-23":377.99,"23-24":400.40,"0-1":378.72},
+  };
+
+  function fmtSec(s) {
+    if (s == null) return '';
+    const m = Math.floor(s/60), sec = Math.round(s%60);
+    return `${m}:${String(sec).padStart(2,'0')}`;
+  }
+  function lerpColor(a, b, t) {
+    t = Math.max(0, Math.min(1, t));
+    const hex = s => parseInt(s.replace('#',''), 16);
+    const ha = hex(a), hb = hex(b);
+    const r1=(ha>>16)&255, g1=(ha>>8)&255, b1=ha&255;
+    const r2=(hb>>16)&255, g2=(hb>>8)&255, b2=hb&255;
+    const r=Math.round(r1+(r2-r1)*t), g=Math.round(g1+(g2-g1)*t), bl=Math.round(b1+(b2-b1)*t);
+    return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${bl.toString(16).padStart(2,'0')}`;
+  }
+  function hmColor(sec, target) {
+    if (sec == null) return '#1a1d24';
+    const ref = target || 600;
+    const ratio = sec / ref;
+    if (ratio <= 1.0) return lerpColor('#133d22','#22c55e', ratio);
+    if (ratio <= 1.15) return lerpColor('#22c55e','#f59e0b', (ratio-1)/0.15);
+    if (ratio <= 1.30) return lerpColor('#f59e0b','#ef4444', (ratio-1.15)/0.15);
+    return '#ef4444';
+  }
+  function textColor(bg) {
+    const hex = parseInt(bg.replace('#',''), 16);
+    const r=(hex>>16)&255, g=(hex>>8)&255, b=hex&255;
+    return (r*299+g*587+b*114)/1000 > 128 ? '#111' : '#eee';
+  }
+
+  const table = document.getElementById('hmTable');
+  const stationNames = Object.keys(HM).filter(k => HM[k]);
+
+  // Header row
+  let html = '<thead><tr><th style="text-align:left;padding:4px 8px;background:#1e2533;color:#9aa0aa;white-space:nowrap;position:sticky;left:0;z-index:1">Station</th>';
+  HM_HOURS.forEach(h => {
+    html += `<th style="padding:4px 5px;background:#1e2533;color:#9aa0aa;text-align:center;min-width:38px">${h.replace('-','\u2013')}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  stationNames.forEach(st => {
+    const tgt = HM_TARGETS[st] || null;
+    html += `<tr><td style="padding:4px 8px;white-space:nowrap;background:#181b22;color:#e8eaed;position:sticky;left:0;font-weight:500;border-right:1px solid #262a33">${st}${tgt ? `<br><span style="color:#9aa0aa;font-size:10px">target ${fmtSec(tgt)}</span>` : ''}</td>`;
+    HM_HOURS.forEach(h => {
+      const sec = HM[st][h] ?? null;
+      const bg = hmColor(sec, tgt);
+      const fg = textColor(bg);
+      const tip = sec != null ? `${st} ${h}: ${fmtSec(sec)} (${sec.toFixed(0)}s)${tgt ? ' · target '+fmtSec(tgt) : ''}` : `${st} ${h}: no data`;
+      html += `<td title="${tip}" style="padding:3px 4px;background:${bg};color:${fg};text-align:center;font-size:10px;cursor:default">${sec != null ? fmtSec(sec) : ''}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+})();
+</script>
+</body>
+</html>

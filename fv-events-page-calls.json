@@ -1,0 +1,205 @@
+[
+  {
+    "url": "https://api.fourvenues.com/sesion/?query={}&options={%22disableCache%22:true}",
+    "method": "GET",
+    "headers": {
+      "storage-bucket": "pro",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://pro.fourvenues.com/",
+      "sec-ch-ua": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "sec-ch-ua-mobile": "?0",
+      "device-id": "Si31adyb6hnvwbacdrk41sh49y8iUrO4",
+      "accept": "application/json, text/plain, */*",
+      "content-type": "application/json",
+      "app-id": "ajihln7fc0006jhmmi4lh75s2lI9O3jx",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
+    "postData": null,
+    "response": {
+      "status": 200,
+      "body": "{\"process_time\":\"3ms\"}"
+    }
+  },
+  {
+    "url": "https://api.fourvenues.com/sesion/?query={}&options={%22disableCache%22:true}",
+    "method": "GET",
+    "headers": {
+      "storage-bucket": "pro",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://pro.fourvenues.com/",
+      "sec-ch-ua": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "sec-ch-ua-mobile": "?0",
+      "device-id": "Si31adyb6hnvwbacdrk41sh49y8iUrO4",
+      "accept": "application/json, text/plain, */*",
+      "content-type": "application/json",
+      "app-id": "ajihln7fc0006jhmmi4lh75s2lI9O3jx",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
+    "postData": null,
+    "response": {
+      "status": 200,
+      "body": "{\"process_time\":\"93ms\"}"
+    }
+  },
+  {
+    "url": "https://api.fourvenues.com/announcements/latest",
+    "method": "GET",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://pro.fourvenues.com/",
+      "sec-ch-ua": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "sec-ch-ua-mobile": "?0",
+      "user-id": "",
+      "device-id": "Si31adyb6hnvwbacdrk41sh49y8iUrO4",
+      "accept": "application/json, text/plain, */*",
+      "content-type": "application/json",
+      "app-id": "ajihln7fc0006jhmmi4lh75s2lI9O3jx",
+      "session-id": ""
+    },
+    "postData": null,
+    "response": {
+      "status": 401,
+      "body": "{\"data\":\"No tienes permiso\",\"process_time\":\"3ms\"}"
+    }
+  },
+  {
+    "url": "https://api.fourvenues.com/sesion/?query={}&options={%22disableCache%22:true}",
+    "method": "GET",
+    "headers": {
+      "storage-bucket": "pro",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://pro.fourvenues.com/",
+      "sec-ch-ua": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "sec-ch-ua-mobile": "?0",
+      "device-id": "Si31adyb6hnvwbacdrk41sh49y8iUrO4",
+      "accept": "application/json, text/plain, */*",
+      "content-type": "application/json",
+      "app-id": "ajihln7fc0006jhmmi4lh75s2lI9O3jx",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
+    "postData": null,
+    "response": {
+      "status": 200,
+      "body": "{\"process_time\":\"936ms\"}"
+    }
+  },
+  {
+    "url": "https://api.fourvenues.com/notificaciones_info/?query={}&options={}",
+    "method": "GET",
+    "headers": {
+      "storage-bucket": "pro",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://pro.fourvenues.com/",
+      "sec-ch-ua": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "sec-ch-ua-mobile": "?0",
+      "device-id": "Si31adyb6hnvwbacdrk41sh49y8iUrO4",
+      "accept": "application/json, text/plain, */*",
+      "content-type": "application/json",
+      "app-id": "ajihln7fc0006jhmmi4lh75s2lI9O3jx",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
+    "postData": null,
+    "response": {
+      "status": 401,
+      "body": "{\"data\":\"No tienes permiso\",\"process_time\":\"2ms\"}"
+    }
+  },
+  {
+    "url": "https://api.fourvenues.com/sesion/?query={}&options={%22disableCache%22:true}",
+    "method": "GET",
+    "headers": {
+      "storage-bucket": "pro",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://pro.fourvenues.com/",
+      "sec-ch-ua": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "sec-ch-ua-mobile": "?0",
+      "device-id": "Si31adyb6hnvwbacdrk41sh49y8iUrO4",
+      "accept": "application/json, text/plain, */*",
+      "content-type": "application/json",
+      "app-id": "ajihln7fc0006jhmmi4lh75s2lI9O3jx",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
+    "postData": null
+  },
+  {
+    "url": "https://api.fourvenues.com/notificaciones/?query={}&options={%22skip%22:0,%22limit%22:20,%22sort%22:{%22created_at%22:-1}}",
+    "method": "GET",
+    "headers": {
+      "storage-bucket": "pro",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://pro.fourvenues.com/",
+      "sec-ch-ua": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "sec-ch-ua-mobile": "?0",
+      "device-id": "Si31adyb6hnvwbacdrk41sh49y8iUrO4",
+      "accept": "application/json, text/plain, */*",
+      "content-type": "application/json",
+      "app-id": "ajihln7fc0006jhmmi4lh75s2lI9O3jx",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
+    "postData": null,
+    "response": {
+      "status": 401,
+      "body": "{\"data\":\"No tienes permiso\",\"process_time\":\"1ms\"}"
+    }
+  },
+  {
+    "url": "https://api.fourvenues.com/authorization/?query={%22type%22:%22page%22,%22redirect_url%22:%22https://pro.fourvenues.com/mila1/events%22}&options={}",
+    "method": "GET",
+    "headers": {
+      "storage-bucket": "pro",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://pro.fourvenues.com/",
+      "sec-ch-ua": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "sec-ch-ua-mobile": "?0",
+      "device-id": "Si31adyb6hnvwbacdrk41sh49y8iUrO4",
+      "accept": "application/json, text/plain, */*",
+      "content-type": "application/json",
+      "app-id": "ajihln7fc0006jhmmi4lh75s2lI9O3jx",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
+    "postData": null,
+    "response": {
+      "status": 200,
+      "body": ""
+    }
+  },
+  {
+    "url": "https://api.fourvenues.com/sesion/?query={}&options={%22disableCache%22:true}",
+    "method": "GET",
+    "headers": {
+      "storage-bucket": "pro",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "https://pro.fourvenues.com/",
+      "sec-ch-ua": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "sec-ch-ua-mobile": "?0",
+      "device-id": "Si31adyb6hnvwbacdrk41sh49y8iUrO4",
+      "accept": "application/json, text/plain, */*",
+      "content-type": "application/json",
+      "app-id": "ajihln7fc0006jhmmi4lh75s2lI9O3jx",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
+    "postData": null
+  },
+  {
+    "url": "https://api.fourvenues.com/sesiones",
+    "method": "POST",
+    "headers": {
+      "sec-ch-ua-platform": "\"Windows\"",
+      "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6InVqaWhtYzQ4ZDAwMGFqaG1ta2g3dnQ4OXNCbHQzaFpXIiwiaWF0IjoxNzgzODA3MjAwLCJleHAiOjE3ODM4MDgxMDB9.9E2h4rC92qqCL7tlmd0swrMvNSXeqYeQfUEfM7m9-mk",
+      "referer": "https://id.fourvenues.com/",
+      "sec-ch-ua": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+      "sec-ch-ua-mobile": "?0",
+      "device-id": "omrgv9d240000357oh4tqpfu3ktKXHT5",
+      "accept": "application/json, text/plain, */*",
+      "content-type": "application/json",
+      "app-id": "ujihmc48d000ajhmmkh7vt89sBlt3hZW",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
+    "postData": "{\"document\":{\"aplicacion_id\":\"ujihmc48d000ajhmmkh7vt89sBlt3hZW\",\"device_id\":\"omrgv9d240000357oh4tqpfu3ktKXHT5\"}}",
+    "response": {
+      "status": 200,
+      "body": "{\"data\":true,\"process_time\":\"1ms\"}"
+    }
+  }
+]

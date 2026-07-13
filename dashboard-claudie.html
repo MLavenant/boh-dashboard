@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claudie · BOH Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0d1117;color:#e8eaed;font:15px/1.5 -apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:1300px;margin:0 auto;padding:0 20px 64px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;padding:20px 0 0}
+h1{font-size:22px;margin:0}
+.badge{margin-left:auto;color:#9aa0aa;font-size:13px}
+.tab-nav{display:flex;gap:2px;border-bottom:2px solid #1e2533;margin:16px 0 22px;padding-bottom:0}
+.tab-btn{padding:9px 22px;border:none;border-bottom:3px solid transparent;background:none;color:#9aa0aa;font:600 14px/1 inherit;cursor:pointer;border-radius:6px 6px 0 0;transition:all .15s;margin-bottom:-2px}
+.tab-btn:hover{background:#1a1f28;color:#e8eaed}
+.tab-btn.active{background:#181b22;color:#e8eaed;border-bottom:3px solid #d9a441}
+.tab-section{display:none}
+.tab-section.active{display:block}
+.card{background:#181b22;border:1px solid #262a33;border-radius:12px;padding:18px;margin-bottom:18px}
+.card h2{font-size:16px;margin:0 0 3px;color:#e8eaed}
+.card p.note{color:#9aa0aa;font-size:12px;margin:0 0 14px}
+.row{display:grid;gap:18px}
+.row.two{grid-template-columns:1fr 1fr}
+.row.three{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:820px){.row.two,.row.three{grid-template-columns:1fr}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:#181b22;border:1px solid #262a33;border-radius:12px;padding:13px 15px}
+.kpi .v{font-size:24px;font-weight:700;color:#d9a441}
+.kpi .l{color:#9aa0aa;font-size:12px;margin-top:2px}
+.kpi.alert .v{color:#e2706a}
+.bpbox{background:#13161c;border:1px solid #2d323c;border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.bpbox .big{font-size:28px;font-weight:700;color:#e2706a}
+.bpbox .l{color:#9aa0aa;font-size:12px}
+.legend{display:flex;gap:14px;font-size:12px;color:#9aa0aa;margin-top:10px;flex-wrap:wrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+canvas{width:100%!important}
+footer{color:#9aa0aa;font-size:12px;margin-top:30px;text-align:center}
+.annotation-box{background:#1a2436;border:1px solid #2d4a6a;border-radius:8px;padding:8px 12px;font-size:12px;color:#7ec8e3;margin-top:8px;display:inline-block}
+.trend-badge{display:inline-block;background:#1f2330;border:1px solid #2d3448;color:#8a9ab5;border-radius:6px;padding:3px 10px;font-size:11px;margin-top:10px}
+.hm-wrap{overflow-x:auto}
+.hm-table{border-collapse:collapse;font-size:11.5px;width:100%}
+.hm-table th{padding:5px 6px;background:#1e2533;color:#9aa0aa;text-align:center;white-space:nowrap;font-weight:600;min-width:52px}
+.hm-table th.row-head{text-align:left;padding-left:8px;min-width:60px;position:sticky;left:0;z-index:2}
+.hm-table td{padding:5px 4px;text-align:center;font-size:11px;font-weight:600;min-width:52px;border:1px solid #0d1117}
+.hm-table td.row-head{text-align:left;padding:5px 8px;background:#181b22;color:#9aa0aa;white-space:nowrap;position:sticky;left:0;border-right:2px solid #262a33;font-weight:500;font-size:12px}
+.hm-toggle{display:flex;gap:8px;margin-bottom:12px}
+.hm-toggle button{padding:5px 16px;border:1px solid #2d3448;background:#1e2533;color:#9aa0aa;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit}
+.hm-toggle button.active{background:#262a33;color:#e8eaed;border-color:#d9a441}
+.section-title{font-size:17px;font-weight:700;color:#d9a441;margin:28px 0 12px;padding-bottom:6px;border-bottom:1px solid #262a33}
+table.menu-tbl{width:100%;border-collapse:collapse;font-size:13px}
+table.menu-tbl th{background:#1e2533;color:#9aa0aa;padding:7px 10px;text-align:left;font-weight:600;cursor:pointer;user-select:none}
+table.menu-tbl th:hover{color:#e8eaed}
+table.menu-tbl td{padding:6px 10px;border-bottom:1px solid #1e2533}
+table.menu-tbl tr:hover td{background:#1e2533}
+.over{color:#e2706a;font-weight:600}
+.ok{color:#74d39a}
+.coming-note{background:#131720;border:1px solid #2d3448;border-radius:8px;padding:10px 14px;font-size:12px;color:#8a9ab5;margin-top:18px;text-align:center}
+/* Station tab styles */
+.station-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.station-pill{padding:6px 16px;border:1px solid #2d3448;background:#1e2533;color:#9aa0aa;border-radius:20px;cursor:pointer;font-size:13px;font-family:inherit;transition:all .15s}
+.station-pill:hover{border-color:#d9a441;color:#e8eaed}
+.station-pill.active{background:#262a33;color:#e8eaed;border-color:#d9a441;font-weight:600}
+.station-pill.green{border-left:3px solid #22c55e}
+.station-pill.amber{border-left:3px solid #f59e0b}
+.station-pill.red{border-left:3px solid #ef4444}
+.station-detail{background:#181b22;border:1px solid #262a33;border-radius:12px;padding:20px}
+.station-header{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #262a33}
+.station-header h2{font-size:18px;margin:0}
+.status-badge{padding:3px 12px;border-radius:12px;font-size:12px;font-weight:700}
+.status-green{background:#1a3a1a;color:#22c55e;border:1px solid #22c55e}
+.status-red{background:#3a1a1a;color:#ef4444;border:1px solid #ef4444}
+.status-amber{background:#3a2a00;color:#f59e0b;border:1px solid #f59e0b}
+.items-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.items-table th{background:#1e2533;color:#9aa0aa;padding:6px 8px;text-align:left;font-weight:600}
+.items-table td{padding:5px 8px;border-bottom:1px solid #1a1d24}
+.items-table tr:hover td{background:#1e2533}
+.bar-cell{display:flex;align-items:center;gap:6px}
+.bar-bg{flex:1;height:8px;background:#1e2533;border-radius:4px;overflow:hidden;min-width:60px}
+.bar-fill{height:100%;border-radius:4px}
+/* Menu search */
+.search-bar{width:100%;padding:8px 14px;background:#1e2533;border:1px solid #2d3448;border-radius:8px;color:#e8eaed;font:14px/1 inherit;margin-bottom:14px;outline:none}
+.search-bar:focus{border-color:#d9a441}
+.sort-btns{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.sort-btn{padding:5px 14px;border:1px solid #2d3448;background:#1e2533;color:#9aa0aa;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit}
+.sort-btn.active{background:#262a33;color:#e8eaed;border-color:#d9a441}
+.menu-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+.menu-stat{background:#13161c;border:1px solid #1e2533;border-radius:8px;padding:10px 12px;text-align:center}
+.menu-stat .v{font-size:20px;font-weight:700}
+.menu-stat .l{color:#9aa0aa;font-size:11px;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Claudie · BOH Dashboard</h1>
+  <span class="badge">Week of Jun 29 – Jul 5, 2026 · Updated Jul 6, 2026</span>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('overview',this)">Overview</button>
+  <button class="tab-btn" onclick="switchTab('stations',this)">Stations</button>
+  <button class="tab-btn" onclick="switchTab('menu',this)">Menu Items</button>
+</nav>
+
+<!-- ========== TAB 1: OVERVIEW ========== -->
+<section id="tab-overview" class="tab-section active">
+
+<div class="kpis">
+  <div class="kpi"><div class="v">22,927</div><div class="l">Food tickets (week)</div></div>
+  <div class="kpi alert"><div class="v">57</div><div class="l">Peak concurrent tickets</div></div>
+  <div class="kpi alert"><div class="v">26</div><div class="l">Breaking point (tickets)</div></div>
+  <div class="kpi alert"><div class="v">141</div><div class="l">Breaking point (guests)</div></div>
+  <div class="kpi"><div class="v">39.4</div><div class="l">Peak avg conc. (Sat 20–21)</div></div>
+  <div class="kpi"><div class="v">15 min</div><div class="l">Fulfillment target</div></div>
+</div>
+
+<!-- Visual 1 -->
+<div class="card">
+  <h2>Visual 1 — Kitchen Pressure Curve</h2>
+  <p class="note">X-axis = concurrent tickets open. Left Y = occurrences. Right Y = avg fulfillment time (min). Red dashed = 15-min target. Crossing point (≥26 concurrent) is where kitchen falls behind.</p>
+  <canvas id="cPressure" style="max-height:400px"></canvas>
+  <div class="legend">
+    <span><span class="sw" style="background:#5aa9e6"></span>Occurrences</span>
+    <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
+    <span><span class="sw" style="background:#e2706a"></span>15-min target</span>
+  </div>
+  <div class="annotation-box">⚡ Breaking point at <strong>26 concurrent tickets</strong> — avg fulfillment jumps to 16.0 min.</div>
+  <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
+</div>
+
+<!-- Visual 2+3 -->
+<div class="row two">
+  <div class="card">
+    <h2>Visual 2 — Breaking Point</h2>
+    <p class="note">Avg fulfillment time and guests vs concurrent ticket load.</p>
+    <div class="row two" style="margin-bottom:12px;gap:8px">
+      <div class="bpbox"><div class="big">26</div><div class="l">tickets → kitchen falls behind</div></div>
+      <div class="bpbox"><div class="big">141</div><div class="l">guests → kitchen falls behind</div></div>
+    </div>
+    <canvas id="cBreaking" style="max-height:260px"></canvas>
+    <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
+  </div>
+  <div class="card">
+    <h2>Visual 3 — Load vs Performance</h2>
+    <p class="note">Bucketed view (10-ticket steps): avg fulfillment time per band.</p>
+    <canvas id="cLoadPerf" style="max-height:260px"></canvas>
+    <div class="legend">
+      <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
+      <span><span class="sw" style="background:#e2706a"></span>15-min target</span>
+    </div>
+    <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
+  </div>
+</div>
+
+<!-- Visual 5: 3D -->
+<div class="card">
+  <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap">
+    <h2 style="margin:0">Visual 5 — 3D Station View (Food stations only)</h2>
+    <span style="margin-left:auto">
+      <span style="font-size:28px;font-weight:700;color:#d9a441" id="kTotal">—</span>
+      <span style="color:#9aa0aa;font-size:12px;display:block;margin-top:-4px">stations over target</span>
+    </span>
+  </div>
+  <p class="note">Each block = a food station. Height ∝ avg fulfillment time. <strong style="color:#2e8b57">Green</strong> ≤ target, <strong style="color:#c99a2e">amber</strong> up to +15%, <strong style="color:#c0392b">red</strong> &gt;+15%. Drag to rotate, scroll to zoom, click for detail.</p>
+  <div id="kitchen" style="height:500px;border-radius:10px;overflow:hidden;background:#0c0e13;cursor:grab"></div>
+  <div class="legend" style="margin-top:10px">
+    <span><span class="sw" style="background:#2e8b57"></span>On target</span>
+    <span><span class="sw" style="background:#c99a2e"></span>Up to +15% over</span>
+    <span><span class="sw" style="background:#c0392b"></span>&gt;15% over target</span>
+    <span><span class="sw" style="background:#6b7280"></span>No target</span>
+  </div>
+  <div id="kDetail" style="margin-top:14px"></div>
+</div>
+
+<!-- Visual 6: Heatmaps -->
+<div class="card">
+  <h2>Visual 6 — Day × Hour Heatmaps</h2>
+  <p class="note">Toggle between fulfillment time and guest count. Y-axis = hour window. X-axis = day of week.</p>
+  <div class="hm-toggle">
+    <button class="active" onclick="showHM('ful',this)">⏱ Avg Fulfillment Time (min)</button>
+    <button onclick="showHM('guests',this)">👥 Avg Guests Seated (OT)</button>
+  </div>
+  <div id="hmFulCallout" style="display:none;background:#2d1a0a;border:1px solid #92400e;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:#fcd34d"></div>
+  <div id="hmFul">
+    <div style="font-size:12px;color:#9aa0aa;margin-bottom:6px">Color scale: <span style="color:#22c55e">■</span> ≤10 min → <span style="color:#f59e0b">■</span> 10–15 min → <span style="color:#ef4444">■</span> &gt;15 min</div>
+    <div class="hm-wrap"><table class="hm-table" id="hmFulTable"></table></div>
+    <div class="legend" style="margin-top:8px">
+      <span><span class="sw" style="background:#22c55e"></span>≤10 min</span>
+      <span><span class="sw" style="background:#f59e0b"></span>10–15 min</span>
+      <span><span class="sw" style="background:#ef4444"></span>&gt;15 min</span>
+      <span><span class="sw" style="background:#1a1d24"></span>No data</span>
+    </div>
+  </div>
+  <div id="hmGuests" style="display:none">
+    <div style="font-size:12px;color:#9aa0aa;margin-bottom:6px">Color scale: <span style="color:#b3d9f7">■</span> few → <span style="color:#1565c0">■</span> many guests</div>
+    <div class="hm-wrap"><table class="hm-table" id="hmGuestsTable"></table></div>
+    <div class="legend" style="margin-top:8px">
+      <span><span class="sw" style="background:#b3d9f7"></span>Few guests</span>
+      <span><span class="sw" style="background:#1565c0"></span>Many guests (170+)</span>
+      <span><span class="sw" style="background:#1a1d24"></span>No data</span>
+    </div>
+  </div>
+</div>
+
+</section>
+
+<!-- ========== TAB 2: STATIONS ========== -->
+<section id="tab-stations" class="tab-section">
+
+<div class="section-title">Station Selector</div>
+<div class="station-pills" id="stationPills"></div>
+<div class="station-detail" id="stationDetail">
+  <p style="color:#9aa0aa;font-size:13px">Select a station above to view details.</p>
+</div>
+
+<div class="section-title" style="margin-top:28px">All Stations — Performance Chart</div>
+<div class="card">
+  <h2>Station Performance — Actual vs Target</h2>
+  <p class="note">Sorted by avg fulfillment descending. Grey tick = target. Food stations only.</p>
+  <canvas id="cStations" style="max-height:420px"></canvas>
+  <div class="legend">
+    <span><span class="sw" style="background:#22c55e"></span>On target</span>
+    <span><span class="sw" style="background:#f59e0b"></span>Up to +15% over</span>
+    <span><span class="sw" style="background:#ef4444"></span>&gt;+15% over</span>
+    <span><span class="sw" style="background:#5aa9e6"></span>No target</span>
+  </div>
+</div>
+<div class="coming-note">📊 3-week trend comparison — coming when Week 2 data is available</div>
+
+</section>
+
+<!-- ========== TAB 3: MENU ITEMS ========== -->
+<section id="tab-menu" class="tab-section">
+
+<div class="section-title">Menu Item Performance</div>
+<div class="card">
+  <div class="menu-stats" id="menuStats"></div>
+  <input class="search-bar" id="menuSearch" placeholder="🔍 Search menu items…" oninput="applyMenuFilters()">
+  <div id="menuStatusFilter" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px"></div>
+  <div class="sort-btns">
+    <span style="color:#9aa0aa;font-size:12px;line-height:28px">Sort by:</span>
+    <button class="sort-btn active" id="sortTime" onclick="setSort('time',this)">Slowest first</button>
+    <button class="sort-btn" id="sortCount" onclick="setSort('count',this)">Most ordered</button>
+    <button class="sort-btn" id="sortName" onclick="setSort('name',this)">Name A–Z</button>
+    <button class="sort-btn" id="sortFast" onclick="setSort('fast',this)">Fastest first</button>
+  </div>
+  <div style="overflow-x:auto">
+    <table class="menu-tbl" id="menuTable">
+      <thead><tr>
+        <th style="width:36px">#</th>
+        <th>Menu Item</th>
+        <th style="width:70px">Count</th>
+        <th style="width:110px">Avg Time</th>
+        <th style="width:180px">vs 15 min threshold</th>
+        <th style="width:70px">Status</th>
+      </tr></thead>
+      <tbody id="menuBody"></tbody>
+    </table>
+  </div>
+</div>
+<div class="coming-note">📊 3-week trend comparison — coming when Week 2 data is available</div>
+
+</section>
+
+<footer>Source: <em>Week 20cl2.xlsx</em> · Fulfillment = Fired Date → Fulfilled Date · Food stations only</footer>
+</div>
+
+<script>
+// ============================================================
+// EMBEDDED DATA
+// ============================================================
+const CURVE = [{"conc":1,"occ":130,"ful":11.55,"guests":27.89},{"conc":2,"occ":174,"ful":11.8,"guests":41.4},{"conc":3,"occ":224,"ful":11.62,"guests":49.35},{"conc":4,"occ":248,"ful":11.64,"guests":60.58},{"conc":5,"occ":253,"ful":11.82,"guests":63.72},{"conc":6,"occ":251,"ful":12.02,"guests":73.74},{"conc":7,"occ":256,"ful":11.89,"guests":82.13},{"conc":8,"occ":229,"ful":11.81,"guests":90.23},{"conc":9,"occ":228,"ful":11.9,"guests":94.92},{"conc":10,"occ":224,"ful":11.6,"guests":107.14},{"conc":11,"occ":232,"ful":12.04,"guests":109.74},{"conc":12,"occ":219,"ful":12.75,"guests":112.16},{"conc":13,"occ":202,"ful":12.9,"guests":113.13},{"conc":14,"occ":202,"ful":13.32,"guests":119.01},{"conc":15,"occ":211,"ful":13.22,"guests":124.33},{"conc":16,"occ":205,"ful":13.71,"guests":122.65},{"conc":17,"occ":212,"ful":13.64,"guests":123.15},{"conc":18,"occ":196,"ful":13.11,"guests":125.78},{"conc":19,"occ":182,"ful":13.69,"guests":124.49},{"conc":20,"occ":146,"ful":13.86,"guests":136.52},{"conc":21,"occ":132,"ful":13.94,"guests":132.29},{"conc":22,"occ":105,"ful":13.77,"guests":136.47},{"conc":23,"occ":81,"ful":14.12,"guests":140.01},{"conc":24,"occ":62,"ful":14.61,"guests":144.67},{"conc":25,"occ":64,"ful":14.17,"guests":144.02},{"conc":26,"occ":76,"ful":16.01,"guests":142.09},{"conc":27,"occ":67,"ful":16.51,"guests":143.94},{"conc":28,"occ":54,"ful":15.93,"guests":140.59},{"conc":29,"occ":46,"ful":15.79,"guests":146.69},{"conc":30,"occ":43,"ful":16.14,"guests":145.55},{"conc":31,"occ":39,"ful":16,"guests":152.65},{"conc":32,"occ":33,"ful":16.79,"guests":160.87},{"conc":33,"occ":30,"ful":17.7,"guests":161.91},{"conc":34,"occ":27,"ful":16.1,"guests":166.18},{"conc":35,"occ":27,"ful":17.3,"guests":159.34},{"conc":36,"occ":22,"ful":16.93,"guests":161.95},{"conc":37,"occ":26,"ful":18.38,"guests":167.98},{"conc":38,"occ":26,"ful":17.43,"guests":169.37},{"conc":39,"occ":35,"ful":16.97,"guests":168.63},{"conc":40,"occ":36,"ful":18.46,"guests":167.38},{"conc":41,"occ":29,"ful":18.15,"guests":165.71},{"conc":42,"occ":30,"ful":19.06,"guests":167.82},{"conc":43,"occ":28,"ful":18.98,"guests":166.54},{"conc":44,"occ":25,"ful":18.47,"guests":167.61},{"conc":45,"occ":21,"ful":18.73,"guests":167.4},{"conc":46,"occ":10,"ful":16.43,"guests":173.2},{"conc":47,"occ":7,"ful":17.07,"guests":172.48},{"conc":48,"occ":6,"ful":17.6,"guests":172.24},{"conc":49,"occ":11,"ful":20.04,"guests":172.18},{"conc":50,"occ":12,"ful":18.38,"guests":171.96},{"conc":51,"occ":10,"ful":16.28,"guests":170.76},{"conc":52,"occ":5,"ful":16.72,"guests":170},{"conc":53,"occ":2,"ful":16.64,"guests":170},{"conc":54,"occ":4,"ful":16.28,"guests":170.52},{"conc":55,"occ":5,"ful":16.32,"guests":170.36},{"conc":56,"occ":5,"ful":16.06,"guests":170.06},{"conc":57,"occ":1,"ful":15.91,"guests":170}];
+const TBK = [{"bucket":"1–10","ful":11.78},{"bucket":"11–20","ful":13.18},{"bucket":"21–30","ful":14.86},{"bucket":"31–40","ful":17.19},{"bucket":"41–50","ful":18.52},{"bucket":"51–60","ful":16.33}];
+const STATIONS = [{"station":"Back Kitchen","count":213,"avg_sec":645.62,"exp_sec":611.83},{"station":"Cold Expo","count":2015,"avg_sec":417.43,"exp_sec":359.64},{"station":"Crudo","count":527,"avg_sec":594.28,"exp_sec":488.2},{"station":"Fryer","count":216,"avg_sec":638.81,"exp_sec":239.17},{"station":"Garde Manger","count":551,"avg_sec":543.19,"exp_sec":365.88},{"station":"Grill Fish","count":139,"avg_sec":866.34,"exp_sec":627.19},{"station":"Grill Meat","count":104,"avg_sec":838.65,"exp_sec":549.81},{"station":"Hot Expo","count":513,"avg_sec":831.57,"exp_sec":596.02},{"station":"No Print","count":596,"avg_sec":224.87,"exp_sec":233.15},{"station":"Pasta","count":173,"avg_sec":867.95,"exp_sec":669.36},{"station":"Pastry","count":393,"avg_sec":335.49,"exp_sec":432.82},{"station":"Sauté","count":139,"avg_sec":874.65,"exp_sec":703.6}];
+const SUMMARY = [{"item":"A-Add-on Bread","count":18,"avg_sec":242.11},{"item":"C-Add-on 10gr Caviar","count":1,"avg_sec":954},{"item":"C-Blini","count":1,"avg_sec":304},{"item":"C-Zucchini Carpaccio","count":39,"avg_sec":569.97},{"item":"CL-1/2 Rack of Lamb","count":10,"avg_sec":976.2},{"item":"CL-12oz Entrecote","count":35,"avg_sec":1032.4},{"item":"CL-30gr Caviar Service","count":4,"avg_sec":635.25},{"item":"CL-50oz Wagyu Porter House","count":2,"avg_sec":107},{"item":"CL-6 Oysters","count":38,"avg_sec":590.11},{"item":"CL-7oz Tenderloin","count":7,"avg_sec":908},{"item":"CL-8oz Wagyu Skirt Steak","count":18,"avg_sec":833.83},{"item":"CL-Add Black Truffle","count":2,"avg_sec":941},{"item":"CL-Add Butter","count":18,"avg_sec":331.67},{"item":"CL-Amuse Bouche","count":47,"avg_sec":451.94},{"item":"CL-Apple Sorbet","count":6,"avg_sec":353.33},{"item":"CL-Apple Tart Fine","count":50,"avg_sec":320.86},{"item":"CL-Bearnaise Sauce","count":4,"avg_sec":300.75},{"item":"CL-Beef Tartare","count":61,"avg_sec":495.26},{"item":"CL-Bouillabaisse","count":23,"avg_sec":955.13},{"item":"CL-Branzino Carpaccio","count":79,"avg_sec":595.08},{"item":"CL-Branzino Grilled","count":31,"avg_sec":893.16},{"item":"CL-Bread Basket","count":579,"avg_sec":224.2},{"item":"CL-Broccolini","count":45,"avg_sec":1031.07},{"item":"CL-Brussels Sprouts","count":27,"avg_sec":909.44},{"item":"CL-Burrata","count":123,"avg_sec":494.59},{"item":"CL-Cakeage Fee","count":2,"avg_sec":569.5},{"item":"CL-Caviar Pasta Petrossian","count":2,"avg_sec":799.5},{"item":"CL-Caviar Pasta Trading","count":9,"avg_sec":1190.22},{"item":"CL-Cheesecake","count":71,"avg_sec":268.62},{"item":"CL-Chocolate Mousse","count":54,"avg_sec":289.15},{"item":"CL-Claudie Seafood Tower","count":8,"avg_sec":996},{"item":"CL-Colossal Prawns","count":23,"avg_sec":683.87},{"item":"CL-Crab Croquettes","count":94,"avg_sec":556.31},{"item":"CL-Creme Brulee","count":100,"avg_sec":322.09},{"item":"CL-Daurade Royal","count":14,"avg_sec":352.21},{"item":"CL-Dessert Platter","count":3,"avg_sec":615.33},{"item":"CL-Dover Sole","count":24,"avg_sec":979.04},{"item":"CL-Escargots","count":144,"avg_sec":614.98},{"item":"CL-French Fries","count":42,"avg_sec":529.71},{"item":"CL-Full Rack of Lamb","count":1,"avg_sec":566},{"item":"CL-Gazpacho","count":34,"avg_sec":457.71},{"item":"CL-Gratin Dauphinois","count":30,"avg_sec":887.37},{"item":"CL-Ice Cream (1 scoop)","count":21,"avg_sec":264.33},{"item":"CL-Lettuce","count":66,"avg_sec":521.14},{"item":"CL-Lobster Pasta","count":57,"avg_sec":982.35},{"item":"CL-Maitre D Butter","count":6,"avg_sec":338.33},{"item":"CL-Mushroom","count":22,"avg_sec":908.64},{"item":"CL-Nicoise","count":27,"avg_sec":620.33},{"item":"CL-Olive Tapenade","count":8,"avg_sec":627.88},{"item":"CL-Pepper Sauce","count":2,"avg_sec":311},{"item":"CL-Petrossian Caviar 50gr","count":1,"avg_sec":863},{"item":"CL-Pistachio Ice Cream","count":51,"avg_sec":550.02},{"item":"CL-Plain Pasta","count":4,"avg_sec":1176},{"item":"CL-Poached Maine Lobster","count":5,"avg_sec":929},{"item":"CL-Potato Gaufrette","count":4,"avg_sec":185},{"item":"CL-Prawns","count":33,"avg_sec":868.85},{"item":"CL-Ratatouille","count":17,"avg_sec":801.35},{"item":"CL-Salmon","count":38,"avg_sec":954.63},{"item":"CL-Smoked Salmon","count":6,"avg_sec":457.67},{"item":"CL-Sorbet & Ice cream","count":35,"avg_sec":285.06},{"item":"CL-Sorbet (1 scoop)","count":15,"avg_sec":257.93},{"item":"CL-Special Scoop","count":30,"avg_sec":321.67},{"item":"CL-Temp Daurade","count":15,"avg_sec":325.8},{"item":"CL-Temp Turbot","count":6,"avg_sec":204.17},{"item":"CL-Temper Porter House","count":2,"avg_sec":107},{"item":"CL-Tomahawk","count":12,"avg_sec":392.25},{"item":"CL-Tomahawk Temp","count":12,"avg_sec":273.67},{"item":"CL-Tropezienne Tart","count":12,"avg_sec":387.67},{"item":"CL-Truffle Macaroni","count":22,"avg_sec":897.73},{"item":"CL-Truffle Purée","count":35,"avg_sec":836.91},{"item":"CL-Truffle Risotto","count":40,"avg_sec":873.3},{"item":"CL-Tuna Tartare","count":110,"avg_sec":539.92},{"item":"CL-Turbot","count":5,"avg_sec":659.6},{"item":"CLPFL- I/C Sorbet 2 scoops","count":22,"avg_sec":400.14},{"item":"CLPFL-Caesar","count":51,"avg_sec":633.71},{"item":"CLPFL-Chicken Paillard","count":11,"avg_sec":791.91},{"item":"CLPFL-Crab Croquettes","count":26,"avg_sec":551.73},{"item":"CLPFL-Creme Brulee","count":32,"avg_sec":460.19},{"item":"CLPFL-Gazpacho","count":31,"avg_sec":570.06},{"item":"CLPFL-Hanger Frites","count":15,"avg_sec":814.87},{"item":"CLPFL-Rigatoni Pasta","count":9,"avg_sec":824},{"item":"CLPFL-Salmon","count":8,"avg_sec":845.62},{"item":"CLPFL-Tropezienne","count":25,"avg_sec":436.68},{"item":"CLPFL-Zucchini Carpaccio","count":32,"avg_sec":520.59},{"item":"Colette's Caress","count":6,"avg_sec":661},{"item":"Eau de Coco","count":166,"avg_sec":459.56},{"item":"GL Benoit Chauveau Sancerre","count":74,"avg_sec":427.49},{"item":"GL Bonneliere Chinon Rouge","count":9,"avg_sec":444.22},{"item":"GL Borgo Castagni, Barolo","count":17,"avg_sec":274.59},{"item":"GL Chateau Minuty Rose","count":13,"avg_sec":372},{"item":"GL Château d’Yquem (1oz)","count":1,"avg_sec":161},{"item":"GL Et Fill Pinot Noir","count":24,"avg_sec":376.29},{"item":"GL Feraud Prestige Rose","count":20,"avg_sec":385.8},{"item":"GL Florio Marsala (3oz)","count":1,"avg_sec":171},{"item":"GL George Noel Chablis","count":35,"avg_sec":248.34},{"item":"GL Grave Figeac","count":17,"avg_sec":283.76},{"item":"GL Heathen Chardonnay","count":29,"avg_sec":551.86},{"item":"GL Hugel Pinot Gris","count":25,"avg_sec":318.8},{"item":"GL Laurent-Perrier Harmony, Demi-Sec","count":7,"avg_sec":290.43},{"item":"GL Laurent-Perrier Harmony, Demi-Sec (3oz)","count":2,"avg_sec":199},{"item":"GL Mercues Malbec","count":8,"avg_sec":284.88},{"item":"GL Michel Juillot Mercurey Chardonnay","count":6,"avg_sec":828.17},{"item":"GL Miner Cabernet","count":35,"avg_sec":326.86},{"item":"GL Moet & Chandon Impérial","count":12,"avg_sec":391.5},{"item":"GL Montgilet Anjou","count":7,"avg_sec":194.29},{"item":"GL PJ Blason Rose","count":9,"avg_sec":934.89},{"item":"GL Pago de Carraovejas","count":3,"avg_sec":451.67},{"item":"GL Pedesclaux","count":4,"avg_sec":335.5},{"item":"GL Renard-Barnier","count":31,"avg_sec":292.55},{"item":"Hemingway's Hilltop","count":27,"avg_sec":401.89},{"item":"Matisse's Muse","count":37,"avg_sec":366.38},{"item":"Menthe de Menton","count":32,"avg_sec":392.81},{"item":"Monaco Muse","count":28,"avg_sec":296.32},{"item":"Paloma","count":59,"avg_sec":383.41},{"item":"Picabia's Provocation","count":86,"avg_sec":351.01},{"item":"Renoir's Garden","count":3,"avg_sec":192.33}];
+const HM_FUL = {"Monday":{"0-1":16.48,"11-12":12.8,"12-13":14.62,"13-14":9.64,"14-15":10.72,"15-16":11.26,"18-19":10.36,"19-20":12.59,"20-21":11.51,"21-22":10.12,"22-23":10.98,"23-24":18.51},"Tuesday":{"12-13":9.75,"13-14":13.97,"14-15":9.61,"15-16":11.87,"16-17":1.5,"18-19":16.78,"19-20":12.79,"20-21":14.48,"21-22":11.1,"22-23":14,"23-24":11.26},"Wednesday":{"0-1":13.34,"12-13":12.31,"13-14":10.89,"14-15":10.33,"15-16":9.02,"18-19":8.91,"19-20":10.86,"20-21":11.23,"21-22":11.9,"22-23":10.82,"23-24":13.7},"Thursday":{"12-13":10.89,"13-14":11.38,"14-15":12.16,"15-16":5.3,"17-18":11.97,"18-19":13.38,"19-20":10.58,"20-21":13,"21-22":11.66,"22-23":12.74,"23-24":9.94},"Friday":{"0-1":11.23,"12-13":14.2,"13-14":14.06,"14-15":15.21,"15-16":14.81,"16-17":11.96,"17-18":11.64,"18-19":8.78,"19-20":9.14,"20-21":19.72,"21-22":12.23,"22-23":12.95,"23-24":14.87},"Saturday":{"0-1":4.62,"1-2":26.43,"17-18":13.37,"18-19":9.53,"19-20":12.13,"20-21":21.13,"21-22":11.99,"22-23":16.47,"23-24":15.25},"Sunday":{"0-1":10.49,"1-2":3.15,"16-17":0.38,"18-19":12.31,"19-20":11.26,"20-21":12.51,"21-22":13.15,"22-23":14.73,"23-24":14.6}};
+const HM_GUESTS = {"Monday":{"0-1":74.9,"12-13":9.7,"13-14":15.9,"14-15":17.1,"15-16":20,"16-17":20,"17-18":0.6,"18-19":30.9,"19-20":86.2,"20-21":111.7,"21-22":104.3,"22-23":43.1,"23-24":12.6},"Tuesday":{"12-13":22.6,"13-14":45,"14-15":38.3,"15-16":12.4,"16-17":1,"18-19":25.1,"19-20":87.5,"20-21":109.1,"21-22":117.1,"22-23":83.7,"23-24":32.5},"Wednesday":{"12-13":26.6,"13-14":41.5,"14-15":27.5,"15-16":6,"18-19":25.3,"19-20":94.3,"20-21":127,"21-22":138.8,"22-23":98.4,"23-24":27.4},"Thursday":{"12-13":18.4,"13-14":48.1,"14-15":41,"15-16":1.6,"17-18":33.8,"18-19":107.8,"19-20":195.9,"20-21":178.9,"21-22":179.9,"22-23":174.7,"23-24":151.4},"Friday":{"0-1":14.3,"12-13":34.9,"13-14":69.9,"14-15":105.2,"15-16":89.8,"16-17":65.7,"17-18":2.7,"18-19":18.5,"19-20":108.5,"20-21":139.8,"21-22":144.8,"22-23":143.2,"23-24":122.8},"Saturday":{"0-1":28.1,"17-18":3.8,"18-19":38.2,"19-20":143.6,"20-21":169.1,"21-22":160.5,"22-23":175.4,"23-24":161.3},"Sunday":{"0-1":72.9,"1-2":2.9,"18-19":39,"19-20":82.2,"20-21":106.7,"21-22":131.4,"22-23":132.1,"23-24":101.1}};
+const STATION_ITEMS = {"Hot Expo":[{"item":"CL-Lobster Pasta","count":59,"avg_sec":989.6},{"item":"CL-Broccolini","count":49,"avg_sec":1001},{"item":"CL-French Fries","count":44,"avg_sec":528.6},{"item":"CL-Salmon","count":42,"avg_sec":956.7},{"item":"CL-Truffle Risotto","count":41,"avg_sec":868.7},{"item":"CL-12oz Entrecote","count":38,"avg_sec":1055.3},{"item":"CL-Truffle Purée","count":37,"avg_sec":828.6},{"item":"CL-Gratin Dauphinois","count":33,"avg_sec":873.1},{"item":"CL-Branzino Grilled","count":33,"avg_sec":876.9},{"item":"CL-Brussels Sprouts","count":28,"avg_sec":946.1},{"item":"CL-Dover Sole","count":26,"avg_sec":1030.4},{"item":"CL-Truffle Macaroni","count":24,"avg_sec":891.3},{"item":"CL-Mushroom","count":24,"avg_sec":979.5},{"item":"CL-8oz Wagyu Skirt Steak","count":24,"avg_sec":797.3},{"item":"CL-Bouillabaisse","count":23,"avg_sec":955.1},{"item":"CLPFL-Chicken Paillard","count":22,"avg_sec":890.7},{"item":"CLPFL-Hanger Frites","count":21,"avg_sec":873.3},{"item":"CL-Ratatouille","count":19,"avg_sec":879.5},{"item":"CL-Temp Daurade","count":15,"avg_sec":325.8},{"item":"CL-Daurade Royal","count":15,"avg_sec":343.9},{"item":"CLPFL-Rigatoni Pasta","count":14,"avg_sec":949},{"item":"CLPFL-Salmon","count":14,"avg_sec":905.4},{"item":"CL-Tomahawk Temp","count":12,"avg_sec":273.7},{"item":"CL-Tomahawk","count":12,"avg_sec":392.3},{"item":"CL-7oz Tenderloin","count":11,"avg_sec":835.3},{"item":"CL-1/2 Rack of Lamb","count":10,"avg_sec":976.2},{"item":"CL-Caviar Pasta Trading","count":9,"avg_sec":1190.2},{"item":"CL-Maitre D Butter","count":6,"avg_sec":338.3},{"item":"CL-Temp Turbot","count":6,"avg_sec":204.2},{"item":"CL-Turbot","count":6,"avg_sec":587.5},{"item":"CL-Plain Pasta","count":5,"avg_sec":1077.8},{"item":"CL-Bearnaise Sauce","count":4,"avg_sec":300.8},{"item":"CL-Potato Gaufrette","count":4,"avg_sec":185},{"item":"CL-Temper Porter House","count":2,"avg_sec":107},{"item":"CL-50oz Wagyu Porter House","count":2,"avg_sec":107},{"item":"CL-Pepper Sauce","count":2,"avg_sec":311},{"item":"CL-Caviar Pasta Petrossian","count":2,"avg_sec":799.5},{"item":"CL-Add Black Truffle","count":2,"avg_sec":941},{"item":"CL-Full Rack of Lamb","count":1,"avg_sec":566}],"Grill Fish":[{"item":"CL-Broccolini","count":49,"avg_sec":1001},{"item":"CL-Salmon","count":42,"avg_sec":956.7},{"item":"CL-Branzino Grilled","count":33,"avg_sec":876.9},{"item":"CL-Bouillabaisse","count":23,"avg_sec":955.1},{"item":"CL-Temp Daurade","count":15,"avg_sec":325.8},{"item":"CL-Daurade Royal","count":15,"avg_sec":343.9},{"item":"CLPFL-Salmon","count":14,"avg_sec":905.4},{"item":"CL-Temp Turbot","count":6,"avg_sec":204.2},{"item":"CL-Turbot","count":6,"avg_sec":587.5}],"Garde Manger":[{"item":"CL-Burrata","count":124,"avg_sec":494.4},{"item":"CL-Crab Croquettes","count":95,"avg_sec":554.8},{"item":"CLPFL-Caesar","count":66,"avg_sec":668.8},{"item":"CL-Lettuce","count":66,"avg_sec":521.1},{"item":"CL-Beef Tartare","count":64,"avg_sec":510.8},{"item":"CL-Amuse Bouche","count":48,"avg_sec":447.7},{"item":"CLPFL-Gazpacho","count":38,"avg_sec":587.3},{"item":"CL-Gazpacho","count":36,"avg_sec":442.9},{"item":"CLPFL-Crab Croquettes","count":29,"avg_sec":582.7},{"item":"CL-Nicoise","count":27,"avg_sec":620.3},{"item":"CL-Bouillabaisse","count":23,"avg_sec":955.1},{"item":"CL-Olive Tapenade","count":8,"avg_sec":627.9},{"item":"Eau de Coco","count":1,"avg_sec":179}],"Fryer":[{"item":"CL-Crab Croquettes","count":95,"avg_sec":554.8},{"item":"CL-French Fries","count":44,"avg_sec":528.6},{"item":"CL-12oz Entrecote","count":38,"avg_sec":1055.3},{"item":"CLPFL-Crab Croquettes","count":29,"avg_sec":582.7},{"item":"CLPFL-Hanger Frites","count":21,"avg_sec":873.3},{"item":"CL-Potato Gaufrette","count":4,"avg_sec":185}],"Cold Expo":[{"item":"CL-Bread Basket","count":597,"avg_sec":220.8},{"item":"CL-Escargots","count":148,"avg_sec":614.3},{"item":"CL-Burrata","count":124,"avg_sec":494.4},{"item":"CL-Tuna Tartare","count":110,"avg_sec":539.9},{"item":"CL-Creme Brulee","count":101,"avg_sec":322},{"item":"CL-Crab Croquettes","count":95,"avg_sec":554.8},{"item":"CL-Branzino Carpaccio","count":79,"avg_sec":595.1},{"item":"CL-Cheesecake","count":72,"avg_sec":266.1},{"item":"CLPFL-Caesar","count":66,"avg_sec":668.8},{"item":"CL-Lettuce","count":66,"avg_sec":521.1},{"item":"CL-Beef Tartare","count":64,"avg_sec":510.8},{"item":"CL-Chocolate Mousse","count":54,"avg_sec":289.1},{"item":"CL-Pistachio Ice Cream","count":51,"avg_sec":550},{"item":"CL-Apple Tart Fine","count":50,"avg_sec":320.9},{"item":"CL-Amuse Bouche","count":48,"avg_sec":447.7},{"item":"CLPFL-Zucchini Carpaccio","count":46,"avg_sec":538.3},{"item":"CL-Sorbet & Ice cream","count":42,"avg_sec":321.3},{"item":"CLPFL-Creme Brulee","count":39,"avg_sec":454.6},{"item":"C-Zucchini Carpaccio","count":39,"avg_sec":570},{"item":"CLPFL-Gazpacho","count":38,"avg_sec":587.3},{"item":"CL-6 Oysters","count":38,"avg_sec":590.1},{"item":"CL-Gazpacho","count":36,"avg_sec":442.9},{"item":"CL-Prawns","count":33,"avg_sec":868.8},{"item":"CLPFL- I/C Sorbet 2 scoops","count":32,"avg_sec":387.2},{"item":"CL-Special Scoop","count":30,"avg_sec":321.7},{"item":"CLPFL-Crab Croquettes","count":29,"avg_sec":582.7},{"item":"CLPFL-Tropezienne","count":29,"avg_sec":426.2},{"item":"CL-Sorbet (1 scoop)","count":29,"avg_sec":308.2},{"item":"CL-Nicoise","count":27,"avg_sec":620.3},{"item":"CL-Colossal Prawns","count":23,"avg_sec":683.9},{"item":"CL-Ice Cream (1 scoop)","count":23,"avg_sec":266.9},{"item":"CL-Add Butter","count":21,"avg_sec":297.3},{"item":"A-Add-on Bread","count":19,"avg_sec":237.1},{"item":"CL-Tropezienne Tart","count":12,"avg_sec":387.7},{"item":"CL-Claudie Seafood Tower","count":8,"avg_sec":996},{"item":"CL-Apple Sorbet","count":8,"avg_sec":403.5},{"item":"CL-Olive Tapenade","count":8,"avg_sec":627.9},{"item":"CL-Smoked Salmon","count":7,"avg_sec":565},{"item":"CL-Poached Maine Lobster","count":5,"avg_sec":929},{"item":"CL-30gr Caviar Service","count":4,"avg_sec":635.3},{"item":"CL-Dessert Platter","count":3,"avg_sec":615.3},{"item":"CL-Cakeage Fee","count":2,"avg_sec":569.5},{"item":"Eau de Coco","count":1,"avg_sec":179},{"item":"C-Add-on 10gr Caviar","count":1,"avg_sec":954},{"item":"CL-Petrossian Caviar 50gr","count":1,"avg_sec":863},{"item":"C-Blini","count":1,"avg_sec":304}],"No Print":[{"item":"CL-Bread Basket","count":597,"avg_sec":220.8},{"item":"A-Add-on Bread","count":19,"avg_sec":237.1}],"Pasta":[{"item":"CL-Lobster Pasta","count":59,"avg_sec":989.6},{"item":"CL-French Fries","count":44,"avg_sec":528.6},{"item":"CL-12oz Entrecote","count":38,"avg_sec":1055.3},{"item":"CL-Truffle Macaroni","count":24,"avg_sec":891.3},{"item":"CLPFL-Rigatoni Pasta","count":14,"avg_sec":949},{"item":"CL-Caviar Pasta Trading","count":9,"avg_sec":1190.2},{"item":"CL-Plain Pasta","count":5,"avg_sec":1077.8},{"item":"CL-Caviar Pasta Petrossian","count":2,"avg_sec":799.5}],"Grill Meat":[{"item":"CL-12oz Entrecote","count":38,"avg_sec":1055.3},{"item":"CL-8oz Wagyu Skirt Steak","count":24,"avg_sec":797.3},{"item":"CLPFL-Chicken Paillard","count":22,"avg_sec":890.7},{"item":"CLPFL-Hanger Frites","count":21,"avg_sec":873.3},{"item":"CL-Tomahawk Temp","count":12,"avg_sec":273.7},{"item":"CL-Tomahawk","count":12,"avg_sec":392.3},{"item":"CL-7oz Tenderloin","count":11,"avg_sec":835.3},{"item":"CL-1/2 Rack of Lamb","count":10,"avg_sec":976.2},{"item":"CL-Temper Porter House","count":2,"avg_sec":107},{"item":"CL-50oz Wagyu Porter House","count":2,"avg_sec":107},{"item":"CL-Full Rack of Lamb","count":1,"avg_sec":566}],"Crudo":[{"item":"CL-Escargots","count":148,"avg_sec":614.3},{"item":"CL-Tuna Tartare","count":110,"avg_sec":539.9},{"item":"CL-Branzino Carpaccio","count":79,"avg_sec":595.1},{"item":"CL-Amuse Bouche","count":48,"avg_sec":447.7},{"item":"CLPFL-Zucchini Carpaccio","count":46,"avg_sec":538.3},{"item":"C-Zucchini Carpaccio","count":39,"avg_sec":570},{"item":"CL-6 Oysters","count":38,"avg_sec":590.1},{"item":"CL-Prawns","count":33,"avg_sec":868.8},{"item":"CL-Colossal Prawns","count":23,"avg_sec":683.9},{"item":"CL-Claudie Seafood Tower","count":8,"avg_sec":996},{"item":"CL-Smoked Salmon","count":7,"avg_sec":565},{"item":"CL-Poached Maine Lobster","count":5,"avg_sec":929},{"item":"CL-30gr Caviar Service","count":4,"avg_sec":635.3},{"item":"C-Add-on 10gr Caviar","count":1,"avg_sec":954},{"item":"CL-Petrossian Caviar 50gr","count":1,"avg_sec":863},{"item":"C-Blini","count":1,"avg_sec":304}],"Back Kitchen":[{"item":"CL-Escargots","count":147,"avg_sec":614.5},{"item":"CL-6 Oysters","count":38,"avg_sec":590.1},{"item":"CL-Colossal Prawns","count":23,"avg_sec":683.9},{"item":"CL-Claudie Seafood Tower","count":8,"avg_sec":996},{"item":"CL-Poached Maine Lobster","count":5,"avg_sec":929},{"item":"CL-30gr Caviar Service","count":4,"avg_sec":635.3},{"item":"C-Add-on 10gr Caviar","count":1,"avg_sec":954},{"item":"CL-Petrossian Caviar 50gr","count":1,"avg_sec":863}],"Sauté":[{"item":"CL-Truffle Risotto","count":41,"avg_sec":868.7},{"item":"CL-Truffle Purée","count":37,"avg_sec":828.6},{"item":"CL-Gratin Dauphinois","count":33,"avg_sec":873.1},{"item":"CL-Brussels Sprouts","count":28,"avg_sec":946.1},{"item":"CL-Dover Sole","count":26,"avg_sec":1030.4},{"item":"CL-Mushroom","count":24,"avg_sec":979.5},{"item":"CL-Bouillabaisse","count":23,"avg_sec":955.1},{"item":"CL-Ratatouille","count":19,"avg_sec":879.5}],"Pastry":[{"item":"CL-Creme Brulee","count":101,"avg_sec":322},{"item":"CL-Cheesecake","count":72,"avg_sec":266.1},{"item":"CL-Chocolate Mousse","count":54,"avg_sec":289.1},{"item":"CL-Pistachio Ice Cream","count":51,"avg_sec":550},{"item":"CL-Apple Tart Fine","count":50,"avg_sec":320.9},{"item":"CL-Sorbet & Ice cream","count":42,"avg_sec":321.3},{"item":"CLPFL-Creme Brulee","count":39,"avg_sec":454.6},{"item":"CLPFL- I/C Sorbet 2 scoops","count":32,"avg_sec":387.2},{"item":"CL-Special Scoop","count":30,"avg_sec":321.7},{"item":"CLPFL-Tropezienne","count":29,"avg_sec":426.2},{"item":"CL-Sorbet (1 scoop)","count":29,"avg_sec":308.2},{"item":"CL-Ice Cream (1 scoop)","count":23,"avg_sec":266.9},{"item":"CL-Tropezienne Tart","count":12,"avg_sec":387.7},{"item":"CL-Apple Sorbet","count":8,"avg_sec":403.5},{"item":"CL-Dessert Platter","count":3,"avg_sec":615.3},{"item":"CL-Cakeage Fee","count":2,"avg_sec":569.5}],"Food":[],"Crudo 2":[],"BTL INSIDE":[],"BTL OUTSIDE":[]};
+const STATION_DETAILS = {"Back Kitchen":{"hourly":{"12-13":{"avg_sec":854.2,"exp_sec":600},"13-14":{"avg_sec":381,"exp_sec":600},"15-16":{"avg_sec":791,"exp_sec":600},"18-19":{"avg_sec":787.7,"exp_sec":680},"19-20":{"avg_sec":654.7,"exp_sec":615},"20-21":{"avg_sec":578.6,"exp_sec":600},"21-22":{"avg_sec":628.4,"exp_sec":600},"22-23":{"avg_sec":547.6,"exp_sec":600},"23-24":{"avg_sec":738,"exp_sec":600},"14-15":{"avg_sec":679.8,"exp_sec":600},"17-18":{"avg_sec":677,"exp_sec":600}},"byDayHour":{"Friday":{"12-13":{"count":1,"avg_sec":859,"exp_sec":600},"13-14":{"count":1,"avg_sec":367,"exp_sec":600},"15-16":{"count":1,"avg_sec":791,"exp_sec":600},"18-19":{"count":1,"avg_sec":623,"exp_sec":600},"19-20":{"count":10,"avg_sec":557.1,"exp_sec":552},"20-21":{"count":7,"avg_sec":582.86,"exp_sec":600},"21-22":{"count":7,"avg_sec":486.71,"exp_sec":582.86},"22-23":{"count":9,"avg_sec":650.67,"exp_sec":640},"23-24":{"count":3,"avg_sec":513.33,"exp_sec":600}},"Monday":{"12-13":{"count":1,"avg_sec":1091,"exp_sec":600},"14-15":{"count":2,"avg_sec":703.5,"exp_sec":600},"18-19":{"count":7,"avg_sec":547.71,"exp_sec":634.29},"19-20":{"count":5,"avg_sec":484.4,"exp_sec":600},"20-21":{"count":6,"avg_sec":542.67,"exp_sec":600},"21-22":{"count":2,"avg_sec":464.5,"exp_sec":660}},"Saturday":{"17-18":{"count":1,"avg_sec":677,"exp_sec":600},"18-19":{"count":1,"avg_sec":674,"exp_sec":600},"19-20":{"count":17,"avg_sec":718.12,"exp_sec":642.35},"20-21":{"count":3,"avg_sec":728.33,"exp_sec":600},"21-22":{"count":10,"avg_sec":566.6,"exp_sec":564},"22-23":{"count":10,"avg_sec":519.1,"exp_sec":600},"23-24":{"count":1,"avg_sec":499,"exp_sec":600}},"Sunday":{"18-19":{"count":6,"avg_sec":1017.17,"exp_sec":660},"19-20":{"count":7,"avg_sec":745.29,"exp_sec":634.29},"20-21":{"count":5,"avg_sec":564.2,"exp_sec":648},"21-22":{"count":11,"avg_sec":813.64,"exp_sec":632.73},"22-23":{"count":9,"avg_sec":420,"exp_sec":640},"23-24":{"count":5,"avg_sec":856.6,"exp_sec":504}},"Thursday":{"12-13":{"count":3,"avg_sec":773.67,"exp_sec":600},"13-14":{"count":1,"avg_sec":395,"exp_sec":600},"18-19":{"count":4,"avg_sec":475,"exp_sec":630},"19-20":{"count":4,"avg_sec":512.25,"exp_sec":600},"20-21":{"count":1,"avg_sec":546,"exp_sec":600},"21-22":{"count":12,"avg_sec":652.5,"exp_sec":620},"22-23":{"count":4,"avg_sec":561,"exp_sec":450},"23-24":{"count":2,"avg_sec":898,"exp_sec":600}},"Tuesday":{"18-19":{"count":4,"avg_sec":1311.75,"exp_sec":750},"19-20":{"count":5,"avg_sec":832.4,"exp_sec":648},"20-21":{"count":2,"avg_sec":494.5,"exp_sec":600},"21-22":{"count":1,"avg_sec":476,"exp_sec":600},"22-23":{"count":1,"avg_sec":748,"exp_sec":600}},"Wednesday":{"14-15":{"count":2,"avg_sec":656,"exp_sec":600},"18-19":{"count":3,"avg_sec":699.67,"exp_sec":680},"19-20":{"count":8,"avg_sec":629.5,"exp_sec":615},"20-21":{"count":2,"avg_sec":583.5,"exp_sec":600},"21-22":{"count":2,"avg_sec":509,"exp_sec":600},"22-23":{"count":3,"avg_sec":631.33,"exp_sec":600}}},"breakingHours":[{"day":"Monday","hr":"12-13","count":1,"avg_sec":1091,"exp_sec":600},{"day":"Sunday","hr":"18-19","count":6,"avg_sec":1017.17,"exp_sec":660},{"day":"Tuesday","hr":"18-19","count":4,"avg_sec":1311.75,"exp_sec":750}]},"Cold Expo":{"hourly":{"12-13":{"avg_sec":499.8,"exp_sec":192.63},"13-14":{"avg_sec":479.8,"exp_sec":141},"14-15":{"avg_sec":437.5,"exp_sec":246},"15-16":{"avg_sec":398.6,"exp_sec":160},"16-17":{"avg_sec":728.5,"exp_sec":0},"17-18":{"avg_sec":480.1,"exp_sec":440},"18-19":{"avg_sec":396.6,"exp_sec":354},"19-20":{"avg_sec":432.3,"exp_sec":387},"20-21":{"avg_sec":376.9,"exp_sec":368.11},"21-22":{"avg_sec":398.8,"exp_sec":410},"22-23":{"avg_sec":426.4,"exp_sec":347.59},"23-24":{"avg_sec":363.4,"exp_sec":440},"11-12":{"avg_sec":386,"exp_sec":0},"0-1":{"avg_sec":412.1,"exp_sec":480},"1-2":{"avg_sec":189,"exp_sec":480}},"byDayHour":{"Friday":{"12-13":{"count":27,"avg_sec":674.33,"exp_sec":151.11},"13-14":{"count":31,"avg_sec":493.52,"exp_sec":170.32},"14-15":{"count":31,"avg_sec":494.94,"exp_sec":110.32},"15-16":{"count":18,"avg_sec":461.44,"exp_sec":136.67},"16-17":{"count":2,"avg_sec":728.5,"exp_sec":0},"17-18":{"count":7,"avg_sec":453.43,"exp_sec":351.43},"18-19":{"count":23,"avg_sec":340.7,"exp_sec":297.39},"19-20":{"count":87,"avg_sec":391.87,"exp_sec":383.45},"20-21":{"count":56,"avg_sec":353.86,"exp_sec":433.93},"21-22":{"count":66,"avg_sec":325.09,"exp_sec":407.27},"22-23":{"count":68,"avg_sec":503.78,"exp_sec":459.71},"23-24":{"count":25,"avg_sec":284.32,"exp_sec":460.8}},"Monday":{"11-12":{"count":1,"avg_sec":386,"exp_sec":0},"12-13":{"count":11,"avg_sec":484.18,"exp_sec":212.73},"13-14":{"count":10,"avg_sec":432.6,"exp_sec":144},"14-15":{"count":16,"avg_sec":463.19,"exp_sec":165},"15-16":{"count":7,"avg_sec":274.57,"exp_sec":68.57},"18-19":{"count":36,"avg_sec":384.56,"exp_sec":383.33},"19-20":{"count":46,"avg_sec":403.96,"exp_sec":382.17},"20-21":{"count":42,"avg_sec":399.4,"exp_sec":440},"21-22":{"count":22,"avg_sec":323.91,"exp_sec":324.55},"22-23":{"count":13,"avg_sec":332.46,"exp_sec":433.85},"23-24":{"count":4,"avg_sec":244.75,"exp_sec":390}},"Saturday":{"0-1":{"count":4,"avg_sec":192.5,"exp_sec":480},"17-18":{"count":7,"avg_sec":484,"exp_sec":360},"18-19":{"count":31,"avg_sec":275.52,"exp_sec":336.77},"19-20":{"count":109,"avg_sec":459.39,"exp_sec":414.5},"20-21":{"count":64,"avg_sec":489.52,"exp_sec":426.56},"21-22":{"count":77,"avg_sec":336.29,"exp_sec":363.9},"22-23":{"count":73,"avg_sec":463.15,"exp_sec":397.81},"23-24":{"count":25,"avg_sec":381.68,"exp_sec":456}},"Sunday":{"0-1":{"count":3,"avg_sec":558.67,"exp_sec":420},"1-2":{"count":1,"avg_sec":189,"exp_sec":480},"18-19":{"count":41,"avg_sec":500.63,"exp_sec":373.17},"19-20":{"count":53,"avg_sec":449.92,"exp_sec":414.34},"20-21":{"count":47,"avg_sec":272.7,"exp_sec":402.13},"21-22":{"count":57,"avg_sec":503.65,"exp_sec":424.21},"22-23":{"count":47,"avg_sec":432.6,"exp_sec":422.55},"23-24":{"count":20,"avg_sec":433.1,"exp_sec":414}},"Thursday":{"12-13":{"count":28,"avg_sec":392.43,"exp_sec":225},"13-14":{"count":31,"avg_sec":452.39,"exp_sec":114.19},"14-15":{"count":9,"avg_sec":312.22,"exp_sec":153.33},"15-16":{"count":3,"avg_sec":292,"exp_sec":160},"17-18":{"count":3,"avg_sec":533.33,"exp_sec":440},"18-19":{"count":19,"avg_sec":383.42,"exp_sec":407.37},"19-20":{"count":36,"avg_sec":523.89,"exp_sec":416.67},"20-21":{"count":34,"avg_sec":275.09,"exp_sec":386.47},"21-22":{"count":71,"avg_sec":454.44,"exp_sec":424.23},"22-23":{"count":34,"avg_sec":295.12,"exp_sec":407.65},"23-24":{"count":16,"avg_sec":441.5,"exp_sec":532.5}},"Tuesday":{"12-13":{"count":24,"avg_sec":408.21,"exp_sec":132.5},"13-14":{"count":19,"avg_sec":572.53,"exp_sec":91.58},"14-15":{"count":16,"avg_sec":353.94,"exp_sec":120},"15-16":{"count":1,"avg_sec":456,"exp_sec":0},"18-19":{"count":16,"avg_sec":638.69,"exp_sec":442.5},"19-20":{"count":38,"avg_sec":445.84,"exp_sec":350.53},"20-21":{"count":21,"avg_sec":492.86,"exp_sec":448.57},"21-22":{"count":32,"avg_sec":436.47,"exp_sec":378.75},"22-23":{"count":10,"avg_sec":251.3,"exp_sec":426},"23-24":{"count":9,"avg_sec":308.33,"exp_sec":500}},"Wednesday":{"0-1":{"count":1,"avg_sec":851,"exp_sec":480},"12-13":{"count":38,"avg_sec":517.13,"exp_sec":192.63},"13-14":{"count":20,"avg_sec":436.8,"exp_sec":141},"14-15":{"count":10,"avg_sec":464.5,"exp_sec":246},"18-19":{"count":20,"avg_sec":275.5,"exp_sec":354},"19-20":{"count":40,"avg_sec":360.45,"exp_sec":387},"20-21":{"count":37,"avg_sec":351.38,"exp_sec":368.11},"21-22":{"count":36,"avg_sec":404.14,"exp_sec":410},"22-23":{"count":29,"avg_sec":398.52,"exp_sec":347.59},"23-24":{"count":6,"avg_sec":338,"exp_sec":440}}},"breakingHours":[]},"Crudo":{"hourly":{"12-13":{"avg_sec":609.9,"exp_sec":195},"13-14":{"avg_sec":532.4,"exp_sec":270},"14-15":{"avg_sec":601.2,"exp_sec":580},"15-16":{"avg_sec":562,"exp_sec":285},"17-18":{"avg_sec":660.7,"exp_sec":540},"18-19":{"avg_sec":689,"exp_sec":610},"19-20":{"avg_sec":621.6,"exp_sec":589.09},"20-21":{"avg_sec":518.9,"exp_sec":531.43},"21-22":{"avg_sec":563.2,"exp_sec":526.67},"22-23":{"avg_sec":614.2,"exp_sec":487.5},"23-24":{"avg_sec":570.7,"exp_sec":480}},"byDayHour":{"Friday":{"12-13":{"count":7,"avg_sec":775.86,"exp_sec":240},"13-14":{"count":4,"avg_sec":620,"exp_sec":405},"14-15":{"count":4,"avg_sec":627,"exp_sec":0},"15-16":{"count":4,"avg_sec":562,"exp_sec":285},"17-18":{"count":1,"avg_sec":600,"exp_sec":480},"18-19":{"count":4,"avg_sec":525.25,"exp_sec":405},"19-20":{"count":26,"avg_sec":606.31,"exp_sec":523.85},"20-21":{"count":20,"avg_sec":478.85,"exp_sec":519},"21-22":{"count":17,"avg_sec":474.12,"exp_sec":543.53},"22-23":{"count":29,"avg_sec":738.62,"exp_sec":552.41},"23-24":{"count":6,"avg_sec":440,"exp_sec":560}},"Monday":{"12-13":{"count":4,"avg_sec":619.25,"exp_sec":270},"13-14":{"count":1,"avg_sec":619,"exp_sec":0},"14-15":{"count":4,"avg_sec":593.25,"exp_sec":300},"18-19":{"count":11,"avg_sec":546.45,"exp_sec":583.64},"19-20":{"count":16,"avg_sec":486.06,"exp_sec":506.25},"20-21":{"count":11,"avg_sec":536.45,"exp_sec":572.73},"21-22":{"count":6,"avg_sec":398.83,"exp_sec":400},"22-23":{"count":1,"avg_sec":117,"exp_sec":540},"23-24":{"count":1,"avg_sec":519,"exp_sec":600}},"Saturday":{"17-18":{"count":2,"avg_sec":691,"exp_sec":540},"18-19":{"count":6,"avg_sec":456.67,"exp_sec":450},"19-20":{"count":29,"avg_sec":694,"exp_sec":587.59},"20-21":{"count":18,"avg_sec":752.72,"exp_sec":413.33},"21-22":{"count":19,"avg_sec":524.79,"exp_sec":514.74},"22-23":{"count":19,"avg_sec":625.53,"exp_sec":505.26},"23-24":{"count":3,"avg_sec":399,"exp_sec":520}},"Sunday":{"18-19":{"count":13,"avg_sec":956.54,"exp_sec":503.08},"19-20":{"count":17,"avg_sec":590.65,"exp_sec":437.65},"20-21":{"count":12,"avg_sec":455.17,"exp_sec":440},"21-22":{"count":20,"avg_sec":708.3,"exp_sec":576},"22-23":{"count":20,"avg_sec":565.1,"exp_sec":522},"23-24":{"count":5,"avg_sec":856.6,"exp_sec":504}},"Thursday":{"12-13":{"count":5,"avg_sec":705.2,"exp_sec":468},"13-14":{"count":4,"avg_sec":386.25,"exp_sec":270},"14-15":{"count":1,"avg_sec":255,"exp_sec":0},"18-19":{"count":7,"avg_sec":541.29,"exp_sec":591.43},"19-20":{"count":12,"avg_sec":693.17,"exp_sec":505},"20-21":{"count":8,"avg_sec":282.5,"exp_sec":517.5},"21-22":{"count":25,"avg_sec":627.76,"exp_sec":520.8},"22-23":{"count":8,"avg_sec":490.75,"exp_sec":412.5},"23-24":{"count":3,"avg_sec":641.33,"exp_sec":580}},"Tuesday":{"12-13":{"count":3,"avg_sec":429.67,"exp_sec":0},"13-14":{"count":4,"avg_sec":611.75,"exp_sec":0},"14-15":{"count":1,"avg_sec":632,"exp_sec":0},"18-19":{"count":6,"avg_sec":1081,"exp_sec":670},"19-20":{"count":12,"avg_sec":734.33,"exp_sec":535},"20-21":{"count":5,"avg_sec":385,"exp_sec":540},"21-22":{"count":5,"avg_sec":526.4,"exp_sec":420},"22-23":{"count":2,"avg_sec":520.5,"exp_sec":600}},"Wednesday":{"12-13":{"count":8,"avg_sec":468,"exp_sec":195},"13-14":{"count":3,"avg_sec":475.67,"exp_sec":0},"14-15":{"count":3,"avg_sec":682.67,"exp_sec":580},"18-19":{"count":6,"avg_sec":492.33,"exp_sec":610},"19-20":{"count":11,"avg_sec":510.27,"exp_sec":589.09},"20-21":{"count":7,"avg_sec":479.14,"exp_sec":531.43},"21-22":{"count":9,"avg_sec":440.78,"exp_sec":526.67},"22-23":{"count":8,"avg_sec":468.12,"exp_sec":487.5},"23-24":{"count":1,"avg_sec":280,"exp_sec":480}}},"breakingHours":[{"day":"Sunday","hr":"18-19","count":13,"avg_sec":956.54,"exp_sec":503.08},{"day":"Tuesday","hr":"18-19","count":6,"avg_sec":1081,"exp_sec":670}]},"Fryer":{"hourly":{"12-13":{"avg_sec":552.4,"exp_sec":300},"13-14":{"avg_sec":624.8,"exp_sec":144},"14-15":{"avg_sec":797.5,"exp_sec":160},"15-16":{"avg_sec":981,"exp_sec":480},"18-19":{"avg_sec":518.9,"exp_sec":480},"19-20":{"avg_sec":522.9,"exp_sec":150},"20-21":{"avg_sec":740.7,"exp_sec":285},"21-22":{"avg_sec":540.3,"exp_sec":225},"22-23":{"avg_sec":771.1,"exp_sec":450},"23-24":{"avg_sec":836.6,"exp_sec":460},"11-12":{"avg_sec":386,"exp_sec":0},"16-17":{"avg_sec":8,"exp_sec":0}},"byDayHour":{"Friday":{"12-13":{"count":3,"avg_sec":830.67,"exp_sec":300},"13-14":{"count":10,"avg_sec":667.5,"exp_sec":96},"14-15":{"count":5,"avg_sec":930.4,"exp_sec":0},"15-16":{"count":1,"avg_sec":981,"exp_sec":480},"18-19":{"count":5,"avg_sec":457.4,"exp_sec":180},"19-20":{"count":5,"avg_sec":521.4,"exp_sec":180},"20-21":{"count":7,"avg_sec":781.71,"exp_sec":642.86},"21-22":{"count":8,"avg_sec":490.12,"exp_sec":345},"22-23":{"count":3,"avg_sec":573.67,"exp_sec":620},"23-24":{"count":2,"avg_sec":483.5,"exp_sec":0}},"Monday":{"11-12":{"count":1,"avg_sec":386,"exp_sec":0},"12-13":{"count":1,"avg_sec":590,"exp_sec":0},"13-14":{"count":1,"avg_sec":578,"exp_sec":0},"14-15":{"count":6,"avg_sec":685.67,"exp_sec":230},"18-19":{"count":3,"avg_sec":683.67,"exp_sec":0},"19-20":{"count":2,"avg_sec":475.5,"exp_sec":0},"20-21":{"count":2,"avg_sec":706.5,"exp_sec":450},"21-22":{"count":2,"avg_sec":340.5,"exp_sec":240}},"Saturday":{"18-19":{"count":2,"avg_sec":497.5,"exp_sec":0},"19-20":{"count":7,"avg_sec":680.57,"exp_sec":257.14},"20-21":{"count":3,"avg_sec":1217,"exp_sec":600},"21-22":{"count":11,"avg_sec":638.18,"exp_sec":250.91},"22-23":{"count":13,"avg_sec":867.92,"exp_sec":318.46},"23-24":{"count":3,"avg_sec":1333,"exp_sec":460}},"Sunday":{"18-19":{"count":3,"avg_sec":514.67,"exp_sec":0},"19-20":{"count":5,"avg_sec":348.2,"exp_sec":384},"20-21":{"count":5,"avg_sec":675.4,"exp_sec":288},"21-22":{"count":8,"avg_sec":715.5,"exp_sec":405},"22-23":{"count":6,"avg_sec":754.67,"exp_sec":460},"23-24":{"count":3,"avg_sec":575.67,"exp_sec":460}},"Thursday":{"12-13":{"count":3,"avg_sec":476,"exp_sec":0},"13-14":{"count":10,"avg_sec":528,"exp_sec":144},"14-15":{"count":3,"avg_sec":791.67,"exp_sec":160},"18-19":{"count":1,"avg_sec":861,"exp_sec":0},"19-20":{"count":3,"avg_sec":465.67,"exp_sec":160},"20-21":{"count":9,"avg_sec":810.33,"exp_sec":413.33},"21-22":{"count":4,"avg_sec":280,"exp_sec":240},"22-23":{"count":2,"avg_sec":768,"exp_sec":450}},"Tuesday":{"12-13":{"count":3,"avg_sec":450.33,"exp_sec":0},"13-14":{"count":2,"avg_sec":973.5,"exp_sec":0},"14-15":{"count":2,"avg_sec":809.5,"exp_sec":0},"16-17":{"count":1,"avg_sec":8,"exp_sec":0},"18-19":{"count":1,"avg_sec":329,"exp_sec":480},"19-20":{"count":4,"avg_sec":517.75,"exp_sec":0},"21-22":{"count":4,"avg_sec":411.75,"exp_sec":225}},"Wednesday":{"12-13":{"count":4,"avg_sec":468,"exp_sec":0},"13-14":{"count":1,"avg_sec":516,"exp_sec":0},"18-19":{"count":1,"avg_sec":236,"exp_sec":480},"19-20":{"count":6,"avg_sec":533.5,"exp_sec":150},"20-21":{"count":8,"avg_sec":497.38,"exp_sec":285},"21-22":{"count":2,"avg_sec":479.5,"exp_sec":0},"22-23":{"count":6,"avg_sec":677.67,"exp_sec":0}}},"breakingHours":[{"day":"Friday","hr":"14-15","count":5,"avg_sec":930.4,"exp_sec":0},{"day":"Friday","hr":"15-16","count":1,"avg_sec":981,"exp_sec":480},{"day":"Saturday","hr":"20-21","count":3,"avg_sec":1217,"exp_sec":600},{"day":"Saturday","hr":"23-24","count":3,"avg_sec":1333,"exp_sec":460},{"day":"Tuesday","hr":"13-14","count":2,"avg_sec":973.5,"exp_sec":0}]},"Garde Manger":{"hourly":{"12-13":{"avg_sec":613.4,"exp_sec":165},"13-14":{"avg_sec":603,"exp_sec":202.5},"14-15":{"avg_sec":558.1,"exp_sec":60},"15-16":{"avg_sec":391.8,"exp_sec":0},"17-18":{"avg_sec":594,"exp_sec":540},"18-19":{"avg_sec":502.8,"exp_sec":540},"19-20":{"avg_sec":545.9,"exp_sec":368.57},"20-21":{"avg_sec":518.7,"exp_sec":323.08},"21-22":{"avg_sec":509.2,"exp_sec":420},"22-23":{"avg_sec":570.6,"exp_sec":216},"23-24":{"avg_sec":481.5,"exp_sec":540},"11-12":{"avg_sec":386,"exp_sec":0},"0-1":{"avg_sec":334,"exp_sec":540}},"byDayHour":{"Friday":{"12-13":{"count":8,"avg_sec":652.25,"exp_sec":0},"13-14":{"count":9,"avg_sec":696.56,"exp_sec":60},"14-15":{"count":9,"avg_sec":609.56,"exp_sec":60},"15-16":{"count":4,"avg_sec":375.75,"exp_sec":0},"17-18":{"count":1,"avg_sec":250,"exp_sec":540},"18-19":{"count":7,"avg_sec":538.29,"exp_sec":300},"19-20":{"count":29,"avg_sec":498.38,"exp_sec":477.93},"20-21":{"count":15,"avg_sec":588,"exp_sec":508},"21-22":{"count":17,"avg_sec":476.41,"exp_sec":427.06},"22-23":{"count":15,"avg_sec":510,"exp_sec":556},"23-24":{"count":4,"avg_sec":356,"exp_sec":270}},"Monday":{"11-12":{"count":1,"avg_sec":386,"exp_sec":0},"12-13":{"count":5,"avg_sec":461.4,"exp_sec":204},"13-14":{"count":2,"avg_sec":380.5,"exp_sec":0},"14-15":{"count":5,"avg_sec":512.4,"exp_sec":0},"18-19":{"count":11,"avg_sec":393.64,"exp_sec":387.27},"19-20":{"count":11,"avg_sec":385.91,"exp_sec":425.45},"20-21":{"count":10,"avg_sec":421.9,"exp_sec":486},"21-22":{"count":4,"avg_sec":491.5,"exp_sec":405},"22-23":{"count":1,"avg_sec":610,"exp_sec":540}},"Saturday":{"17-18":{"count":1,"avg_sec":705,"exp_sec":480},"18-19":{"count":6,"avg_sec":430.83,"exp_sec":450},"19-20":{"count":38,"avg_sec":629.84,"exp_sec":462.63},"20-21":{"count":19,"avg_sec":793.21,"exp_sec":562.11},"21-22":{"count":18,"avg_sec":583.72,"exp_sec":396.67},"22-23":{"count":26,"avg_sec":682.65,"exp_sec":408.46},"23-24":{"count":4,"avg_sec":672.25,"exp_sec":480}},"Sunday":{"0-1":{"count":1,"avg_sec":334,"exp_sec":540},"18-19":{"count":10,"avg_sec":511.2,"exp_sec":420},"19-20":{"count":18,"avg_sec":583.06,"exp_sec":503.33},"20-21":{"count":13,"avg_sec":376.31,"exp_sec":507.69},"21-22":{"count":17,"avg_sec":604.41,"exp_sec":472.94},"22-23":{"count":7,"avg_sec":499.14,"exp_sec":385.71},"23-24":{"count":1,"avg_sec":492,"exp_sec":0}},"Thursday":{"12-13":{"count":10,"avg_sec":552.6,"exp_sec":108},"13-14":{"count":16,"avg_sec":543.38,"exp_sec":63.75},"14-15":{"count":1,"avg_sec":391,"exp_sec":0},"17-18":{"count":2,"avg_sec":710.5,"exp_sec":540},"18-19":{"count":6,"avg_sec":620.67,"exp_sec":510},"19-20":{"count":13,"avg_sec":537.38,"exp_sec":443.08},"20-21":{"count":11,"avg_sec":354.64,"exp_sec":376.36},"21-22":{"count":15,"avg_sec":398.33,"exp_sec":452},"22-23":{"count":7,"avg_sec":410.14,"exp_sec":454.29},"23-24":{"count":1,"avg_sec":210,"exp_sec":540}},"Tuesday":{"12-13":{"count":10,"avg_sec":655.9,"exp_sec":54},"13-14":{"count":9,"avg_sec":704.44,"exp_sec":60},"14-15":{"count":3,"avg_sec":535.33,"exp_sec":0},"15-16":{"count":1,"avg_sec":456,"exp_sec":0},"18-19":{"count":3,"avg_sec":738.67,"exp_sec":540},"19-20":{"count":10,"avg_sec":633.7,"exp_sec":348},"20-21":{"count":3,"avg_sec":424.67,"exp_sec":520},"21-22":{"count":11,"avg_sec":505.73,"exp_sec":507.27}},"Wednesday":{"12-13":{"count":16,"avg_sec":653,"exp_sec":165},"13-14":{"count":8,"avg_sec":558.5,"exp_sec":202.5},"18-19":{"count":1,"avg_sec":388,"exp_sec":540},"19-20":{"count":14,"avg_sec":439.21,"exp_sec":368.57},"20-21":{"count":13,"avg_sec":414.77,"exp_sec":323.08},"21-22":{"count":10,"avg_sec":446,"exp_sec":420},"22-23":{"count":10,"avg_sec":528.5,"exp_sec":216}}},"breakingHours":[]},"Grill Fish":{"hourly":{"12-13":{"avg_sec":1279,"exp_sec":840},"13-14":{"avg_sec":604.8,"exp_sec":840},"14-15":{"avg_sec":825.4,"exp_sec":420},"19-20":{"avg_sec":728.5,"exp_sec":684},"20-21":{"avg_sec":1142.2,"exp_sec":531.43},"21-22":{"avg_sec":596.3,"exp_sec":420},"22-23":{"avg_sec":944.8,"exp_sec":840},"23-24":{"avg_sec":712.6,"exp_sec":480},"11-12":{"avg_sec":380,"exp_sec":840},"18-19":{"avg_sec":805.4,"exp_sec":560}},"byDayHour":{"Friday":{"12-13":{"count":2,"avg_sec":1413,"exp_sec":0},"13-14":{"count":2,"avg_sec":658.5,"exp_sec":0},"14-15":{"count":1,"avg_sec":1018,"exp_sec":840},"19-20":{"count":6,"avg_sec":883.67,"exp_sec":800},"20-21":{"count":10,"avg_sec":1636.5,"exp_sec":708},"21-22":{"count":2,"avg_sec":927,"exp_sec":870},"22-23":{"count":4,"avg_sec":941.5,"exp_sec":765},"23-24":{"count":1,"avg_sec":886,"exp_sec":840}},"Monday":{"11-12":{"count":1,"avg_sec":380,"exp_sec":840},"19-20":{"count":2,"avg_sec":985.5,"exp_sec":840},"20-21":{"count":1,"avg_sec":694,"exp_sec":840}},"Saturday":{"19-20":{"count":10,"avg_sec":709.2,"exp_sec":492},"20-21":{"count":12,"avg_sec":1374.25,"exp_sec":700},"21-22":{"count":6,"avg_sec":665.83,"exp_sec":780},"22-23":{"count":11,"avg_sec":1041.27,"exp_sec":670.91},"23-24":{"count":1,"avg_sec":726,"exp_sec":900}},"Sunday":{"18-19":{"count":1,"avg_sec":946,"exp_sec":840},"19-20":{"count":3,"avg_sec":565.33,"exp_sec":580},"20-21":{"count":2,"avg_sec":682.5,"exp_sec":900},"21-22":{"count":4,"avg_sec":762.75,"exp_sec":570},"22-23":{"count":3,"avg_sec":859.67,"exp_sec":440},"23-24":{"count":2,"avg_sec":1137.5,"exp_sec":660}},"Thursday":{"12-13":{"count":1,"avg_sec":1011,"exp_sec":840},"13-14":{"count":1,"avg_sec":564,"exp_sec":840},"14-15":{"count":2,"avg_sec":914.5,"exp_sec":420},"18-19":{"count":1,"avg_sec":729,"exp_sec":900},"19-20":{"count":3,"avg_sec":541.67,"exp_sec":580},"20-21":{"count":5,"avg_sec":826.4,"exp_sec":768},"21-22":{"count":3,"avg_sec":70.67,"exp_sec":0},"22-23":{"count":2,"avg_sec":813,"exp_sec":840},"23-24":{"count":4,"avg_sec":550,"exp_sec":630}},"Tuesday":{"18-19":{"count":3,"avg_sec":784,"exp_sec":560},"19-20":{"count":4,"avg_sec":623.75,"exp_sec":555},"20-21":{"count":1,"avg_sec":864,"exp_sec":840},"21-22":{"count":2,"avg_sec":738.5,"exp_sec":900},"23-24":{"count":1,"avg_sec":326,"exp_sec":480}},"Wednesday":{"13-14":{"count":2,"avg_sec":571.5,"exp_sec":0},"14-15":{"count":2,"avg_sec":640,"exp_sec":420},"19-20":{"count":5,"avg_sec":771.8,"exp_sec":684},"20-21":{"count":7,"avg_sec":498.86,"exp_sec":531.43},"21-22":{"count":2,"avg_sec":370.5,"exp_sec":420},"22-23":{"count":1,"avg_sec":415,"exp_sec":840}}},"breakingHours":[{"day":"Friday","hr":"12-13","count":2,"avg_sec":1413,"exp_sec":0},{"day":"Friday","hr":"14-15","count":1,"avg_sec":1018,"exp_sec":840},{"day":"Friday","hr":"20-21","count":10,"avg_sec":1636.5,"exp_sec":708},{"day":"Friday","hr":"21-22","count":2,"avg_sec":927,"exp_sec":870},{"day":"Friday","hr":"22-23","count":4,"avg_sec":941.5,"exp_sec":765},{"day":"Monday","hr":"19-20","count":2,"avg_sec":985.5,"exp_sec":840},{"day":"Saturday","hr":"20-21","count":12,"avg_sec":1374.25,"exp_sec":700},{"day":"Saturday","hr":"22-23","count":11,"avg_sec":1041.27,"exp_sec":670.91},{"day":"Sunday","hr":"18-19","count":1,"avg_sec":946,"exp_sec":840},{"day":"Sunday","hr":"23-24","count":2,"avg_sec":1137.5,"exp_sec":660},{"day":"Thursday","hr":"12-13","count":1,"avg_sec":1011,"exp_sec":840},{"day":"Thursday","hr":"14-15","count":2,"avg_sec":914.5,"exp_sec":420}]},"Grill Meat":{"hourly":{"12-13":{"avg_sec":1045,"exp_sec":900},"13-14":{"avg_sec":893,"exp_sec":0},"14-15":{"avg_sec":964.8,"exp_sec":450},"15-16":{"avg_sec":216,"exp_sec":0},"18-19":{"avg_sec":357.6,"exp_sec":450},"19-20":{"avg_sec":939.7,"exp_sec":810},"20-21":{"avg_sec":926.6,"exp_sec":880},"21-22":{"avg_sec":646.2,"exp_sec":600},"22-23":{"avg_sec":901.9,"exp_sec":450},"23-24":{"avg_sec":936.8,"exp_sec":580},"17-18":{"avg_sec":1024,"exp_sec":900},"16-17":{"avg_sec":8,"exp_sec":0}},"byDayHour":{"Friday":{"12-13":{"count":1,"avg_sec":1437,"exp_sec":900},"13-14":{"count":1,"avg_sec":1072,"exp_sec":0},"14-15":{"count":6,"avg_sec":1020.5,"exp_sec":0},"15-16":{"count":1,"avg_sec":216,"exp_sec":0},"18-19":{"count":1,"avg_sec":840,"exp_sec":900},"19-20":{"count":2,"avg_sec":629,"exp_sec":900},"20-21":{"count":6,"avg_sec":1073.67,"exp_sec":900},"21-22":{"count":3,"avg_sec":621.33,"exp_sec":900},"22-23":{"count":4,"avg_sec":957,"exp_sec":795},"23-24":{"count":1,"avg_sec":1293,"exp_sec":840}},"Monday":{"13-14":{"count":2,"avg_sec":446.5,"exp_sec":0},"14-15":{"count":2,"avg_sec":1038.5,"exp_sec":450},"18-19":{"count":1,"avg_sec":21,"exp_sec":0},"20-21":{"count":1,"avg_sec":907,"exp_sec":900}},"Saturday":{"18-19":{"count":2,"avg_sec":210,"exp_sec":420},"19-20":{"count":5,"avg_sec":1202,"exp_sec":684},"20-21":{"count":3,"avg_sec":1237.67,"exp_sec":840},"21-22":{"count":4,"avg_sec":699.25,"exp_sec":840},"22-23":{"count":5,"avg_sec":1068.8,"exp_sec":720},"23-24":{"count":2,"avg_sec":977.5,"exp_sec":450}},"Sunday":{"18-19":{"count":2,"avg_sec":514.5,"exp_sec":450},"19-20":{"count":1,"avg_sec":739,"exp_sec":720},"20-21":{"count":3,"avg_sec":830.33,"exp_sec":480},"21-22":{"count":3,"avg_sec":708,"exp_sec":600},"22-23":{"count":4,"avg_sec":993,"exp_sec":885},"23-24":{"count":3,"avg_sec":791,"exp_sec":580}},"Thursday":{"13-14":{"count":4,"avg_sec":907,"exp_sec":0},"14-15":{"count":2,"avg_sec":675,"exp_sec":0},"17-18":{"count":1,"avg_sec":1024,"exp_sec":900},"18-19":{"count":1,"avg_sec":193,"exp_sec":0},"19-20":{"count":1,"avg_sec":566,"exp_sec":720},"20-21":{"count":4,"avg_sec":669,"exp_sec":900},"22-23":{"count":2,"avg_sec":605,"exp_sec":450}},"Tuesday":{"13-14":{"count":3,"avg_sec":1113,"exp_sec":0},"14-15":{"count":1,"avg_sec":1063,"exp_sec":0},"16-17":{"count":1,"avg_sec":8,"exp_sec":0},"20-21":{"count":1,"avg_sec":702,"exp_sec":900},"21-22":{"count":3,"avg_sec":538.33,"exp_sec":600},"22-23":{"count":1,"avg_sec":1256,"exp_sec":900}},"Wednesday":{"12-13":{"count":1,"avg_sec":653,"exp_sec":0},"13-14":{"count":2,"avg_sec":892,"exp_sec":0},"19-20":{"count":2,"avg_sec":882,"exp_sec":810},"20-21":{"count":3,"avg_sec":842.33,"exp_sec":880},"22-23":{"count":2,"avg_sec":312,"exp_sec":450}}},"breakingHours":[{"day":"Friday","hr":"12-13","count":1,"avg_sec":1437,"exp_sec":900},{"day":"Friday","hr":"13-14","count":1,"avg_sec":1072,"exp_sec":0},{"day":"Friday","hr":"14-15","count":6,"avg_sec":1020.5,"exp_sec":0},{"day":"Friday","hr":"20-21","count":6,"avg_sec":1073.67,"exp_sec":900},{"day":"Friday","hr":"22-23","count":4,"avg_sec":957,"exp_sec":795},{"day":"Friday","hr":"23-24","count":1,"avg_sec":1293,"exp_sec":840},{"day":"Monday","hr":"14-15","count":2,"avg_sec":1038.5,"exp_sec":450},{"day":"Monday","hr":"20-21","count":1,"avg_sec":907,"exp_sec":900},{"day":"Saturday","hr":"19-20","count":5,"avg_sec":1202,"exp_sec":684},{"day":"Saturday","hr":"20-21","count":3,"avg_sec":1237.67,"exp_sec":840},{"day":"Saturday","hr":"22-23","count":5,"avg_sec":1068.8,"exp_sec":720},{"day":"Saturday","hr":"23-24","count":2,"avg_sec":977.5,"exp_sec":450},{"day":"Sunday","hr":"22-23","count":4,"avg_sec":993,"exp_sec":885},{"day":"Thursday","hr":"13-14","count":4,"avg_sec":907,"exp_sec":0},{"day":"Thursday","hr":"17-18","count":1,"avg_sec":1024,"exp_sec":900},{"day":"Tuesday","hr":"13-14","count":3,"avg_sec":1113,"exp_sec":0},{"day":"Tuesday","hr":"14-15","count":1,"avg_sec":1063,"exp_sec":0},{"day":"Tuesday","hr":"22-23","count":1,"avg_sec":1256,"exp_sec":900}]},"Hot Expo":{"hourly":{"12-13":{"avg_sec":910.8,"exp_sec":240},"13-14":{"avg_sec":687.6,"exp_sec":253.33},"14-15":{"avg_sec":888.1,"exp_sec":420},"15-16":{"avg_sec":723,"exp_sec":720},"17-18":{"avg_sec":921,"exp_sec":900},"18-19":{"avg_sec":577.3,"exp_sec":480},"19-20":{"avg_sec":764.3,"exp_sec":652.94},"20-21":{"avg_sec":1023,"exp_sec":610.59},"21-22":{"avg_sec":655.5,"exp_sec":642.86},"22-23":{"avg_sec":903.1,"exp_sec":530},"23-24":{"avg_sec":865,"exp_sec":620},"0-1":{"avg_sec":524,"exp_sec":480},"11-12":{"avg_sec":380,"exp_sec":840},"16-17":{"avg_sec":8,"exp_sec":0}},"byDayHour":{"Friday":{"12-13":{"count":4,"avg_sec":1471,"exp_sec":225},"13-14":{"count":6,"avg_sec":615.83,"exp_sec":160},"14-15":{"count":9,"avg_sec":953,"exp_sec":93.33},"15-16":{"count":2,"avg_sec":598.5,"exp_sec":240},"17-18":{"count":3,"avg_sec":886.67,"exp_sec":900},"18-19":{"count":4,"avg_sec":396.75,"exp_sec":450},"19-20":{"count":12,"avg_sec":722.75,"exp_sec":745},"20-21":{"count":23,"avg_sec":1260.39,"exp_sec":766.96},"21-22":{"count":10,"avg_sec":660.6,"exp_sec":678},"22-23":{"count":18,"avg_sec":814.72,"exp_sec":740},"23-24":{"count":8,"avg_sec":928.62,"exp_sec":660}},"Monday":{"0-1":{"count":1,"avg_sec":524,"exp_sec":480},"11-12":{"count":1,"avg_sec":380,"exp_sec":840},"12-13":{"count":1,"avg_sec":663,"exp_sec":0},"13-14":{"count":2,"avg_sec":446.5,"exp_sec":0},"14-15":{"count":3,"avg_sec":757,"exp_sec":460},"15-16":{"count":1,"avg_sec":987,"exp_sec":720},"18-19":{"count":2,"avg_sec":31,"exp_sec":0},"19-20":{"count":9,"avg_sec":888.33,"exp_sec":693.33},"20-21":{"count":5,"avg_sec":683.8,"exp_sec":624},"21-22":{"count":5,"avg_sec":508.4,"exp_sec":588},"22-23":{"count":1,"avg_sec":1832,"exp_sec":720}},"Saturday":{"18-19":{"count":7,"avg_sec":474.71,"exp_sec":531.43},"19-20":{"count":23,"avg_sec":947.43,"exp_sec":610.43},"20-21":{"count":33,"avg_sec":1237.64,"exp_sec":740},"21-22":{"count":20,"avg_sec":652.2,"exp_sec":699},"22-23":{"count":41,"avg_sec":1032.76,"exp_sec":661.46},"23-24":{"count":9,"avg_sec":854.44,"exp_sec":653.33}},"Sunday":{"18-19":{"count":9,"avg_sec":666.44,"exp_sec":526.67},"19-20":{"count":13,"avg_sec":562.46,"exp_sec":600},"20-21":{"count":16,"avg_sec":820.94,"exp_sec":622.5},"21-22":{"count":14,"avg_sec":824.43,"exp_sec":604.29},"22-23":{"count":22,"avg_sec":835.14,"exp_sec":638.18},"23-24":{"count":13,"avg_sec":940,"exp_sec":636.92}},"Thursday":{"12-13":{"count":1,"avg_sec":1011,"exp_sec":840},"13-14":{"count":9,"avg_sec":585.44,"exp_sec":253.33},"14-15":{"count":7,"avg_sec":906.86,"exp_sec":325.71},"17-18":{"count":1,"avg_sec":1024,"exp_sec":900},"18-19":{"count":5,"avg_sec":917.4,"exp_sec":468},"19-20":{"count":12,"avg_sec":639,"exp_sec":610},"20-21":{"count":17,"avg_sec":895.29,"exp_sec":698.82},"21-22":{"count":8,"avg_sec":519.25,"exp_sec":397.5},"22-23":{"count":8,"avg_sec":836.12,"exp_sec":660},"23-24":{"count":4,"avg_sec":550,"exp_sec":630}},"Tuesday":{"12-13":{"count":2,"avg_sec":440.5,"exp_sec":240},"13-14":{"count":4,"avg_sec":1101.25,"exp_sec":0},"14-15":{"count":1,"avg_sec":1063,"exp_sec":0},"15-16":{"count":1,"avg_sec":708,"exp_sec":0},"16-17":{"count":1,"avg_sec":8,"exp_sec":0},"18-19":{"count":4,"avg_sec":670.25,"exp_sec":540},"19-20":{"count":5,"avg_sec":654.2,"exp_sec":624},"20-21":{"count":3,"avg_sec":791.33,"exp_sec":880},"21-22":{"count":8,"avg_sec":595.75,"exp_sec":757.5},"22-23":{"count":2,"avg_sec":779,"exp_sec":810},"23-24":{"count":3,"avg_sec":822.33,"exp_sec":620}},"Wednesday":{"12-13":{"count":3,"avg_sec":526.67,"exp_sec":0},"13-14":{"count":4,"avg_sec":731.75,"exp_sec":0},"14-15":{"count":2,"avg_sec":640,"exp_sec":420},"18-19":{"count":1,"avg_sec":236,"exp_sec":480},"19-20":{"count":17,"avg_sec":755.59,"exp_sec":652.94},"20-21":{"count":17,"avg_sec":743.88,"exp_sec":610.59},"21-22":{"count":7,"avg_sec":649.29,"exp_sec":642.86},"22-23":{"count":6,"avg_sec":506.67,"exp_sec":530}}},"breakingHours":[{"day":"Friday","hr":"12-13","count":4,"avg_sec":1471,"exp_sec":225},{"day":"Friday","hr":"14-15","count":9,"avg_sec":953,"exp_sec":93.33},{"day":"Friday","hr":"20-21","count":23,"avg_sec":1260.39,"exp_sec":766.96},{"day":"Friday","hr":"23-24","count":8,"avg_sec":928.62,"exp_sec":660},{"day":"Monday","hr":"15-16","count":1,"avg_sec":987,"exp_sec":720},{"day":"Monday","hr":"22-23","count":1,"avg_sec":1832,"exp_sec":720},{"day":"Saturday","hr":"19-20","count":23,"avg_sec":947.43,"exp_sec":610.43},{"day":"Saturday","hr":"20-21","count":33,"avg_sec":1237.64,"exp_sec":740},{"day":"Saturday","hr":"22-23","count":41,"avg_sec":1032.76,"exp_sec":661.46},{"day":"Sunday","hr":"23-24","count":13,"avg_sec":940,"exp_sec":636.92},{"day":"Thursday","hr":"12-13","count":1,"avg_sec":1011,"exp_sec":840},{"day":"Thursday","hr":"14-15","count":7,"avg_sec":906.86,"exp_sec":325.71},{"day":"Thursday","hr":"17-18","count":1,"avg_sec":1024,"exp_sec":900},{"day":"Thursday","hr":"18-19","count":5,"avg_sec":917.4,"exp_sec":468},{"day":"Tuesday","hr":"13-14","count":4,"avg_sec":1101.25,"exp_sec":0},{"day":"Tuesday","hr":"14-15","count":1,"avg_sec":1063,"exp_sec":0}]},"No Print":{"hourly":{"12-13":{"avg_sec":300.1,"exp_sec":240},"13-14":{"avg_sec":317,"exp_sec":240},"14-15":{"avg_sec":306.2,"exp_sec":240},"15-16":{"avg_sec":587.5,"exp_sec":120},"17-18":{"avg_sec":297.2,"exp_sec":240},"18-19":{"avg_sec":181.1,"exp_sec":240},"19-20":{"avg_sec":196.1,"exp_sec":240},"20-21":{"avg_sec":143.4,"exp_sec":216},"21-22":{"avg_sec":228.3,"exp_sec":240},"22-23":{"avg_sec":232.1,"exp_sec":240},"23-24":{"avg_sec":405.3,"exp_sec":240},"0-1":{"avg_sec":903,"exp_sec":240}},"byDayHour":{"Friday":{"12-13":{"count":10,"avg_sec":456,"exp_sec":240},"13-14":{"count":12,"avg_sec":321.92,"exp_sec":220},"14-15":{"count":10,"avg_sec":338.9,"exp_sec":240},"15-16":{"count":2,"avg_sec":587.5,"exp_sec":120},"17-18":{"count":4,"avg_sec":353,"exp_sec":240},"18-19":{"count":11,"avg_sec":214.64,"exp_sec":240},"19-20":{"count":33,"avg_sec":217.06,"exp_sec":232.73},"20-21":{"count":13,"avg_sec":78.92,"exp_sec":240},"21-22":{"count":19,"avg_sec":201.47,"exp_sec":240},"22-23":{"count":18,"avg_sec":265,"exp_sec":226.67},"23-24":{"count":2,"avg_sec":194.5,"exp_sec":240}},"Monday":{"12-13":{"count":3,"avg_sec":320.67,"exp_sec":240},"13-14":{"count":4,"avg_sec":252,"exp_sec":240},"14-15":{"count":6,"avg_sec":345.83,"exp_sec":240},"18-19":{"count":13,"avg_sec":259.15,"exp_sec":240},"19-20":{"count":16,"avg_sec":304.56,"exp_sec":240},"20-21":{"count":11,"avg_sec":201.45,"exp_sec":196.36},"21-22":{"count":8,"avg_sec":215.38,"exp_sec":210},"22-23":{"count":3,"avg_sec":361.33,"exp_sec":240},"23-24":{"count":1,"avg_sec":163,"exp_sec":0}},"Saturday":{"17-18":{"count":4,"avg_sec":271,"exp_sec":240},"18-19":{"count":15,"avg_sec":150.8,"exp_sec":240},"19-20":{"count":38,"avg_sec":151.66,"exp_sec":240},"20-21":{"count":10,"avg_sec":223.2,"exp_sec":216},"21-22":{"count":30,"avg_sec":139.7,"exp_sec":232},"22-23":{"count":18,"avg_sec":145.22,"exp_sec":226.67},"23-24":{"count":2,"avg_sec":542,"exp_sec":240}},"Sunday":{"0-1":{"count":1,"avg_sec":903,"exp_sec":240},"18-19":{"count":17,"avg_sec":162.18,"exp_sec":240},"19-20":{"count":14,"avg_sec":161.71,"exp_sec":240},"20-21":{"count":12,"avg_sec":72,"exp_sec":240},"21-22":{"count":16,"avg_sec":376.38,"exp_sec":210},"22-23":{"count":11,"avg_sec":352.18,"exp_sec":218.18},"23-24":{"count":4,"avg_sec":434,"exp_sec":240}},"Thursday":{"12-13":{"count":12,"avg_sec":155.67,"exp_sec":240},"13-14":{"count":6,"avg_sec":351.33,"exp_sec":240},"14-15":{"count":1,"avg_sec":99,"exp_sec":240},"17-18":{"count":1,"avg_sec":179,"exp_sec":240},"18-19":{"count":6,"avg_sec":74.17,"exp_sec":240},"19-20":{"count":8,"avg_sec":365.75,"exp_sec":240},"20-21":{"count":12,"avg_sec":103.25,"exp_sec":240},"21-22":{"count":22,"avg_sec":268.73,"exp_sec":229.09},"22-23":{"count":8,"avg_sec":231.62,"exp_sec":240},"23-24":{"count":2,"avg_sec":325.5,"exp_sec":240}},"Tuesday":{"12-13":{"count":11,"avg_sec":177.18,"exp_sec":240},"13-14":{"count":3,"avg_sec":265,"exp_sec":240},"14-15":{"count":6,"avg_sec":185,"exp_sec":240},"18-19":{"count":6,"avg_sec":208.17,"exp_sec":240},"19-20":{"count":15,"avg_sec":140.8,"exp_sec":224},"20-21":{"count":6,"avg_sec":198.17,"exp_sec":240},"21-22":{"count":9,"avg_sec":279.56,"exp_sec":240},"22-23":{"count":4,"avg_sec":126.25,"exp_sec":240}},"Wednesday":{"12-13":{"count":13,"avg_sec":412.85,"exp_sec":240},"13-14":{"count":5,"avg_sec":347,"exp_sec":240},"14-15":{"count":1,"avg_sec":676,"exp_sec":240},"18-19":{"count":12,"avg_sec":170.42,"exp_sec":240},"19-20":{"count":13,"avg_sec":135.31,"exp_sec":240},"20-21":{"count":10,"avg_sec":184.2,"exp_sec":216},"21-22":{"count":8,"avg_sec":171.88,"exp_sec":240},"22-23":{"count":4,"avg_sec":155,"exp_sec":240},"23-24":{"count":1,"avg_sec":840,"exp_sec":240}}},"breakingHours":[{"day":"Sunday","hr":"0-1","count":1,"avg_sec":903,"exp_sec":240}]},"Pasta":{"hourly":{"12-13":{"avg_sec":1037.2,"exp_sec":450},"13-14":{"avg_sec":431.1,"exp_sec":360},"14-15":{"avg_sec":781.5,"exp_sec":480},"15-16":{"avg_sec":892,"exp_sec":720},"18-19":{"avg_sec":608.6,"exp_sec":480},"19-20":{"avg_sec":797.5,"exp_sec":740},"20-21":{"avg_sec":1033.6,"exp_sec":735},"21-22":{"avg_sec":705.9,"exp_sec":820},"22-23":{"avg_sec":962,"exp_sec":740},"23-24":{"avg_sec":1019.3,"exp_sec":690}},"byDayHour":{"Friday":{"12-13":{"count":2,"avg_sec":1529,"exp_sec":450},"13-14":{"count":3,"avg_sec":435.33,"exp_sec":320},"14-15":{"count":1,"avg_sec":622,"exp_sec":0},"15-16":{"count":1,"avg_sec":981,"exp_sec":480},"18-19":{"count":2,"avg_sec":594,"exp_sec":900},"19-20":{"count":1,"avg_sec":617,"exp_sec":900},"20-21":{"count":9,"avg_sec":1023.56,"exp_sec":820},"21-22":{"count":4,"avg_sec":536,"exp_sec":690},"22-23":{"count":8,"avg_sec":780.62,"exp_sec":735},"23-24":{"count":4,"avg_sec":1190.25,"exp_sec":780}},"Monday":{"12-13":{"count":1,"avg_sec":663,"exp_sec":0},"14-15":{"count":2,"avg_sec":739.5,"exp_sec":690},"15-16":{"count":1,"avg_sec":987,"exp_sec":720},"19-20":{"count":2,"avg_sec":974,"exp_sec":660},"20-21":{"count":3,"avg_sec":905.33,"exp_sec":760},"21-22":{"count":4,"avg_sec":575.5,"exp_sec":615},"22-23":{"count":1,"avg_sec":1832,"exp_sec":720}},"Saturday":{"18-19":{"count":3,"avg_sec":748.67,"exp_sec":660},"19-20":{"count":5,"avg_sec":1154.2,"exp_sec":756},"20-21":{"count":10,"avg_sec":1249.2,"exp_sec":828},"21-22":{"count":7,"avg_sec":641.71,"exp_sec":711.43},"22-23":{"count":17,"avg_sec":1054.82,"exp_sec":712.94},"23-24":{"count":5,"avg_sec":1090.4,"exp_sec":720}},"Sunday":{"18-19":{"count":2,"avg_sec":739,"exp_sec":780},"19-20":{"count":7,"avg_sec":553.71,"exp_sec":591.43},"20-21":{"count":5,"avg_sec":976.8,"exp_sec":552},"21-22":{"count":7,"avg_sec":894.29,"exp_sec":685.71},"22-23":{"count":6,"avg_sec":876,"exp_sec":720},"23-24":{"count":5,"avg_sec":790.8,"exp_sec":672}},"Thursday":{"13-14":{"count":4,"avg_sec":269.25,"exp_sec":360},"14-15":{"count":1,"avg_sec":1025,"exp_sec":480},"19-20":{"count":2,"avg_sec":652.5,"exp_sec":570},"20-21":{"count":8,"avg_sec":1014.25,"exp_sec":660},"21-22":{"count":5,"avg_sec":788.4,"exp_sec":636},"22-23":{"count":3,"avg_sec":801.67,"exp_sec":740}},"Tuesday":{"12-13":{"count":1,"avg_sec":854,"exp_sec":0},"13-14":{"count":1,"avg_sec":1066,"exp_sec":0},"15-16":{"count":1,"avg_sec":708,"exp_sec":0},"18-19":{"count":1,"avg_sec":329,"exp_sec":480},"21-22":{"count":4,"avg_sec":651.25,"exp_sec":840},"23-24":{"count":2,"avg_sec":1070.5,"exp_sec":690}},"Wednesday":{"12-13":{"count":1,"avg_sec":611,"exp_sec":0},"18-19":{"count":1,"avg_sec":236,"exp_sec":480},"19-20":{"count":3,"avg_sec":811.33,"exp_sec":740},"20-21":{"count":4,"avg_sec":723,"exp_sec":735},"21-22":{"count":3,"avg_sec":752.33,"exp_sec":820}}},"breakingHours":[{"day":"Friday","hr":"12-13","count":2,"avg_sec":1529,"exp_sec":450},{"day":"Friday","hr":"15-16","count":1,"avg_sec":981,"exp_sec":480},{"day":"Friday","hr":"20-21","count":9,"avg_sec":1023.56,"exp_sec":820},{"day":"Friday","hr":"23-24","count":4,"avg_sec":1190.25,"exp_sec":780},{"day":"Monday","hr":"15-16","count":1,"avg_sec":987,"exp_sec":720},{"day":"Monday","hr":"19-20","count":2,"avg_sec":974,"exp_sec":660},{"day":"Monday","hr":"20-21","count":3,"avg_sec":905.33,"exp_sec":760},{"day":"Monday","hr":"22-23","count":1,"avg_sec":1832,"exp_sec":720},{"day":"Saturday","hr":"19-20","count":5,"avg_sec":1154.2,"exp_sec":756},{"day":"Saturday","hr":"20-21","count":10,"avg_sec":1249.2,"exp_sec":828},{"day":"Saturday","hr":"22-23","count":17,"avg_sec":1054.82,"exp_sec":712.94},{"day":"Saturday","hr":"23-24","count":5,"avg_sec":1090.4,"exp_sec":720},{"day":"Sunday","hr":"20-21","count":5,"avg_sec":976.8,"exp_sec":552},{"day":"Thursday","hr":"14-15","count":1,"avg_sec":1025,"exp_sec":480},{"day":"Thursday","hr":"20-21","count":8,"avg_sec":1014.25,"exp_sec":660},{"day":"Tuesday","hr":"13-14","count":1,"avg_sec":1066,"exp_sec":0},{"day":"Tuesday","hr":"23-24","count":2,"avg_sec":1070.5,"exp_sec":690}]},"Pastry":{"hourly":{"12-13":{"avg_sec":891.3,"exp_sec":480},"13-14":{"avg_sec":436.1,"exp_sec":160},"14-15":{"avg_sec":394.9,"exp_sec":80},"15-16":{"avg_sec":343.2,"exp_sec":160},"16-17":{"avg_sec":728.5,"exp_sec":0},"17-18":{"avg_sec":917,"exp_sec":480},"18-19":{"avg_sec":253.9,"exp_sec":480},"19-20":{"avg_sec":311.8,"exp_sec":525},"20-21":{"avg_sec":364.9,"exp_sec":500},"21-22":{"avg_sec":355.2,"exp_sec":540},"22-23":{"avg_sec":231.7,"exp_sec":510},"23-24":{"avg_sec":283.3,"exp_sec":480},"0-1":{"avg_sec":343.3,"exp_sec":480},"1-2":{"avg_sec":189,"exp_sec":480}},"byDayHour":{"Friday":{"12-13":{"count":1,"avg_sec":2356,"exp_sec":0},"13-14":{"count":6,"avg_sec":447.83,"exp_sec":80},"14-15":{"count":8,"avg_sec":495,"exp_sec":60},"15-16":{"count":8,"avg_sec":422.5,"exp_sec":135},"16-17":{"count":2,"avg_sec":728.5,"exp_sec":0},"17-18":{"count":1,"avg_sec":912,"exp_sec":480},"18-19":{"count":2,"avg_sec":198,"exp_sec":480},"19-20":{"count":6,"avg_sec":213.33,"exp_sec":480},"20-21":{"count":11,"avg_sec":314.91,"exp_sec":496.36},"21-22":{"count":16,"avg_sec":203.5,"exp_sec":480},"22-23":{"count":9,"avg_sec":253.56,"exp_sec":520},"23-24":{"count":13,"avg_sec":204.23,"exp_sec":507.69}},"Monday":{"13-14":{"count":3,"avg_sec":646,"exp_sec":160},"14-15":{"count":1,"avg_sec":401,"exp_sec":0},"15-16":{"count":7,"avg_sec":274.57,"exp_sec":68.57},"18-19":{"count":1,"avg_sec":431,"exp_sec":480},"19-20":{"count":5,"avg_sec":392,"exp_sec":480},"20-21":{"count":10,"avg_sec":443.9,"exp_sec":516},"21-22":{"count":3,"avg_sec":329.33,"exp_sec":480},"22-23":{"count":8,"avg_sec":313.88,"exp_sec":480},"23-24":{"count":2,"avg_sec":148.5,"exp_sec":480}},"Saturday":{"0-1":{"count":4,"avg_sec":192.5,"exp_sec":480},"17-18":{"count":1,"avg_sec":922,"exp_sec":480},"18-19":{"count":3,"avg_sec":242.67,"exp_sec":480},"19-20":{"count":6,"avg_sec":237.17,"exp_sec":480},"20-21":{"count":21,"avg_sec":258.81,"exp_sec":485.71},"21-22":{"count":13,"avg_sec":252.31,"exp_sec":493.85},"22-23":{"count":11,"avg_sec":242.27,"exp_sec":512.73},"23-24":{"count":18,"avg_sec":312.94,"exp_sec":490}},"Sunday":{"0-1":{"count":1,"avg_sec":439,"exp_sec":480},"1-2":{"count":1,"avg_sec":189,"exp_sec":480},"18-19":{"count":1,"avg_sec":222,"exp_sec":480},"19-20":{"count":6,"avg_sec":250.83,"exp_sec":510},"20-21":{"count":13,"avg_sec":242.69,"exp_sec":493.85},"21-22":{"count":10,"avg_sec":232,"exp_sec":498},"22-23":{"count":9,"avg_sec":184.67,"exp_sec":480},"23-24":{"count":10,"avg_sec":215.1,"exp_sec":480}},"Thursday":{"12-13":{"count":1,"avg_sec":68,"exp_sec":0},"13-14":{"count":5,"avg_sec":367.2,"exp_sec":96},"14-15":{"count":6,"avg_sec":344.17,"exp_sec":190},"15-16":{"count":3,"avg_sec":292,"exp_sec":160},"19-20":{"count":4,"avg_sec":338,"exp_sec":540},"20-21":{"count":6,"avg_sec":429.17,"exp_sec":570},"21-22":{"count":12,"avg_sec":553.42,"exp_sec":560},"22-23":{"count":12,"avg_sec":162.33,"exp_sec":495},"23-24":{"count":10,"avg_sec":427.9,"exp_sec":576}},"Tuesday":{"13-14":{"count":3,"avg_sec":432,"exp_sec":160},"14-15":{"count":6,"avg_sec":385.83,"exp_sec":80},"19-20":{"count":3,"avg_sec":380.67,"exp_sec":480},"20-21":{"count":8,"avg_sec":775.88,"exp_sec":525},"21-22":{"count":7,"avg_sec":517.43,"exp_sec":582.86},"22-23":{"count":4,"avg_sec":241.75,"exp_sec":525},"23-24":{"count":9,"avg_sec":308.33,"exp_sec":500}},"Wednesday":{"0-1":{"count":1,"avg_sec":851,"exp_sec":480},"12-13":{"count":1,"avg_sec":250,"exp_sec":480},"13-14":{"count":3,"avg_sec":321.67,"exp_sec":0},"14-15":{"count":6,"avg_sec":320.17,"exp_sec":80},"19-20":{"count":4,"avg_sec":484.75,"exp_sec":525},"20-21":{"count":9,"avg_sec":354.33,"exp_sec":500},"21-22":{"count":9,"avg_sec":528.33,"exp_sec":540},"22-23":{"count":6,"avg_sec":272.33,"exp_sec":510},"23-24":{"count":4,"avg_sec":227,"exp_sec":480}}},"breakingHours":[{"day":"Friday","hr":"12-13","count":1,"avg_sec":2356,"exp_sec":0},{"day":"Friday","hr":"17-18","count":1,"avg_sec":912,"exp_sec":480},{"day":"Saturday","hr":"17-18","count":1,"avg_sec":922,"exp_sec":480}]},"Sauté":{"hourly":{"17-18":{"avg_sec":886.7,"exp_sec":900},"19-20":{"avg_sec":788.4,"exp_sec":626.67},"20-21":{"avg_sec":1002.1,"exp_sec":576},"21-22":{"avg_sec":803.5,"exp_sec":600},"22-23":{"avg_sec":913.9,"exp_sec":480},"23-24":{"avg_sec":803.4,"exp_sec":690},"0-1":{"avg_sec":524,"exp_sec":480},"18-19":{"avg_sec":879.8,"exp_sec":585},"14-15":{"avg_sec":1072,"exp_sec":480},"12-13":{"avg_sec":27,"exp_sec":480}},"byDayHour":{"Friday":{"17-18":{"count":3,"avg_sec":886.67,"exp_sec":900},"19-20":{"count":5,"avg_sec":636.2,"exp_sec":828},"20-21":{"count":5,"avg_sec":937.4,"exp_sec":816},"21-22":{"count":3,"avg_sec":796.67,"exp_sec":760},"22-23":{"count":4,"avg_sec":725.75,"exp_sec":750},"23-24":{"count":1,"avg_sec":150,"exp_sec":480}},"Monday":{"0-1":{"count":1,"avg_sec":524,"exp_sec":480},"19-20":{"count":4,"avg_sec":971.25,"exp_sec":810},"21-22":{"count":1,"avg_sec":240,"exp_sec":480}},"Saturday":{"18-19":{"count":1,"avg_sec":542,"exp_sec":900},"19-20":{"count":5,"avg_sec":1094.4,"exp_sec":744},"20-21":{"count":13,"avg_sec":1223.38,"exp_sec":747.69},"21-22":{"count":6,"avg_sec":808.5,"exp_sec":760},"22-23":{"count":11,"avg_sec":1134.36,"exp_sec":692.73},"23-24":{"count":3,"avg_sec":608.33,"exp_sec":760}},"Sunday":{"18-19":{"count":3,"avg_sec":700.67,"exp_sec":480},"19-20":{"count":2,"avg_sec":500.5,"exp_sec":600},"20-21":{"count":8,"avg_sec":720,"exp_sec":720},"21-22":{"count":4,"avg_sec":989.5,"exp_sec":795},"22-23":{"count":9,"avg_sec":829.33,"exp_sec":740},"23-24":{"count":4,"avg_sec":1113,"exp_sec":690}},"Thursday":{"14-15":{"count":2,"avg_sec":1072,"exp_sec":480},"18-19":{"count":4,"avg_sec":1098.5,"exp_sec":585},"19-20":{"count":7,"avg_sec":699.14,"exp_sec":660},"20-21":{"count":2,"avg_sec":818,"exp_sec":480},"22-23":{"count":2,"avg_sec":1134.5,"exp_sec":690}},"Tuesday":{"12-13":{"count":1,"avg_sec":27,"exp_sec":480},"19-20":{"count":2,"avg_sec":907,"exp_sec":900},"20-21":{"count":1,"avg_sec":808,"exp_sec":900},"21-22":{"count":2,"avg_sec":738.5,"exp_sec":900},"22-23":{"count":1,"avg_sec":302,"exp_sec":720}},"Wednesday":{"19-20":{"count":9,"avg_sec":728.67,"exp_sec":626.67},"20-21":{"count":5,"avg_sec":1055.2,"exp_sec":576},"21-22":{"count":2,"avg_sec":773.5,"exp_sec":600},"22-23":{"count":3,"avg_sec":667,"exp_sec":480}}},"breakingHours":[{"day":"Friday","hr":"20-21","count":5,"avg_sec":937.4,"exp_sec":816},{"day":"Monday","hr":"19-20","count":4,"avg_sec":971.25,"exp_sec":810},{"day":"Saturday","hr":"19-20","count":5,"avg_sec":1094.4,"exp_sec":744},{"day":"Saturday","hr":"20-21","count":13,"avg_sec":1223.38,"exp_sec":747.69},{"day":"Saturday","hr":"22-23","count":11,"avg_sec":1134.36,"exp_sec":692.73},{"day":"Sunday","hr":"21-22","count":4,"avg_sec":989.5,"exp_sec":795},{"day":"Sunday","hr":"23-24","count":4,"avg_sec":1113,"exp_sec":690},{"day":"Thursday","hr":"14-15","count":2,"avg_sec":1072,"exp_sec":480},{"day":"Thursday","hr":"18-19","count":4,"avg_sec":1098.5,"exp_sec":585},{"day":"Thursday","hr":"22-23","count":2,"avg_sec":1134.5,"exp_sec":690},{"day":"Tuesday","hr":"19-20","count":2,"avg_sec":907,"exp_sec":900},{"day":"Wednesday","hr":"20-21","count":5,"avg_sec":1055.2,"exp_sec":576}]}};
+const HM_HRS = ["11-12","12-13","13-14","14-15","15-16","16-17","17-18","18-19","19-20","20-21","21-22","22-23","23-24","0-1"];
+const HM_DAYS_FULL = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const HM_DAYS_SHORT = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+// ============================================================
+// UTILS
+// ============================================================
+const THRESHOLD = 15;
+const gc = '#262a33';
+
+function fmtSec(s) {
+  if (s == null || s === 0) return '—';
+  const m = Math.floor(s / 60), sec = Math.round(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
+}
+function fmtMin(s) {
+  if (s == null) return '—';
+  const m = Math.floor(s / 60), sec = Math.round(s % 60);
+  return m + ' min ' + (sec > 0 ? sec + ' sec' : '');
+}
+function lerpColor(a, b, t) {
+  t = Math.max(0, Math.min(1, t));
+  const hex = s => parseInt(s.replace('#',''), 16);
+  const ha=hex(a), hb=hex(b);
+  const r1=(ha>>16)&255,g1=(ha>>8)&255,b1=ha&255;
+  const r2=(hb>>16)&255,g2=(hb>>8)&255,b2=hb&255;
+  const r=Math.round(r1+(r2-r1)*t),g=Math.round(g1+(g2-g1)*t),bl=Math.round(b1+(b2-b1)*t);
+  return '#'+r.toString(16).padStart(2,'0')+g.toString(16).padStart(2,'0')+bl.toString(16).padStart(2,'0');
+}
+function textFor(bg) {
+  if (bg === '#1a1d24') return '#3a3d44';
+  const h = parseInt(bg.replace('#',''), 16);
+  const r=(h>>16)&255,g=(h>>8)&255,b=h&255;
+  return (r*299+g*587+b*114)/1000 > 100 ? '#111' : '#eee';
+}
+function fulColor(min) {
+  if (min == null) return '#1a1d24';
+  if (min <= 10) return lerpColor('#1a3a1a','#22c55e', min/10);
+  if (min <= 15) return lerpColor('#22c55e','#f59e0b', (min-10)/5);
+  if (min <= 20) return lerpColor('#f59e0b','#ef4444', (min-15)/5);
+  return '#ef4444';
+}
+function guestColor(g) {
+  if (g == null || g === 0) return '#1a1d24';
+  return lerpColor('#b3d9f7','#1565c0', Math.min(1, g/180));
+}
+function hmColor(sec, target) {
+  if (sec == null || sec === 0) return '#1a1d24';
+  const ref = target || 600;
+  const ratio = sec / ref;
+  if (ratio <= 1.0) return lerpColor('#133d22','#22c55e', ratio);
+  if (ratio <= 1.15) return lerpColor('#22c55e','#f59e0b', (ratio-1)/0.15);
+  if (ratio <= 1.30) return lerpColor('#f59e0b','#ef4444', (ratio-1.15)/0.15);
+  return '#ef4444';
+}
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'overview' && window._threeRenderer) {
+    const host = document.getElementById('kitchen');
+    const W = host.clientWidth || 900;
+    window._threeRenderer.setSize(W, 500);
+    window._threeCamera.aspect = W / 500;
+    window._threeCamera.updateProjectionMatrix();
+  }
+}
+
+// ============================================================
+// HEATMAP TOGGLE
+// ============================================================
+function showHM(which, btn) {
+  document.querySelectorAll('.hm-toggle button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('hmFul').style.display = which === 'ful' ? '' : 'none';
+  document.getElementById('hmGuests').style.display = which === 'guests' ? '' : 'none';
+}
+
+// ============================================================
+// CHART.JS DEFAULTS
+// ============================================================
+Chart.defaults.color = '#9aa0aa';
+Chart.defaults.borderColor = gc;
+Chart.defaults.font.family = 'inherit';
+
+// ============================================================
+// VISUAL 1: Kitchen Pressure Curve
+// ============================================================
+(function() {
+  const labels = CURVE.map(d => d.conc);
+  const BP = 26;
+  const bpPlugin = {
+    id:'bpZone',
+    beforeDraw(chart) {
+      const {ctx, chartArea:a, scales} = chart;
+      if (!a || !scales.x) return;
+      const bpIdx = labels.indexOf(BP);
+      if (bpIdx < 0) return;
+      const xBp = scales.x.getPixelForValue(bpIdx);
+      ctx.save();
+      ctx.fillStyle='rgba(226,112,106,0.07)';
+      ctx.fillRect(xBp,a.top,a.right-xBp,a.height);
+      const yThr=scales.y1.getPixelForValue(THRESHOLD);
+      if(yThr>=a.top&&yThr<=a.bottom){ctx.strokeStyle='#e2706a';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(a.left,yThr);ctx.lineTo(a.right,yThr);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#e2706a';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('15 min target',a.left+4,yThr-4);}
+      ctx.strokeStyle='#e2706a';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(xBp,a.top);ctx.lineTo(xBp,a.bottom);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#e2706a';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText('⚡ BP:26',xBp,a.top+14);
+      ctx.restore();
+    }
+  };
+  new Chart(document.getElementById('cPressure'),{
+    data:{labels,datasets:[
+      {type:'bar',label:'Occurrences',data:CURVE.map(d=>d.occ),backgroundColor:labels.map(l=>l>=BP?'rgba(226,112,106,0.55)':'rgba(90,169,230,0.55)'),borderColor:labels.map(l=>l>=BP?'#e2706a':'#5aa9e6'),borderWidth:1,yAxisID:'y',order:2,borderRadius:2},
+      {type:'line',label:'Avg fulfillment (min)',data:CURVE.map(d=>d.ful),borderColor:'#d9a441',backgroundColor:'rgba(217,164,65,0.0)',tension:0.3,pointRadius:2,pointHoverRadius:5,borderWidth:2.5,yAxisID:'y1',order:1}
+    ]},
+    options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent tickets open'},grid:{color:gc}},y:{position:'left',title:{display:true,text:'Occurrences'},grid:{color:gc},min:0},y1:{position:'right',title:{display:true,text:'Avg fulfillment (min)'},grid:{display:false},min:0,suggestedMax:24}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
+    plugins:[bpPlugin]
+  });
+})();
+
+// ============================================================
+// VISUAL 2: Breaking Point
+// ============================================================
+(function() {
+  const labels = CURVE.map(d => d.conc);
+  const bpTickets=26, bpGuests=141;
+  const refLines={id:'refLines',afterDraw(chart){
+    const {ctx,chartArea:a,scales}=chart;if(!a)return;
+    const bpIdx=labels.indexOf(bpTickets);
+    if(bpIdx>=0){const xBp=scales.x.getPixelForValue(bpIdx);ctx.save();ctx.strokeStyle='#e2706a';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(xBp,a.top);ctx.lineTo(xBp,a.bottom);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#e2706a';ctx.font='11px sans-serif';ctx.fillText('BP: 26',xBp+4,a.top+14);ctx.restore();}
+    const yThr=scales.y.getPixelForValue(THRESHOLD);if(yThr>=a.top&&yThr<=a.bottom){ctx.save();ctx.strokeStyle='#e2706a';ctx.lineWidth=1;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(a.left,yThr);ctx.lineTo(a.right,yThr);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#e2706a';ctx.font='11px sans-serif';ctx.fillText('15 min',a.left+4,yThr-4);ctx.restore();}
+    const yGBp=scales.y1.getPixelForValue(bpGuests);if(yGBp>=a.top&&yGBp<=a.bottom){ctx.save();ctx.strokeStyle='#5aa9e6';ctx.lineWidth=1;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(a.left,yGBp);ctx.lineTo(a.right,yGBp);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#5aa9e6';ctx.font='11px sans-serif';ctx.textAlign='right';ctx.fillText('BP: 141 guests',a.right-4,yGBp-4);ctx.restore();}
+  }};
+  new Chart(document.getElementById('cBreaking'),{
+    data:{labels,datasets:[
+      {type:'line',label:'Avg fulfillment (min)',data:CURVE.map(d=>d.ful),borderColor:'#d9a441',backgroundColor:'rgba(217,164,65,0.12)',fill:true,tension:0.3,pointRadius:0,yAxisID:'y',order:1},
+      {type:'line',label:'Avg guests seated',data:CURVE.map(d=>d.guests),borderColor:'#5aa9e6',backgroundColor:'rgba(90,169,230,0.08)',fill:true,tension:0.3,pointRadius:0,yAxisID:'y1',order:2}
+    ]},
+    options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent tickets open'},grid:{color:gc}},y:{position:'left',title:{display:true,text:'Avg fulfillment (min)'},grid:{color:gc},suggestedMax:22},y1:{position:'right',title:{display:true,text:'Avg guests seated'},grid:{display:false},suggestedMax:200}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
+    plugins:[refLines]
+  });
+})();
+
+// ============================================================
+// VISUAL 3: Load vs Performance
+// ============================================================
+(function(){
+  const thrLine={id:'thr',afterDraw(chart){const{ctx,chartArea:a,scales}=chart;if(!a||!scales.y)return;const yy=scales.y.getPixelForValue(THRESHOLD);if(yy<a.top||yy>a.bottom)return;ctx.save();ctx.strokeStyle='#e2706a';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(a.left,yy);ctx.lineTo(a.right,yy);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#e2706a';ctx.font='11px sans-serif';ctx.fillText(THRESHOLD+' min target',a.left+6,yy-4);ctx.restore();}};
+  new Chart(document.getElementById('cLoadPerf'),{type:'bar',data:{labels:TBK.map(b=>b.bucket),datasets:[{label:'Avg fulfillment (min)',data:TBK.map(b=>b.ful),backgroundColor:TBK.map(b=>b.ful>THRESHOLD?'#8a3f1a':'#d9a441'),borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Concurrent tickets open (bucket)'},grid:{display:false}},y:{title:{display:true,text:'Avg fulfillment (min)'},grid:{color:gc},suggestedMax:22}}},plugins:[thrLine]});
+})();
+
+// ============================================================
+// VISUAL 4: 3D Station View
+// ============================================================
+(function(){
+  const host = document.getElementById('kitchen');
+  if (!window.THREE) {
+    host.innerHTML='<div style="padding:40px;color:#9aa0aa;text-align:center">Three.js failed to load. Check CDN connection.<br><small>CDN: cdnjs.cloudflare.com</small></div>';
+    return;
+  }
+  const LAYOUT = {
+    'Grill Meat':[-6,-4.5],'Grill Fish':[-4,-4.5],'Sauté':[-2,-4.5],
+    'Fryer':[0,-4.5],'Pasta':[2,-4.5],'Back Kitchen':[5,-4.5],
+    'Hot Expo':[0,-2],'No Print':[2.6,-2],
+    'Cold Expo':[-6.5,-1.5],'Garde Manger':[-6.5,0.3],'Crudo':[-6.5,2.1],
+    'Pastry':[-6.5,3.9]
+  };
+  const ZONES=[['HOT LINE',-2,-5.6],['COLD LINE',-6.5,-3],['PASS',1.3,-2.9]];
+  function perfColor(s){
+    if(!s.exp_sec||s.exp_sec===0)return 0x6b7280;
+    const r=s.avg_sec/s.exp_sec;
+    if(r<=1.0)return 0x2e8b57;
+    if(r<=1.15)return 0xc99a2e;
+    return 0xc0392b;
+  }
+  function tSprite(t,sub,color,big){
+    const c=document.createElement('canvas');c.width=256;c.height=sub?80:48;
+    const g=c.getContext('2d');
+    g.font='bold '+(big?24:20)+'px sans-serif';g.fillStyle=color||'#fff';g.textAlign='center';
+    g.fillText(t,128,sub?30:32);
+    if(sub){g.font='20px sans-serif';g.fillStyle='#ffd479';g.fillText(sub,128,62);}
+    return new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true}));
+  }
+  let W=host.clientWidth||900,H=500;
+  const scene=new THREE.Scene();scene.background=new THREE.Color(0x0c0e13);
+  const camera=new THREE.PerspectiveCamera(45,W/H,0.1,200);
+  const renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(window.devicePixelRatio||1);renderer.setSize(W,H);
+  host.appendChild(renderer.domElement);
+  window._threeRenderer=renderer;window._threeCamera=camera;
+  scene.add(new THREE.AmbientLight(0xffffff,0.82));
+  const dl=new THREE.DirectionalLight(0xffffff,0.6);dl.position.set(6,14,8);scene.add(dl);
+  const kitchen=new THREE.Group();scene.add(kitchen);
+  const FW=17,FD=15;
+  const floor=new THREE.Mesh(new THREE.BoxGeometry(FW,0.2,FD),new THREE.MeshLambertMaterial({color:0x161a21}));
+  floor.position.y=-0.1;kitchen.add(floor);
+  const grid=new THREE.GridHelper(Math.max(FW,FD),16,0x2a2f3a,0x1e222a);grid.position.y=0.02;kitchen.add(grid);
+  const wallMat=new THREE.MeshLambertMaterial({color:0x222831});
+  function wall(w,d,x,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,1.6,d),wallMat);m.position.set(x,0.8,z);kitchen.add(m);}
+  wall(FW,0.25,0,-FD/2);wall(FW,0.25,0,FD/2);wall(0.25,FD,-FW/2,0);wall(0.25,FD,FW/2,0);
+  const countMat=new THREE.MeshLambertMaterial({color:0x2c333d});
+  function counter(w,d,x,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,0.35,d),countMat);m.position.set(x,0.17,z);kitchen.add(m);}
+  counter(9.5,1.6,-1,-4.5);counter(1.6,7.0,-6.5,1.2);
+  ZONES.forEach(([t,x,z])=>{const sp=tSprite(t,null,'#7f8794',false);sp.scale.set(3.0,0.6,1);sp.position.set(x,0.25,z);kitchen.add(sp);});
+  const withTargets=STATIONS.filter(s=>s.exp_sec>0);
+  const overTarget=withTargets.filter(s=>s.avg_sec>s.exp_sec).length;
+  document.getElementById('kTotal').textContent=overTarget+'/'+withTargets.length+' over target';
+  const boxes=[];let gi=0;
+  STATIONS.forEach(s=>{
+    let pos=LAYOUT[s.station];
+    if(!pos){const col=gi%5,row=Math.floor(gi/5);pos=[(col-2)*1.8,6.8+row*1.8];gi++;}
+    const[x,z]=pos;
+    const mins=s.avg_sec?s.avg_sec/60:0;
+    const h=Math.max(0.4,Math.min(6,mins*0.32));
+    const box=new THREE.Mesh(new THREE.BoxGeometry(1.4,h,1.4),new THREE.MeshLambertMaterial({color:perfColor(s)}));
+    box.position.set(x,0.35+h/2,z);box.userData=s;kitchen.add(box);boxes.push(box);
+    const label=tSprite(s.station.replace('Garde Manger','Garde M.'),(mins?mins.toFixed(1):'–')+' min','#fff',true);
+    label.scale.set(2.8,0.88,1);label.position.set(x,0.35+h+0.85,z);kitchen.add(label);
+  });
+  let rotY=0.7,rotX=0.7,dist=22;
+  function place(){camera.position.set(dist*Math.sin(rotY)*Math.cos(rotX),dist*Math.sin(rotX),dist*Math.cos(rotY)*Math.cos(rotX));camera.lookAt(0,0.6,0);}
+  place();
+  let drag=false,px=0,py=0,moved=0,spin=true;
+  const dom=renderer.domElement;
+  dom.addEventListener('pointerdown',e=>{drag=true;moved=0;px=e.clientX;py=e.clientY;spin=false;host.style.cursor='grabbing';});
+  window.addEventListener('pointerup',e=>{if(drag&&moved<6)pick(e);drag=false;host.style.cursor='grab';});
+  window.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-px,dy=e.clientY-py;moved+=Math.abs(dx)+Math.abs(dy);rotY-=dx*0.008;rotX=Math.max(0.2,Math.min(1.45,rotX+dy*0.006));px=e.clientX;py=e.clientY;place();});
+  dom.addEventListener('wheel',e=>{e.preventDefault();dist=Math.max(9,Math.min(46,dist+(e.deltaY>0?1.4:-1.4)));place();},{passive:false});
+  const ray=new THREE.Raycaster(),m2=new THREE.Vector2();
+  function pick(e){const r=dom.getBoundingClientRect();m2.x=((e.clientX-r.left)/r.width)*2-1;m2.y=-((e.clientY-r.top)/r.height)*2+1;ray.setFromCamera(m2,camera);const hit=ray.intersectObjects(boxes,false);if(hit.length)selectStation3D(hit[0].object.userData);}
+  function selectStation3D(s){
+    const ratio=s.exp_sec>0?(s.avg_sec/s.exp_sec*100).toFixed(1)+'%':'no target';
+    let sc='#74d39a',st='On target';
+    if(!s.exp_sec){sc='#9aa0aa';st='No target';}
+    else if(s.avg_sec/s.exp_sec>1.15){sc='#e2706a';st='Over target';}
+    else if(s.avg_sec>s.exp_sec){sc='#c99a2e';st='Slightly over';}
+    document.getElementById('kDetail').innerHTML='<div style="border-top:1px solid #262a33;padding-top:14px"><h2 style="font-size:15px;margin:0 0 10px">'+s.station+'</h2><div class="kpis" style="margin-bottom:0"><div class="kpi"><div class="v" style="font-size:19px">'+s.count+'</div><div class="l">Tickets</div></div><div class="kpi"><div class="v" style="font-size:19px">'+fmtSec(s.avg_sec)+'</div><div class="l">Avg time</div></div><div class="kpi"><div class="v" style="font-size:19px">'+(s.exp_sec>0?fmtSec(s.exp_sec):'—')+'</div><div class="l">Target</div></div><div class="kpi"><div class="v" style="font-size:19px;color:'+sc+'">'+ratio+'</div><div class="l">'+st+'</div></div></div></div>';
+  }
+  function loop(){requestAnimationFrame(loop);if(spin)kitchen.rotation.y+=0.0022;renderer.render(scene,camera);}
+  loop();
+  window.addEventListener('resize',()=>{W=host.clientWidth||W;renderer.setSize(W,H);camera.aspect=W/H;camera.updateProjectionMatrix();});
+})();
+
+// ============================================================
+// VISUAL 5: Day x Hour Heatmaps
+// ============================================================
+(function(){
+  function buildHM(tblId, getVal, colorFn, dispFn, tipFn) {
+    const tbl = document.getElementById(tblId);
+    let html = '<thead><tr><th class="row-head" style="background:#1e2533">Hour</th>';
+    HM_DAYS_SHORT.forEach(d => { html += '<th style="background:#1e2533;min-width:72px">'+d+'</th>'; });
+    html += '</tr></thead><tbody>';
+    HM_HRS.forEach(hr => {
+      html += '<tr><td class="row-head" style="background:#181b22;font-weight:600;color:#9aa0aa">'+hr+'</td>';
+      HM_DAYS_FULL.forEach(day => {
+        const v = getVal(day, hr);
+        const bg = colorFn(v);
+        const fg = textFor(bg);
+        html += '<td title="'+tipFn(day,hr,v)+'" style="background:'+bg+';color:'+fg+';padding:6px 3px">'+dispFn(v)+'</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody>';
+    tbl.innerHTML = html;
+  }
+  buildHM('hmFulTable',
+    (day,hr) => HM_FUL[day]&&HM_FUL[day][hr]!=null?HM_FUL[day][hr]:null,
+    fulColor,
+    v => v!=null?v.toFixed(1):'',
+    (day,hr,v) => v!=null?day+' '+hr+': '+v.toFixed(1)+' min':day+' '+hr+': no data'
+  );
+  buildHM('hmGuestsTable',
+    (day,hr) => HM_GUESTS[day]&&HM_GUESTS[day][hr]?HM_GUESTS[day][hr]:null,
+    guestColor,
+    v => v!=null?v.toFixed(0):'',
+    (day,hr,v) => v!=null?day+' '+hr+': '+v.toFixed(0)+' guests':day+' '+hr+': no data'
+  );
+})();
+
+// ============================================================
+// TAB 2: Station Selector & Detail
+// ============================================================
+(function(){
+  const sorted = [...STATIONS].sort((a,b)=>b.avg_sec-a.avg_sec);
+  let selectedStation = STATIONS[0];
+
+  function pillClass(s) {
+    if (!s.exp_sec) return '';
+    const r = s.avg_sec / s.exp_sec;
+    if (r <= 1.0) return 'green';
+    if (r <= 1.15) return 'amber';
+    return 'red';
+  }
+
+  // Build pills
+  const pillsEl = document.getElementById('stationPills');
+  STATIONS.forEach((s, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'station-pill ' + pillClass(s);
+    btn.textContent = s.station;
+    btn.onclick = () => {
+      document.querySelectorAll('.station-pill').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderStationDetail(s);
+    };
+    if (idx === 0) btn.classList.add('active');
+    pillsEl.appendChild(btn);
+  });
+
+  function renderStationDetail(s) {
+    selectedStation = s;
+    const det = STATION_DETAILS[s.station] || {};
+    const items = STATION_ITEMS[s.station] || [];
+    const ratio = s.exp_sec > 0 ? s.avg_sec / s.exp_sec : null;
+    let statusClass = 'status-red', statusText = 'Over target';
+    if (!s.exp_sec) { statusClass=''; statusText='No target'; }
+    else if (ratio <= 1.0) { statusClass='status-green'; statusText='On target ✓'; }
+    else if (ratio <= 1.15) { statusClass='status-amber'; statusText='Slightly over'; }
+
+    // Breaking point: find hour windows where avg_sec > 900
+    const brkHours = (det.breakingHours || []).filter(r => r.avg_sec > 900);
+    const brkText = brkHours.length > 0
+      ? brkHours.slice(0,5).map(r=>r.day+' '+r.hr+' ('+fmtSec(r.avg_sec)+')').join(', ')
+      : 'None found (≤15 min all periods)';
+
+    // Hourly heatmap
+    const hourly = det.hourly || {};
+    const hourlyHours = Object.keys(hourly).sort();
+    const target = s.exp_sec || 0;
+
+    let hmHtml = '';
+    if (hourlyHours.length > 0) {
+      hmHtml = '<div style="overflow-x:auto;margin-top:12px"><table style="border-collapse:collapse;font-size:11px;min-width:600px">';
+      hmHtml += '<tr><th style="background:#1e2533;padding:4px 6px;text-align:left;color:#9aa0aa;white-space:nowrap">Hour</th>';
+      hourlyHours.forEach(hr => {
+        hmHtml += '<th style="background:#1e2533;padding:4px 5px;text-align:center;color:#9aa0aa;white-space:nowrap;min-width:52px">'+hr+'</th>';
+      });
+      hmHtml += '</tr><tr><td style="background:#181b22;padding:4px 6px;color:#9aa0aa;white-space:nowrap">Avg</td>';
+      hourlyHours.forEach(hr => {
+        const sec = hourly[hr] ? hourly[hr].avg_sec : null;
+        const bg = hmColor(sec, target);
+        const fg = textFor(bg);
+        const expSec = hourly[hr] ? hourly[hr].exp_sec : 0;
+        const tip = sec != null ? fmtSec(sec) + (expSec?' · tgt '+fmtSec(expSec):'') : 'no data';
+        hmHtml += '<td title="'+tip+'" style="padding:4px 4px;background:'+bg+';color:'+fg+';text-align:center;font-weight:600">'+(sec!=null?fmtSec(sec):'')+'</td>';
+      });
+      hmHtml += '</tr>';
+      // Per-day rows if available
+      const byDayHour = det.byDayHour || {};
+      ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day => {
+        if (!byDayHour[day]) return;
+        hmHtml += '<tr><td style="background:#13161c;padding:3px 6px 3px 14px;color:#9aa0aa;font-size:10px;white-space:nowrap">'+day.slice(0,3)+'</td>';
+        hourlyHours.forEach(hr => {
+          const d = byDayHour[day][hr];
+          const sec = d ? d.avg_sec : null;
+          const tgt2 = d ? d.exp_sec : target;
+          const bg = hmColor(sec, tgt2||target);
+          const fg = textFor(bg);
+          hmHtml += '<td style="padding:3px 4px;background:'+bg+';color:'+fg+';text-align:center;font-size:10px">'+(sec&&sec>0?fmtSec(sec):'')+'</td>';
+        });
+        hmHtml += '</tr>';
+      });
+      hmHtml += '</table></div>';
+    }
+
+    // Items table (top 20)
+    const topItems = items.slice(0, 20);
+    let itemsHtml = '';
+    if (topItems.length > 0) {
+      const maxSec = Math.max(...topItems.map(i=>i.avg_sec), s.exp_sec||0, 900);
+      itemsHtml = '<table class="items-table"><thead><tr><th>Menu Item</th><th>Count</th><th>Avg Time</th><th>vs Target</th><th style="min-width:120px">Bar</th></tr></thead><tbody>';
+      topItems.forEach(it => {
+        const over = it.avg_sec > (s.exp_sec||900);
+        const delta = s.exp_sec ? it.avg_sec - s.exp_sec : it.avg_sec - 900;
+        const deltaStr = s.exp_sec
+          ? (delta>0?'<span style="color:#e2706a">+'+fmtSec(delta)+'</span>':'<span style="color:#74d39a">'+fmtSec(-delta)+' under</span>')
+          : '—';
+        const pct = Math.min(100, (it.avg_sec / maxSec) * 100);
+        const barColor = over ? '#ef4444' : '#22c55e';
+        itemsHtml += '<tr><td>'+(over?'<span style="color:#e2706a">'+it.item+'</span>':it.item)+'</td><td style="color:#9aa0aa">'+it.count+'</td><td style="font-weight:600">'+fmtSec(it.avg_sec)+'</td><td>'+deltaStr+'</td><td><div class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div><span style="font-size:10px;color:#9aa0aa;white-space:nowrap">'+fmtSec(it.avg_sec)+'</span></div></td></tr>';
+      });
+      itemsHtml += '</tbody></table>';
+      if (items.length > 20) itemsHtml += '<p style="font-size:11px;color:#9aa0aa;margin:6px 0 0">+'+(items.length-20)+' more items</p>';
+    } else {
+      itemsHtml = '<p style="color:#9aa0aa;font-size:12px">No item-level data available from ticket drop for this station.</p>';
+    }
+
+    const statusSpan = statusClass
+      ? '<span class="status-badge '+statusClass+'">'+statusText+'</span>'
+      : '<span style="color:#9aa0aa;font-size:12px">'+statusText+'</span>';
+    const ratioColor = ratio ? (ratio>1.15?'#ef4444':ratio>1?'#f59e0b':'#22c55e') : '#9aa0aa';
+    const ratioDisp = ratio ? (ratio*100).toFixed(0)+'%' : '—';
+    document.getElementById('stationDetail').innerHTML =
+      '<div class="station-header">'+
+        '<h2>'+s.station+'</h2>'+statusSpan+
+        '<div class="kpis" style="margin:0 0 0 auto;grid-template-columns:repeat(4,auto)">'+
+          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+s.count+'</div><div class="l">Tickets</div></div>'+
+          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+fmtSec(s.avg_sec)+'</div><div class="l">Avg time</div></div>'+
+          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+(s.exp_sec?fmtSec(s.exp_sec):'—')+'</div><div class="l">Target</div></div>'+
+          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px;color:'+ratioColor+'">'+ratioDisp+'</div><div class="l">vs Target</div></div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="margin-bottom:16px">'+
+        '<div style="font-size:13px;font-weight:600;color:#d9a441;margin-bottom:4px">⚡ Breaking Point</div>'+
+        '<div style="font-size:12px;color:#9aa0aa">'+brkText+'</div>'+
+      '</div>'+
+      '<div style="font-size:13px;font-weight:600;color:#d9a441;margin-bottom:4px">Hourly Heatmap (Day × Hour)</div>'+
+      hmHtml+
+      '<div style="font-size:13px;font-weight:600;color:#d9a441;margin:16px 0 4px">Menu Items at this station (from ticket drop)</div>'+
+      itemsHtml;
+  }
+
+  // Render first station
+  renderStationDetail(STATIONS[0]);
+
+  // Station bar chart
+  const stSorted = [...STATIONS].sort((a,b)=>b.avg_sec-a.avg_sec);
+  function barColor(s){
+    if(!s.exp_sec)return '#5aa9e6';
+    const r=s.avg_sec/s.exp_sec;
+    if(r<=1.0)return '#22c55e';
+    if(r<=1.15)return '#f59e0b';
+    return '#ef4444';
+  }
+  const thrPlugin={id:'targetLines',afterDatasetsDraw(chart){
+    const{ctx,chartArea:a,scales}=chart;if(!a)return;
+    stSorted.forEach((s,i)=>{
+      if(!s.exp_sec)return;
+      const x=scales.x.getPixelForValue(i);
+      const y=scales.y.getPixelForValue(s.exp_sec/60);
+      const hw=(scales.x.getPixelForValue(1)-scales.x.getPixelForValue(0))*0.3;
+      ctx.save();ctx.strokeStyle='#888';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-hw,y);ctx.lineTo(x+hw,y);ctx.stroke();ctx.restore();
+    });
+  }};
+  new Chart(document.getElementById('cStations'),{
+    type:'bar',
+    data:{labels:stSorted.map(s=>s.station),datasets:[{label:'Avg fulfillment (min)',data:stSorted.map(s=>+(s.avg_sec/60).toFixed(2)),backgroundColor:stSorted.map(barColor),borderRadius:4}]},
+    options:{interaction:{mode:'index',intersect:false},scales:{x:{grid:{display:false},ticks:{maxRotation:45,minRotation:30}},y:{title:{display:true,text:'Avg fulfillment time (min)'},grid:{color:gc},min:0}},plugins:{legend:{display:false},tooltip:{callbacks:{label(ctx){const s=stSorted[ctx.dataIndex];const lines=['Avg: '+fmtSec(s.avg_sec)+' ('+ctx.parsed.y.toFixed(1)+' min)','Count: '+s.count];if(s.exp_sec){lines.push('Target: '+fmtSec(s.exp_sec));lines.push('Ratio: '+(s.avg_sec/s.exp_sec*100).toFixed(1)+'%');}else lines.push('No target');return lines;}}}}},
+    plugins:[thrPlugin]
+  });
+})();
+
+// ============================================================
+// TAB 3: Menu Items
+// ============================================================
+(function(){
+  const THR_SEC = 900;
+  let currentSort = 'time';
+  let currentSearch = '';
+
+  // Stats
+  const over15 = SUMMARY.filter(d=>d.avg_sec>=900).length;
+  const b1015 = SUMMARY.filter(d=>d.avg_sec>=600&&d.avg_sec<900).length;
+  const under10 = SUMMARY.filter(d=>d.avg_sec<600).length;
+  document.getElementById('menuStats').innerHTML =
+    '<div class="menu-stat"><div class="v">'+SUMMARY.length+'</div><div class="l">Total items</div></div>'+
+    '<div class="menu-stat"><div class="v" style="color:#ef4444">'+over15+'</div><div class="l">Over 15 min</div></div>'+
+    '<div class="menu-stat"><div class="v" style="color:#f59e0b">'+b1015+'</div><div class="l">10–15 min</div></div>'+
+    '<div class="menu-stat"><div class="v" style="color:#22c55e">'+under10+'</div><div class="l">Under 10 min</div></div>';
+
+  function sorted(data) {
+    const s = [...data];
+    if (currentSort === 'time') s.sort((a,b)=>b.avg_sec-a.avg_sec);
+    else if (currentSort === 'fast') s.sort((a,b)=>a.avg_sec-b.avg_sec);
+    else if (currentSort === 'count') s.sort((a,b)=>b.count-a.count);
+    else s.sort((a,b)=>a.item.localeCompare(b.item));
+    return s;
+  }
+
+  function itemStatusColor(sec) {
+    if (sec >= 900) return '#ef4444';
+    if (sec >= 600) return '#f59e0b';
+    return '#22c55e';
+  }
+  function itemStatusLabel(sec) {
+    if (sec >= 900) return '<span style="color:#ef4444;font-size:11px">● &gt;15 min</span>';
+    if (sec >= 600) return '<span style="color:#f59e0b;font-size:11px">● 10–15 min</span>';
+    return '<span style="color:#22c55e;font-size:11px">● &lt;10 min</span>';
+  }
+
+  function renderMenu() {
+    let data = SUMMARY;
+    if (currentSearch) data = data.filter(d=>d.item.toLowerCase().includes(currentSearch.toLowerCase()));
+    const s = sorted(data);
+    const MAX_SEC = 1800; // 30 min for bar scale
+    document.getElementById('menuBody').innerHTML = s.map((d,i) => {
+      const over = d.avg_sec >= THR_SEC;
+      const diff = d.avg_sec - THR_SEC;
+      const diffStr = diff > 0
+        ? '<span class="over">+'+fmtSec(diff)+'</span>'
+        : '<span class="ok">'+fmtSec(-diff)+' under</span>';
+      const pct = Math.min(100, (d.avg_sec / MAX_SEC) * 100);
+      const barCol = itemStatusColor(d.avg_sec);
+      const tgtPct = (THR_SEC / MAX_SEC) * 100;
+      return '<tr>'+
+        '<td style="color:#9aa0aa">'+(i+1)+'</td>'+
+        '<td style="'+(over?'color:#e2706a;font-weight:600':'')+'">'+d.item+'</td>'+
+        '<td style="color:#9aa0aa;text-align:right">'+d.count+'</td>'+
+        '<td style="font-weight:700;color:'+barCol+'">'+fmtMin(d.avg_sec)+'</td>'+
+        '<td style="min-width:160px"><div style="position:relative;height:10px;background:#1e2533;border-radius:5px;overflow:visible"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+barCol+';border-radius:5px"></div><div style="position:absolute;left:'+tgtPct+'%;top:-2px;width:2px;height:14px;background:#e2706a;border-radius:1px"></div></div></td>'+
+        '<td>'+itemStatusLabel(d.avg_sec)+'</td>'+
+        '</tr>';
+    }).join('');
+  }
+
+  window.applyMenuFilters = function() {
+    currentSearch = document.getElementById('menuSearch').value;
+    renderMenu();
+  };
+  window.setSort = function(s, btn) {
+    currentSort = s;
+    document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderMenu();
+  };
+  renderMenu();
+})();
+</script>
+</body>
+</html>

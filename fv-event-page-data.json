@@ -1,0 +1,30 @@
+{
+  "https://api.fourvenues.com/sesion/?query={}&options={%22disableCache%22:true}": {
+    "status": 200,
+    "body": "{\"process_time\":\"2ms\"}"
+  },
+  "https://api.fourvenues.com/announcements/latest": {
+    "status": 401,
+    "body": "{\"data\":\"No tienes permiso\",\"process_time\":\"1ms\"}"
+  },
+  "https://api.fourvenues.com/notificaciones_info/?query={}&options={}": {
+    "status": 401,
+    "body": "{\"data\":\"No tienes permiso\",\"process_time\":\"2ms\"}"
+  },
+  "https://api.fourvenues.com/notificaciones/?query={}&options={%22skip%22:0,%22limit%22:20,%22sort%22:{%22created_at%22:-1}}": {
+    "status": 401,
+    "body": "{\"data\":\"No tienes permiso\",\"process_time\":\"4ms\"}"
+  },
+  "https://api.fourvenues.com/sesiones": {
+    "status": 200,
+    "body": "{\"data\":true,\"process_time\":\"1ms\"}"
+  },
+  "https://api.fourvenues.com/dispositivos": {
+    "status": 200,
+    "body": "{\"data\":{\"_id\":\"jf6uy4c5872a20q3isfciylg4mjimbrm\",\"browser\":\"Chrome\",\"language\":\"en\",\"country\":\"\",\"os\":\"Windows\",\"device\":\"Other\",\"velocidad\":81,\"device_id\":\"Si31adyb6hnvwbacdrk41sh49y8iUrO4\",\"aplicacion_id\":\"ajihln7fc0006jhmmi4lh75s2lI9O3jx\",\"created_at\":1783807738366,\"created_by\":\"\",\"updated_at\":1783807738366,\"updated_by\":\"\",\"removed_at\":0,\"id\":\"jf6uy4c5872a20q3isfciylg4mjimbrm\"},\"process_time\":\"7ms\"}"
+  },
+  "https://api.fourvenues.com/authorization/?query={%22type%22:%22page%22,%22redirect_url%22:%22https://pro.fourvenues.com/mila1/events/of26x5gux3si5w13x": {
+    "status": 200,
+    "body": "{\"data\":{\"_id\":\"wpy7fzm5abq0u17jng5usiha4e6z0asi\",\"authorization_url\":\"https://id.fourvenues.com/authorization/amrgx2a8n0a6c017z1lwv50odG34xwZq\",\"redirect_url\":\"https://pro.fourvenues.com/mila1/events/of26x5gux3si5w13x53v9pf2byf2qspt/reservations\",\"error_url\":\"https://pro.fourvenues.com/mila1/events/of26x5gux3si5w13x53v9pf2byf2qspt/reservations\"},\"process_time\":\"17ms\"}"
+  }
+}

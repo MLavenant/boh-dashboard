@@ -1,0 +1,2347 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" ng-strict-di>
+    <head>
+        <script>
+    (function () {
+
+        window.fides_overrides = {
+            fides_consent_non_applicable_flag_mode: "include",
+            fides_consent_flag_type: "boolean",
+            ot_fides_mapping: encodeURIComponent(JSON.stringify({
+                /*Strictly Necessary*/ "C0001": ["essential"],
+                /*Performance*/ "C0002": ["analytics"],
+                /*Functional*/ "C0003": ["functional"],
+                /*Targeting*/ "C0004": ["marketing"]
+            }))
+        };
+
+        var fidesHost = "https://toast.fides-cdn.ethyca.com/fides.js";
+        var fidesPropertyId = "FDS-A6VAWQ";
+        var fidesSrc = fidesHost + "?property_id=" + fidesPropertyId + "&";
+
+        function insertFidesScript() {
+            addEventListener("FidesInitializing", function () {
+                window.Fides.gtm();
+            });
+
+            addEventListener("FidesInitialized", function () {
+                addExperienceIdToBody();
+            });
+
+            function addExperienceIdToBody() {
+                try {
+                    var experience = window.Fides.experience || {};
+                    var config = experience.experience_config || {};
+                    var id = config.id;
+                    if (id) {
+                        window.document.body.classList.add(id);
+                    }
+                } catch {
+                    console.warn("Couldn't apply Fides experience ID to body.");
+                }
+            }
+
+            var fidesPrefix = "fides_";
+            var searchParams = new URLSearchParams(location.search);
+            var fidesSearchParams = new URLSearchParams();
+            searchParams.forEach(function (value, key) {
+                if (key.startsWith(fidesPrefix)) {
+                    fidesSearchParams.set(
+                        key.replace(fidesPrefix, ""),
+                        key === fidesPrefix + "cache_bust" ? Date.now().toString() : value
+                    );
+                }
+            });
+
+            var src = fidesSrc + fidesSearchParams.toString();
+            var script = document.createElement("script");
+            script.async = false;
+            script.defer = false;
+            script.setAttribute("src", src);
+            script.setAttribute("id", "fides-js");
+            script.setAttribute("type", "text/javascript");
+            document.head.appendChild(script);
+        }
+
+        insertFidesScript();
+    })();
+</script>
+
+<script type="text/javascript">
+    (function() {
+        function conditionallyLoad() {
+            var consentData = {
+                hasPerformanceConsent: Fides?.consent?.analytics || false,
+                hasTargetingConsent: Fides?.consent?.marketing || false,
+                hasFunctionalConsent: Fides?.consent?.functional || false
+            };
+            
+            console.debug('[Consent Debug] consent.html: conditionallyLoad called', { consentData: consentData });
+            
+            handlePlatformVendorConsent(consentData);
+        }
+        
+        function handlePlatformVendorConsent(consent) {
+            // Google Analytics/GTM
+            if (window.gtag) {
+                console.debug('[Consent Debug] consent.html: Updating gtag consent');
+                gtag('consent', 'update', {
+                    'analytics_storage': consent.hasPerformanceConsent ? 'granted' : 'denied',
+                    'ad_storage': consent.hasTargetingConsent ? 'granted' : 'denied',
+                    'ad_user_data': consent.hasTargetingConsent ? 'granted' : 'denied',
+                    'ad_personalization': consent.hasTargetingConsent ? 'granted' : 'denied'
+                });
+            }
+            
+            // Amplitude opt-out
+            if (window.amplitude) {
+                console.debug('[Consent Debug] consent.html: Updating Amplitude opt-out', { optOut: !consent.hasPerformanceConsent });
+                amplitude.setOptOut(!consent.hasPerformanceConsent);
+            }
+            
+            // DataDog RUM
+            if (typeof window.DD_RUM !== 'undefined' && window.DD_RUM.setTrackingConsent) {
+                var ddConsent = consent.hasPerformanceConsent ? 'granted' : 'not-granted';
+                console.debug('[Consent Debug] consent.html: Updating DD_RUM tracking consent', { ddConsent: ddConsent });
+                window.DD_RUM.setTrackingConsent(ddConsent);
+            }
+            
+            // Heap
+            if (typeof window.heap !== 'undefined') {
+                console.debug('[Consent Debug] consent.html: Updating Heap consent flag', { consentGranted: consent.hasPerformanceConsent });
+                window.heap._consentGranted = consent.hasPerformanceConsent;
+            }
+            
+            // FullStory
+            if (typeof window.FS !== 'undefined') {
+                console.debug('[Consent Debug] consent.html: Updating FullStory consent', { hasConsent: consent.hasTargetingConsent });
+                if (window.FS.consent) {
+                    window.FS.consent(consent.hasTargetingConsent);
+                } else {
+                    if (consent.hasTargetingConsent) {
+                        if (window.FS.restart) window.FS.restart();
+                    } else {
+                        if (window.FS.shutdown) window.FS.shutdown();
+                    }
+                }
+            }
+
+            // Tealium
+            if (typeof window.utag !== 'undefined' && window.utag.gdpr) {
+                console.debug('[Consent Debug] consent.html: Updating Tealium consent');
+                window.utag.gdpr.setConsentValue(consent.hasPerformanceConsent ? 1 : 0);
+                window.utag.gdpr.setConsentCategories([
+                    consent.hasPerformanceConsent ? 'analytics' : '',
+                    consent.hasTargetingConsent ? 'advertising' : '',
+                    consent.hasFunctionalConsent ? 'functional' : ''
+                ].filter(Boolean));
+            }
+        }
+
+        if (window.Fides?.initialized) {
+            conditionallyLoad();
+        } else {
+            window.addEventListener('FidesInitialized', conditionallyLoad);
+        }
+
+        window.addEventListener('FidesUpdated', conditionallyLoad);
+    })();
+</script>
+        <title ng-bind-template="{{ $state.current.data.displayName }}"></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="shortcut icon" type="image/x-icon" href="https://cdn.toasttab.com/static/42fd6cabe2aa1dc8ad50e0d66f30ce9e3de4aa36/images/favicon.ico" />
+<link rel="apple-touch-icon" href="https://cdn.toasttab.com/static/f15a61f3b4ebca72b60a4dca4c813c424f2c2837/images/toast-iphone-icon.png">
+<link rel="icon" href="https://cdn.toasttab.com/static/f15a61f3b4ebca72b60a4dca4c813c424f2c2837/images/toast-iphone-icon.png">
+
+        <script src="https://cdn.toasttab.com/bob-release-467-2/javascripts/jquery-1.7.min.js"></script>
+
+                    <script src="https://cdn.toasttab.com/bob-release-467-2/javascripts/jquery.ba-hashchange.min.js"></script>
+            <script src="https://cdn.toasttab.com/bob-release-467-2/javascripts/toast-jquery.tablednd.0.7.js"></script>
+                <script src="https://cdn.toasttab.com/bob-release-467-2/javascripts/glance-screenshare-manager.js"></script>
+
+
+        <link
+  href="https://cdn.toasttab.com/static/c0e87434edc5e023a033280f818516dc5c4d005c/projects/tailwindcss/preflight.min.css"
+  rel="stylesheet"
+  type="text/css"
+/>
+        <link href="https://cdn.toasttab.com/bob-release-467-2/stylesheets/fonts/calibre.css" rel="stylesheet" type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.toasttab.com/bob-release-467-2/bootstrap/css/toast-bootstrap-3-0.min.css?v=114" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.toasttab.com/bob-release-467-2/bootstrap/css/toast-bootstrap-select-3-0.min.css?v=114" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.toasttab.com/bob-release-467-2/bootstrap/css/toast-bootstrap-datepicker-3-0.min.css?v=114" />
+
+    <link href="https://cdn.toasttab.com/bob-release-467-2/stylesheets/fonts/material-icons.css" rel="stylesheet" type='text/css'>
+
+    <script src="https://cdn.toasttab.com/bob-release-467-2/bootstrap/js/toast-bootstrap.min.js"></script>
+    <script src="https://cdn.toasttab.com/bob-release-467-2/bootstrap/js/bootstrap-select.min.js"></script>
+    <script src="https://cdn.toasttab.com/bob-release-467-2/bootstrap/js/bootstrap-datepicker.min.js"></script>
+
+
+                        <link rel="stylesheet" type="text/css" href="https://cdn.toasttab.com/bob-release-467-2/bootstrap/css/bootstrap-multiselect.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.toasttab.com/bob-release-467-2/datatables/css/ColVis.css" />
+    <style>
+        /* These styles are for the dropdown to switch reports (back to Analytics UI), they are link tags */
+        .aml-dropdown-item {
+            display: block;
+            padding: 6px 16px;
+            clear: both;
+            font-weight: normal;
+            line-height: 24px;
+            min-height: 36px;
+            vertical-align: middle;
+            color: #252525;
+            white-space: nowrap;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        .aml-dropdown-item:hover{
+            text-decoration: none;
+            color: #252525;
+            background-color: rgba(0,0,0,0.04);
+        }
+        .aml-dropdown-item i {
+            margin-right: 8px;
+        }
+    </style>
+<script type="text/javascript">
+    window.reporting = window.reporting || {};
+    window.reporting.ToastI18nMessages = {
+        "time-entry-add-break.title": "Add Break",
+        "time-entry-update-break.title": "Update Break",
+        "time-entry-delete-entry.text": "Are you sure you want to delete this time entry?",
+        "time-entry-update-entry.title": "Update Time Entry",
+        "time-entry-add-entry.title": "Add Time Entry",
+        "time-entry-delete-break.text": "Are you sure you want to delete this break?",
+        "customer-detail-modal.heading": "Customer Details",
+        "order-details.card-details-modal.heading": "Card Details",
+        "order-details.modal.successfully-updated-guest-number": "Guest number updated successfully",
+        "order-details.modal.successfully-updated-revenue-center": "Revenue center updated successfully",
+        "order-details.modal.reopen-check-warning": "This will re-open this check and send it to all POS devices.  Continue?",
+        "order-details.modal.check-reopened-successfully": "Check re-opened",
+        "order-details.modal.check-status-paid": "(Paid)",
+        "order-details.modal.order-send-warning": "This will send this order to all POS devices.  Continue?",
+        "order-details.modal.order-sent-successfully": "Order Sent To Devices",
+        "order-details.modal.email-send-warning": "This will send an email to the customer reminding them to pay for their OPT Tab. Continue?",
+        "order-details.modal.loyaltyDetails": "Loyalty Details",
+        "order-details.heading": "Order Details",
+        "order-details.gift-card-modal.deleteOwnerWarning": "Deleting the guest profile will remove the customer info and any linked rewards email or phone numbers. This can not be undone. Continue?",
+        "order-details.gift-card-modal.successfullyDeletedOwner": "Card owner data deleted successfully",
+        "order-details.gift-card-modal.failedToDeleteOwner": "Error processing request - card owner data not deleted",
+        "order-details.gift-card-modal.deletePurchaserWarning": "Deleting the purchaser profile will remove the customer info and any linked rewards email or phone numbers. This can not be undone. Continue?",
+        "order-details.gift-card-modal.successfullyDeletedPurchaser": "Card purchaser data deleted successfully",
+        "order-details.gift-card-modal.failedToDeletePurchaser": "Error processing request - card purchaser data not deleted"
+    };
+    window.reporting.restaurantLocale = 'en-US';
+</script>
+    
+                    
+<link type="text/css" rel="stylesheet" href="https://cdn.toasttab.com/bob-release-467-2/admin/app-cad9fcacd28cf9408431.css">
+<script src="https://cdn.toasttab.com/bob-release-467-2/admin/vendor-bbfced683281b0cce246.js"></script>
+<script src="https://cdn.toasttab.com/bob-release-467-2/admin/app-cad9fcacd28cf9408431.js"></script>
+                
+<link type="text/css" rel="stylesheet" href="https://cdn.toasttab.com/bob-release-467-2/adminFrame/app-ada9ac9be8b20f14c654.css">
+<script src="https://cdn.toasttab.com/bob-release-467-2/adminFrame/vendor-2fc0562010cdece09dc5.js"></script>
+<script src="https://cdn.toasttab.com/bob-release-467-2/adminFrame/app-ada9ac9be8b20f14c654.js"></script>
+        <link href="https://cdn.toasttab.com/bob-release-467-2/stylesheets/tailwindcss/fonts.css" rel="stylesheet" type='text/css'>
+<link href="https://cdn.toasttab.com/bob-release-467-2/stylesheets/tailwindcss/main.css" rel="stylesheet" type='text/css'>
+        <script>
+            $(function() {
+                                Toast.init('https://toasttab.s3.amazonaws.com', 'https://cdn.toasttab.com/bob-release-467-2');
+                Toast.trackUnsavedChanges();
+                Toast.confirmUnsavedChangesOnUnload();
+                            });
+        </script>
+
+        <script>
+            function logWarnMessage(message, level) {
+                message += ", url=" + window.location;
+                $.ajax({
+                    type: 'GET',
+                    url: "/logutil/logwarnmessage?message=" + message
+                });
+            }
+        </script>
+
+        <script>
+    window.__TOAST_BANQUET_INITIAL_DATA__ = {
+        featureFlags: {"accint-enable-accounting-sync":true,"accint-show-sales-sync-feature":false,"accint-show-ap-sync-feature":false,"advm-adv-props-in-price-editor":true,"advm-bulk-update-prices":false,"advm-edit-price-levels-in-menu-manager":true,"advm-lsp-msp-menu-manager":true,"advm-menu-manager-export":true,"advm-menu-manager-rollout":true,"advm-msp-in-menu-manager":true,"advm-price-levels-in-menu-manager":true,"advm-size-price-in-price-editor":true,"bill-food-court":false,"bill-food-court-custom-payment-opts":false,"bill-food-court-wave-2":false,"bill-food-court-sub-opt-out":false,"bill-use-bank-account-spa":true,"bill-use-billing-preferences-spa":false,"bill-use-ss-file-storage":true,"bill-new-customers-invoice-experience":true,"bill-new-customers-invoice-experience-link":true,"bill-device-licensing-info":false,"brands-toast-advertising":true,"cxt-enable-plaid-flow":true,"c3p-limit-contacts-to-authenticated-users":true,"c3p-enable-unauthenticated-users-via-ui":true,"cac-close-out-config-spa-cash-overview":true,"cac-close-out-config-spa-shift-review":true,"cac-close-out-config-spa-shift-review-advanced-view":true,"cac-2304-guest-pref-cfg-spa-guest-tags":false,"cac-menu-upsell-separate-publish":true,"cac-upsell-experiment":true,"cac-upsell-kiosk":true,"cac-enable-mlm-upsells":true,"brands-mastercard-fundraising-spotlight":false,"cfg-menu-import-tool":true,"coat-enable-payroll-onboarding":true,"crdis-enable-restaurant-card-issuing-spa":false,"crm-freedompay-restaurant":false,"opt-ddi-onboarding":true,"disc-offers-spa-lbt-card-and-channel":true,"disc-offers-spa-select-dining-option-behaviors":false,"delphi-dmb-menu-channel-vis":false,"delphi-stock-config":false,"delphi-ocs-config":false,"delphi-ocs-config-v2":false,"delphi-dt-reports":false,"dex-device-hub-customer-access":true,"dex-device-hub-licensing":false,"dex-device-hub-toggle-view":true,"dex-networks-spa-ngn-pilot-restaurant":false,"dex-networks-spa-read-only-access":false,"dot-enable-fundraising-donation-receipt-info":false,"dot-fundraising-maintenance":false,"dot-fundraising-rolling-disbursements":true,"dot-fundraising-spotlight":true,"dot-fundraising-mlm":false,"dot-fundraising-receipt-lookup":true,"dot-packaging-config":true,"dot-food-waste-ai":false,"dot-food-waste-config-spa":true,"dot-food-waste-secondary-sales":false,"dot-food-waste-secondary-sales-stock-refresh":false,"ds-216-SEMANTIC_BOT_SEARCH":false,"ds-2557-surface-ai-chat-bot":false,"ec-eem-employee-card-spa-show":true,"ec-elm-new-employment-overview":true,"ec-next-insurance-integration":true,"ec-next-insurance-integration-recommend-card":true,"ec-pcard-tipout-admin-tools-spa":false,"ec-pcard-tipout-signup":false,"ec-pcard-tipout-payments":false,"ec-pcard-tipout-use-employee-invite":true,"ec-pcard-tipout-reporting":false,"intl-tipout-enabled":false,"ec-timekeeping-new-labor-spa":true,"ec-timekeeping-cqrs-queries":true,"ec-timekeeping-time-entry-reporting":true,"ec-tips-new-shifts-api":false,"ec-tips-single-button":true,"earn-pooled-tips-multi-day":false,"earn-tips-onboarding-v1":true,"earn-use-gql-proxy":false,"cxt-disable-expedited-shipping":false,"ecomm-disco-hub-v2":true,"ecomm-show-intl-shop-link":true,"ecomm-disable-credit-card-payment":false,"ecomm-shop-block-list":false,"ecomm-test-kitchen-access":true,"eedev-employee-productivity-v1":true,"eedev-employee-profile-performance-v1":true,"eedev-employee-performance-team-dynamic-score-v1":false,"eedev-contests-v1":false,"ffr-tr-enable-open-banking-flow":false,"ffr-plaid-bank-account-verification-flow":true,"ent-3pl-gfd-config":true,"ent-display-default-removed-mods":true,"ent-enable-selection-fulfillment-for-unsized-items":false,"ent-enable-selection-fulfillment-mapping":false,"ent-menu-plu-ordering":false,"ent-qsr-enable-combos-menu-manager":false,"ffr-cbk-challenger-auto-upload-deletable":true,"ffr-cbk-challenger-win-score":true,"ffr-one-click-challenger":true,"ffr-indemnification-indication-cb-mgmt-spa":false,"ffr-chargeback-file-compression":true,"ffr-tr-order-popup-enabled":false,"fr-cbk-rep":true,"fr-payout-overview-sales-day":true,"fr-payout-rep":true,"fr-payout-status-display":true,"fr-rec-rep":true,"gclw-manager-alert":true,"gcs-campaign-builder-gift-card-promo":false,"gcs-giftcard-config-v2":true,"gcs-gift-receipt-phase-0":true,"gcs-warning-banner-promo-code-gc-supc-true":false,"grm-guest-report-v-2-spa":true,"grm-guestbook-write-api":true,"grm-guest-feedback-management-spa":true,"hlp-help-center-rollout":true,"hot-data-extensions":true,"hot-hours-services-spa":false,"mship-6-house-accounts-v2-enabled":true,"intl-allergens-on-menu":true,"intl-locations-page-updates":true,"intl-locale-selector-poc":false,"intl-plate-cost-pmix-report":true,"intl-costs-in-menu-manager":true,"intl-apply-service-charge-on-pre-tax-amount":true,"intl-user-content-translations":false,"intl-user-content-translations-ai-suggestions":false,"intl-inventory-avt":true,"intl-inventory-waste-spa-ff":true,"intl-inventory-onboarding":false,"intl-suppliers":true,"intl-boba-machine-qr-spa":false,"intl-fiscal-config-spa":false,"intl-rra-tax-inclusive-temp":true,"intl-enable-service-charge-spa":false,"ksk-kiosk-config-spa":true,"ksk-ga-force-nke-permanent":true,"ksk-v2-configurable-loyalty-check-in-flow":false,"ksk-v2-should-crop-logo":false,"ksk-v2-auto-populate-loyalty-name-in-text-field":false,"ksk-v2-pos-name-vs-name":false,"ksk-room-charge":false,"ko-enable-topology-report":true,"loy-item-based-redemption-v1":true,"loy-visit-based-v1":true,"loy-landing-settings-v1":true,"loy-multi-item-rewards":true,"loy-onboarding-wizard-v1":true,"loy-fixed-amount-item-rewards":true,"loy-mixed-rewards-v1":true,"loy-config-flow-B":false,"loy-insights-tab":true,"menu-disable-strict-mode":false,"menu-mlm-menu-builder":false,"menu-mlm-menu-entity-versions-table":false,"menu-mlm-menu-entity-with-groups":true,"menu-mlm-menu-page":true,"menu-mm-discovery-push":false,"menu-non-mlm-menu-groups-section":true,"menu-pos-layout-view":true,"menu-2.0-from-edit-menus":false,"menu-remove-edit-menus-entry":false,"menu-mlm-item-page":true,"menu-item-configure-plate-cost":true,"menu-item-prep-time-overrides":false,"menu-item-prep-stations-overrides":false,"menu-item-modifier-groups-overrides":false,"menu-item-sales-category-overrides":false,"menu-spa-channel-visibility":true,"menu-uiv-orphaned-create-page":false,"menu-contextless-item-page":true,"menu-bulk-edit-versions":false,"menu-modifier-ai-recommendations":false,"menu-config-guest-count":false,"menu-item-list-override-components":false,"mkt-marketing-magic":true,"mkt-instore-and-online-automations":true,"mkt-post-purchase-automation":true,"mkt-preload-list-counts":true,"mkt-sms-automation":true,"mkt-sms-ai-widget":false,"mkt-sms-feedback-display":false,"mkt-add-subscribers-access":false,"mkt-sms-spa-entitlements":true,"mkt-sms-url-shortener":true,"mkt-sms-subscriber-upload-available":true,"mkt-remove-toast-list":true,"mkt-editor-outage-banner":false,"mlx-advanced-properties-guardrails":true,"mlx-config-copy-tool-navigation":false,"mlx-config-copy-tool":true,"mlx-denormalize-mgmt-set":true,"mlx-1-pub-nav":true,"mlx-groups-archive":true,"menu-item-mod-channel-vis-menu-generation":false,"menu-item-mod-channel-vis-ecommerce":false,"mlx-location-groups":true,"mlx-locations-tab":true,"mlx-prep-stations":false,"mlx-prep-stations-sub-rows":false,"mlx-receipt-config":false,"mlx-tree-view":true,"mlx-ui-options":true,"mlx-ui-options-legacy-redirect":false,"msg-marketing-hub-ai-input-bar":false,"msg-marketing-hub-ai-text-widget":true,"msg-marketing-suite-widget-spa":true,"msg-sms-campaign-builder":true,"msg-social-campaign-builder":true,"msg-basic-tier-pilot":false,"msg-instagram-social-channel":true,"nav-sous-chef":false,"nav-ai-insights":false,"nav-intercom-chat":false,"nav-autocomplete-click-through":true,"nav-take-the-tour-pendo":false,"nav-bp-retail-pilot":false,"nv1-booking-enabled":false,"nv1-guest-accounts":true,"nv1-new-restaurant-info":true,"nv1-reservation-enabled":false,"nv1-service-area-group-enabled":true,"nv1-create-schedules":true,"ca-rx-insights":true,"ca-ads-platform":false,"brands-insights-entitlements-override":false,"brands-insights-widget":false,"brands-benchmarking-kill-switch-web":false,"brands-benchmark-sales-projection":true,"brands-advertising-200-saas":false,"brands-meta-new-login-flow":true,"nv6-ai-answering":false,"nv6-operator-admin-ui":false,"nvi-growguide":false,"nvi-phygital":false,"nvi-vsmb-restaurants":false,"nvr-availability-copy-changes":false,"nvr-can-filter-oos-on-oo-page":true,"nvr-can-search-oo-order-page":false,"nvr-enable-ebt":true,"nvr-guest-feedback-categories":false,"nvr-onhand-availability":false,"nvr-retail":false,"nvr-reusable-flag-alpha":true,"nvr-reusable-flag-bravo":false,"nvr-reusable-flag-charlie":true,"nvr-reusable-flag-delta":true,"nvr-reusable-flag-echo":false,"nvr-reusable-flag-foxtrot":false,"nvr-reusable-flag-golf":true,"nvr-reusable-flag-hotel":true,"nvs-auto-print-guest-info":true,"oat-big-3-native-exp":true,"oat-confirm-hardware":false,"oat-enable-tca-for-all":true,"oat-enable-tca-for-all-m2":false,"oat-migrate-checklist-mounting-location":false,"oat-mobile-onboarding-control-point":false,"oat-toggle-checklist-variant":true,"oat-toggle-setup-page":true,"oat-toggle-setup-page-fullstory-tracking":false,"oat-toastweb-parity-m3":true,"opa-manager-log-spa":true,"opt-show-toastpay-payment-header-upgrade":false,"oo-branded-app-logo-layout":true,"oo-menu-item-tags":false,"oo-button-customization":false,"oo-guest-ecomm":false,"oo-reusable-flag-alpha":true,"oo-reusable-flag-bravo":true,"oo-reusable-flag-charlie":true,"oo-reusable-flag-delta":false,"oo-reusable-flag-echo":false,"oo-reusable-flag-foxtrot":true,"oo-reusable-flag-golf":true,"oo-reusable-flag-hotel":true,"oo-reusable-flag-india":true,"oo-time-based-menu-rules-enabled":true,"oo-time-based-preorder-rule-enabled":true,"oo-test-kitchen-guest-google-review-admin":false,"oo-tbr-new-alert":false,"oo-voice-ordering-experiment":false,"opa-chrome-toast-now-app-install-banner":true,"ord-hub-config-ui-banquet-enable":true,"ord-audit-spa":false,"ow-individually-hold-and-send-items":true,"ow-menu-item-search":true,"ow-ord-config":true,"ow-order-ready-display-url":true,"ow-order-ready-kds-config":true,"ow-order-ready-send-sms-phone-orders":false,"ow-pos-3-0-order-by-seat":true,"ow-pos-3-0-order-by-seat-config":true,"ow-print-barcode-on-receipt":true,"ow-pos-3-0-order-by-seat-device-setting":false,"ow-disable-order-by-seat-optional":false,"ow-pos-3-0-phase-one":true,"ow-pos-3-0-phase-three":true,"ow-pos-3-0-phase-two":true,"ow-pos-3-0-require-toggle-access":true,"ow-required-courses":true,"ow-server-item-firing":false,"ow-total-item-quantity":true,"ow-special-request-price-entry-setting":true,"ow-show-saag-stock-section-setting":true,"ow-enable-id-verification-configs":true,"ow-enable-drive-thru-configs":false,"ow-enable-camera-item-scanning-config":false,"ow-enable-dt-queue-handoff-config":false,"pac-1625-smart-delays-frontend":true,"pac-1986-snooze-via-publish":true,"pac-2395-smart-quote-reporting":true,"pac-2603-disable-takeout-and-delivery-bff":true,"pac-2742-orb-fire-stick-sunset":true,"pac-2913-pre-time-round-up-removal":true,"pac-2955-marketing-smart-quote":true,"pac-3275-consider-kitchen-caps-api-orders":false,"pac-3390-view-availability-status":true,"plg-119-product-page":false,"plg-122-top-nav-shop-link":true,"plg-129-tr-payroll":true,"plg-131-payroll-splash-cd":false,"plg-132-payroll-social-copy":false,"plg-133-payroll-social-map":false,"plg-134-tr-move-up":false,"plg-135-tr-xtrachef":true,"plg-136-tips-upsell-unlock-setting":true,"plg-137-payroll-on-search":true,"plg-138-xtrachef-on-search":false,"plg-139-payroll-demo":false,"plg-179-payroll-task-link-v2":true,"plg-202-payroll-self-serve":false,"plg-205-payroll-cta-test":false,"plg-207-shop-access-point":false,"plg-246-logo-soup":false,"plg-247-countdown":false,"plg-248-tr-payroll-testimonial":false,"plg-249-payroll-chilipiper":false,"plg-295-hpc-community":true,"plg-297-hpc-toast-now":true,"plg-298-hpc-pos-3":false,"plg-300-hpc-catering":false,"plg-302-hpc-toast-tables":false,"plg-314-bf-banner":false,"plg-316-hpc-shop":true,"plg-33-tw-search-placement":true,"plg-40-shop-link-name-test":false,"plg-oo-pro-free-trial-cohort":false,"plg-oo-pro-free-trial-signup":false,"plg-pp30-rollout":true,"plg-cande-freemium-cohort":true,"plg-cande-freemium-signup":true,"plg-tables-ft-cohort":true,"plg-tables-ft-signup":true,"plg-tables-plus-ft-cohort":false,"plg-tables-plus-ft-signup":true,"plg-tips-ft-cohort":false,"plg-tips-ft-cohort-legacy":false,"plg-tips-ft-signup":false,"pmts-pricing-surcharging-block-new-non-compliant-menu-items":false,"pmts-pricing-surcharging-enable-sign-up":true,"pmts-toast-capital-financial-products-page":true,"pmts-toast-capital-home-page-card":true,"pmts-toast-capital-fpp-v2":false,"poe-campaign-builder-mvp":false,"pop-curbside-arrival-checkin-migration":true,"pop-orb-enable-screen-orientation":false,"pop-orb-ui-v2":true,"pop-enable-orb-demo-mode":false,"ptl-process-chargebacks":true,"ptl-rep3-mvp":false,"pwf-4178-early-loyalty-check-in-gfd-config":true,"pwf-5409-gfd-menu-upsell-spa":true,"pwf-6258-min-req-pos-version-banner":false,"rcp-publish-history-multi-location":false,"rcp-pub-hub-internal-access-history":true,"rcp-pub-hub-spa-publish-history":true,"rcp-pub-hub-spa-publish-now":false,"rcp-pub-hub-spa":true,"rcp-show-pending-in-search":false,"rra-2930-multi-location-comparison":true,"rra-1188-R30-Sales-Summary":true,"rra-2385-enable-labor-cost-breakdown":true,"rra-labor-cost-breakdown-tax-inclusive-sales":true,"rra-location-overview-tax-inclusive-sales":true,"rra-weekly-overview-tax-inclusive-sales":true,"rra-2866-enable-pmix-report":true,"rra-3160-irish-uk-sales-summary":true,"rra-4167-custom-reports-rollout":true,"rra-4398-pmix-banner-switch-for-test-kitchen":false,"rra-4854-upsell-performance-report":true,"fr-enable-cb-payout-reports":true,"rra-4906-smartgm-trends-console":false,"rra-4633-support-pmix-subgroups":true,"rra-4834-olap-report-mode":true,"rra-5650-deprecate-legacy-pmix-reports":true,"sa-billpay-enable-billpay-spa":false,"stp-onboarding-enabled":true,"stp-pay-admin-spa-google-reviews":false,"stp-pay-admin-spa-secondary-navigation":false,"smx-advanced-break-configs":true,"smx-individual-shift-audit":true,"smx-new-time-entry-audits-mvp":true,"smx-new-time-entry-audits-table-exp":true,"smx-shift-audit-report-employeev2-filtering":false,"smx-basic-wage-pay-time-entry-mgmt":false,"smx-dine-break-waivers":true,"tds-refund-page-frontend":true,"tds-refund-submission-frontend":true,"3pod-tds-billing-report-download":true,"tds-international-canada-enabled":false,"tds-oo-onboarding-consolidation":true,"tds-order-tracker-ui":true,"tds-1pd-provider-enabled":false,"tds-enable-debug-spa":true,"3pod-3po-config-pages-rollout":true,"3pod-3po-enable-third-party-mock":false,"3pod-onboarding-dd-oauth":true,"3pod-3po-enable-channel-debug-spa":true,"3pod-3po-enable-3po-onboarding-tools":true,"3pod-3po-grubhub-onboarding-enhancements":false,"3pod-3po-config-page-show-toggles":false,"3pod-3po-ue-fast-track-2-5":true,"3pod-3po-uber-promo":true,"3pod-3po-show-uber-plg-onboarding-checklist-ad":true,"3pod-3665-plg-carousel-position":false,"3pod-3565-daypart-exclusivity-pilot":false,"wex-buffet-evolution-theme":true,"wex-2423-cookie-safety-value":true,"wex-2877-initial-data-query":false,"wex-1653-product-page":false,"wex-1226-redirect-same-page":true,"wex-2891-spa-preloading":false,"tpc-customer-webhooks":true,"nav-experience-opt-in":false,"nav-toggle-link-farm":true,"wex-2921-basicinfo-legacy-iframe":false,"wex-2918-reporting-legacy-iframe":false,"wex-2919-menus-legacy-iframe":false,"wex-2967-heap-upgrade":true,"loy-tracking-page-v2":true,"entp-freedompay-ecomm-enabled":false,"whsl-wholesale-enabled":false},
+        features: {"optEnabled":false,"kioskEnabled":true,"kdsEnabled":true,"onlineOrderingEnabled":false,"multiLocationManagementEnabled":true,"marketingEnabled":false,"toastLoyaltyEnabled":false,"loyaltyIntegrationEnabled":true,"birthdayRewardsEnabled":false,"toastGiftCardsEnabled":true,"giftCardsIntegrationEnabled":false},
+        userInfo: {"isInternalUser":false,"userFullName":"Matthias Lavenant","userGuid":"fd53d909-4ffa-4035-bb90-9d5812822d01","userEmail":"matthias@rivieradininggroup.com","userPhoneNumber":"941-241-6851"},
+        restaurantInfo: {"restaurantGuid":"0a365c66-d2b9-42ab-8f45-94ea26d50716","restaurantName":"AVA MediterrAegean - AVA MediterrAegean","restaurantSetGuid":"96e8e2b8-d95d-4432-b574-ceee10cf17d5","isToastNowRestaurant":false,"isTestModeEnabled":false,"isRestaurantActive":true,"isOperatingOutsideUnitedStates":false,"timezoneId":"America/New_York"},
+        session: {}
+    }
+</script>
+        <meta name="importmap-type" content="systemjs-importmap" />
+
+<script type="systemjs-importmap" data-spa-control-import-map>
+    {
+  "imports" : {
+    "rate-comparison-spa" : "//cdn.toasttab.com/spa/rate-comparison-spa/main.a3c1cdf88681e3efe75a.js",
+    "config-copy-spa" : "//cdn.toasttab.com/spa/config-copy-spa/main.bb768c9e95e31c7dec42.js",
+    "team-chat-spa" : "//cdn.toasttab.com/spa/team-chat-spa/main.b23a65391578e4f96094.js",
+    "growguide-professional-spa" : "//cdn.toasttab.com/spa/growguide-professional-spa/main.c341c99a6640f3c8e186.js",
+    "tds-onboarding-spa" : "//cdn.toasttab.com/spa/tds-onboarding-spa/main.a49b8b9ca8cdc6ad8e04.js",
+    "operator-admin-ui" : "//cdn.toasttab.com/spa/operator-admin-ui/main.ff7f92bb22bdd0ba87c5.js",
+    "pub-status-service" : "//cdn.toasttab.com/spa/pub-status-service/main.47b25df9fab0f7110fc5.js",
+    "menu-upload-ui" : "//cdn.toasttab.com/spa/menu-upload-ui/main.e238955c4f67183cc6e6.js",
+    "menu-crud-ui" : "//cdn.toasttab.com/spa/menu-crud-ui/main.fac8a43b5be87ea38f1f.js",
+    "accounting-ap-assignments-spa" : "//cdn.toasttab.com/spa/accounting-ap-assignments-spa/main.56b512a6e44294dc1fd4.js",
+    "employee-card-spa" : "//cdn.toasttab.com/spa/employee-card-spa/main.15f9ae582eeba6c13bed.js",
+    "sites-reports-spa" : "//cdn.toasttab.com/spa/sites-reports-spa/main.efd0801d42bbdd8578a5.js",
+    "media-center-widget-spa" : "//cdn.toasttab.com/spa/media-center-widget-spa/main.72d718fc36942bf3451b.js",
+    "tpo-onboarding-debug-spa" : "//cdn.toasttab.com/spa/tpo-onboarding-debug-spa/main.f42f0d049e741de1b21e.js",
+    "banquet-runtime-modules" : "//cdn.toasttab.com/spa/banquet-runtime-modules/main.b3d2d16b4921ebe4a2ec.js",
+    "business-insurance-spa" : "//cdn.toasttab.com/spa/business-insurance-spa/main.6476134a05e006fbd908.js",
+    "navigation-layout-spa" : "//cdn.toasttab.com/spa/navigation-layout-spa/main.d6173a556c4028eb9b73.js",
+    "fuel-management-spa" : "//cdn.toasttab.com/spa/fuel-management-spa/main.6360a8b76d452b190616.js",
+    "channel-config-spa" : "//cdn.toasttab.com/spa/channel-config-spa/main.8fdcacb42a9339e0e991.js",
+    "merchant-spa" : "//cdn.toasttab.com/spa/merchant-spa/main.8fbb08df54230a341687.js",
+    "booking-report-spa" : "//cdn.toasttab.com/spa/booking-report-spa/main.1baea48d75c642867302.js",
+    "restaurant-meals-program-spa" : "//cdn.toasttab.com/spa/restaurant-meals-program-spa/main.9662e4b8030cd1568ded.js",
+    "delphi-drive-thru-reporting-spa" : "//cdn.toasttab.com/spa/delphi-drive-thru-reporting-spa/main.ed86a2df111e35976a4a.js",
+    "kitchen-topology-report-spa" : "//cdn.toasttab.com/spa/kitchen-topology-report-spa/main.b6f38006c3726dff2f11.js",
+    "ebt-config-spa" : "//cdn.toasttab.com/spa/ebt-config-spa/main.13442d46afc08b3ce9de.js",
+    "onboarding-setup-page-spa" : "//cdn.toasttab.com/spa/onboarding-setup-page-spa/main.84559bf7b47f7f92d992.js",
+    "membership-operator-spa" : "//cdn.toasttab.com/spa/membership-operator-spa/main.9e2f6291c6465b84d1be.js",
+    "seven-course" : "//cdn.toasttab.com/spa/seven-course/main.950d375cb72c4741b0c4.js",
+    "rx-general-info-spa" : "//cdn.toasttab.com/spa/rx-general-info-spa/main.21a01fe67dbf663cce71.js",
+    "restaurant-products-spa" : "//cdn.toasttab.com/spa/restaurant-products-spa/main.674452562955b3ac4a2b.js",
+    "ai-assistant-spa" : "//cdn.toasttab.com/spa/ai-assistant-spa/main.9406e41bcb467ab8dbd5.js",
+    "comp-card-setup" : "//cdn.toasttab.com/spa/comp-card-setup/main.fde2df01045db9986061.js",
+    "ocs-config-spa" : "//cdn.toasttab.com/spa/ocs-config-spa/main.28cb55dc8b9f413c6545.js",
+    "global-inventory-recipes-spa" : "//cdn.toasttab.com/spa/global-inventory-recipes-spa/main.7a71941e77cc0360fa13.js",
+    "ui-options-spa" : "//cdn.toasttab.com/spa/ui-options-spa/main.7f021e249ad388ec2517.js",
+    "pub-hub-spa" : "//cdn.toasttab.com/spa/pub-hub-spa/main.721f5104eacbb8f96c9d.js",
+    "brand-onboarding-widget-spa" : "//cdn.toasttab.com/spa/brand-onboarding-widget-spa/main.d107fd40579151fe33d5.js",
+    "product-upgrade-spa" : "//cdn.toasttab.com/spa/product-upgrade-spa/main.f2ab256b93a378cda762.js",
+    "ads-platform-spa" : "//cdn.toasttab.com/spa/ads-platform-spa/main.19b02c802e2ce774b176.js",
+    "capital-marketplace-spa" : "//cdn.toasttab.com/spa/capital-marketplace-spa/main.e1b01435743068c67c31.js",
+    "restaurant-navigation-spa" : "//cdn.toasttab.com/spa/restaurant-navigation-spa/main.77c18f2a0a27639d5f46.js",
+    "restaurant-select-dialog-spa" : "//cdn.toasttab.com/spa/restaurant-select-dialog-spa/main.3faa34ea888b9a7f515a.js",
+    "menu-price-spa" : "//cdn.toasttab.com/spa/menu-price-spa/main.d8073455a98a9ee53289.js",
+    "campaign-portal-spa" : "//cdn.toasttab.com/spa/campaign-portal-spa/main.faa7f7a5188790ded14b.js",
+    "spa-settings-my-account" : "//cdn.toasttab.com/spa/spa-settings-my-account/main.8b77b22ffedd8c7951e4.js",
+    "gmb-spa" : "//cdn.toasttab.com/spa/gmb-spa/main.09dc55c1306d6804ac8d.js",
+    "financial-products-page-spa" : "//cdn.toasttab.com/spa/financial-products-page-spa/main.489ff53e2486c741865f.js",
+    "tds-provider-refunds-spa" : "//cdn.toasttab.com/spa/tds-provider-refunds-spa/main.897fc0a88a27b4a64225.js",
+    "capital-customer-spa" : "//cdn.toasttab.com/spa/capital-customer-spa/main.9f3b74d8dbaeafa34696.js",
+    "restaurant-groups-spa" : "//cdn.toasttab.com/spa/restaurant-groups-spa/main.351d68fcaa10cd14e771.js",
+    "packaging-config-spa" : "//cdn.toasttab.com/spa/packaging-config-spa/main.f90d5844d43a5d5199e3.js",
+    "menu-audit-ui" : "//cdn.toasttab.com/spa/menu-audit-ui/main.1890f7b30c32525b93e7.js",
+    "billpay-spa" : "//cdn.toasttab.com/spa/billpay-spa/main.8ebce422607b506d0881.js",
+    "retail-spa" : "//cdn.toasttab.com/spa/retail-spa/main.6544da611bd7bab61fca.js",
+    "dual-pricing-config-spa" : "//cdn.toasttab.com/spa/dual-pricing-config-spa/main.5449b7ebd16ab18afb61.js",
+    "email-marketing-spa" : "//cdn.toasttab.com/spa/email-marketing-spa/main.422d791855dc796ff641.js",
+    "restaurant-footer-spa" : "//cdn.toasttab.com/spa/restaurant-footer-spa/main.e65cf415ca8cc09fb30c.js",
+    "toast-pay-admin-spa" : "//cdn.toasttab.com/spa/toast-pay-admin-spa/main.f7718ea578a39bf63f07.js",
+    "loyalty-config-web" : "//cdn.toasttab.com/spa/loyalty-config-web/main.4b78e0e7a76f5252201c.js",
+    "popup-notifications-spa" : "//cdn.toasttab.com/spa/popup-notifications-spa/main.a859ce7a54ef7ed6dc12.js",
+    "menu-nav-spa" : "//cdn.toasttab.com/spa/menu-nav-spa/main.f9f857d982ec7cd8e907.js",
+    "break-adherence-spa" : "//cdn.toasttab.com/spa/break-adherence-spa/main.e8b26b83dd4d73414ef8.js",
+    "doc-vendor-admin-spa" : "//cdn.toasttab.com/spa/doc-vendor-admin-spa/main.24c9b5ed9d6ba263e9a1.js",
+    "sales-assignments-spa" : "//cdn.toasttab.com/spa/sales-assignments-spa/main.806121986b4f7104c650.js",
+    "restaurant-select-dialog-internal-tool-spa" : "//cdn.toasttab.com/spa/restaurant-select-dialog-internal-tool-spa/main.49684a0146ecb9308a4a.js",
+    "offers-spa" : "//cdn.toasttab.com/spa/offers-spa/main.4f6dd449fafc9c622c0d.js",
+    "oat-oatmeal-tools" : "//cdn.toasttab.com/spa/oat-oatmeal-tools/main.ec8f893e37ae5b602d4d.js",
+    "employee-card-loc-link-spa" : "//cdn.toasttab.com/spa/employee-card-loc-link-spa/main.d1170699d6fb1cf0c318.js",
+    "quick-actions-spa" : "//cdn.toasttab.com/spa/quick-actions-spa/main.076774379616b99583a1.js",
+    "guest-feedback-details-spa" : "//cdn.toasttab.com/spa/guest-feedback-details-spa/main.3c844f58fd761afdf039.js",
+    "global-nav-spa" : "//cdn.toasttab.com/spa/global-nav-spa/main.17a50d23877528f95af3.js",
+    "user-content-translations-spa" : "//cdn.toasttab.com/spa/user-content-translations-spa/main.66e19533195cb8df4321.js",
+    "dotorg-home-page-spa" : "//cdn.toasttab.com/spa/dotorg-home-page-spa/main.052ef6c62ce018da2b8b.js",
+    "banquet-store" : "//cdn.toasttab.com/spa/banquet-store/main.1be0c9219ecbd2516071.js",
+    "performance-center-spa" : "//cdn.toasttab.com/spa/performance-center-spa/main.d9c9226a508c012fe3e4.js",
+    "restaurant-admin-header-notifications-spa" : "//cdn.toasttab.com/spa/restaurant-admin-header-notifications-spa/main.93c3733ae23c0f384817.js",
+    "shelves-and-stock" : "//cdn.toasttab.com/spa/shelves-and-stock/main.b7db98d4972fc731b52f.js",
+    "find-checks-spa" : "//cdn.toasttab.com/spa/find-checks-spa/main.4339be2bcc7f44418a57.js",
+    "foh-config-spa" : "//cdn.toasttab.com/spa/foh-config-spa/main.39f302579795f977ae5e.js",
+    "employee-contests-spa" : "//cdn.toasttab.com/spa/employee-contests-spa/main.d8aac37ed3bcb04c2a46.js",
+    "master-config-ui" : "//cdn.toasttab.com/spa/master-config-ui/main.6e903681f4396c1bece5.js",
+    "reporting-homepage-spa" : "//cdn.toasttab.com/spa/reporting-homepage-spa/main.e22db2e37eb295e6185b.js",
+    "rewards-activity-spa" : "//cdn.toasttab.com/spa/rewards-activity-spa/main.0c4c0563d72679818112.js",
+    "menu-pos-web-view" : "//cdn.toasttab.com/spa/menu-pos-web-view/main.261302463e61d54658b0.js",
+    "pocket-toast-spa" : "//cdn.toasttab.com/spa/pocket-toast-spa/main.23f0cc025539e00bc5b5.js",
+    "giftcard-config-spa" : "//cdn.toasttab.com/spa/giftcard-config-spa/main.1781baf037f9bddfea94.js",
+    "ord-config-spa" : "//cdn.toasttab.com/spa/ord-config-spa/main.f69c270bcfa2197274be.js",
+    "tds-debug-spa" : "//cdn.toasttab.com/spa/tds-debug-spa/main.d9f4300b88670a8b047a.js",
+    "opt-onboarding" : "//cdn.toasttab.com/spa/opt-onboarding/main.5b559ac7c170ec24233f.js",
+    "opd-takeout-and-delivery-spa" : "//cdn.toasttab.com/spa/opd-takeout-and-delivery-spa/main.698f7106f9f9e31ce3f4.js",
+    "doc-quality-control-admin-spa" : "//cdn.toasttab.com/spa/doc-quality-control-admin-spa/main.71dd066d9382017d616a.js",
+    "channel-debug-spa" : "//cdn.toasttab.com/spa/channel-debug-spa/main.77f8bd60ab593515b88f.js",
+    "giftcard-receipt-config-spa" : "//cdn.toasttab.com/spa/giftcard-receipt-config-spa/main.d7e89bf69edcf82ffe40.js",
+    "data-extensions-spa" : "//cdn.toasttab.com/spa/data-extensions-spa/main.4a43e4a45f917c0e3870.js",
+    "scheduling-spa" : "//cdn.toasttab.com/spa/scheduling-spa/main.0af1179240dbf2ebd7cf.js",
+    "third-party-feedback-config-spa" : "//cdn.toasttab.com/spa/third-party-feedback-config-spa/main.153c8af0c1e7ed3b39f5.js",
+    "employee-add-contests-spa" : "//cdn.toasttab.com/spa/employee-add-contests-spa/main.071baa640d220c5facd7.js",
+    "excess-food-reporting-spa" : "//cdn.toasttab.com/spa/excess-food-reporting-spa/main.a3e116347aeac02a6acd.js",
+    "team-email-verification-spa" : "//cdn.toasttab.com/spa/team-email-verification-spa/main.064567e2302f172ca7bf.js",
+    "stp-onboarding" : "//cdn.toasttab.com/spa/stp-onboarding/main.fc12f59a95f92fe29a67.js",
+    "sms-marketing-spa" : "//cdn.toasttab.com/spa/sms-marketing-spa/main.8c9df3641fc311f84f89.js",
+    "menu-upsell-spa" : "//cdn.toasttab.com/spa/menu-upsell-spa/main.d323bc33ad6775c0a8ef.js",
+    "entity-mapping-spa" : "//cdn.toasttab.com/spa/entity-mapping-spa/main.a907bac3a52c13b675d0.js",
+    "inventory-ordering-receiving-spa" : "//cdn.toasttab.com/spa/inventory-ordering-receiving-spa/main.8db6caa7d5b197b3c833.js",
+    "inventory-smb" : "//cdn.toasttab.com/spa/inventory-smb/main.d6d395e52e42f44ad2ed.js",
+    "kitchen-assembly-line-spa" : "//cdn.toasttab.com/spa/kitchen-assembly-line-spa/main.51e6ad026b48b498afcb.js",
+    "dmb-config-spa" : "//cdn.toasttab.com/spa/dmb-config-spa/main.c37392f44ee5a496e5bf.js",
+    "device-hub-spa" : "//cdn.toasttab.com/spa/device-hub-spa/main.8493915dd02233ad8898.js",
+    "handle-orders-at-eod-spa" : "//cdn.toasttab.com/spa/handle-orders-at-eod-spa/main.40cfc5e8d27f53e16bef.js",
+    "scheduled-banner-spa" : "//cdn.toasttab.com/spa/scheduled-banner-spa/main.602f3f78ae560ff013b6.js",
+    "inventory-waste-spa" : "//cdn.toasttab.com/spa/inventory-waste-spa/main.55d331190e1c83707be0.js",
+    "wholesale-spa" : "//cdn.toasttab.com/spa/wholesale-spa/main.eb4a8dd0a995848af778.js",
+    "excess-food-spa" : "//cdn.toasttab.com/spa/excess-food-spa/main.9ef3be63f6a39d01fe92.js",
+    "inventory-reporting-avt-spa" : "//cdn.toasttab.com/spa/inventory-reporting-avt-spa/main.ff47910cba963ece8ac1.js",
+    "help-center-spa" : "//cdn.toasttab.com/spa/help-center-spa/main.e093443c4096e7993147.js",
+    "search-spa" : "//cdn.toasttab.com/spa/search-spa/main.7aa9e16e03b5b4e04a15.js",
+    "tpc-spa-my-integrations" : "//cdn.toasttab.com/spa/tpc-spa-my-integrations/main.a2e97e8140e97a6c602c.js",
+    "contact-platform-spa" : "//cdn.toasttab.com/spa/contact-platform-spa/main.7e98946f70c3fbaf266a.js",
+    "team-chat-config-spa" : "//cdn.toasttab.com/spa/team-chat-config-spa/main.f6efee01d446f66de7e9.js",
+    "capman-mgmt-portal-ui" : "//cdn.toasttab.com/spa/capman-mgmt-portal-ui/main.323b638674f370ecc5ad.js",
+    "ecomm-discovery-spa" : "//cdn.toasttab.com/spa/ecomm-discovery-spa/main.9924e50bf9aeb3673421.js",
+    "chargeback-mgmt-spa" : "//cdn.toasttab.com/spa/chargeback-mgmt-spa/main.5a586f52b034c1ee8030.js",
+    "reporting-archived-spa" : "//cdn.toasttab.com/spa/reporting-archived-spa/main.0fce422cf920270e30ec.js",
+    "receipt-config-spa" : "//cdn.toasttab.com/spa/receipt-config-spa/main.d4b0e16eb937b2caf4ff.js",
+    "data-export-config-spa" : "//cdn.toasttab.com/spa/data-export-config-spa/main.343684c1a321dba88a0c.js",
+    "marketing-email-editor-spa" : "//cdn.toasttab.com/spa/marketing-email-editor-spa/main.ee5ebd9c5d2d3383f418.js",
+    "wex-banquet-root" : "//cdn.toasttab.com/spa/wex-banquet-root/main.959c2542081699c0a59b.js",
+    "tipout-spa" : "//cdn.toasttab.com/spa/tipout-spa/main.2a8154e41c25cac2b70d.js",
+    "ds-marketing-hub-spa" : "//cdn.toasttab.com/spa/ds-marketing-hub-spa/main.0c6fe848b439754e5bd0.js",
+    "financial-insights-spa" : "//cdn.toasttab.com/spa/financial-insights-spa/main.b8799b11641694931142.js",
+    "rra-subnav-spa" : "//cdn.toasttab.com/spa/rra-subnav-spa/main.6a76ce35304bf03e83de.js",
+    "rx-insights-widget" : "//cdn.toasttab.com/spa/rx-insights-widget/main.aadd5e616223bbd35d1d.js",
+    "jobs-and-permissions-spa" : "//cdn.toasttab.com/spa/jobs-and-permissions-spa/main.d0c3ec03ed2d38ab3abc.js",
+    "accounting-settings-spa" : "//cdn.toasttab.com/spa/accounting-settings-spa/main.4f6a50b7708fabb40be0.js",
+    "employee-dev-reports-spa" : "//cdn.toasttab.com/spa/employee-dev-reports-spa/main.39568deac82be819ddb1.js",
+    "advanced-properties-spa" : "//cdn.toasttab.com/spa/advanced-properties-spa/main.b9528524a5e3701d0ddd.js",
+    "ai-chat-spa" : "//cdn.toasttab.com/spa/ai-chat-spa/main.bc8d8edeba6cb10362ee.js",
+    "menu-bulk-spa" : "//cdn.toasttab.com/spa/menu-bulk-spa/main.3b1bbff3314307a71147.js",
+    "product-demo-spa" : "//cdn.toasttab.com/spa/product-demo-spa/main.1503d70d4176568cd090.js",
+    "job-based-access-mgmt-spa" : "//cdn.toasttab.com/spa/job-based-access-mgmt-spa/main.cbc1e6da72871067ddaf.js",
+    "team-overview-spa" : "//cdn.toasttab.com/spa/team-overview-spa/main.4e00bf52e9da14c82998.js",
+    "marketing-campaign-mgmt-spa" : "//cdn.toasttab.com/spa/marketing-campaign-mgmt-spa/main.9ad02f89d6e82b7bb479.js",
+    "kitchen-load-balancing-spa" : "//cdn.toasttab.com/spa/kitchen-load-balancing-spa/main.ac85283afbb0d273f43f.js",
+    "analytics-spa" : "//cdn.toasttab.com/spa/analytics-spa/main.c31c9c5729f8c93fa27d.js",
+    "accounting-connections-spa" : "//cdn.toasttab.com/spa/accounting-connections-spa/main.0f84efaef3cc86059bf5.js",
+    "third-party-ordering-onboarding-spa" : "//cdn.toasttab.com/spa/third-party-ordering-onboarding-spa/main.5f7782939dac22464a55.js",
+    "wifi-config-spa" : "//cdn.toasttab.com/spa/wifi-config-spa/main.db6a4e6f381977dec325.js",
+    "invoice-admin-web" : "//cdn.toasttab.com/spa/invoice-admin-web/main.bde45257dbe1e1ee985b.js",
+    "ecomm-shop-spa" : "//cdn.toasttab.com/spa/ecomm-shop-spa/main.6f8008b41ad5a5544f02.js",
+    "house-accounts-spa" : "//cdn.toasttab.com/spa/house-accounts-spa/main.b9d4613dc55f82601c5a.js",
+    "spa-mandatory-mfa" : "//cdn.toasttab.com/spa/spa-mandatory-mfa/main.63756875240921cbadba.js",
+    "toast-sites-admin-spa" : "//cdn.toasttab.com/spa/toast-sites-admin-spa/main.11d07502e6846f43ef73.js",
+    "attribution-reporting-spa" : "//cdn.toasttab.com/spa/attribution-reporting-spa/main.d697ec2dbc71def21924.js",
+    "instant-deposit-spa" : "//cdn.toasttab.com/spa/instant-deposit-spa/main.e46c112e81892783aa16.js",
+    "guestbook-report-spa" : "//cdn.toasttab.com/spa/guestbook-report-spa/main.3cd6e7886e55273c3d15.js",
+    "food-court-spa" : "//cdn.toasttab.com/spa/food-court-spa/main.57a1c5503a04ae702f64.js",
+    "bank-accounts-admin-spa" : "//cdn.toasttab.com/spa/bank-accounts-admin-spa/main.4e7380cdda4a94509a74.js",
+    "growguide-spa" : "//cdn.toasttab.com/spa/growguide-spa/main.536ce7a68a604be48509.js",
+    "returns-config-spa" : "//cdn.toasttab.com/spa/returns-config-spa/main.f8194750cde3347f5398.js",
+    "branded-app-admin-spa" : "//cdn.toasttab.com/spa/branded-app-admin-spa/main.0d49d4316f52baeae960.js",
+    "analytics-ui" : "//cdn.toasttab.com/spa/analytics-ui/main.801e1a32799cce14d114.js",
+    "selection-fulfillment-spa" : "//cdn.toasttab.com/spa/selection-fulfillment-spa/main.473c6d0fdb0a91c6bc0b.js",
+    "prep-stations-spa" : "//cdn.toasttab.com/spa/prep-stations-spa/main.a2a48deb8e34ff78216f.js",
+    "freedompay-merchant-info-spa" : "//cdn.toasttab.com/spa/freedompay-merchant-info-spa/main.47c9e8e03fa2c454db3d.js",
+    "break-config-spa" : "//cdn.toasttab.com/spa/break-config-spa/main.14895bdeb6e718ecffd1.js",
+    "spa-data-freshness" : "//cdn.toasttab.com/spa/spa-data-freshness/main.0bd33a72f4823a213e6c.js",
+    "brand-hub-spa" : "//cdn.toasttab.com/spa/brand-hub-spa/main.094eeb817db7e1b68f78.js",
+    "notification-modal-spa" : "//cdn.toasttab.com/spa/notification-modal-spa/main.c73fb54bde027d0422f9.js",
+    "payroll-assignments-spa" : "//cdn.toasttab.com/spa/payroll-assignments-spa/main.df0d6f2c97ef866b5417.js",
+    "wex-home-page-alerts-spa" : "//cdn.toasttab.com/spa/wex-home-page-alerts-spa/main.d35cfa919a06115de690.js",
+    "guest-feedback-management-spa" : "//cdn.toasttab.com/spa/guest-feedback-management-spa/main.0667f47cfb0a521a1484.js",
+    "tip-config" : "//cdn.toasttab.com/spa/tip-config/main.f9b6a46064fa900a236a.js",
+    "reporting-spa" : "//cdn.toasttab.com/spa/reporting-spa/main.98951e83568613b06a0e.js",
+    "food-waste-config-spa" : "//cdn.toasttab.com/spa/food-waste-config-spa/main.3bcb9e332e1b92ee6251.js",
+    "voice-ordering-spa" : "//cdn.toasttab.com/spa/voice-ordering-spa/main.ba590aa4a346d1066710.js",
+    "retail-reporting-spa" : "//cdn.toasttab.com/spa/retail-reporting-spa/main.e613886033bdb4921d6f.js",
+    "toast-onboarding-checklist-spa" : "//cdn.toasttab.com/spa/toast-onboarding-checklist-spa/main.2d8a4575bc1de5c734d3.js",
+    "close-out-config-spa" : "//cdn.toasttab.com/spa/close-out-config-spa/main.8c891cb531e801babb7e.js",
+    "menu-item-feedback-reporting-spa" : "//cdn.toasttab.com/spa/menu-item-feedback-reporting-spa/main.eff8b7f99379a6ecdbe0.js",
+    "high-yield-account-spa" : "//cdn.toasttab.com/spa/high-yield-account-spa/main.04f7dce2abb4c04ce2dd.js",
+    "spa-settings-management-layout" : "//cdn.toasttab.com/spa/spa-settings-management-layout/main.9fcd2cb4851012446717.js",
+    "spa-customer-sessions" : "//cdn.toasttab.com/spa/spa-customer-sessions/main.f1c781184f2713065c27.js",
+    "kitchen-prep-stations-spa" : "//cdn.toasttab.com/spa/kitchen-prep-stations-spa/main.dbdfe53c0724cc074d82.js",
+    "sous-chef-admin" : "//cdn.toasttab.com/spa/sous-chef-admin/main.cc86090079d11500a08d.js",
+    "react-dom" : "https://cdn.toasttab.com/static/4f692c06eef2bf35ec1e0e9900eb0d4defec930b/projects/scripts/react/18.2.0/system/react-dom.production.min.js",
+    "@apollo/client" : "https://cdn.toasttab.com/static/4c11776447cf86c689feb6e0e1db9be09a970216/projects/scripts/@apollo/client/3.7.17/system/@apollo/client.production.min.js",
+    "@apollo/client/link/persisted-queries" : "https://cdn.toasttab.com/static/4c11776447cf86c689feb6e0e1db9be09a970216/projects/scripts/@apollo/client/link/persisted-queries/3.7.17/system/@apollo/client/link/persisted-queries.production.min.js",
+    "i18next" : "https://cdn.toasttab.com/static/6b2e6d90a870275b3960fd0d45c22b74c552e510/projects/scripts/i18next/23.11.2/i18next.js",
+    "react" : "https://cdn.toasttab.com/static/4f692c06eef2bf35ec1e0e9900eb0d4defec930b/projects/scripts/react/18.2.0/system/react.production.min.js",
+    "single-spa" : "https://cdn.toasttab.com/static/710aba56a2b0f197f487e51c9b3034539fb3ab07/projects/scripts/single-spa/5.9.4/single-spa.min.js",
+    "@sentry/browser" : "https://cdn.toasttab.com/static/f0440a9531d47869e17cc0c4ec38c1c903db596a/projects/scripts/@sentry/browser/7.120.4/system/production.min.js",
+    "menu-item-feedback-config-spa" : "//cdn.toasttab.com/spa/menu-item-feedback-config-spa/main.4d38b529293fef9cacf5.js",
+    "accounting-overview-spa" : "//cdn.toasttab.com/spa/accounting-overview-spa/main.9deab5d68593f20729a8.js",
+    "manager-logbook-spa" : "//cdn.toasttab.com/spa/manager-logbook-spa/main.ccb24035882d0def3d03.js",
+    "marketing-hub-sections-spa" : "//cdn.toasttab.com/spa/marketing-hub-sections-spa/main.e83023cba40dd75db657.js",
+    "product-trial-spa" : "//cdn.toasttab.com/spa/product-trial-spa/main.9be196ec9a5c9dc42470.js",
+    "marketing-template-gallery-spa" : "//cdn.toasttab.com/spa/marketing-template-gallery-spa/main.bf821780d8a5775a2ce7.js",
+    "order-audit-spa" : "//cdn.toasttab.com/spa/order-audit-spa/main.d954daecd60267ee52ef.js",
+    "gfo-validation-spa" : "//cdn.toasttab.com/spa/gfo-validation-spa/main.3934d437d8740c9fba8d.js",
+    "doc-prompt-admin-spa" : "//cdn.toasttab.com/spa/doc-prompt-admin-spa/main.3468e40f4a5b1312c97c.js",
+    "jobs-qr-phygital-spa" : "//cdn.toasttab.com/spa/jobs-qr-phygital-spa/main.e1dd6962a4e3e6711117.js",
+    "intl-quebec-compliance-spa" : "//cdn.toasttab.com/spa/intl-quebec-compliance-spa/main.1aff83da0feef8b7ff2f.js",
+    "third-party-ordering-config-spa" : "//cdn.toasttab.com/spa/third-party-ordering-config-spa/main.d71235eff9bcbd4fa883.js",
+    "marketing-suite-widget-spa" : "//cdn.toasttab.com/spa/marketing-suite-widget-spa/main.4ee7cb1eddf0b1b94635.js",
+    "orders-hub-communication-spa" : "//cdn.toasttab.com/spa/orders-hub-communication-spa/main.e59668df272579b558bb.js",
+    "employee-import-spa" : "//cdn.toasttab.com/spa/employee-import-spa/main.d92599ba7c6e1049d385.js",
+    "toast-employees-spa" : "//cdn.toasttab.com/spa/toast-employees-spa/main.40618f38e46542c7e0ac.js",
+    "test-kitchen" : "//cdn.toasttab.com/spa/test-kitchen/main.2ab545a07e8e85261a70.js",
+    "sites-seo-spa" : "//cdn.toasttab.com/spa/sites-seo-spa/main.74c7f4fedbe75db45211.js",
+    "sling-org-connect" : "//cdn.toasttab.com/spa/sling-org-connect/main.c94ee7f60b3f0b4e2e09.js",
+    "fundraising-spa" : "//cdn.toasttab.com/spa/fundraising-spa/main.4cfbc72cb7d8e5b08d53.js",
+    "kiosk-config-spa" : "//cdn.toasttab.com/spa/kiosk-config-spa/main.1ff9b25062af07e25cc3.js",
+    "tpc-customer-api-access-spa" : "//cdn.toasttab.com/spa/tpc-customer-api-access-spa/main.26de2f5c5d540487e281.js",
+    "freedompay-uncaptured-report-spa" : "//cdn.toasttab.com/spa/freedompay-uncaptured-report-spa/main.9e0145ce9dc91c3268b4.js",
+    "rx-insights-spa" : "//cdn.toasttab.com/spa/rx-insights-spa/main.ece858a222d9ab809482.js",
+    "gfd-config-spa" : "//cdn.toasttab.com/spa/gfd-config-spa/main.368e57ac41629bd76b92.js",
+    "spa-idm-restaurant-users" : "//cdn.toasttab.com/spa/spa-idm-restaurant-users/main.7cf1162f75abd3124bd3.js",
+    "guest-analytics-spa" : "//cdn.toasttab.com/spa/guest-analytics-spa/main.7cb645b77cea438f2850.js",
+    "restaurant-home-page-layout" : "//cdn.toasttab.com/spa/restaurant-home-page-layout/main.9c6f1c0d31fb536db98e.js",
+    "privacy-request-spa" : "//cdn.toasttab.com/spa/privacy-request-spa/main.2e41dc3249462d5954e6.js",
+    "subscription-hub-spa" : "//cdn.toasttab.com/spa/subscription-hub-spa/main.c9e9c48c94291e300073.js",
+    "network-mgmt-spa" : "//cdn.toasttab.com/spa/network-mgmt-spa/main.b37b6aaf0f9be488c5d7.js",
+    "pub-nav-spa" : "//cdn.toasttab.com/spa/pub-nav-spa/main.df96f2de8de4f9ed2ab0.js",
+    "doc-email-settings-spa" : "//cdn.toasttab.com/spa/doc-email-settings-spa/main.29f972d94385f6447efa.js",
+    "boba-machine-qr-spa" : "//cdn.toasttab.com/spa/boba-machine-qr-spa/main.a22e8bc81dc98d113873.js",
+    "service-charge-spa" : "//cdn.toasttab.com/spa/service-charge-spa/main.92e5234deaeb264030d8.js",
+    "fintech-reporting-spa" : "//cdn.toasttab.com/spa/fintech-reporting-spa/main.09c2777fdd6fbe84ac1d.js",
+    "cc-surcharge-config-spa" : "//cdn.toasttab.com/spa/cc-surcharge-config-spa/main.58843ff97a6e8aa10d6f.js",
+    "bank-accounts-spa" : "//cdn.toasttab.com/spa/bank-accounts-spa/main.a9f0eb3f07588eeca28b.js",
+    "finance-products-spa" : "//cdn.toasttab.com/spa/finance-products-spa/main.82d40227a2546ce2946a.js",
+    "restaurant-admin-layout" : "//cdn.toasttab.com/spa/restaurant-admin-layout/main.3a1fbf0afb75fb0e9ee1.js",
+    "notification-log-spa" : "//cdn.toasttab.com/spa/notification-log-spa/main.eb050870aaf17a35addc.js",
+    "reporting-runtime" : "//cdn.toasttab.com/spa/reporting-runtime/main.4d857d8b8bac8c06ce43.js",
+    "loyalty-import-tool" : "//cdn.toasttab.com/spa/loyalty-import-tool/main.a76e24c56305861474b9.js",
+    "sous-chef-spa" : "//cdn.toasttab.com/spa/sous-chef-spa/main.c599810df3bde05db729.js",
+    "customer-invoice-spa" : "//cdn.toasttab.com/spa/customer-invoice-spa/main.23350b6809c1b36b1c86.js",
+    "link-farm-spa" : "//cdn.toasttab.com/spa/link-farm-spa/main.12036cc5301e175f9991.js",
+    "customer-insights-spa" : "//cdn.toasttab.com/spa/customer-insights-spa/main.6694ba1a925dcfe99b1f.js",
+    "ec-labor-spa" : "//cdn.toasttab.com/spa/ec-labor-spa/main.d818d172b4deb2a277c8.js",
+    "labor-reporting-dashboard-spa" : "//cdn.toasttab.com/spa/labor-reporting-dashboard-spa/main.039c5f2a24c148cf3e1b.js",
+    "tds-management-spa" : "//cdn.toasttab.com/spa/tds-management-spa/main.a4471afd5e29e835ba0d.js",
+    "shifts-who-is-in-dashboard-spa" : "//cdn.toasttab.com/spa/shifts-who-is-in-dashboard-spa/main.99105d7bf6d38cd0a254.js",
+    "shift-alerts-dashboard-spa" : "//cdn.toasttab.com/spa/shift-alerts-dashboard-spa/main.4e4200dbdeed1fe6c5d0.js",
+    "autofire-device-config-ui" : "//cdn.toasttab.com/spa/autofire-device-config-ui/main.1ede4d5fd1dc7e465e56.js",
+    "doc-vendor-prompt-management-spa" : "//cdn.toasttab.com/spa/doc-vendor-prompt-management-spa/main.82b053ff6931b7c2e28c.js",
+    "fundraising-reporting-spa" : "//cdn.toasttab.com/spa/fundraising-reporting-spa/main.2ebe50c01d800494e7ae.js",
+    "marketing-suite-home-page-spa" : "//cdn.toasttab.com/spa/marketing-suite-home-page-spa/main.ede24467858196ff3d12.js",
+    "cash-config-spa" : "//cdn.toasttab.com/spa/cash-config-spa/main.9d0bff1a21f089bf6dd6.js",
+    "tip-reporting" : "//cdn.toasttab.com/spa/tip-reporting/main.33ec935067c618b4dc5c.js",
+    "time-based-menu-rules-admin-spa" : "//cdn.toasttab.com/spa/time-based-menu-rules-admin-spa/main.3bb3c4eaa5be066cb753.js",
+    "onboarding-payroll-spa" : "//cdn.toasttab.com/spa/onboarding-payroll-spa/main.fb9b0b1eac30e9ff4c45.js"
+  }
+}
+</script>
+
+
+
+<script src="https://cdn.toasttab.com/static/2623ba5c52e4b8007224e906b00fef77a555b932/projects/scripts/systemjs/6.8.3/system.min.js"></script>
+<script src="https://cdn.toasttab.com/static/2623ba5c52e4b8007224e906b00fef77a555b932/projects/scripts/systemjs/6.8.3/extras/named-exports.min.js"></script>
+
+        <script type="text/javascript">
+    (function() {
+        var loaded = false;
+
+        function conditionallyLoad() {
+            console.debug('[Consent Debug] pendo.html: conditionallyLoad called', { analyticsConsent: Fides?.consent?.analytics, loaded: loaded });
+            
+            if (Fides?.consent?.analytics && !loaded) {
+                console.debug('[Consent Debug] pendo.html: Analytics consent granted, initializing Pendo');
+                loaded = true;
+                (function(apiKey){
+                    (function(p,e,n,d,o){var v,w,x,y,z;o=p[d]=p[d]||{};o._q=[];
+                        v=['initialize','identify','updateOptions','pageLoad'];for(w=0,x=v.length;w<x;++w)(function(m){
+                            o[m]=o[m]||function(){o._q[m===v[0]?'unshift':'push']([m].concat([].slice.call(arguments,0)));};})(v[w]);
+                        y=e.createElement(n);y.async=!0;y.src='https://cdn.pendo.io/agent/static/'+apiKey+'/pendo.js';
+                        z=e.getElementsByTagName(n)[0];z.parentNode.insertBefore(y,z);})(window,document,'script','pendo');
+
+                    pendo.initialize({
+                        visitor: {
+                            id: "fd53d909-4ffa-4035-bb90-9d5812822d01",
+                            full_name: "Matthias Lavenant",
+                            email: 'matthias@rivieradininggroup.com'
+                        },
+                        account: {
+                            id: "0a365c66-d2b9-42ab-8f45-94ea26d50716",
+                            management_group_guid: "b813dbe9-f2bd-4087-82ca-f3a27571317c",
+                            name: "AVA MediterrAegean"
+                        }
+                    });
+                })('21d7c162-0d47-4267-4e39-e46c3484c34c');
+            } else if (!Fides?.consent?.analytics && loaded && window.pendo) {
+                console.debug('[Consent Debug] pendo.html: Marketing consent revoked, updating Pendo');
+                
+                window.pendo?.updateOptions?.({
+                    visitor: {
+                        consentOptedOut: true,
+                        consentRevokedAt: new Date().toISOString()
+                    }
+                });
+                
+            } else {
+                console.debug('[Consent Debug] pendo.html: Skipping Pendo action', { hasAnalytics: Fides?.consent?.analytics, loaded: loaded });
+            }
+        }
+
+        if (window.Fides?.initialized) {
+            conditionallyLoad();
+        } else {
+            window.addEventListener('FidesInitialized', conditionallyLoad);
+        }
+
+        window.addEventListener('FidesUpdated', conditionallyLoad);
+    })();
+</script>
+
+        
+<script type="text/javascript">
+    (function() {
+                var isProd = true;
+                
+        var loaded = false;
+
+        function conditionallyLoad() {
+            console.debug('[Consent Debug] heap.html (PROD): conditionallyLoad called', { analyticsConsent: Fides?.consent?.analytics, loaded });
+            
+            if (Fides?.consent?.analytics && !loaded) {
+                console.debug('[Consent Debug] heap.html (PROD): Analytics consent granted, initializing Heap');
+                loaded = true;
+               
+               
+                if (isProd || localStorage.getItem('toast-dev-heap') ) {
+                window.heapReadyCb=window.heapReadyCb||[],window.heap=window.heap||[],heap.load=function(e,t){window.heap.envId=e,window.heap.clientConfig=t=t||{},window.heap.clientConfig.shouldFetchServerConfig=!1;var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src="https://cdn.us.heap-api.com/config/"+e+"/heap_config.js";var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(a,r);var n=["init","startTracking","stopTracking","track","resetIdentity","identify","getSessionId","getUserId","getIdentity","addUserProperties","addEventProperties","removeEventProperty","clearEventProperties","addAccountProperties","addAdapter","addTransformer","addTransformerFn","onReady","addPageviewProperties","removePageviewProperty","clearPageviewProperties","trackPageview"],i=function(e){return function(){var t=Array.prototype.slice.call(arguments,0);window.heapReadyCb.push({name:e,fn:function(){heap[e]&&heap[e].apply(heap,t)}})}};for(var p=0;p<n.length;p++)heap[n[p]]=i(n[p])};
+heap.load("1811500362", {
+  eventPropertiesStorage: 'localstorage',
+  metadataStorage: 'localstorage'
+})
+                }
+                
+            } else if (!Fides?.consent?.analytics && loaded && window.heap) {
+                console.debug('[Consent Debug] heap.html (PROD): Analytics consent revoked, flagging Heap');
+                window.heap._consentGranted = false;
+            } else {
+                console.debug('[Consent Debug] heap.html (PROD): Skipping Heap action', { hasAnalytics: Fides?.consent?.analytics, alreadyInitialized: loaded });
+            }
+        }
+
+        if (window.Fides?.initialized) {
+            conditionallyLoad();
+        } else {
+            window.addEventListener('FidesInitialized', conditionallyLoad);
+        }
+
+        window.addEventListener('FidesUpdated', conditionallyLoad);
+    })();
+</script>
+                <meta name="apple-itunes-app" content="app-id=6444586410"/>
+        
+                <script src="https://cdn.toasttab.com/bob-release-467-2/javascripts/reporting.min.js?v=114"></script>
+    <script src="https://cdn.toasttab.com/bob-release-467-2/bootstrap/js/bootstrap-multiselect.min.js?v=114"></script>
+    <script src="https://cdn.toasttab.com/bob-release-467-2/bootstrap/js/bootstrap-treepicker.js"></script>
+
+    </head>
+
+    
+    <body class="logged-in admin-web  global-header toast-3-0" id="">
+        
+<script type="text/javascript">
+    (function() {
+        var loaded = false;
+
+        function conditionallyLoad() {
+            console.debug('[Consent Debug] tealium.html: conditionallyLoad called', { analyticsConsent: Fides?.consent?.analytics, loaded: loaded });
+            
+            if (Fides?.consent?.analytics && !loaded) {
+                console.debug('[Consent Debug] tealium.html: Analytics consent granted, initializing Tealium');
+                loaded = true;
+                window.utag_cfg_ovrd = window.utag_cfg_ovrd || {};
+                window.utag_cfg_ovrd.noview = true;
+                (function(a,b,c,d) {
+                    a='//tags.tiqcdn.com/utag/toast/us-user/prod/utag.js';
+                    b=document;c='script';d=b.createElement(c);d.src=a;
+                    d.type='text/java'+c;d.async=true;
+                    a=b.getElementsByTagName(c)[0];a.parentNode.insertBefore(d,a)})();
+            } else if (!Fides?.consent?.analytics && loaded) {
+                console.debug('[Consent Debug] tealium.html: Analytics consent revoked, updating Tealium');
+                window?.utag?.gdpr?.setConsentValue?.(0);
+            } else {
+                console.debug('[Consent Debug] tealium.html: Skipping Tealium action', { hasAnalytics: Fides?.consent?.analytics, loaded: loaded });
+            }
+        }
+
+        if (window.Fides?.initialized) {
+            conditionallyLoad();
+        } else {
+            window.addEventListener('FidesInitialized', conditionallyLoad);
+        }
+
+        window.addEventListener('FidesUpdated', conditionallyLoad);
+    })();
+</script>
+        <input ng-non-bindable type="hidden" name="restaurantId" id="restaurantId" value="97505000000000000" />
+                            <!-- Global header skeletons -->
+<style>
+
+    /* Mobile skeleton */
+    .global-header-top-skeleton {
+        background:white;
+        border-bottom:1px solid rgba(0,0,0,0.12);
+        height:3rem;
+        position:absolute;
+        width:100%;
+        top:0;
+        z-index:10;
+    }
+
+    .left-rail-skeleton, .desktop-skeleton-logo {
+        display: none;
+    }
+
+    /* Desktop skeleton */
+    @media(min-width:768px) {
+        .global-header-top-skeleton {
+            background:white;
+            border-bottom:1px solid rgba(0,0,0,0.12);
+            height:4rem;
+            position:fixed;
+            width:100%;
+            top:0;
+        }
+
+        .left-rail-skeleton {
+            background: white;
+            border-right: 1px solid rgba(0, 0, 0, 0.12);
+            height: calc(100vh - 4rem);
+            display: block;
+            position: fixed;
+            width: var(--global-left-margin);
+            left: 0;
+            bottom: 0;
+        }
+
+        .desktop-skeleton-logo {
+            background: white;
+            height: 4rem;
+            top: 0;
+            width: var(--global-logo-width, 4rem);
+            left: 0;
+            position: fixed;
+            display: block;
+        }
+        .basic-skeleton .global-header-top-skeleton {
+            border-bottom:none;
+        }
+    }
+
+    .global-navigation-desktop {
+        --global-header-margin: 4rem;
+        padding-top: var(--global-header-margin);
+    }
+
+    .global-navigation-mobile {
+        --global-header-margin: 3rem;
+        padding-top: var(--global-header-margin);
+    }
+
+    .navigation-active {
+        --global-left-margin: 13rem;
+        --global-logo-width: 13rem;
+        margin-left: var(--global-left-margin);
+    }
+
+    .navigation-inactive {
+        --global-left-margin: 0rem;
+        --global-logo-width: 4rem;
+        margin-left: var(--global-left-margin);
+    }
+
+    @media(min-width: 1024px) {
+        .navigation-inactive {
+            --global-left-margin: 4rem;
+            margin-left: var(--global-left-margin);
+        }
+    }
+
+    @media print {
+        .navigation-inactive {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+            margin-left: 0 !important;
+        }
+    }
+</style>
+<div class="global-header-top-skeleton">
+    <div class="desktop-skeleton-logo"></div>
+    <div class="left-rail-skeleton"></div>
+</div>
+<script>
+
+
+    // Determine if the left rail subnav should be open based on (1) local storage left rail state, (2) whether current page is home page
+    var isHomepage = window.location.pathname === "/restaurants/admin/home"
+    var storedState = window.localStorage.getItem('left-rail-state');
+    var isOpen = Boolean(storedState === "true" || (storedState === null && isHomepage));
+
+    // Apply the correct classes based on (1) window size, (2) local storage left rail state, (3) feature flags
+    adjustHeaderMarginBasedOnWindowSize(window.innerWidth)
+    adjustLeftRailBasedOnWindowSize(window.innerWidth, isOpen)
+
+    function adjustHeaderMarginBasedOnWindowSize(size) {
+        if (size < 768) {
+            document.body.classList.remove('global-navigation-desktop');
+            document.body.classList.add('global-navigation-mobile')
+        } else {
+            document.body.classList.remove('global-navigation-mobile')
+            document.body.classList.add('global-navigation-desktop');
+        }
+    }
+
+    function adjustLeftRailBasedOnWindowSize(size, isOpen) {
+
+        if (size < 768) {
+            document.body.classList.remove('navigation-inactive');
+            document.body.classList.remove('navigation-active');
+        } else if (isOpen) {
+            document.body.classList.add('navigation-active');
+            document.body.classList.remove('navigation-inactive');
+        } else if (!isOpen && size < 1024) {
+            document.body.classList.remove('navigation-inactive');
+            document.body.classList.remove('navigation-active');
+        } else if (!isOpen && size >= 1024) {
+            document.body.classList.remove('navigation-active');
+            document.body.classList.add('navigation-inactive');
+        } else {
+            document.body.classList.remove('navigation-inactive');
+            document.body.classList.remove('navigation-active');
+        }
+    }
+
+
+</script>
+
+<!-- toolbar content below the global header -->
+<div data-with-global-header>
+    <div class="navbar fixed-navbar-content">
+                    <div class="admin-toolbar with-left-rail-static">
+                <div class="container-fluid">
+                    <div class="admin-col-left">
+                            <ul class="breadcrumb">
+                <li>
+            <a ng-non-bindable href="/restaurants/admin/home"><i class="icon-home" style="margin-right:3px;"></i>Home</a> <span class="divider">/</span>
+        </li>
+                            <li class="active">
+                                        <span ng-non-bindable>Reports</a>
+                        </li>
+                                                        <breadcrumb></breadcrumb>
+    </ul>
+    
+                    </div>
+                    <div class="admin-col-right">
+                        <div class="admin-toolbar-btns btn-toolbar">
+                </div>
+
+                    </div>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        
+        
+        <div data-testid="main-content-area" class="wrapper">
+
+            <div class="container-fluid with-left-rail-static">
+                <div class="content content-admin-toolbar">
+                    <div ng-non-bindable>
+                        <div data-tw class="with-left-rail">
+  <div class="rounded space-x-2 px-4 py-3 text-default bg-warning-0 hidden" id="sessionWarning">
+    <div class='flex items-start'>
+      <span class='leading-none pr-2'>
+        <i
+            class='inline-block leading-none text-warning'
+            data-testid='alert-warning-icon'
+            aria-hidden='true'
+        >
+          <svg
+              width='24'
+              height='24'
+              viewBox='0 0 24 24'
+              fill='none'
+              class='inline-block align-middle h-6 w-6'
+          >
+            <path
+                d='M10.027 4.623a2.257 2.257 0 013.904 0l4.003 6.39 3.703 5.992c1.001 1.498-.2 3.495-2.002 3.495H4.322c-1.801 0-2.902-1.997-2.001-3.495l3.703-5.991 4.003-6.39zM11.929 8.518v4.493'
+                stroke='currentColor'
+                stroke-width='1.5'
+                stroke-miterlimit='10'
+                stroke-linecap='round'
+                stroke-linejoin='round'></path>
+            <path
+                d='M11.929 17.567a1 1 0 10-1.001-.999 1 1 0 001 .999z'
+                fill='currentColor'></path>
+          </svg>
+        </i>
+      </span>
+      <span class='type-default flex-grow'>Another restaurant session was detected in this browser. Please close this session and continue working in the other session.</span>
+      <button
+          title='Dismiss'
+          type='button'
+          class='flex items-center p-1 outline-none group -mr-3 -my-3 close'
+          onclick="hideWarning()"
+      >
+        <i
+            class='inline-block leading-none p-2 rounded-full group-hover:bg-darken-4 group-focus-visible:shadow-focus-inset'
+            aria-hidden='true'
+        >
+          <svg
+              width='24'
+              height='24'
+              viewBox='0 0 24 24'
+              fill='none'
+              class='inline-block align-middle h-6 w-6'
+          >
+            <path
+                d='M6.4 6.4l11.2 11.2m0-11.2L6.4 17.6'
+                stroke='currentColor'
+                stroke-width='1.5'
+                stroke-miterlimit='10'
+                stroke-linecap='round'
+                stroke-linejoin='round'
+            ></path>
+          </svg>
+        </i>
+      </button>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.toasttab.com/bob-release-467-2/javascripts/jquery.cookie.js"></script>
+<script>
+
+function getRestaurantId(){
+    var toastSessionCookie = $.cookie('TOAST_SESSION');
+    return toastSessionCookie.match(/[-&]rGuid=(.+?)[&"]/)[1];
+}
+
+function hideWarning() {
+    $("#sessionWarning").addClass('hidden')
+}
+
+var existingRestaurantId = getRestaurantId();
+window.onfocus = function(){
+    if (document.cookie.indexOf(existingRestaurantId) < 0) {
+        var elements = $("#sessionWarning");
+        if (elements.length>0) {
+            elements.removeClass('hidden')
+        }
+    }
+};
+</script>
+                    </div>
+                    
+
+                    
+        
+    
+
+    
+
+
+                    
+<div class="row-fluid admin-content admin-offset">
+    <div ng-non-bindable>
+        <div id="notifications" class="indented" style="display: none">
+    
+
+
+</div>    </div>
+    
+
+
+    
+
+
+
+    
+
+
+
+    
+<script type="text/javascript">
+$(function() {
+    Toast.reporting.init("/restaurants/admin/reports/orders", {
+        timeFilterable: true,
+        employeeFilterable: true,
+        supportsGroups: true,
+        supportsMoreFilters: true,
+        async: false,
+        sharded: false
+    });
+
+    var filterContainer = $("#filter-container");
+    filterContainer.bind("DOMNodeInserted",function(){
+        Toast.reporting.shouldShowHr();
+    });
+    filterContainer.bind("DOMNodeRemoved",function(){
+        Toast.reporting.shouldRemoveHr();
+    });
+
+    var addFilter = function(elementUrl) {
+        $.ajax({
+            url: elementUrl
+        }).done(function( data ) {
+            $("#filter-container").append(data);
+        });
+    };
+
+    var handleSelect = function(rootElement, url, checked) {
+        var element = $(rootElement);
+        if (!checked && element.find("option:selected").size() > 0) {
+            Toast.reporting.highlightUpdateBtn();
+        }
+        if (checked && element.length == 0) {
+            addFilter(url);
+        } else if (!checked && element.length != 0) {
+            element.remove();
+        }
+    };
+
+    $('#more-dropdown').css('display', 'inline-block').multiselect({
+        buttonText: function(options, select) {
+            return 'More';
+        },
+        selectedClass: '',
+        onChange: function(option, checked, select) {
+            var val = $(option).val();
+            if (val == 'autoClosed') {
+                handleSelect("#auto-closed-option", "/restaurants/admin/reports/getsearchelement?type=autoClosed", checked);
+            } else if (val == 'scheduled') {
+                handleSelect("#scheduled-option", "/restaurants/admin/reports/getsearchelement?type=scheduled", checked);
+            } else if (val == 'source') {
+                handleSelect("#source-option", "/restaurants/admin/reports/getsearchelement?type=source", checked);
+            } else if (val == 'serviceArea') {
+                handleSelect("#service-area-option", "/restaurants/admin/reports/getsearchelement?type=serviceArea", checked);
+            } else if (val == 'service') {
+                handleSelect("#service-option", "/restaurants/admin/reports/getsearchelement?type=service", checked);
+            } else if (val == 'revenueCenter') {
+                handleSelect("#revenue-center-option", "/restaurants/admin/reports/getsearchelement?type=revenueCenter", checked);
+            } else if (val == 'voided') {
+                handleSelect("#voided-option", "/restaurants/admin/reports/getsearchelement?type=voided", checked);
+            } else if (val == 'discounted') {
+                handleSelect("#discount-option", "/restaurants/admin/reports/getsearchelement?type=discounted", checked);
+            } else if (val == 'state') {
+                handleSelect("#state-option", "/restaurants/admin/reports/getsearchelement?type=state", checked);
+            } else if (val == 'diningOption') {
+                handleSelect("#dining-option-option", "/restaurants/admin/reports/getsearchelement?type=diningOption", checked);
+            } else if (val == 'taxExempt') {
+                handleSelect("#tax-exempt-option", "/restaurants/admin/reports/getsearchelement?type=taxExempt", checked);
+            } else if (val == 'itemTag') {
+                handleSelect("#item-tags-option", "/restaurants/admin/reports/getsearchelement?type=itemTags", checked);
+            } else if (val == 'paymentSource') {
+                handleSelect("#payment-source-option", "/restaurants/admin/reports/getsearchelement?type=paymentSource", checked);
+                        }
+        }
+    });
+
+    if(''.length){
+        handleSelect("#dining-option-option", "/restaurants/admin/reports/getsearchelement?type=diningOption", true);
+        $('#more-dropdown').multiselect('select', 'diningOption')
+    }
+
+    if(''.length){
+        handleSelect("#service-option", "/restaurants/admin/reports/getsearchelement?type=service", true);
+        $('#more-dropdown').multiselect('select', 'service')
+    }
+
+    if(''.length){
+        handleSelect("#source-option", "/restaurants/admin/reports/getsearchelement?type=source", true);
+        $('#more-dropdown').multiselect('select', 'source')
+    }
+
+    if(''.length){
+        handleSelect("#source-option", "/restaurants/admin/reports/getsearchelement?type=revenueCenter", true);
+        $('#more-dropdown').multiselect('select', 'revenueCenter')
+    }
+
+    if(''.length){
+        handleSelect("#service-area-option", "/restaurants/admin/reports/getsearchelement?type=serviceArea", true);
+        $('#more-dropdown').multiselect('select', 'serviceArea')
+    }
+
+    
+    if(''.length){
+        handleSelect("#auto-closed-option", "/restaurants/admin/reports/getsearchelement?type=autoClosed", true);
+        $('#more-dropdown').multiselect('select', 'autoClosed')
+    }
+
+    if(''.length){
+        handleSelect("#payment-source-option", "/restaurants/admin/reports/getsearchelement?type=paymentSource", true);
+        $('#more-dropdown').multiselect('select', 'paymentSource')
+    }
+});
+
+var changePageTitle = function(title) {
+        document.title = title + ' Reports';
+    }
+
+$(function() {
+    if(location.hash === '#chargebacks' && true){
+        return;
+    }
+    var title = document.title;
+
+    if(title === "Archive Test Orders"){
+        return;
+     }
+     else {
+        document.title = $("a.btn.dropdown-toggle")[0].innerText + ' Reports';
+     }
+});
+</script>
+
+
+
+
+        
+<div id="feature-flag-export-selected-columns" ></div>
+
+
+<div class="row-fluid report-page">
+        <div class="span-12" id="left-column">
+        <div class="indented">
+            <div class="alert" id="home-stale-reporting-data-alert" style="display:none">
+                Please note: Currently, the most up-to-date data available for this date range is through <span id="home-stale-reporting-data-refresh-date"></span>. <a href="/restaurants/admin/analytics/home/accounting/overview">To access all data, visit Accounting Overview &gt;</a>
+            </div>
+            <div class="report-options well">
+            <!-- todo: the code below this div should all be indented. -->
+            <div id="report-options-left" style="width: 100%">
+                <!-- The code in the div below is hidden but intact to not break the legacy reporting -->
+                <div class="btn-group report-name" data-field="reportName" data-value="orders" style="display: none;">
+                    <a data-toggle="dropdown" href="#">
+                        <span class="dropdown-label">Orders</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                                                    <li><a data-value="orders"
+                                    data-time-filterable="true"
+                                    data-employee-filterable="true"
+                                    data-supports-groups="true"
+                                    data-supports-more-filters="true"
+                                    data-perms-mask-low="64"
+                                    data-perms-mask-high="0"
+                                    data-perms-mask-string= "'0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'"
+                                    data-async="false"
+                                    data-sharded="false"
+                                    onclick="changePageTitle('Orders')"
+                                    href="/restaurants/admin/reports/orders"><i class="icon-signal"></i>&nbsp;Orders</a>
+                            </li>
+                                                    <li><a data-value="labor"
+                                    data-time-filterable="true"
+                                    data-employee-filterable="true"
+                                    data-supports-groups="true"
+                                    data-supports-more-filters="false"
+                                    data-perms-mask-low="256"
+                                    data-perms-mask-high="0"
+                                    data-perms-mask-string= "'0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'"
+                                    data-async="true"
+                                    data-sharded="false"
+                                    onclick="changePageTitle('Labor')"
+                                    href="/restaurants/admin/reports/labor"><i class="icon-time"></i>&nbsp;Labor</a>
+                            </li>
+                                                    <li><a data-value="menu"
+                                    data-time-filterable="true"
+                                    data-employee-filterable="true"
+                                    data-supports-groups="true"
+                                    data-supports-more-filters="true"
+                                    data-perms-mask-low="128"
+                                    data-perms-mask-high="0"
+                                    data-perms-mask-string= "'0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'"
+                                    data-async="false"
+                                    data-sharded="false"
+                                    onclick="changePageTitle('Menu')"
+                                    href="/restaurants/admin/reports/menu"><i class="icon-book"></i>&nbsp;Menu</a>
+                            </li>
+                                                    <li><a data-value="exceptions"
+                                    data-time-filterable="true"
+                                    data-employee-filterable="true"
+                                    data-supports-groups="true"
+                                    data-supports-more-filters="true"
+                                    data-perms-mask-low="64"
+                                    data-perms-mask-high="0"
+                                    data-perms-mask-string= "'0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'"
+                                    data-async="false"
+                                    data-sharded="false"
+                                    onclick="changePageTitle('Sales Exceptions')"
+                                    href="/restaurants/admin/reports/exceptions"><i class="icon-warning-sign"></i>&nbsp;Sales Exceptions</a>
+                            </li>
+                                                    <li><a data-value="reconciliation"
+                                    data-time-filterable="false"
+                                    data-employee-filterable="false"
+                                    data-supports-groups="true"
+                                    data-supports-more-filters="false"
+                                    data-perms-mask-low="64"
+                                    data-perms-mask-high="0"
+                                    data-perms-mask-string= "'0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'"
+                                    data-async="true"
+                                    data-sharded="false"
+                                    onclick="changePageTitle('Deposits')"
+                                    href="/restaurants/admin/reports/reconciliation"><i class="icon-ok"></i>&nbsp;Deposits</a>
+                            </li>
+                                                    <li><a data-value="cards"
+                                    data-time-filterable="true"
+                                    data-employee-filterable="false"
+                                    data-supports-groups="true"
+                                    data-supports-more-filters="false"
+                                    data-perms-mask-low="0"
+                                    data-perms-mask-high="1"
+                                    data-perms-mask-string= "'0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'"
+                                    data-async="false"
+                                    data-sharded="false"
+                                    onclick="changePageTitle('Gift / Rewards')"
+                                    href="/restaurants/admin/reports/cards"><i class="icon-gift"></i>&nbsp;Gift / Rewards</a>
+                            </li>
+                                                    <li><a data-value="accounting"
+                                    data-time-filterable="false"
+                                    data-employee-filterable="false"
+                                    data-supports-groups="true"
+                                    data-supports-more-filters="false"
+                                    data-perms-mask-low="64"
+                                    data-perms-mask-high="0"
+                                    data-perms-mask-string= "'0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'"
+                                    data-async="false"
+                                    data-sharded="false"
+                                    onclick="changePageTitle('Accounting')"
+                                    href="/restaurants/admin/reports/accounting"><i class="icon-book"></i>&nbsp;Accounting</a>
+                            </li>
+                                                    <li><a data-value="kitchen"
+                                    data-time-filterable="true"
+                                    data-employee-filterable="true"
+                                    data-supports-groups="true"
+                                    data-supports-more-filters="true"
+                                    data-perms-mask-low="64"
+                                    data-perms-mask-high="0"
+                                    data-perms-mask-string= "'0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'"
+                                    data-async="false"
+                                    data-sharded="true"
+                                    onclick="changePageTitle('Kitchen')"
+                                    href="/restaurants/admin/reports/kitchen"><i class="icon-glass"></i>&nbsp;Kitchen</a>
+                            </li>
+                                                    <li><a data-value="guestfeedback"
+                                    data-time-filterable="true"
+                                    data-employee-filterable="true"
+                                    data-supports-groups="true"
+                                    data-supports-more-filters="false"
+                                    data-perms-mask-low="64"
+                                    data-perms-mask-high="0"
+                                    data-perms-mask-string= "'0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'"
+                                    data-async="false"
+                                    data-sharded="false"
+                                    onclick="changePageTitle('Guest Feedback')"
+                                    href="/restaurants/admin/reports/guestfeedback"><i class="icon-comment"></i>&nbsp;Guest Feedback</a>
+                            </li>
+                                                    <li><a data-value="restaurantPartnerActions"
+                                    data-time-filterable="true"
+                                    data-employee-filterable="false"
+                                    data-supports-groups="false"
+                                    data-supports-more-filters="false"
+                                    data-perms-mask-low="0"
+                                    data-perms-mask-high="0"
+                                    data-perms-mask-string= "'0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'"
+                                    data-async="false"
+                                    data-sharded="false"
+                                    onclick="changePageTitle('My Integration Activity')"
+                                    href="/restaurants/admin/reports/restaurantpartneractions"><i class="icon-comment"></i>&nbsp;My Integration Activity</a>
+                            </li>
+                                            </ul>
+                </div>
+                <!-- end legacy hidden div -->
+                <!-- Begin Analytics switch dropdown -->
+                <span class="report-options-label">View&nbsp;</span>
+                <div class="btn-group report-name" data-field="reportName" data-value="orders">
+                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                        <span class="dropdown-label">
+                                                                                                                                                Orders
+                                                    </span>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="dropdown-menu">
+                                                                                                            <a class="aml-dropdown-item"
+                                    href="/restaurants/admin/reports/sales/sales-summary">
+                                    <i class="icon-">dashboard</i> Sales Summary
+                                </a>
+                                                                                                        <a class="aml-dropdown-item"
+                            href="/restaurants/admin/analytics/home/locations">
+                            <i class="icon-">location_on</i> Locations
+                        </a>
+                        <a class="aml-dropdown-item"
+                            href="/restaurants/admin/analytics/home/sales">
+                            <i class="icon-">timeline</i> Sales
+                        </a>
+                        <a class="aml-dropdown-item"
+                            href="/restaurants/admin/analytics/home/menu">
+                            <i class="icon-">list_alt</i> Menu
+                        </a>
+                        <a class="aml-dropdown-item"
+                            href="/restaurants/admin/analytics/home/labor">
+                            <i class="icon-">watch</i> Labor
+                        </a>
+                        <a class="aml-dropdown-item"
+                            href="/restaurants/admin/analytics/home/accounting">
+                            <i class="icon-">account_balance</i> Accounting
+                        </a>
+                        <a class="aml-dropdown-item"
+                            href="/restaurants/admin/analytics/home/cash">
+                            <i class="icon-">attach_money</i> Cash
+                        </a>
+                        <a class="aml-dropdown-item"
+                            href="/restaurants/admin/analytics/home/guests/customers">
+                            <i class="icon-">people</i> Guests, Gift Cards, and Loyalty
+                        </a>
+                        <a class="aml-dropdown-item"
+                            href="/restaurants/admin/analytics/home/kitchen">
+                            <i class="icon-">restaurant_menu</i> Kitchen
+                        </a>
+                        <a class="aml-dropdown-item"
+                            href="/restaurants/admin/analytics/home/finance">
+                            <i class="icon-">receipt</i> Finance
+                        </a>
+                    </div>
+                </div>
+                <div id="date-dropdown-container" class="btn-group date-range-btn" data-field="reportDateRange" data-value="today" >
+                    <button class="btn dropdown-toggle" data-toggle="dropdown">
+                        <span class="dropdown-label">Today</span>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                                                                                                                <li><a data-value="today" href="#">Today</a></li>
+                                                                                                                                            <li><a data-value="yesterday" href="#">Yesterday</a></li>
+                                                                                                                                            <li><a data-value="currentWeek" href="#">This Week</a></li>
+                                                                                                                                            <li><a data-value="lastSevenDays" href="#">Last 7 Days</a></li>
+                                                                                                                                            <li><a data-value="lastWeek" href="#">Last Week</a></li>
+                                                                                                                                            <li><a data-value="currentMonth" href="#">This Month</a></li>
+                                                                                                                                            <li><a data-value="lastMonth" href="#">Last Month</a></li>
+                                                                                                                <li class="divider"></li>
+                                                                                                                                                                        <li><a data-value="custom" href="#">Custom Date</a></li>
+                                                                        </ul>
+                </div>
+                <div class="custom-range" style="display:none">
+                    <span class="report-options-label" style="padding-left: 0;">Days</span>
+                    <input name="reportDateStart" class="input-small date-field" type="text" placeholder="mm-dd-yyyy" value="07-02-2026" data-date-format="MM-dd-yyyy" autocomplete="off" />
+                    <span class="report-options-label">through</span>
+                    <input name="reportDateEnd" class="input-small date-field" type="text" placeholder="mm-dd-yyyy" value="07-02-2026" data-date-format="MM-dd-yyyy" autocomplete="off" />
+                </div>
+                                    <div id="time-dropdown-container" class="btn-group time-range-btn" data-field="reportTimeRange" data-value="-2" >
+                        <button class="btn dropdown-toggle" data-toggle="dropdown">
+                            <span class="dropdown-label">All Hours</span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                                                                                            <li><a data-value="-2" href="#" >All Hours</a></li>
+                                                                                            <li><a data-value="500000014276806763" href="#" >10:00 AM - 4:00 PM</a></li>
+                                                                                            <li><a data-value="500000034219480772" href="#" >4:00 PM - 11:00 PM</a></li>
+                                                                                            <li><a data-value="500000034219480773" href="#" >11:00 PM - 1:00 AM</a></li>
+                                                                                                                                    <li class="divider"></li>
+                                                                <li><a data-value="-1" href="#" >Custom Hours</a></li>
+                                                    </ul>
+                    </div>
+                    <div id="time-custom-range" class="custom-time-range" style="display:none">
+                        <span class="report-options-label" style="padding-left: 0;">Hours</span>
+                        <input name="reportTimeStart" class="input-small" type="text" placeholder="hh:mm am" value="" />
+                        <span class="report-options-label">through</span>
+                        <input name="reportTimeEnd" class="input-small" type="text" placeholder="hh:mm pm" value="" />
+                    </div>
+                                                <div id="employee-dropdown-container" style="display:inline-block;;">
+                    <span class="report-options-label">&nbsp;for&nbsp;</span>
+<div class="btn-group bootstrap-select select-shell auto-width"
+        data-css-class="auto-width"        data-template-id="employee-filter-template">
+    <button type="button" class="btn dropdown-toggle selectpicker btn-default"
+                        data-toggle="dropdown" >
+        <input type="hidden" value="all" name="reportEmployee"  />
+        <span class="filter-option pull-left">All Employees</span>&nbsp;
+        <span class="caret"></span>
+    </button>
+</div>
+<select id="employee-filter-template" data-live-search="true" title="All Employees" style="display:none" disabled>
+    <option value="all">All Employees</option>
+            <option value="500000001295095001">Abranches, Hortencia</option>
+            <option value="500000001187657540">Aguiar, Ariel</option>
+            <option value="500000001371608397">Aguilera, Ramon Ivan</option>
+            <option value="500000001428606654">Aguirre, Tristan</option>
+            <option value="500000001214728795">Al khodari,  Lalu zulpaka</option>
+            <option value="500000001488917560">Albanese, Dominick</option>
+            <option value="500000000952570266">Albert, Tiphaine</option>
+            <option value="500000001434646991">Algarin, Giannah</option>
+            <option value="500000001251123081">Amaro, Tristan</option>
+            <option value="500000001332196537">Anderson, Bronte</option>
+            <option value="500000001448164445">Androulakis, Martha</option>
+            <option value="500000001277681150">Anggreni, Ni Kadek</option>
+            <option value="500000000413748469">Araiza, Fernando</option>
+            <option value="500000001276321988">Arce, Eduardo</option>
+            <option value="500000000760923311">Arteaga, Ruben</option>
+            <option value="500000001174428096">Aumeunier, Frederic </option>
+            <option value="500000001286942514">Barba, Kevin</option>
+            <option value="500000000663705505">Baron, Nicson</option>
+            <option value="500000000356121504">Barton, Kimberly</option>
+            <option value="500000000392365161">Bell, Peyton</option>
+            <option value="500000000333765117">Benjamin, Tiana</option>
+            <option value="500000001282362333">Benn, Kelsi</option>
+            <option value="500000000886153432">Blasi, Robert</option>
+            <option value="500000000427314648">Bonnaud , Erwan </option>
+            <option value="500000000630369696">Borjas, Cody</option>
+            <option value="500000000937371148">Bourgeois, Zachary</option>
+            <option value="500000000264870369">Bradley, Lacey</option>
+            <option value="500000001332181665">Bryant, Bradley</option>
+            <option value="500000000592008811">Burgos, Sorayda</option>
+            <option value="500000000663719781">Burrell, Rylee</option>
+            <option value="500000001393227737">Burress, Kevin</option>
+            <option value="500000000326337215">Cabrera, Joshua</option>
+            <option value="500000000719604675">Cahelo, Arieh</option>
+            <option value="500000001256888096">Carrera, Carlos</option>
+            <option value="500000000526497232">Carrillo, Vanessa</option>
+            <option value="500000000365809356">Castro III, Tomas </option>
+            <option value="500000001380162336">Cattaneo, Adriano </option>
+            <option value="500000001468393846">Cavalcante, Casey</option>
+            <option value="500000001482277705">Chamussy, Juliette</option>
+            <option value="500000000511445846">Chaparro, Heidy</option>
+            <option value="500000001495659887">Cherilus, Lovelie</option>
+            <option value="500000001269914633">Choi, Bryan</option>
+            <option value="500000001478062724">Clichy, Nicolas</option>
+            <option value="500000001495659217">Correra, Jorge</option>
+            <option value="500000000611510616">Corsico, Justin</option>
+            <option value="500000001176795061">Crist, Quinlan</option>
+            <option value="500000001399854100">De Castro Gomes, Bruna</option>
+            <option value="500000001332166764">de Leon, Elias</option>
+            <option value="500000001019624531">DEVICE LOGIN*, *GENERIC</option>
+            <option value="500000000264865552">Diaz, Sheena</option>
+            <option value="500000001145791161">Dills, Justin</option>
+            <option value="500000001427467687">Dorestan, Nethro </option>
+            <option value="500000000316302900">DOUIBI, Marie</option>
+            <option value="500000001332200008">Ducharm, Erica</option>
+            <option value="500000001020158011">Dunn, Alexandra</option>
+            <option value="500000000293089372">Emanuely, Cyril</option>
+            <option value="500000000733623519">Enriquez De Romero, Jessica</option>
+            <option value="500000001481764164">Evans, Rylan</option>
+            <option value="500000001072482175">Fabian, Betsy</option>
+            <option value="500000001176800285">Ferreira, Adriana</option>
+            <option value="500000000362202813">Flores Vega , Yamil </option>
+            <option value="500000000792912372">Fourcade, James</option>
+            <option value="500000001385646230">Gabaldon, Annabel </option>
+            <option value="500000001495658240">Gagliardo, Christina</option>
+            <option value="500000000000450447">Galy, Gregory</option>
+            <option value="500000000039999305">Galy, Marine</option>
+            <option value="500000000599124743">Garcia , Ana Camila </option>
+            <option value="500000001167853823">Garcia, Natalia</option>
+            <option value="500000001488913483">Gentry, Noah</option>
+            <option value="500000001475437791">Giglio, Alexander</option>
+            <option value="500000000035722873">GLIMPSE, PAUL</option>
+            <option value="500000001399854824">Goncalves, Anna Gabriela</option>
+            <option value="500000001118977951">Gonzalez Zambrano, Santiago Alfonso</option>
+            <option value="500000000848235294">Gonzalez, Luis</option>
+            <option value="500000000960867924">Gonzalez, Natalie</option>
+            <option value="500000001103101064">Gonzalez, Pierina</option>
+            <option value="500000001399855379">Grajales, Juan</option>
+            <option value="500000001203158522">Gramling, Tyler</option>
+            <option value="500000000162384250">Guardiola, Fabien</option>
+            <option value="500000000911707498">Guerin, Frederic</option>
+            <option value="500000001353528708">Gulec, Gozde</option>
+            <option value="500000001182582451">Hall, Constance</option>
+            <option value="500000001162431706">Hariadi, I Dodi</option>
+            <option value="500000000553684382">Hazelton, Jazmine </option>
+            <option value="500000001206456102">Helms, Yanlu</option>
+            <option value="500000000031755044">Helpdesk, Support305</option>
+            <option value="500000001290925845">Heraz Perez, Juan Carlos</option>
+            <option value="500000001139876203">Hernandez, Daniela</option>
+            <option value="500000001197396361">Hernandez, Eduardo</option>
+            <option value="500000000251552217">HOUSE, SC</option>
+            <option value="500000001226227063">Hunt, Quinton</option>
+            <option value="500000001475438749">Ikotun, Oluwatimilehin</option>
+            <option value="500000000229465073">Inurritegui, Estefania</option>
+            <option value="500000001454767264">Izquierdo, Evan</option>
+            <option value="500000000730148796">JeanClaude , Jameson</option>
+            <option value="500000000827074021">Joinvil, Avena</option>
+            <option value="500000001119702674">Joinville, Jacquelin</option>
+            <option value="500000000542761845">Kawamoto , Takuma </option>
+            <option value="500000000462469773">KDS, KDS</option>
+            <option value="500000001332172842">Knoop, Evan</option>
+            <option value="500000001406440236">Korovesis, Dimitrios</option>
+            <option value="500000001233825350">Koziol, Joseph</option>
+            <option value="500000000692794406">Larsen, Kevin</option>
+            <option value="500000000737766228">Lavenant, Matthias</option>
+            <option value="500000000461480207">Le Bastard, Etienne</option>
+            <option value="500000001052089682">Lebon, Maxime</option>
+            <option value="500000001332187203">Lee, Thomas</option>
+            <option value="500000001121492608">Leftwich, Casey</option>
+            <option value="500000001332175401">Legg, Ryan</option>
+            <option value="500000001019767936">Legrand, Cynthia</option>
+            <option value="500000001233829216">Lewis, Rodrick</option>
+            <option value="500000001277643330">Liu, Yixuan</option>
+            <option value="500000000580780512">Login, Generic</option>
+            <option value="500000001495657649">Lopez, Yamen</option>
+            <option value="500000000430340338">Lyon, Emily</option>
+            <option value="500000000700708636">Marconi, Fernando</option>
+            <option value="500000001332170447">Margary Spragers, Alondra</option>
+            <option value="500000001488916192">Martinez, Jeanpierre</option>
+            <option value="500000001359222472">Mayorga, Alejandro </option>
+            <option value="500000001226230541">Medina, Maira</option>
+            <option value="574184482">Mendez, Heidy</option>
+            <option value="500000000473428868">Milochevitch, Hugo</option>
+            <option value="500000001428609702">Miranda, Nina</option>
+            <option value="500000001029141310">Monroig, Claudia</option>
+            <option value="500000000185685186">Montalvo, Jennifer</option>
+            <option value="500000000534085983">Montalvo, Jenny</option>
+            <option value="500000001213454826">Montenegro, Lianne</option>
+            <option value="500000001468392335">Mora Pineda, Estefanya</option>
+            <option value="500000001434646223">Morales, Madisyn</option>
+            <option value="500000001124789329">Moreno, Juan</option>
+            <option value="500000001428609170">Murray, Linzee</option>
+            <option value="500000001213824007">Nevarez, Israel</option>
+            <option value="500000001481764725">Neves, Barbara</option>
+            <option value="500000001412748559">Nguyen, Trang</option>
+            <option value="500000000350556993">Nieto, Johan</option>
+            <option value="500000000690809557">Noriega, Mateo</option>
+            <option value="500000001475356049">Nussbaum, Elea</option>
+            <option value="500000001495657124">Othman, Naseem</option>
+            <option value="500000001347330176">Outumuro, Mitchell</option>
+            <option value="500000001428608669">Papasakellariou, Sebastian</option>
+            <option value="500000001379077607">Perez, Kristy</option>
+            <option value="500000001064247643">Perez, Ricardo</option>
+            <option value="500000001072483690">Perez, Sofia</option>
+            <option value="500000001237177639">Perilla Garcia, Jorge</option>
+            <option value="500000001226233357">Philistin, Hebert</option>
+            <option value="500000000481562607">Pimenta, Gabriela </option>
+            <option value="500000000642830014">Pineiro , Kristian </option>
+            <option value="500000001385590719">Plana, Ana</option>
+            <option value="500000001276317187">Pope, Marquis</option>
+            <option value="500000001302106477">Porcaccio, Davide</option>
+            <option value="500000001440693813">Portuese, Peter</option>
+            <option value="500000000277668788">Purser, Adrian</option>
+            <option value="500000000700729436">Rae, Guillermina </option>
+            <option value="500000001448175568">Ralph, Shacquez</option>
+            <option value="500000001440692987">Ramos, Rubi</option>
+            <option value="500000001495658803">Rebolledo, Gesen</option>
+            <option value="500000000782836804">Rein, Hallie</option>
+            <option value="500000000862774737">Reservations, Reservations</option>
+            <option value="500000000516958392">Reyes , Gloria </option>
+            <option value="500000000137927328">Ridard, Michael</option>
+            <option value="500000001495667403">Rieme, Philippine</option>
+            <option value="500000001488911592">Rivera Martinez, Daniely</option>
+            <option value="500000001386109049">Rivera, Isaiah</option>
+            <option value="500000001276320718">Rivera, Jorge</option>
+            <option value="500000000233181625">Rivera, Maria</option>
+            <option value="500000000891116180">Rivero, Michelle</option>
+            <option value="500000001436876362">Robles, Nestor</option>
+            <option value="500000001213820181">Rodriguez,  Angela Lissette</option>
+            <option value="500000000600913685">Rodriguez, Gabriel </option>
+            <option value="500000001481765729">Romero, Judith</option>
+            <option value="500000001287096079">Ronssin, Daniela</option>
+            <option value="500000001243354047">Ruas, Dylan</option>
+            <option value="500000001406439549">Ruiz, Giovanny</option>
+            <option value="500000001308246385">Sanchez Flores, Leticia </option>
+            <option value="500000000316492791">Sanderson, Jamali</option>
+            <option value="500000000863415427">Santirzo, Emilie</option>
+            <option value="500000001205978998">Segovia, Valentina</option>
+            <option value="500000000781313184">Sevrain, Nancy </option>
+            <option value="500000000444903483">Sharaf, Mariam</option>
+            <option value="500000000516235744">Sheput, Juan</option>
+            <option value="500000001239246466">Simon, Fanise</option>
+            <option value="500000000828482699">Simon, Frenel</option>
+            <option value="500000000700528093">Smets, Nathalia</option>
+            <option value="500000001332183722">Smith, Albert</option>
+            <option value="500000000326401753">Sousa, Andre</option>
+            <option value="500000001038363599">Sparks, Daniel</option>
+            <option value="500000001301487730">Steele, Austin</option>
+            <option value="500000001233830286">Stephan, Zeina</option>
+            <option value="500000000989506849">Suarez, Stephanie</option>
+            <option value="500000001277698371">Subagia, Putu</option>
+            <option value="500000000409035865">Swaby , Omar </option>
+            <option value="500000000236351641">Szaltis, JP</option>
+            <option value="500000001182910978">Tapcheck, Tapcheck</option>
+            <option value="500000000326282895">testing, test</option>
+            <option value="500000000334179523">Toast, Andrew</option>
+            <option value="500000001411680473">Torres, Christopher</option>
+            <option value="500000001221996000">Torres, Esteban</option>
+            <option value="500000001369478928">Troncoso, Monike</option>
+            <option value="500000000567982030">Vargas , Elias</option>
+            <option value="500000000636521017">Vargas, Esthefany</option>
+            <option value="500000000524943668">Vasquez, Pedro </option>
+            <option value="500000000576102617">Vila, Alexandra</option>
+            <option value="500000001427204241">Vives, Marcela</option>
+            <option value="500000001230571701">Washington, Jirard</option>
+            <option value="500000000172582991">Weaver, Dominic</option>
+            <option value="500000001286577421">Zelouf, David</option>
+            <option value="500000000658001786">Zuluaga , Manuel </option>
+    </select>
+<script>
+$(function() {
+    Toast.enableSelectPickerTemplate($('#employee-dropdown-container'), function() {
+        Toast.reporting.highlightUpdateBtn();
+        var div = $("#employee-dropdown-container");
+        div.find("button").toggleClass("dropdown-non-default", $(this).val() !== 'all');
+    });
+});
+Toast.reloadEmployees = function() {
+    $.get('/restaurants/admin/reports/reloademployees').done(function(data) {
+        $('#employee-dropdown-container').html(data);
+    });
+};
+</script>                </div>
+                                    <div id="allrestaurants-dropdown-container" style="display:inline-block;">
+                        <span class="report-options-label">&nbsp;at&nbsp;</span>
+                        
+
+<div class="btn-group bootstrap-select bootstrap-treepicker show-tick" id="report-restaurants" value="AVA MediterrAegean">
+    <button type="button" class="btn dropdown-toggle selectpicker" data-toggle="dropdown">
+        <div style="padding-right:20px">
+            <span class="selected-label pull-left" id="filtered-restaurant" style="max-width:100%;overflow:hidden;text-overflow:ellipsis"></span>&nbsp;
+        </div>
+        <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu open">
+        <ul class="dropdown-menu inner" role="menu">
+                                <li data-val="500000045010094652" data-guid="1e2a98d8-71b4-4cdf-ae5c-9fc0b79b35be"             data-has-permissions="false"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 0px">RDG</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+                <ul class="dropdown-menu inner selectpicker open" role="menu">
+                <li data-val="500000055174371704" data-guid="3483716e-1f32-4b59-90bc-1da35f96ecae"             data-has-permissions="false"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 10px">Ava Coconut Grove Group</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+                <ul class="dropdown-menu inner selectpicker open" role="menu">
+                <li data-val="500000056033936853" data-guid="a42e9dd5-9ebb-4830-ab82-b8fd99747c2c" data-is-leaf="true"            data-has-permissions="true"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 20px">AVA MediterrAegean Coconut Grove</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+            </li>
+        </ul>
+            </li>
+    <li data-val="500000045246952250" data-guid="71885f75-d91e-4276-baa6-2f361bd8edab"             data-has-permissions="false"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 10px">AVA Winter Park</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+                <ul class="dropdown-menu inner selectpicker open" role="menu">
+                <li data-val="500000013674501001" data-guid="96e8e2b8-d95d-4432-b574-ceee10cf17d5" data-is-leaf="true"            data-has-permissions="true"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 20px">AVA MediterrAegean</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+            </li>
+    <li data-val="500000020877751155" data-guid="af065e32-4e52-40d6-aacb-5a513141321f" data-is-leaf="true"            data-has-permissions="true"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 20px">MM Club at AVA</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+            </li>
+        </ul>
+            </li>
+    <li data-val="500000038958898300" data-guid="287f481f-333f-4515-a8a1-a17739506d87"             data-has-permissions="false"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 10px">Casa Neos Group</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+                <ul class="dropdown-menu inner selectpicker open" role="menu">
+                <li data-val="500000037911188149" data-guid="819bc27e-780f-4173-af47-db4f4e12efac" data-is-leaf="true"            data-has-permissions="true"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 20px">CASA NEOS </span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+            </li>
+    <li data-val="500000060638376351" data-guid="a2a5b806-d0b7-49cc-a445-057a2af8183e" data-is-leaf="true"            data-has-permissions="true"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 20px">Casa Neos Lounge</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+            </li>
+        </ul>
+            </li>
+    <li data-val="500000045010094653" data-guid="74decf61-18da-4f53-ae42-c26cfa060a8c"             data-has-permissions="false"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 10px">Claudie Group</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+                <ul class="dropdown-menu inner selectpicker open" role="menu">
+                <li data-val="500000037853698711" data-guid="23f8098f-bc71-45fc-a13b-f85223aba0c6" data-is-leaf="true"            data-has-permissions="true"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 20px">Claudie</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+            </li>
+        </ul>
+            </li>
+    <li data-val="500000033825876959" data-guid="2d3e4bda-eb1d-49d6-831f-8163aa72b53d"             data-has-permissions="false"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 10px">MILA 3F &amp; 2F</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+                <ul class="dropdown-menu inner selectpicker open" role="menu">
+                <li data-val="500000000001501691" data-guid="ccdfb8b1-c2a0-4e3f-84d8-405ecfb001b0" data-is-leaf="true"            data-has-permissions="true"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 20px">MILA Miami</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+            </li>
+    <li data-val="500000020878616311" data-guid="9a4543a1-6618-43af-aec8-025641e0a3e7" data-is-leaf="true"            data-has-permissions="true"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 20px">MM Club at MILA</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+            </li>
+        </ul>
+            </li>
+    <li data-val="500000000001526801" data-guid="f5650f11-25ad-4bfa-be92-59a97d90c70c"             data-has-permissions="true"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 10px">Mila Group</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+                <ul class="dropdown-menu inner selectpicker open" role="menu">
+                <li data-val="500000000001501691" data-guid="ccdfb8b1-c2a0-4e3f-84d8-405ecfb001b0" data-is-leaf="true"            data-has-permissions="true"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 20px">MILA Miami</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+            </li>
+    <li data-val="500000020878616311" data-guid="9a4543a1-6618-43af-aec8-025641e0a3e7" data-is-leaf="true"            data-has-permissions="true"
+            class="org-node">
+        <a tabindex="0">
+            <span class="text" style="padding-left: 20px">MM Club at MILA</span>
+            <i class="glyphicon glyphicon-ok icon-ok check-mark"></i>
+        </a>
+            </li>
+        </ul>
+            </li>
+        </ul>
+            </li>
+                    </ul>
+    </div>
+    <input type="hidden" name="" id="report-restaurants_input" class="ignore-changes" />
+</div>
+
+<script>
+(function() {
+    var treepicker = $("#report-restaurants").treepicker({input: $("#report-restaurants_input"), multiselect: true});
+    var selectedIds = JSON.parse("[&quot;500000013674501001&quot;]".replace(/&quot;/g, '"')); //unescape and parse the array of IDs
+    treepicker.treepicker("val", {values: selectedIds, hasPermissions:false});
+})();
+</script>                      </div>
+                                <div id="more-dropdown-container" style="margin-left: 3px; display: inline-block;">
+                    <select id="more-dropdown" multiple="multiple" style="display: none">
+                        <option value="autoClosed">Auto-Closed</option>
+                        <option value="diningOption">Dining Option</option>
+                        <option value="discounted">Discounted</option>
+                        <option value="revenueCenter">Revenue Center</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="service">Service</option>
+                        <option value="serviceArea">Service Area</option>
+                        <option value="state">State</option>
+                        <option value="source">Source</option>
+                        <option value="paymentSource">Toast Pay</option>
+                        <option value="taxExempt">Tax Exempt</option>
+                        <option value="voided">Voided</option>
+                                                                    </select>
+                </div>
+
+                
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button id="update-btn" class="btn btn-default">Update</button>
+                    </div>
+                    <div class="btn-group" style="margin-left:2px;">
+                        <button id="adhoc-export-btn" data-toggle="modal" href="#adhoc-export-email-dialog" class="btn btn-default" >Email Export</button>
+                    </div>
+                </div>
+
+                <div id="filter-container">
+                    <hr id="filter-container-hr" style="display: none;height: 1px; border: 0; border-top: 1px solid #cccccc; margin: 5px 0 4px; padding: 0;">
+                </div>
+            </div>
+            </div> <!-- closes class="report-options well" -->
+            <div class="report-container">
+            </div>
+        </div>
+    </div>
+    </div>
+
+<div id="adhoc-export-email-dialog" class="modal hide">
+    <div class="modal-header">
+        <h3>Please enter recipient email addresses</h3>
+    </div>
+    <div class="modal-body form-horizontal">
+        <div class="control-group">
+            <label for="adhoc-export-email-input" class="control-label">Email addresses</label>
+
+            <div class="controls">
+                <input id="adhoc-export-email-token" type="hidden" value="49983c730e3fb54e8858d27233d42f5a35076363">
+                <input id="adhoc-export-email-input" type="email" class="input-xlarge" value="matthias@rivieradininggroup.com"/>
+                <p class="help-inline">Multiple emails can be separated by comma</p>
+            </div>
+        </div>
+
+        <div class="alert" id="stale-reporting-data-alert" style="display:none">
+            Please note: Currently, the most up-to-date data available for this date range is through <span id="stale-reporting-data-refresh-date"></span>.
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <a href="#" id="adhoc-export-submit-btn" class="btn btn-primary" data-dismiss="modal">Submit</a>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+      google.charts.load('current', {packages: ['corechart']});
+      google.charts.setOnLoadCallback(Toast.reporting.googleChartsCallback);
+      var ANALYTICS_HOME = "/restaurants/admin/analytics/home";
+      var LINKS = {
+        accounting: "/accounting",
+        cash: "/cash",
+        finance: "/finance",
+        guestLoyalty: "/guests/customers",
+        kitchen: "/kitchen",
+        labor: "/labor",
+        menu: "/menu",
+        sales: "/sales"
+      };
+
+      var reverseMapping = {
+        // Sales
+        "#labor-hourly-sales-and-labor": LINKS.sales,
+        "#voids": LINKS.sales,
+        "#sales-payments": LINKS.sales,
+        "#sales-orders": LINKS.sales,
+        "#sales-group": LINKS.sales,
+        "#sales-order-details": LINKS.sales,
+        "#shifts": LINKS.sales,
+
+        // Menu
+        "#menu-pmix": LINKS.menu,
+        "#menu-pmix-comp": LINKS.menu,
+        "#selection-details": LINKS.menu,
+        "#modifier-details": LINKS.menu,
+        "#menu-group-list": LINKS.menu,
+        "#menu-item-list": LINKS.menu,
+        "#menu-modifiers-list": LINKS.menu,
+        "#menu-86-report": LINKS.menu,
+
+        // Labor
+        "#labor-summary": LINKS.labor,
+        "#labor-time-entries": LINKS.labor,
+        "#labor-break-entries": LINKS.labor,
+        "#labor-productivity": LINKS.labor,
+        "#labor-pooledtips": LINKS.labor,
+        "#labor-swipecardlog": LINKS.labor,
+        "#labor-time-entries-audit": LINKS.labor,
+
+        // Accounting
+        "#accounting": LINKS.accounting,
+        "#accounting-daily": LINKS.accounting,
+        "#check-review": LINKS.accounting,
+        "#house-account-sales": LINKS.accounting,
+
+        // Cash
+        "#cash-mgmt": LINKS.cash,
+        "#cash-drawer-report": LINKS.cash,
+        "#cash-group": LINKS.cash,
+
+        // Guest Loyalty
+            // n.b. two special cases here, TBA:
+            // Guest Feedback
+            // Guest Credits
+        "#card-summary": LINKS.guestLoyalty,
+        "#gift-cards": LINKS.guestLoyalty,
+        "#stored-value": LINKS.guestLoyalty,
+        "#stored-value-liability": LINKS.guestLoyalty,
+        "#failed-deliveries": LINKS.guestLoyalty,
+        "#inactive-cards": LINKS.guestLoyalty,
+        "#rewards-cards": LINKS.guestLoyalty,
+        "#loyalty-points": LINKS.guestLoyalty,
+
+        // Kitchen
+        "#kitchen-details-chart": LINKS.kitchen,
+        "#tickets-fulfillment-chart": LINKS.kitchen,
+        "#kitchen-timing-table": LINKS.kitchen,
+
+        // Finance
+        "#overview": LINKS.finance,
+        "#daily-summaries": LINKS.finance,
+        "#history": LINKS.finance,
+        "#cost-breakdown": LINKS.finance,
+        "#primaryhistory": LINKS.finance,
+        "#statements": LINKS.finance,
+        "#invoices": LINKS.finance,
+        "#chargebacks": LINKS.finance,
+        "#interchange": LINKS.finance
+      };
+      $(".go-back-one").click(function(e) {
+        e.preventDefault();
+        var landingPageHash = window.location.hash;
+        window.location = ANALYTICS_HOME + (reverseMapping[landingPageHash] || ''); // blank string preferrable to 'undefined' as a string.
+      });
+</script>
+
+<div id="order-detail" class="modal hide">
+    <div class="modal-header">
+        <a href="#" class="back" style="display:none;">&lt; Back</a>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Order Details</h3>
+    </div>
+    <div class="modal-body" style="overflow:auto;padding:0;">
+        <div class="template" style="height:100%;line-height:250px;text-align:center;padding:0;">
+            <img src="https://cdn.toasttab.com/bob-release-467-2/images/ajax-loader-big.gif" />
+        </div>
+    </div>
+</div>
+<style>
+#order-detail {
+    max-width: 90vw;
+    left: 50% !important;
+    /*
+     * Override Bootstrap's responsive `right: 20px` on .modal,
+     * which constrains the modal width when combined with left: 50%.
+     */
+    right: auto;
+    transform: translateX(-50%);
+}
+
+/*
+ * On narrow viewports, the Bootstrap 2 float grid (span1/span2/span4)
+ * breaks because the percentage-based column widths become too small
+ * for the label text. Switch to a 2-column CSS grid. Force every
+ * odd child (label) to start in column 1 so that each label-value
+ * pair occupies its own row regardless of how many pairs exist.
+ */
+@media (max-width: 768px) {
+    #order-detail .row-fluid {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 2px 10px;
+    }
+    #order-detail .row-fluid [class*="span"] {
+        float: none;
+        width: auto;
+        margin-left: 0;
+    }
+    /* Ensure each label div starts a new grid row in column 1 */
+    #order-detail .row-fluid [class*="span"]:nth-child(odd) {
+        grid-column: 1;
+    }
+    #order-detail .row-fluid [class*="span"]:nth-child(even) {
+        grid-column: 2;
+    }
+}
+#order-detail .actual {
+    padding:15px;
+    height: 100%;
+    overflow-y: auto;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+#order-detail .modal-header h3 {
+    text-align:center;
+}
+#order-detail .modal-header h3.space {
+    margin: 0 55px;
+}
+#order-detail .modal-header .back {
+    position:absolute;
+    line-height:30px;
+}
+</style>
+<script>
+
+Toast.reporting.orderDetails = function() {
+    var currentUrl;
+    var editDialog = undefined;
+    var showOrderDetailDialog = function(url, options) {
+        var dialog = $("#order-detail");
+
+        if (currentUrl === undefined || typeof options != 'object' || !options.keepCurrentPage) {
+            // Clear the page stack
+            dialog.find('.modal-header .back').hide();
+            dialog.find('.modal-header h3').remove();
+            dialog.find('.actual').remove();
+
+            // Load the page
+            load(url, options);
+        } else {
+            // Update title, in case its generated by a function
+            setTitle(options);
+        }
+
+        var maxHeight = typeof options == 'object' && options.maxHeight ? options.maxHeight : 400;
+
+        // Adjust the size of the dialog
+        var height = Math.min($(window).height() - 60, maxHeight);
+        dialog.css("width", "auto")
+            .find('.modal-body').css("height", height).css("max-height", maxHeight)
+            .find('.template').css('line-height', height + 'px');
+
+        // Show the dialog
+        dialog.modal().center();
+
+        dialog.on('hidden', function () {
+            $("body").css("overflow", "auto");
+        })
+
+        if (editDialog == undefined) {
+            dialog.appendTo('#left-column');
+            editDialog = dialog;
+        }
+
+        // Setup event handler
+        dialog.find('.back').off('click').on('click', function(e) {
+            back();
+            e.preventDefault();
+        });
+        return dialog;
+    };
+    var setTitle = function(options) {
+        if (typeof options === 'object' && options.replacePage) {
+            // This is for pagination
+            // Don't change the title
+            return;
+        }
+        var dialog = $('#order-detail'),
+            header = dialog.find('.modal-header'),
+            title;
+        if (typeof options === 'string') {
+            title = options;
+        } else if (typeof options === 'object') {
+            title = options.title;
+        }
+        if (typeof title === 'function') {
+            title = title();
+        }
+        if (!title) {
+            title = "Order Details"
+        }
+        header.find('h3').hide();
+        header.append($('<h3></h3>').text(title));
+    };
+    var load = function(url, options) {
+        var dialog = $("#order-detail"),
+            container = $('<div class="actual"></div>'),
+            header = dialog.find('.modal-header'),
+            body = dialog.find('.modal-body'),
+            title,
+            placeholder = dialog.find('.template'),
+            afterLoad = function() {
+                placeholder.hide();
+                var topContainer = dialog.find('.actual').last();
+                topContainer.show();
+            };
+        currentUrl = url;
+
+        setTitle(options);
+
+        if (typeof options === 'object' && options.replacePage) {
+            dialog.find('.actual').last().remove();
+        }
+
+        body.append(container);
+        $("body").css("overflow", "hidden");
+        placeholder.show();
+
+        dialog.find('.actual').hide();
+
+        function success() {
+            afterLoad();
+            dialog.data('url', url);
+            dialog.trigger('afterLoad');
+        }
+        function error() {
+            dialog.modal('hide');
+        }
+
+        if (options && options.async) {
+            var containerId = Toast.getOrCreateElmtId(container);
+            Toast.reporting.loadHtmlAsyncReport(url, containerId, success, error);
+        }
+        else {
+            container.load(url, function(responseText, textStatus) {
+                if (textStatus === 'success') {
+                    success();
+                } else {
+                    error();
+                }
+            });
+        }
+        if (body.find('.actual').size() > 1) {
+            header.find('.back').show();
+            header.find('h3').addClass('space');
+        }
+        return dialog;
+    };
+    var back = function() {
+        var dialog = $("#order-detail");
+        dialog.find('.template').hide();
+        dialog.find('.actual').last().remove();
+        dialog.find('.actual').last().show();
+        dialog.find('.modal-header h3').last().remove();
+        dialog.find('.modal-header h3').last().show();
+        if (dialog.find('.actual').size() == 1) {
+            dialog.find('.back').hide();
+        }
+    }
+    return {
+        onCreatedRow : function(urlFunction, options, noDialogCls) {
+            return function( nRow, aData, iDataIndex ) {
+                $(nRow).css( 'cursor', 'pointer');
+                var url = urlFunction(nRow, aData, iDataIndex);
+                if (url) {
+                    $(nRow).mouseover(function() {
+                        $(this).addClass('info');
+                    }).mouseout(function() {
+                        $(this).removeClass('info');
+                    }).click(function(e) {
+                        if (!($(e.target).hasClass(noDialogCls))){
+                            showOrderDetailDialog(url, options);
+                        }
+                    });
+                }
+            }
+        },
+        showDialog: function(url, options) {
+            return showOrderDetailDialog(url, options);
+        },
+        loadDialogPage: function(url, options) {
+            return load(url, options);
+        }
+    }
+}();
+
+</script>
+
+
+
+</div>
+<div ng-non-bindable>
+    <input type="hidden" name="authenticityToken" value="49983c730e3fb54e8858d27233d42f5a35076363">
+                    <input type="hidden" id="fsUserGUID" value="fd53d909-4ffa-4035-bb90-9d5812822d01">
+        <input type="hidden" id="fullStory" value="H4DEP">
+    <script type="text/javascript">
+        (function() {
+            var loaded = false;
+         
+
+            function conditionallyLoad() {
+                console.debug('[Consent Debug] fullStory.html: conditionallyLoad called', { analyticsConsent: Fides?.consent?.analytics, loaded: loaded });
+                
+                if (Fides?.consent?.analytics && !loaded) {
+                    console.debug('[Consent Debug] fullStory.html: Analytics consent granted, loading FullStory script');
+                    loaded = true;
+                    var script = document.createElement('script');
+                    script.src = 'https://cdn.toasttab.com/bob-release-467-2/javascripts/full-story-init.js';
+                    script.async = true;
+                    document.head.appendChild(script);
+                } else if (!Fides?.consent?.analytics && loaded && window.FS) {
+                    console.debug('[Consent Debug] fullStory.html: Marketing consent revoked, shutting down FullStory');
+                    
+                    window.FS?.shutdown?.();
+                    
+                } else {
+                    console.debug('[Consent Debug] fullStory.html: Skipping FullStory action', { hasAnalytics: Fides?.consent?.analytics, loaded: loaded });
+                }
+            }
+
+            if (window.Fides?.initialized) {
+                conditionallyLoad();
+            } else {
+                window.addEventListener('FidesInitialized', conditionallyLoad);
+            }
+
+            window.addEventListener('FidesUpdated', conditionallyLoad);
+        })();
+    </script>
+</div>
+                    <input id="authenticity-token" type="hidden" value="49983c730e3fb54e8858d27233d42f5a35076363">
+<div id="single-spa-application:root"></div>
+
+<script src="https://cdn.toasttab.com/static/79eaf2b422ac36e44720dba081bb4267a12b1155/projects/scripts/core-js/3.38.1/system/core-js.production.js"></script>
+<script src="https://cdn.toasttab.com/static/5f2c7d325c644e4cbde7aa74e6c8fbb3a6b9218c/projects/scripts/regenerator-runtime/0.13.11/system/runtime.production.js"></script>
+
+<script>
+    System.import("wex-banquet-root");
+</script>
+                </div>
+            </div>
+        </div>
+
+                    <div class="footer">
+    <div id="footer-content"></div>
+</div>
+        
+                <script src="https://cdn.toasttab.com/bob-release-467-2/javascripts/thirdPartyDataCollectors.js"></script>
+                <script src="https://cdn.toasttab.com/bob-release-467-2/javascripts/toast-ganalytics.js"></script>
+        <script type="text/javascript">
+            (function() {
+                var loaded = false;
+
+                function conditionallyLoad() {
+                    console.debug('[Consent Debug] admin-layout.html: conditionallyLoad called', { analyticsConsent: Fides?.consent?.analytics, loaded });
+
+                    if (Fides?.consent?.analytics && !loaded) {
+                        console.debug('[Consent Debug] admin-layout.html: Analytics consent granted, calling gaAdminLoad');
+                        loaded = true;
+                        gaAdminLoad("UA-31548241-6",
+                            "961XLTS117",
+                            "97505000000000000",
+                            "AVA MediterrAegean - AVA MediterrAegean",
+                            "100"
+                        )
+
+                        createCustomDimensions("Mila Management Group",
+                            "AVA MediterrAegean",
+                            "0a365c66-d2b9-42ab-8f45-94ea26d50716",
+                            "bob-release-467-2",
+                            "false");
+
+                        $(function() {
+                            $('.admin-content').on('change',
+                                '[data-analytics-section] [data-analytics-field]', function () {
+                                    var fieldEl = $(this);
+                                    var fieldValue = fieldEl.val();
+                                    var sectionEl = fieldEl.closest('[data-analytics-section]');
+
+                                    var eventValue = null;
+                                    if (jQuery.isNumeric(fieldValue)) {
+                                        eventValue = parseFloat(fieldValue);
+                                    } else if (typeof fieldValue === 'boolean') {
+                                        eventValue = fieldValue ? 1 : 0;
+                                    } else if (fieldValue === 'true') {
+                                        eventValue = 1;
+                                    } else if (fieldValue === 'false') {
+                                        eventValue = 0;
+                                    }
+
+                                    var label = fieldEl.label
+
+                                    trackFieldChange(sectionEl.data('analyticsSection'),
+                                        fieldEl.data('analyticsField'), eventValue, label);
+                                });
+                        });
+                    } else {
+                        console.debug('[Consent Debug] admin-layout.html: Skipping gaAdminLoad', { hasAnalytics: Fides?.consent?.analytics, alreadyInitialized: loaded });
+                    }
+                }
+
+                if (window.Fides?.initialized) {
+                    conditionallyLoad();
+                } else {
+                    window.addEventListener('FidesInitialized', conditionallyLoad);
+                }
+
+                window.addEventListener('FidesUpdated', conditionallyLoad);
+            })();
+        </script>
+
+        <div ng-non-bindable>
+                                                            <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<style type='text/css'>
+    .embeddedServiceHelpButton .helpButton .uiButton {
+        background-color: #005290;
+        font-family: "Arial", sans-serif;
+    }
+
+    .embeddedServiceHelpButton .helpButton .uiButton:focus {
+        outline: 1px solid #005290;
+    }
+
+    .embeddedServiceSidebarButton.uiButton .label {
+        background-color: inherit;
+    }
+</style>
+
+<script type='text/javascript' src='https://service.force.com/embeddedservice/5.0/esw.min.js'></script>
+<script type='text/javascript'>
+    var decodeHTML = function (html) {
+        var text = document.createElement('textarea');
+        text.innerHTML = html;
+        return text.value;
+    };
+
+    var initESW = function (gslbBaseURL) {
+        var chatConfig = {
+            // salesforce config
+            eswJSUrl: 'https://toast.my.salesforce.com/embeddedservice/5.0/esw.min.js',
+            svcInitEndpoint: 'https://toast.my.salesforce.com',
+            svcChatEndpoint: 'https://d.la3-c2-ph2.salesforceliveagent.com/chat',
+            svcContentEndpoint: 'https://c.la3-c2-ph2.salesforceliveagent.com/content',
+            deploymentId: '5723c000000k9iJ',
+            buttonId: '573C00000008RMb',
+            eswLiveAgentDevName: 'EmbeddedServiceLiveAgent_Parent04I3c0000000CK9EAM_174b30518e1',
+            svcSiteEndpoint: 'https://central.toasttab.com/',
+            snapinName: 'Toast_Web_Chat_V2',
+            orgId: '00DC00000017Bak',
+            displayHelpButton: false
+
+        };
+
+        embedded_svc.settings.displayHelpButton = chatConfig.displayHelpButton;
+        embedded_svc.settings.language = ''; //For example, enter 'en' or 'en-US'
+
+        embedded_svc.settings.enabledFeatures = ['LiveAgent'];
+        embedded_svc.settings.entryFeature = 'LiveAgent';
+        embedded_svc.settings.prepopulatedPrechatFields = {
+            FirstName: decodeHTML('Matthias'),
+            LastName: decodeHTML('Lavenant'),
+            Restaurant_Name__c: decodeHTML('AVA MediterrAegean')
+        };
+
+        embedded_svc.settings.extraPrechatFormDetails = [{"label":"I have a question about", "transcriptFields": ["I_have_a_question_about__c"]}];
+
+        embedded_svc.init(
+            chatConfig.svcInitEndpoint,
+            chatConfig.svcSiteEndpoint,
+            gslbBaseURL,
+            chatConfig.orgId,
+            chatConfig.snapinName,
+            {
+                baseLiveAgentContentURL: chatConfig.svcContentEndpoint,
+                deploymentId: chatConfig.deploymentId,
+                buttonId: chatConfig.buttonId,
+                baseLiveAgentURL: chatConfig.svcChatEndpoint,
+                eswLiveAgentDevName: chatConfig.eswLiveAgentDevName,
+                isOfflineSupportEnabled: false
+            }
+        );
+    };
+
+    if (!window.embedded_svc) {
+        var s = document.createElement('script');
+        s.setAttribute('src', chatConfig.eswJSUrl);
+        s.onload = function () {
+            initESW(null);
+        };
+        document.body.appendChild(s);
+    } else {
+        initESW('https://service.force.com');
+    }
+</script>
+                                    </div>
+
+        <div id="banquetPortalsContainer" data-tw-spa></div>
+        <!-- To be changed with @toasttab/buffet-pui-snackbar update -->
+        <div id="spa-cs-snackbar-container" data-cs="true"></div>
+        <div data-cs-portal-container="true" data-cs="true"></div>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a14e502758078a0a',t:'MTc4MzAwMjI1Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

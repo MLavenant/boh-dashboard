@@ -1,0 +1,83 @@
+<input type="hidden" id="startDate" value="" />
+<input type="hidden" id="endDate" value="" />
+<div class="tabbable">
+    <div class="toast-tab-collapse">
+        <div class="toggle"><i class="icon-chevron-left"></i></div>
+        <div class="toast-tab-wrapper">
+            <ul class="nav nav-tabs toast-tabs">
+                <li class="active" ><a href="#kitchen-details-chart" data-toggle="tab" data-report="KITCHEN_DETAILS_CHART" data-async="true" data-load-url="/restaurantkitchenreports/kitchendetailschart">Tickets by Hour</a></li>
+                <li><a href="#tickets-fulfillment-chart" data-toggle="tab" data-report="KITCHEN_TICKETS_FULFILLMENT_CHART" data-async="true" data-load-url="/restaurantkitchenreports/ticketsbytimingchart">Tickets by Fulfillment</a></li>
+                <li><a href="#kitchen-timing-table" data-report="KITCHEN_DETAILS_TABLE" data-toggle="tab">Ticket Details</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="tab-pane active" id="kitchen-details-chart">
+        </div>
+        <div class="tab-pane" id="tickets-fulfillment-chart">
+        </div>
+        <div class = "tab-pane" id="kitchen-timing-table">
+        <h3 class="reportTitle admin-edit-section indented">Ticket Details</h3>
+<table class="table table-bordered table-striped" id="kitchen-details-report">
+    <thead>
+    <tr>
+            <th>Location</th>
+            <th>ID</th>
+            <th>Server</th>
+            <th>Check #</th>
+            <th>Table</th>
+            <th>Check Opened</th>
+            <th>Station</th>
+            <th>Expediter Level</th>
+            <th>Fired Date</th>
+            <th>Fulfilled Date</th>
+            <th>Fulfillment Time</th>
+            <th>Fulfilled By</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<script>
+    $(function() {
+        $("a[href='#kitchen-timing-table']").one('shown', function(e) {
+
+            Toast.reporting.augmentTable("kitchen-details-report", {
+                "sAjaxSource": "/restaurantkitchenreports/kitchendetailstable",
+                "excelExportUrl": "/restaurantkitchenreports/kitchendetailstable?excel=true",
+                "async": true,
+                "oLanguage": {
+                    "sLengthMenu": "_MENU_ items per page",
+                    "sZeroRecords": "No tickets exist for this time period",
+                    "sInfo": "Showing _START_ to _END_ of _TOTAL_ items",
+                },
+                "aoColumns": [
+                                        { },
+                                        { "bVisible": false},                           // KitchenTiming Id
+                    { "bVisible": true},                            // Server
+                    { "bVisible": true},                            // Check #
+                    { "bVisible": true},                            // Table
+                    { "bVisible": false},                           // Check Opened
+                    { "bVisible": true, "bSortable": false},        // Prep Station
+                    { "bVisible": true, "bSortable": false},        // Expediter Level
+                    { "bVisible": true},                            // Fired Date
+                    { "bVisible": true},                            // Fulfilled Date
+                    { "bVisible": true, "bSortable": true, "asSorting": [ "desc", "asc"]},
+                    { "bVisible": true}                             // Fulfilled By
+                ],
+                "aaSorting":[[8, "desc"]],
+                "fnCreatedRow": Toast.reporting.orderDetails.onCreatedRow(function(nRow, aData, iDataIndex) {
+                    return '/restaurants/admin/reports/orderdetail?kitchenTimingId=' + aData[1];
+                })
+            });
+        });
+    });
+</script>        </div>
+    </div>
+</div>
+<script>
+    $(function() {
+       Toast.initTabs();
+    });
+</script>

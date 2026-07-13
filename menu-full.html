@@ -1,0 +1,384 @@
+
+<style>
+
+.all-menus-row th {
+    border-top: 1px solid #999999;
+}
+
+.menu-row th {
+    border-top: 2px solid #666666;
+    border-bottom: 1px solid #999999;
+}
+
+.group-row td {
+    font-weight: bold;
+    border-bottom: 1px solid #999999;
+}
+
+td.depth1 { padding-left: 20px; }
+td.depth2 { padding-left: 40px; }
+td.depth3 { padding-left: 60px; }
+td.depth4 { padding-left: 80px; }
+td.depth5 { padding-left: 100px; }
+td.depth6 { padding-left: 120px; }
+td.depth7 { padding-left: 140px; }
+td.depth8 { padding-left: 160px; }
+
+</style>
+<input type="hidden" id="startDate" value="6/22/26" />
+<input type="hidden" id="endDate" value="6/28/26" /><!--<div class="alert alert-info">
+    Looking to run the product mix report for historical data, including modifiers and special requests? Click
+    <a href="/restaurants/admin/analytics/home/menu"> <strong>here</strong></a> to use the new platform.
+</div>-->
+
+<div class="tabbable">
+    <div class="toast-tab-collapse">
+        <div class="toggle"><i class="icon-chevron-left"></i></div>
+        <div class="toast-tab-wrapper">
+            <ul class="nav nav-tabs toast-tabs">
+                <li class="active">
+                                                                                            <a href="/restaurants/admin/reports/menu/product-mix">Product Mix</a>
+                                                                                    </li>
+                                <li><a href="#menu-pmix-comp" data-toggle="tab" data-report="MENU" data-load-url="/restaurants/admin/reports/menu/pmixcomparison" data-async="true">Product Mix Comparison</a></li>
+                                <li>
+                                                                                            <a href="/restaurants/admin/reports/menu/product-mix">Top Groups</a>
+                                                                                    </li>
+                <li>
+                                                                                            <a href="/restaurants/admin/reports/menu/product-mix">Top Items</a>
+                                                                                    </li>
+                <li><a href="#menu-modifiers-list" data-toggle="tab" data-report="MENU" data-load-url="/restaurants/admin/reports/menu/topmodifiers" data-async="true">Top Modifiers</a></li>
+                <li><a href="#selection-details" data-toggle="tab" data-report="MENU">Item Details</a></li>
+                <li><a href="#modifier-details" data-toggle="tab" data-report="MENU">Modifier Details</a></li>
+                <li><a href="#menu-86-report" data-toggle="tab" data-report="MENU">86 Report</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="tab-pane active" id="menu-pmix">
+            <div id="first-load-container" style="text-align: center">
+    <!-- Load button -->
+    <button class="btn btn-large load-report" style="width: 200px; z-index: 100;">Load Report</button>
+    <!-- Spacer -->
+    <div style="height: 200px; width: 400px;"></div>
+    <!-- Loading image -->
+    <img src="https://cdn.toasttab.com/bob-release-467-2/images/data-load-bg.png" style="margin-top: -200px; display: inline-block"/>
+</div>
+        </div>
+                    <div class="tab-pane" id="menu-pmix-comp"></div>
+                <div class="tab-pane" id="menu-group-list">
+        </div>
+        <div class="tab-pane" id="menu-item-list">
+        </div>
+        <div class="tab-pane" id="menu-modifiers-list">
+        </div>
+        <div class="tab-pane" id="selection-details">
+            <h3 class="reportTitle admin-edit-section indented">Item Details</h3>
+            <h4>All Menu Item Selections for the current time period</h4>
+            <table class="table table-bordered table-striped" id="menu-items-report">
+                <thead>
+                    <tr>
+                                                    <th>Location</th>
+                                                    <th>Order Id</th>
+                                                    <th>Order #</th>
+                                                    <th>Sent Date</th>
+                                                    <th>Order Date</th>
+                                                    <th>Check Id</th>
+                                                    <th>Server</th>
+                                                    <th>Table</th>
+                                                    <th>Dining Area</th>
+                                                    <th>Service</th>
+                                                    <th>Dining Option</th>
+                                                    <th>Item Selection Id</th>
+                                                    <th>Item Id</th>
+                                                    <th>Master Id</th>
+                                                    <th>SKU</th>
+                                                    <th>PLU</th>
+                                                    <th>Menu Item</th>
+                                                    <th>Menu Subgroup(s)</th>
+                                                    <th>Menu Group</th>
+                                                    <th>Menu</th>
+                                                    <th>Sales Category</th>
+                                                    <th>Gross Price</th>
+                                                    <th>Discount</th>
+                                                    <th>Net Price</th>
+                                                    <th>Qty</th>
+                                                    <th>Tax</th>
+                                                    <th>Void?</th>
+                                                    <th>Deferred</th>
+                                                    <th>Tax Exempt</th>
+                                                    <th>Tax Inclusion Option</th>
+                                                    <th>Dining Option Tax</th>
+                                                    <th>Tab Name</th>
+                                            </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+                    </div>
+        <div class="tab-pane" id="modifier-details">
+            <h3 class="reportTitle admin-edit-section indented">Modifier Details</h3>
+            <h4>All Menu Modifier Selections for the current time period</h4>
+            <table class="table table-bordered table-striped" id="menu-modifiers-report">
+                <thead>
+                    <tr>
+                                                    <th>Location</th>
+                                                    <th>Order Id</th>
+                                                    <th>Order #</th>
+                                                    <th>Sent Date</th>
+                                                    <th>Order Date</th>
+                                                    <th>Check Id</th>
+                                                    <th>Server</th>
+                                                    <th>Table</th>
+                                                    <th>Dining Area</th>
+                                                    <th>Service</th>
+                                                    <th>Dining Option</th>
+                                                    <th>Item Selection Id</th>
+                                                    <th>Modifier Id</th>
+                                                    <th>Master Id</th>
+                                                    <th>Modifier SKU</th>
+                                                    <th>Modifier PLU</th>
+                                                    <th>Modifier</th>
+                                                    <th>Option Group ID</th>
+                                                    <th>Option Group Name</th>
+                                                    <th>Parent Menu Selection Item ID</th>
+                                                    <th>Parent Menu Selection</th>
+                                                    <th>Sales Category</th>
+                                                    <th>Gross Price</th>
+                                                    <th>Discount</th>
+                                                    <th>Net Price</th>
+                                                    <th>Qty</th>
+                                                    <th>Void?</th>
+                                                    <th>Void Reason ID</th>
+                                                    <th>Void Reason</th>
+                                            </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane" id="menu-86-report">
+            <script>
+$(function() {
+    $("a[href='#menu-86-report']").one('shown', function(e) {
+        Toast.reporting.augmentTable("86-report-table", {
+            "sAjaxSource": "/restaurants/admin/reports/menu/generate86report",
+            "excelExportUrl": "/restaurants/admin/reports/menu/generate86report?excel=true",
+            "aoColumns": [
+                { "bVisible": true},                                        // Location
+                { "bVisible": true},                                        // Menu Name
+                { "bVisible": true},                                        // Group Name
+                { "bVisible": false},                                       // Subgroups
+                { "bVisible": true},                                        // Item Name
+                { "bVisible": true, "sClass": "right"},                     // Quantity Remaining
+                { "bVisible": false},                                       // SKU
+                { "bVisible": false},                                       // PLU
+            ],
+            "bPaginate": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "fnServerParams": function(aoData) {
+                aoData.push({name:'threshold', value: $("#threshold").val()});
+            }
+        });
+    });
+});
+
+$("#reload").click( function() {
+    var table = $('#86-report-table').dataTable().fnStandingRedraw();
+});
+</script>
+
+<h3 class="reportTitle admin-edit-section indented">86 Report</h3>
+<div class="control-group">
+    <div class="controls">
+        Threshold Value: <input id="threshold" type="text" class="input-mini" style="margin-bottom:0px; text-align:right" value="0"/>
+        <button class="btn" id="reload">Submit</button>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped" id="86-report-table">
+    <thead>
+        <tr>
+                          <th>Location</th>
+                          <th>Menu Name</th>
+                          <th>Group Name</th>
+                          <th>Subgroup(s)</th>
+                          <th>Item Name</th>
+                          <th>Quantity Remaining</th>
+                          <th>SKU</th>
+                          <th>PLU</th>
+                   </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>        </div>
+    </div>
+</div>
+
+<script>
+Toast.reporting.createReportDataHandler = function(sAjaxSource, excelExportUrl, oLanguage, tabDivSelector, tableName, reportColumns) {
+    return function(e) {
+        Toast.reporting.augmentTable(tableName, {
+            "sAjaxSource": sAjaxSource,
+            "excelExportUrl": excelExportUrl,
+            "async": true,
+            "oLanguage": oLanguage,
+            "search":true,
+            "aoColumns": reportColumns,
+            "aaSorting":[[3, "desc"]],
+            "fnCreatedRow": Toast.reporting.orderDetails.onCreatedRow(
+                    function(nRow, aData, iDataIndex) {
+                        return '/restaurants/admin/reports/orderdetail?selectionId=' + aData[11];
+                    }
+            )
+        });
+    };
+};
+
+$(function() {
+    Toast.reporting.refreshExecutionMetaData();
+
+    var loadSummary = function() {
+        Toast.reporting.loadNoInitialLoadTab($('#menu-pmix'), '/restaurants/admin/reports/menu/pmix', 'menu-pmix');
+    };
+
+    $('button.load-report').on('click', loadSummary);
+
+    
+    $("a[href='#selection-details']").one(
+            'shown',
+            Toast.reporting.createReportDataHandler(
+                "/restaurants/admin/reports/menu/toplevelitemselections",
+                "/restaurants/admin/reports/menu/toplevelitemselections?excel=true",
+                {
+                    "sLengthMenu": "_MENU_ items per page",
+                    "sZeroRecords": "No menu items exist for this time period",
+                    "sInfo": "Showing _START_ to _END_ of _TOTAL_ items",
+                    "sSearch":"Search Item Name"
+                },
+                '#selection-details',
+                'menu-items-report',
+                [
+                                        { },
+                                        { "bVisible": false},                            // Order Id
+                    { "bVisible": true},                             // Order #
+                    { "sWidth": "100px" },                           // Created Date
+                    { "bVisible": false, "sWidth": "100px" },        // Order Opened Date
+                    { "bVisible": false},                            // Check Id
+                    { "bVisible": false},                            // Server
+                    { "bVisible": false},                            // Table
+                    { "bVisible": false},                            // Dining Area
+                    { "bVisible": false},                            // Service
+                    { "bVisible": false, "bSortable": false},        // Dining Option
+                    { "bVisible": false},                            // Item Selection Id
+
+                    { "bVisible": false},                            // Item Id
+                    { "bVisible": false},                            // Item Master Id
+                    { "bVisible": false},                            // SKU
+                    { "bVisible": false},                            // PLU
+                    { "bVisible": true},                             // Menu Item
+                    { "bVisible": false},                            // Menu Subgroup(s)
+                    { "bVisible": true},                             // Menu Group
+                    { "bVisible": true},                             // Menu
+                    { "bVisible": true},                             // Sales Category
+                    { "bVisible": false, "sClass": "right"},         // Gross Price
+                    { "bVisible": false, "sClass": "right", "bSortable": false},            // Discount
+                    { "bVisible": true, "sClass": "right"},          // Net Price
+                    { "bVisible": true, "sClass": "right"},          // Quantity
+                    { "bVisible": false, "sClass": "right"},         // Tax
+                    { "bVisible": true},                             // Voided?
+                    { "bVisible": false},                            // Deferred?
+                    { "bVisible": false},                            // Tax Exempt
+                    { "bVisible": false},                            // Tax Inclusion Option
+                    { "bVisible": false},                            // Dining Option Tax
+                    { "bVisible": false}                             // Tab Name
+                ]
+            )
+    );
+    $("a[href='#modifier-details']").one(
+            'shown',
+            Toast.reporting.createReportDataHandler(
+                "/restaurants/admin/reports/menu/modifieritemselections",
+                "/restaurants/admin/reports/menu/modifieritemselections?excel=true",
+                {
+                    "sLengthMenu": "_MENU_ modifiers per page",
+                    "sZeroRecords": "No modifiers exist for this time period",
+                    "sInfo": "Showing _START_ to _END_ of _TOTAL_ modifiers",
+                    "sSearch":"Search Modifier"
+                },
+                '#modifier-details',
+                'menu-modifiers-report',
+                [
+                                        { },
+                                        { "bVisible": false},                            // Order Id
+                    { "bVisible": true},                             // Order #
+                    { "sWidth": "100px" },                           // Created Date
+                    { "bVisible": false, "sWidth": "100px" },        // Order Opened Date
+                    { "bVisible": false},                            // Check Id
+                    { "bVisible": false},                            // Server
+                    { "bVisible": false},                            // Table
+                    { "bVisible": false},                            // Dining Area
+                    { "bVisible": false},                            // Service
+                    { "bVisible": false, "bSortable": false},        // Dining Option
+                    { "bVisible": false},                            // Item Selection Id
+
+                    { "bVisible": false},                            // Modifier Item Id
+                    { "bVisible": false},                            // Modifier Master Id
+                    { "bVisible": false},                            // Modifier SKU
+                    { "bVisible": false},                            // Modifier PLU
+                    { "bVisible": true},                             // Modifier Item
+                    { "bVisible": false},                            // Modifier Group ID
+                    { "bVisible": true},                             // Modifier Group Name
+                    { "bVisible": false},                            // Parent Menu Item ID
+                    { "bVisible": true},                             // Parent Menu Item name
+                    { "bVisible": false},                            // Sales Category
+                    { "bVisible": false, "sClass": "right"},         // Gross Price
+                    { "bVisible": true, "sClass": "right", "bSortable": false},            // Discount
+                    { "bVisible": true, "sClass": "right"},          // Net Price
+                    { "bVisible": true, "sClass": "right"},          // Quantity
+                    { "bVisible": true},                             // Voided?
+                    { "bVisible": false},                            // Void Reason ID
+                    { "bVisible": true, "bSortable": false }         // Void Reason Name
+                ]
+            )
+    );
+
+    // This should come after the attachment of the event for the tab getting shown so that if we load a page at the # for a data table tag,
+    // the above listener will get called when the # is read from the URL
+    Toast.initTabs();
+
+    $('#recompute-sales-categories a').click(function(e) {
+        e.preventDefault();
+
+        var a = $(this),
+            spinner = a.parent().find('.spinner');
+
+        if (a.data('working')) {
+            return;
+        }
+        spinner.show();
+        a.data('working', true);
+        var jqxhr = $.get('/restaurants/admin/reports/menu/recomputesalescategories', {}, function(text, textStatus, jqXHR) {
+            var json = $.parseJSON(Toast.trimKeepalivePrefix(text));
+            if (json && json.message == 'success') {
+                // Reload the table
+                var t = $('#menu-items-report');
+                if (t.isDataTable()) {
+                    t.dataTable().fnStandingRedraw();
+                }
+                alert("Success!");
+            } else if (json && json.message) {
+                alert(json.message);
+            } else {
+                alert("Error trying to re-compute sales categories");
+            }
+        }, 'text');
+
+        jqxhr.always(function() {
+            spinner.hide();
+            a.data('working', false);
+        });
+    });
+
+});
+</script>
