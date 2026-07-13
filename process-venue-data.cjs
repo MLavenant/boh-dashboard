@@ -287,8 +287,8 @@ const tbk = Object.entries(tbkMap).sort((a,b) => a[1].low - b[1].low).map(([labe
   ful: +(d.sum / d.count).toFixed(2),
 }));
 
-// Breaking point
-const breakingPointRow = curve.find(r => r.ful > 15);
+// Breaking point — skip first 10 concurrent ticket levels, require occ >= 5
+const breakingPointRow = curve.find((r, i) => i >= 10 && r.occ >= 5 && r.ful > 15);
 const breakingPoint = breakingPointRow ? breakingPointRow.conc : null;
 const breakingPointGuests = breakingPointRow ? Math.round(breakingPointRow.guests) : null;
 console.log('Breaking point (tickets):', breakingPoint, '| guests:', breakingPointGuests);
