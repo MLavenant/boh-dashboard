@@ -437,4 +437,9 @@ const output = {
 const outPath = path.join(__dirname, `${venueArg}-data.json`);
 fs.writeFileSync(outPath, JSON.stringify(output), 'utf8');
 console.log(`Written to ${outPath}`);
+if (weekArg) {
+  const weekOutPath = path.join(__dirname, `${venueArg}-data-${weekArg}.json`);
+  fs.writeFileSync(weekOutPath, JSON.stringify(output), 'utf8');
+  console.log(`Written to ${weekOutPath}`);
+}
 console.log('Stations:', stations.map(s => `${s.station}(${s.count})`).join(', '));

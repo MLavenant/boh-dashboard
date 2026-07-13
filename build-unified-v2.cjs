@@ -19,23 +19,53 @@ if (!rollingWeeks.length) rollingWeeks = [{ label: 'W27', key: '2026-W27' }];
 
 const DIR = __dirname;
 
-// ── Load all data files ──────────────────────────────────────────────────────
-const VENUES = {
-  claudie:  JSON.parse(fs.readFileSync(path.join(DIR, 'dashboard-data.json'), 'utf8')),
-  casaneos: JSON.parse(fs.readFileSync(path.join(DIR, 'casaneos-data.json'), 'utf8')),
-  ava_cg:   JSON.parse(fs.readFileSync(path.join(DIR, 'ava_coconut_grove-data.json'), 'utf8')),
-  ava_wp:   JSON.parse(fs.readFileSync(path.join(DIR, 'ava_winter_park-data.json'), 'utf8')),
-  mila:     JSON.parse(fs.readFileSync(path.join(DIR, 'mila-data.json'), 'utf8')),
+// ── Load all data files (nested by venue → weekKey) ──────────────────────────
+// Map from build venue key → process-venue-data.cjs slug
+const VENUE_SLUG_MAP = {
+  claudie:  'claudie',
+  casaneos: 'casa_neos',
+  ava_cg:   'ava_coconut_grove',
+  ava_wp:   'ava_winter_park',
+  mila:     'mila',
 };
 
-// ── Apply station targets (always override from protected config) ─────────────
 const TARGETS = JSON.parse(fs.readFileSync(path.join(DIR, 'station-targets.json'), 'utf8'));
-Object.entries(VENUES).forEach(([venueKey, data]) => {
+
+function applyTargets(venueKey, data) {
   const venueTargets = TARGETS[venueKey] || {};
   (data.stations || []).forEach(s => {
     if (venueTargets[s.station]) s.exp_sec = venueTargets[s.station];
   });
-});
+  return data;
+}
+
+// Build nested ALL_DATA: { venueKey: { weekKey: data, ... }, ... }
+const VENUES = {};
+for (const [venueKey, slug] of Object.entries(VENUE_SLUG_MAP)) {
+  VENUES[venueKey] = {};
+  for (const w of rollingWeeks) {
+    const weekFile = path.join(DIR, `${slug}-data-${w.key}.json`);
+    if (fs.existsSync(weekFile)) {
+      VENUES[venueKey][w.key] = applyTargets(venueKey, JSON.parse(fs.readFileSync(weekFile, 'utf8')));
+    }
+  }
+  // fallback: load the plain data file as 'latest' if no week files found
+  if (Object.keys(VENUES[venueKey]).length === 0) {
+    const fallbackFiles = [
+      path.join(DIR, `${slug}-data.json`),
+      path.join(DIR, `${venueKey}-data.json`),
+      path.join(DIR, 'dashboard-data.json'),
+    ];
+    for (const fb of fallbackFiles) {
+      if (fs.existsSync(fb)) {
+        const data = applyTargets(venueKey, JSON.parse(fs.readFileSync(fb, 'utf8')));
+        VENUES[venueKey]['latest'] = data;
+        if (rollingWeeks.length > 0) VENUES[venueKey][rollingWeeks[rollingWeeks.length - 1].key] = data;
+        break;
+      }
+    }
+  }
+}
 
 const VENUE_LABELS = {
   claudie:  'Claudie',
@@ -62,10 +92,11 @@ let html = htmlPart
   <span class="badge" id="dashBadge">${rollingWeeks[rollingWeeks.length-1].label}</span>
 </header>
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
-<div id="weekSelector" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
-  <button id="weekPrev" onclick="changeWeek(-1)" style="background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:3px 10px;cursor:pointer;font-family:inherit">◀</button>
-  <span id="weekLabel" style="font-weight:600;color:#e8eaed">${rollingWeeks[rollingWeeks.length-1].label}</span>
-  <button id="weekNext" onclick="changeWeek(1)" style="background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:3px 10px;cursor:pointer;font-family:inherit">▶</button>
+<div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
+  <span style="color:#9aa0aa">Week:</span>
+  <select id="weekDropdown" onchange="selectWeek(this.value)" style="background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">
+    ${rollingWeeks.map((w,i) => `<option value="${i}"${i===rollingWeeks.length-1?' selected':''}>${w.label}</option>`).join('')}
+  </select>
 </div>`
   );
 
@@ -258,9 +289,12 @@ const newScript = `
 ${allDataJS}
 
 const WEEKS = ${JSON.stringify(rollingWeeks)};
-let currentWeekIdx = 0;
+let currentWeekIdx = WEEKS.length - 1;
 let currentVenue = 'claudie';
-function getD() { return ALL_DATA[currentVenue]; }
+function getD() {
+  const weekKey = WEEKS[currentWeekIdx]?.key;
+  return ALL_DATA[currentVenue]?.[weekKey] || ALL_DATA[currentVenue]?.['latest'] || {};
+}
 
 // ============================================================
 // FOOD STATION FILTER
@@ -1723,7 +1757,8 @@ function renderGroup() {
 
   // Build venue summary data
   const venueData = Object.entries(VENUE_LABELS_LOCAL).map(([key, label]) => {
-    const d = ALL_DATA[key];
+    const weekKey = WEEKS[currentWeekIdx]?.key;
+    const d = ALL_DATA[key]?.[weekKey] || ALL_DATA[key]?.['latest'] || {};
     const stations = (d.stations || []).filter(s => isFoodStation(s.station));
     // Weighted avg fulfillment across food stations
     let totalCount = 0, totalSec = 0;
@@ -2026,11 +2061,16 @@ function initVenuePills() {
 // ============================================================
 // WEEK SELECTOR
 // ============================================================
+function selectWeek(idx) {
+  currentWeekIdx = parseInt(idx);
+  renderAll();
+}
 function changeWeek(dir) {
   const next = currentWeekIdx + dir;
   if (next < 0 || next >= WEEKS.length) return;
   currentWeekIdx = next;
-  document.getElementById('weekLabel').textContent = WEEKS[currentWeekIdx].label;
+  const dd = document.getElementById('weekDropdown');
+  if (dd) dd.value = currentWeekIdx;
   document.getElementById('weekPrev').disabled = currentWeekIdx === 0;
   document.getElementById('weekNext').disabled = currentWeekIdx === WEEKS.length - 1;
   renderAll();
