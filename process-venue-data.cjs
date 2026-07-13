@@ -40,6 +40,19 @@ const coversRaw = JSON.parse(fs.readFileSync(coversPath, 'utf8'));
 const tickets = ktRaw.tickets || ktRaw;
 const covers = coversRaw.covers || coversRaw;
 
+// Load item details if available
+const itemDetailsPath = path.join(DATA_DIR, `item-details-${venueArg}.json`);
+let itemDetails = [];
+if (fs.existsSync(itemDetailsPath)) {
+  try {
+    const idRaw = JSON.parse(fs.readFileSync(itemDetailsPath, 'utf8'));
+    itemDetails = idRaw.items || [];
+    console.log(`Item details for ${venueArg}: ${itemDetails.length} rows`);
+  } catch(e) { console.warn('Could not load item details:', e.message); }
+} else {
+  console.log(`No item-details-${venueArg}.json found, skipping menu item volumes`);
+}
+
 // ---- Station filter ----
 const EXCLUDE_WORDS = ['bar','champagne','wine','btg','pos','barista','somm','water','service','beach','drink'];
 function isFood(name) {
@@ -335,11 +348,77 @@ Object.keys(stationDetails).forEach(st => {
   stationDetailsOut[st] = { byDayHour, hourly, breakingHours };
 });
 
-// ---- stationItemsArr: no menu items in this data ----
-const stationItemsArr = {};
+// ---- Build ticket lookup by server+table+date (fuzzy match) ----
+// Kitchen timing tickets don't share orderId/checkId with item-details rows.
+// We match on server firstname + table + date prefix (e.g. "7/6/26").
+const ticketByKey = {};
+foodTickets.forEach(t => {
+  const datePfx = (t['Fired Date'] || '').slice(0, 6); // "7/6/26"
+  const key = (t['Server'] || '').split(' ')[0] + '|' + (t['Table'] || '') + '|' + datePfx;
+  if (!ticketByKey[key]) ticketByKey[key] = [];
+  ticketByKey[key].push(t);
+});
 
-// ---- summary: no menu items ----
-const summary = [];
+// ---- stationItemsArr: per-station item volume + avg fulfillment ----
+const stationItemsMap = {}; // { station: { itemName: { qty, totalFulSec, count } } }
+
+itemDetails.forEach(item => {
+  if (!item.menuItem) return;
+  const datePfx = (item.sentDate || '').slice(0, 6);
+  const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
+  const matches = ticketByKey[key] || [];
+  if (matches.length === 0) return;
+
+  // Use first matching ticket's station
+  const t = matches[0];
+  const station = t['Station'];
+  if (!station || !isFood(station)) return;
+  if (!stationItemsMap[station]) stationItemsMap[station] = {};
+  if (!stationItemsMap[station][item.menuItem]) {
+    stationItemsMap[station][item.menuItem] = { qty: 0, totalFulSec: 0, count: 0 };
+  }
+  stationItemsMap[station][item.menuItem].qty += (item.qty || 1);
+  if (t._fulSec != null) {
+    stationItemsMap[station][item.menuItem].totalFulSec += t._fulSec;
+    stationItemsMap[station][item.menuItem].count++;
+  }
+});
+
+// Convert to array format: { station: [{menuItem, qty, avgFulSec}] }
+const stationItemsArr = {};
+Object.keys(stationItemsMap).forEach(station => {
+  stationItemsArr[station] = Object.entries(stationItemsMap[station])
+    .map(([menuItem, d]) => ({
+      menuItem,
+      qty: d.qty,
+      avgFulSec: d.count > 0 ? +(d.totalFulSec / d.count).toFixed(1) : null,
+    }))
+    .sort((a, b) => b.qty - a.qty);
+});
+
+// ---- menuItems: overall item volume + avg fulfillment across all stations ----
+const menuItemsMap = {}; // { menuItem: { qty, totalFulSec, count } }
+itemDetails.forEach(item => {
+  if (!item.menuItem) return;
+  const datePfx = (item.sentDate || '').slice(0, 6);
+  const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
+  const matches = ticketByKey[key] || [];
+  if (!menuItemsMap[item.menuItem]) menuItemsMap[item.menuItem] = { qty: 0, totalFulSec: 0, count: 0 };
+  menuItemsMap[item.menuItem].qty += (item.qty || 1);
+  if (matches.length > 0 && matches[0]._fulSec != null) {
+    menuItemsMap[item.menuItem].totalFulSec += matches[0]._fulSec;
+    menuItemsMap[item.menuItem].count++;
+  }
+});
+
+const summary = Object.entries(menuItemsMap)
+  .map(([menuItem, d]) => ({
+    menuItem,
+    qty: d.qty,
+    avgFulSec: d.count > 0 ? +(d.totalFulSec / d.count).toFixed(1) : null,
+  }))
+  .sort((a, b) => b.qty - a.qty)
+  .slice(0, 200);
 
 // ---- Output ----
 const output = {

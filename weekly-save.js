@@ -238,6 +238,63 @@ async function fetchKitchenTiming(venueKey) {
   throw new Error(`[${venueKey}] Kitchen timing CSV export timed out`);
 }
 
+// ── Item Details (toplevelitemselections) fetch ─────────────────────────────
+
+const ITEM_DETAILS_VENUES = ['claudie', 'casa_neos', 'ava_coconut_grove', 'ava_winter_park', 'mila'];
+const ITEM_DETAILS_ENDPOINT = '/restaurants/admin/reports/menu/toplevelitemselections';
+
+async function fetchItemDetails(venueKey) {
+  console.log(`  [item-details] Fetching for ${venueKey}...`);
+  const cookies = getSessionCookies();
+  const headers = {
+    Cookie: cookies,
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    Accept: '*/*',
+    'X-Requested-With': 'XMLHttpRequest',
+    Referer: 'https://www.toasttab.com/restaurants/admin/reports/home',
+  };
+  const groupId = KITCHEN_GROUP_IDS[venueKey];
+  let qs = `excel=true&reportDateRange=lastWeek&numberOfRestaurants=1`;
+  if (groupId) qs += `&reportGroupIds=${groupId}`;
+
+  const triggerRes = await axios.get(
+    `${TOAST_ADMIN}${ITEM_DETAILS_ENDPOINT}?${qs}`,
+    { headers, validateStatus: () => true }
+  );
+  const s3Url = triggerRes.headers['location'];
+  if (!s3Url) throw new Error(`[${venueKey}] No S3 URL in response (status ${triggerRes.status})`);
+
+  for (let i = 0; i < 25; i++) {
+    await new Promise(r => setTimeout(r, 3000));
+    const s3Res = await axios.get(s3Url, { validateStatus: () => true });
+    const d = s3Res.data;
+    if (d.downloadUrl) {
+      const csvRes = await axios.get(d.downloadUrl, { responseType: 'arraybuffer', validateStatus: () => true });
+      const csvText = Buffer.from(csvRes.data).toString('latin1');
+      const rows = parseCSV(csvText);
+      // Transform to slim objects
+      const items = rows
+        .filter(r => r['Void?'] !== 'true')
+        .map(r => ({
+          orderId:    r['Order Id']   || '',
+          checkId:    r['Check Id']   || '',
+          sentDate:   r['Sent Date']  || '',
+          menuItem:   r['Menu Item']  || '',
+          menuGroup:  r['Menu Group'] || '',
+          diningArea: r['Dining Area'] || '',
+          table:      r['Table']      || '',
+          server:     r['Server']     || '',
+          qty:        parseFloat(r['Qty'])       || 1,
+          netPrice:   parseFloat(r['Net Price']) || 0,
+        }));
+      console.log(`  [item-details] ${venueKey}: ${items.length} items`);
+      return items;
+    }
+    if (d.status === 'ERROR' || d.status === 'FAILED') throw new Error(`[${venueKey}] Report error: ${d.message}`);
+  }
+  throw new Error(`[${venueKey}] item-details CSV export timed out`);
+}
+
 // ── Item fulfillment custom report fetch ────────────────────────────────────
 
 async function fetchItemFulfillment(venueKey, reportUuid, startDate, endDate) {
@@ -472,6 +529,20 @@ async function main() {
       weekEntry.venues[venue].tickets = tickets;
     } catch (err) {
       console.error(`  [toast] ERROR for ${venue}:`, err.message);
+    }
+  }
+
+  // ── Item Details (per-order item selections) ─────────────────────────────
+  console.log("\n─── Item Details ───");
+  for (const venue of ITEM_DETAILS_VENUES) {
+    try {
+      const items = await fetchItemDetails(venue);
+      const outPath = path.join(weekDir, `item-details-${venue}.json`);
+      saveJSON(outPath, { weekLabel, startDate, endDate, venue, items });
+      if (!weekEntry.venues[venue]) weekEntry.venues[venue] = {};
+      weekEntry.venues[venue].itemDetails = items;
+    } catch (err) {
+      console.error(`  [item-details] ERROR for ${venue}:`, err.message);
     }
   }
 
