@@ -405,6 +405,7 @@ function computeBreakingPoint() {
 // ============================================================
 function renderPressure() {
   const CURVE = getD().curve;
+  if (!CURVE || !CURVE.length) { const ex = Chart.getChart('cPressure'); if (ex) ex.destroy(); return; }
   const BP = computeBreakingPoint().tickets;
   const labels = CURVE.map(d => d.conc);
   const bpPlugin = {
@@ -466,6 +467,7 @@ function renderPressure() {
 // ============================================================
 function renderBreaking() {
   const CURVE = getD().curve;
+  if (!CURVE || !CURVE.length) { const ex = Chart.getChart('cBreaking'); if (ex) ex.destroy(); return; }
   const { tickets: bpTickets, guests: bpGuests } = computeBreakingPoint();
   const labels = CURVE.map(d => d.conc);
   const refLines={id:'refLines',afterDraw(chart){
@@ -1602,6 +1604,8 @@ function renderMenuItems() {
       ctx.restore();
     }};
 
+    const existingMb = Chart.getChart('cMenuBubble');
+    if (existingMb) existingMb.destroy();
     new Chart(document.getElementById('cMenuBubble'), {
       type: 'bubble',
       data: { datasets },
@@ -1996,8 +2000,8 @@ function changeWeek(dir) {
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   initVenuePills();
-  document.getElementById('weekPrev').disabled = true;
-  document.getElementById('weekNext').disabled = WEEKS.length <= 1;
+  document.getElementById('weekPrev').disabled = currentWeekIdx === 0;
+  document.getElementById('weekNext').disabled = currentWeekIdx >= WEEKS.length - 1;
   renderAll();
 });
 </script>
