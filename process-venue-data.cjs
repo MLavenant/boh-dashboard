@@ -366,11 +366,29 @@ foodTickets.forEach(t => {
   ticketByKey[key].push(t);
 });
 
+// ---- Beverage filter for station items ----
+const BEVERAGE_KEYWORDS = [
+  'evian', 'pellegrino', 'perrier', 'water', 'coke', 'coca', 'diet',
+  'sprite', 'soda', 'juice', 'lemonade', 'iced tea',
+  'beer', 'kronenbourg', 'heineken', 'stella', 'bud', 'corona',
+  'wine', 'champagne', 'prosecco', 'sancerre', 'pinot', 'chardonnay',
+  'bordeaux', 'burgundy', 'rosé', 'rose',
+  'vodka', 'gin', 'rum', 'tequila', 'whiskey', 'bourbon', 'scotch',
+  'tito', 'martini', 'negroni', 'cocktail', 'spritz',
+  'espresso', 'coffee', 'latte', 'cappuccino', 'tea', 'barista',
+  'gl ', 'benoit',
+];
+function isBeverageItem(name) {
+  const n = (name || '').toLowerCase();
+  return BEVERAGE_KEYWORDS.some(kw => n.includes(kw));
+}
+
 // ---- stationItemsArr: per-station item volume + avg fulfillment ----
 const stationItemsMap = {}; // { station: { itemName: { qty, totalFulSec, count } } }
 
 itemDetails.forEach(item => {
   if (!item.menuItem) return;
+  if (isBeverageItem(item.menuItem)) return;
   const datePfx = (item.sentDate || '').slice(0, 6);
   const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
   const matches = ticketByKey[key] || [];

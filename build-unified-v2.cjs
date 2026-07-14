@@ -1163,6 +1163,21 @@ function renderStations() {
   const STATIONS = getD().stations;
   const STATION_ITEMS = getD().stationItemsArr;
   const STATION_DETAILS = getD().stationDetails;
+  const _BEV_KW = [
+    'evian','pellegrino','perrier','water','coke','coca','diet',
+    'sprite','soda','juice','lemonade','iced tea',
+    'beer','kronenbourg','heineken','stella','bud','corona',
+    'wine','champagne','prosecco','sancerre','pinot','chardonnay',
+    'bordeaux','burgundy','ros\u00e9','rose',
+    'vodka','gin','rum','tequila','whiskey','bourbon','scotch',
+    'tito','martini','negroni','cocktail','spritz',
+    'espresso','coffee','latte','cappuccino','tea','barista',
+    'gl ','benoit',
+  ];
+  function isBeverageItem(name) {
+    const n = (name || '').toLowerCase();
+    return _BEV_KW.some(kw => n.includes(kw));
+  }
 
   // ── Sort by ratio descending (food stations worst first) ──
   function stationRatio(s) {
@@ -1318,7 +1333,7 @@ function renderStations() {
 
   function renderStationDetail(s) {
     const det = STATION_DETAILS[s.station] || {};
-    const items = (STATION_ITEMS[s.station] || []);
+    const items = (STATION_ITEMS[s.station] || []).filter(it => !isBeverageItem(it.menuItem || it.item || ''));
     const ratio = s.exp_sec > 0 ? s.avg_sec / s.exp_sec : null;
     let statusClass = 'status-red', statusText = 'Over target';
     if (!s.exp_sec) { statusClass=''; statusText='No target'; }
