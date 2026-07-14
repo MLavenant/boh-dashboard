@@ -270,8 +270,9 @@ const tbk = Object.entries(tbkMap).sort((a,b) => a[1].low - b[1].low).map(([labe
   ful: d.sumOcc > 0 ? +(d.sumFul / d.sumOcc).toFixed(2) : 0,
 }));
 
-// Breaking point — skip first 10 load levels, require occ>=5, first crossing p75 > 15 min
-const breakingPointRow = curve.find((r, i) => i >= 10 && r.occ >= 5 && r.p75 > 15);
+// Breaking point — skip first 10 load levels, require occ>=3, first crossing avg > 15 min
+// occ counts tickets (not minutes) so threshold is lower than sweep-line approach
+const breakingPointRow = curve.find((r, i) => i >= 10 && r.occ >= 3 && r.ful > 15);
 const breakingPoint = breakingPointRow ? breakingPointRow.conc : null;
 const breakingPointGuests = breakingPointRow ? Math.round(breakingPointRow.guests) : null;
 console.log('Breaking point (tickets):', breakingPoint, '| guests:', breakingPointGuests);
@@ -320,7 +321,7 @@ stations.forEach(stRow => {
       p75: +(sorted[p75idx]).toFixed(2),
     };
   }).sort((a, b) => a.conc - b.conc);
-  const bpRow = stCurve.find((r, i) => i >= 5 && r.occ >= 3 && r.p75 > threshold);
+  const bpRow = stCurve.find((r, i) => i >= 5 && r.occ >= 3 && r.ful > threshold);
   stRow.bp_tickets = bpRow ? bpRow.conc : null;
   stRow.bp_curve = stCurve;
 });

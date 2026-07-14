@@ -393,8 +393,7 @@ function computeBreakingPoint() {
     if (i < 10) continue;
     const d = curve[i];
     if (d.occ < 5) continue;
-    // Use p75 for robust BP detection (outlier-resistant)
-    if ((d.p75 != null ? d.p75 : d.ful) >= getThreshold()) { bpEntry = d; break; }
+    if (d.occ >= 3 && d.ful >= getThreshold()) { bpEntry = d; break; }
   }
   if (!bpEntry) return { tickets: null, guests: null };
   return { tickets: bpEntry.conc, guests: Math.round(bpEntry.guests) };
