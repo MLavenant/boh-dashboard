@@ -15,7 +15,8 @@ const endIdx    = html.indexOf(endMarker, startIdx);
 if (endIdx < 0) { console.error("end not found"); process.exit(1); }
 
 const before   = html.slice(0, startIdx);
-const existing = html.slice(startIdx + startStr.length, endIdx + 1).trim(); // include ]
+// existing = content between [ and ] (exclusive of both brackets)
+const existing = html.slice(startIdx + startStr.length, endIdx).trim();
 const after    = html.slice(endIdx + 1); // from ; onwards
 
 const newEntries = JSON.stringify(newWeek).slice(1, -1); // strip outer []

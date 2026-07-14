@@ -203,60 +203,62 @@ const uniqueTickets = foodTickets.filter(t => {
 });
 console.log(`Unique tickets (deduped): ${uniqueTickets.length}`);
 
-// Step 2: Build minute-by-minute concurrent count map using event sweep
-const wlEvents = [];
-uniqueTickets.forEach(t => {
-  wlEvents.push({ time: t._fired.getTime(), type: 1, ticket: t });
-  wlEvents.push({ time: t._fulfilled.getTime(), type: 0, ticket: t });
-});
-wlEvents.sort((a, b) => a.time !== b.time ? a.time - b.time : a.type - b.type);
+// Step 2: Build duration-weighted interval curve
+function buildIntervalCurve(ticketList) {
+  const events = [];
+  ticketList.forEach(t => {
+    events.push({ time: t._fired.getTime(), type: 1, ticket: t });
+    events.push({ time: t._fulfilled.getTime(), type: -1, ticket: t });
+  });
+  // sort: earlier first; on tie, closes before opens to avoid momentary phantom overlap
+  events.sort((a, b) => a.time !== b.time ? a.time - b.time : a.type - b.type);
 
-const minuteCount = {}; // minute -> concurrent count at that minute
-const openSet = new Set();
-let prevTime = null;
+  const open = new Set();
+  let prevTime = null;
+  const intervals = [];
 
-wlEvents.forEach(ev => {
-  if (prevTime !== null && ev.time > prevTime && openSet.size > 0) {
-    // Record concurrent count for every minute in this interval
-    const startMin = Math.floor(prevTime / 60000);
-    const endMin = Math.floor(ev.time / 60000);
-    for (let m = startMin; m <= endMin; m++) {
-      minuteCount[m] = openSet.size;
+  events.forEach(ev => {
+    if (prevTime !== null && ev.time > prevTime && open.size > 0) {
+      const duration_sec = (ev.time - prevTime) / 1000;
+      const fuls = [...open].map(t => t._fulSec);
+      const avg_ful_sec = fuls.reduce((s, x) => s + x, 0) / fuls.length;
+      const midTs = new Date((prevTime + ev.time) / 2);
+      const guests = concurrentGuestsAt(midTs);
+      intervals.push({ conc: open.size, duration_sec, avg_ful_sec, guests });
     }
-  }
-  if (ev.type === 1) {
-    openSet.add(ev.ticket);
-  } else {
-    openSet.delete(ev.ticket);
-  }
-  prevTime = ev.time;
-});
+    if (ev.type === 1) open.add(ev.ticket);
+    else open.delete(ev.ticket);
+    prevTime = ev.time;
+  });
 
-// Step 3: Fire-time attribution — attribute each ticket to the concurrent load at its fire minute
-const concMap = {};
-uniqueTickets.forEach(t => {
-  const fireMin = Math.floor(t._fired.getTime() / 60000);
-  const count = minuteCount[fireMin] || 1;
-  if (!concMap[count]) concMap[count] = { tickets: [], guestSum: 0, guestCount: 0 };
-  concMap[count].tickets.push(t._fulSec / 60); // fulfillment in minutes
-  const guests = concurrentGuestsAt(new Date(fireMin * 60000));
-  if (guests > 0) { concMap[count].guestSum += guests; concMap[count].guestCount++; }
-});
+  // Group intervals by concurrent count
+  const byConc = {};
+  intervals.forEach(iv => {
+    if (!byConc[iv.conc]) byConc[iv.conc] = [];
+    byConc[iv.conc].push(iv);
+  });
 
-// Step 4: Compute curve with avg and p75 per concurrent load group
-const curve = Object.entries(concMap).map(([k, d]) => {
-  const sorted = [...d.tickets].sort((a, b) => a - b);
-  const p75idx = Math.min(Math.floor(sorted.length * 0.75), sorted.length - 1);
-  return {
-    conc: +k,
-    occ: d.tickets.length, // tickets fired at this load
-    ful: +(d.tickets.reduce((s, x) => s + x, 0) / d.tickets.length).toFixed(2), // avg fulfillment min
-    p75: +(sorted[p75idx]).toFixed(2), // p75 fulfillment min
-    guests: d.guestCount > 0 ? +(d.guestSum / d.guestCount).toFixed(1) : 0,
-  };
-}).sort((a, b) => a.conc - b.conc);
+  return Object.entries(byConc).map(([k, ivs]) => {
+    const totalDur = ivs.reduce((s, iv) => s + iv.duration_sec, 0);
+    const ful_min = ivs.reduce((s, iv) => s + (iv.avg_ful_sec / 60) * iv.duration_sec, 0) / totalDur;
+    const sorted = [...ivs].sort((a, b) => a.avg_ful_sec - b.avg_ful_sec);
+    const p75idx = Math.min(Math.floor(sorted.length * 0.75), sorted.length - 1);
+    const p75_min = sorted[p75idx].avg_ful_sec / 60;
+    const guestSum = ivs.reduce((s, iv) => s + iv.guests * iv.duration_sec, 0);
+    const guests = totalDur > 0 ? guestSum / totalDur : 0;
+    return {
+      conc: +k,
+      occ: ivs.length,
+      ful: +ful_min.toFixed(2),
+      p75: +p75_min.toFixed(2),
+      guests: +guests.toFixed(1),
+    };
+  }).sort((a, b) => a.conc - b.conc);
+}
 
-// tbk: bucket curve by 10 concurrent tickets, weighted by occurrences
+const curve = buildIntervalCurve(uniqueTickets);
+
+// tbk: bucket curve by 10 concurrent tickets, weighted by duration (occ × ful proxy)
 const tbkMap = {};
 curve.forEach(r => {
   const bucket = Math.floor(r.conc / 10) * 10;
@@ -270,12 +272,11 @@ const tbk = Object.entries(tbkMap).sort((a,b) => a[1].low - b[1].low).map(([labe
   ful: d.sumOcc > 0 ? +(d.sumFul / d.sumOcc).toFixed(2) : 0,
 }));
 
-// Breaking point — skip first 10 load levels, require occ>=3, first crossing avg > 15 min
-// occ counts tickets (not minutes) so threshold is lower than sweep-line approach
-const breakingPointRow = curve.find((r, i) => i >= 10 && r.occ >= 3 && r.ful > 15);
+// Breaking point — skip first 10 load levels, require occ>=5 intervals, first crossing avg > 15 min
+const breakingPointRow = curve.find((r, i) => i >= 10 && r.occ >= 5 && r.ful > 15);
 const breakingPoint = breakingPointRow ? breakingPointRow.conc : null;
 const breakingPointGuests = breakingPointRow ? Math.round(breakingPointRow.guests) : null;
-console.log('Breaking point (tickets):', breakingPoint, '| guests:', breakingPointGuests);
+console.log('Breaking point (intervals):', breakingPoint, '| guests:', breakingPointGuests);
 
 // ---- Stations ----
 const stationAgg = {};
@@ -292,35 +293,23 @@ const stations = Object.entries(stationAgg).map(([station, d]) => ({
   exp_sec: STATION_TARGETS[station] || 0,
 })).sort((a,b) => b.count - a.count);
 
-// ---- Per-station breaking point using fire-time attribution ----
-// Build a per-station concMap: { station: { concCount: [fulMin, ...] } }
-const stationConcMap = {};
-uniqueTickets.forEach(t => {
-  const fireMin = Math.floor(t._fired.getTime() / 60000);
-  const count = minuteCount[fireMin] || 1;
-  // A unique ticket may span multiple stations — use the station from foodTickets (pre-dedup rows)
+// ---- Per-station breaking point using duration-weighted intervals ----
+// For each station, collect its tickets (deduped within station) and build interval curve
+const stationTicketsMap = {}; // station -> Set of unique ticket keys -> ticket
+foodTickets.forEach(t => {
   const st = t['Station'];
   if (!st) return;
-  if (!stationConcMap[st]) stationConcMap[st] = {};
-  if (!stationConcMap[st][count]) stationConcMap[st][count] = [];
-  stationConcMap[st][count].push(t._fulSec / 60);
+  if (!stationTicketsMap[st]) stationTicketsMap[st] = new Map();
+  const key = `${t['Check #']}||${t['Fired Date']}||${t['Fulfillment Time']}`;
+  if (!stationTicketsMap[st].has(key)) stationTicketsMap[st].set(key, t);
 });
 
 stations.forEach(stRow => {
   const st = stRow.station;
-  const stMap = stationConcMap[st];
-  if (!stMap) { stRow.bp_tickets = null; stRow.bp_curve = []; return; }
+  const stTickets = stationTicketsMap[st] ? [...stationTicketsMap[st].values()] : [];
+  if (stTickets.length === 0) { stRow.bp_tickets = null; stRow.bp_curve = []; return; }
   const threshold = stRow.exp_sec > 0 ? stRow.exp_sec / 60 : 15;
-  const stCurve = Object.entries(stMap).map(([k, tickets]) => {
-    const sorted = [...tickets].sort((a, b) => a - b);
-    const p75idx = Math.min(Math.floor(sorted.length * 0.75), sorted.length - 1);
-    return {
-      conc: +k,
-      occ: tickets.length,
-      ful: +(tickets.reduce((s, x) => s + x, 0) / tickets.length).toFixed(2),
-      p75: +(sorted[p75idx]).toFixed(2),
-    };
-  }).sort((a, b) => a.conc - b.conc);
+  const stCurve = buildIntervalCurve(stTickets);
   const bpRow = stCurve.find((r, i) => i >= 5 && r.occ >= 3 && r.ful > threshold);
   stRow.bp_tickets = bpRow ? bpRow.conc : null;
   stRow.bp_curve = stCurve;
