@@ -402,6 +402,10 @@ function isBeverageItem(name) {
 // ---- stationItemsArr: per-station item volume + avg fulfillment ----
 const stationItemsMap = {}; // { station: { itemName: { qty, totalFulSec, count } } }
 
+// Canonical station: once an item is assigned to a station, always use that station.
+// This prevents items like "CL-Crab Croquettes" from appearing under multiple stations.
+const itemFirstStation = {};
+
 itemDetails.forEach(item => {
   if (!item.menuItem) return;
   if (isBeverageItem(item.menuItem)) return;
@@ -410,18 +414,24 @@ itemDetails.forEach(item => {
   const matches = ticketByKey[key] || [];
   if (matches.length === 0) return;
 
-  // Use first matching ticket's station
   const t = matches[0];
   const station = t['Station'];
   if (!station || !isFood(station)) return;
-  if (!stationItemsMap[station]) stationItemsMap[station] = {};
-  if (!stationItemsMap[station][item.menuItem]) {
-    stationItemsMap[station][item.menuItem] = { qty: 0, totalFulSec: 0, count: 0 };
+
+  // Lock to the first-seen station for this item (canonical mapping)
+  if (!itemFirstStation[item.menuItem]) {
+    itemFirstStation[item.menuItem] = station;
   }
-  stationItemsMap[station][item.menuItem].qty += (item.qty || 1);
+  const canonicalStation = itemFirstStation[item.menuItem];
+
+  if (!stationItemsMap[canonicalStation]) stationItemsMap[canonicalStation] = {};
+  if (!stationItemsMap[canonicalStation][item.menuItem]) {
+    stationItemsMap[canonicalStation][item.menuItem] = { qty: 0, totalFulSec: 0, count: 0 };
+  }
+  stationItemsMap[canonicalStation][item.menuItem].qty += (item.qty || 1);
   if (t._fulSec != null) {
-    stationItemsMap[station][item.menuItem].totalFulSec += t._fulSec;
-    stationItemsMap[station][item.menuItem].count++;
+    stationItemsMap[canonicalStation][item.menuItem].totalFulSec += t._fulSec;
+    stationItemsMap[canonicalStation][item.menuItem].count++;
   }
 });
 
@@ -436,6 +446,42 @@ Object.keys(stationItemsMap).forEach(station => {
     }))
     .sort((a, b) => b.qty - a.qty);
 });
+
+// ---- assignmentData: flat list of food items with canonical station + fulfillment ----
+// Join stationItemsArr (item→station) with item-fulfillment (item→avgSeconds from Toast report)
+const itemToStation = {};
+Object.entries(stationItemsArr).forEach(([station, items]) => {
+  items.forEach(it => {
+    if (!itemToStation[it.menuItem]) itemToStation[it.menuItem] = station;
+  });
+});
+
+const itemFulPath = path.join(DATA_DIR, `item-fulfillment-${venueArg}.json`);
+let itemFulfillmentItems = [];
+if (fs.existsSync(itemFulPath)) {
+  try {
+    const raw = JSON.parse(fs.readFileSync(itemFulPath, 'utf8'));
+    itemFulfillmentItems = raw.items || [];
+  } catch(e) { console.warn('Could not load item-fulfillment:', e.message); }
+}
+
+const assignmentData = itemFulfillmentItems
+  .filter(it => it.menuItem && !isBeverageItem(it.menuItem))
+  .map(it => {
+    const station = itemToStation[it.menuItem] || null;
+    const targetSec = station ? (STATION_TARGETS[station] || null) : null;
+    return {
+      menuItem: it.menuItem,
+      station,
+      targetSec,
+      avgFulSec: it.avgSeconds || null,
+      count: it.count || 0,
+    };
+  })
+  .filter(it => it.station)
+  .sort((a, b) => (a.station || '').localeCompare(b.station || '') || a.menuItem.localeCompare(b.menuItem));
+
+console.log(`Assignment data for ${venueArg}: ${assignmentData.length} items across ${new Set(assignmentData.map(i=>i.station)).size} stations`);
 
 // ---- menuItems: overall item volume + avg fulfillment across all stations ----
 const menuItemsMap = {}; // { menuItem: { qty, totalFulSec, count } }
@@ -473,6 +519,7 @@ const output = {
   breakingPointGuests,
   stationItemsArr,
   stationDetails: stationDetailsOut,
+  assignmentData,
 };
 
 const outPath = path.join(__dirname, `${venueArg}-data.json`);

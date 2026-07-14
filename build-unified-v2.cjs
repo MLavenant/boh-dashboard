@@ -126,10 +126,10 @@ html = html.replace(
 <div class="station-pills" id="stationPills"></div>`
 );
 
-// Add Group tab to nav
+// Add Assignment + Group tabs to nav
 html = html.replace(
   '<button class="tab-btn" onclick="switchTab(\'menu\',this)">Menu Items</button>\n</nav>',
-  '<button class="tab-btn" onclick="switchTab(\'menu\',this)">Menu Items</button>\n  <button class="tab-btn" onclick="switchTab(\'group\',this)">🏢 Group</button>\n</nav>'
+  '<button class="tab-btn" onclick="switchTab(\'menu\',this)">Menu Items</button>\n  <button class="tab-btn" onclick="switchTab(\'assignment\',this)">📋 Assignment</button>\n  <button class="tab-btn" onclick="switchTab(\'group\',this)">🏢 Group</button>\n</nav>'
 );
 
 // Add Visual 4 (WoW) + Station Breaking Lines before Visual 5 (3D)
@@ -185,10 +185,38 @@ html = html.replace(
   '<th style="width:70px">Target</th>\n        <th style="width:70px">Status</th>\n        <th style="width:80px">Trend</th>\n        <th style="width:80px">Station</th>'
 );
 
-// Add Group section before footer
+// Add Assignment + Group sections before footer
 html = html.replace(
   '<footer>',
-  `<!-- ========== TAB 4: GROUP ========== -->
+  `<!-- ========== TAB 5: ASSIGNMENT ========== -->
+<section id="tab-assignment" class="tab-section">
+<div class="section-title">Item–Station Assignment</div>
+<div class="card">
+  <h2>Menu Item → Station Mapping</h2>
+  <p class="note">All food items assigned to their canonical kitchen station. Target = station fulfillment target. Avg Actual = current week avg from Toast. Searchable and sorted by station.</p>
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+    <input id="assignSearch" type="text" placeholder="Search items…" oninput="applyAssignFilter()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;width:220px;outline:none">
+    <span id="assignCount" style="font-size:12px;color:#9aa0aa"></span>
+  </div>
+  <div style="overflow-x:auto">
+    <table id="assignTable" style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="background:#1e2533;text-align:left">
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;white-space:nowrap">Station</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Menu Item</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;text-align:right;white-space:nowrap">Target</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;text-align:right;white-space:nowrap">Avg Actual</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;text-align:right;white-space:nowrap">Count</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;text-align:center;white-space:nowrap">Status</th>
+        </tr>
+      </thead>
+      <tbody id="assignBody"></tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ========== TAB 4: GROUP ========== -->
 <section id="tab-group" class="tab-section">
 <div class="section-title" id="groupTitle">RDG Group — ${rollingWeeks[rollingWeeks.length-1].label} Performance</div>
 <div class="row three" id="groupCards" style="margin-bottom:18px"></div>
@@ -1754,6 +1782,64 @@ function renderMenuItems() {
 }
 
 // ============================================================
+// TAB 5: Assignment
+// ============================================================
+function renderAssignment() {
+  const DATA = getD().assignmentData || [];
+  let filtered = DATA;
+  const searchEl = document.getElementById('assignSearch');
+  if (searchEl) { searchEl.value = ''; }
+
+  function getRows() {
+    const q = (document.getElementById('assignSearch')?.value || '').toLowerCase();
+    return q ? DATA.filter(r => r.menuItem.toLowerCase().includes(q) || (r.station||'').toLowerCase().includes(q)) : DATA;
+  }
+
+  function statusBadge(avgFulSec, targetSec) {
+    if (!avgFulSec) return '<span style="color:#6b7280;font-size:11px">—</span>';
+    if (!targetSec) return '<span style="color:#9aa0aa;font-size:11px">no tgt</span>';
+    const r = avgFulSec / targetSec;
+    if (r > 1.15) return '<span style="color:#ef4444;font-size:11px">● Over</span>';
+    if (r > 1.0) return '<span style="color:#f59e0b;font-size:11px">● Watch</span>';
+    return '<span style="color:#22c55e;font-size:11px">● OK</span>';
+  }
+
+  function renderRows(rows) {
+    let lastStation = null;
+    const countEl = document.getElementById('assignCount');
+    if (countEl) countEl.textContent = rows.length + ' items';
+    document.getElementById('assignBody').innerHTML = rows.map(r => {
+      const stationCell = r.station !== lastStation
+        ? '<td style="padding:7px 10px;font-weight:700;color:#d9a441;white-space:nowrap;vertical-align:top">' + (r.station||'—') + '</td>'
+        : '<td style="padding:7px 10px;color:#3a3f4a;border-top:none"></td>';
+      lastStation = r.station;
+      const avgColor = r.avgFulSec && r.targetSec
+        ? (r.avgFulSec > r.targetSec * 1.15 ? '#ef4444' : r.avgFulSec > r.targetSec ? '#f59e0b' : '#22c55e')
+        : '#9aa0aa';
+      return '<tr style="border-top:1px solid #1e2533">' +
+        stationCell +
+        '<td style="padding:7px 10px;color:#e8eaed">' + r.menuItem + '</td>' +
+        '<td style="padding:7px 10px;text-align:right;color:#9aa0aa">' + (r.targetSec ? fmtSec(r.targetSec) : '—') + '</td>' +
+        '<td style="padding:7px 10px;text-align:right;font-weight:600;color:' + avgColor + '">' + (r.avgFulSec ? fmtSec(r.avgFulSec) : '—') + '</td>' +
+        '<td style="padding:7px 10px;text-align:right;color:#9aa0aa">' + (r.count || '—') + '</td>' +
+        '<td style="padding:7px 10px;text-align:center">' + statusBadge(r.avgFulSec, r.targetSec) + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  renderRows(getRows());
+
+  window.applyAssignFilter = function() {
+    renderRows(getRows());
+  };
+
+  if (!DATA.length) {
+    document.getElementById('assignBody').innerHTML =
+      '<tr><td colspan="6" style="text-align:center;padding:40px 20px;color:#9aa0aa;font-size:14px">No assignment data available for this venue/week.<br><small style="color:#6b7280">Requires item-fulfillment and item-details files.</small></td></tr>';
+  }
+}
+
+// ============================================================
 // TAB 4: Group Summary
 // ============================================================
 function renderGroup() {
@@ -1978,6 +2064,7 @@ function renderAll() {
   renderStationWoW();
   renderStations();
   renderMenuItems();
+  renderAssignment();
   renderGroup();
   renderPageSummary();
 }
