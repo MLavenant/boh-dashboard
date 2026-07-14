@@ -1,20 +1,99 @@
 {
   "Casa Neos Beach Club": {
-    "salesStatus": 504,
-    "collStatus": 504,
-    "salesJson": null,
-    "collJson": null
+    "salesData": {
+      "data": [
+        {
+          "salesNumber": 7,
+          "event": {
+            "id": "doezxpcprf8qtyudvqb1all2wrv9ic44",
+            "name": "JOEZI",
+            "image": "https://fourvenues.com/cdn-cgi/imagedelivery/kWuoTchaMsk7Xnc_FNem7A/a1fc9fa6-faf6-4445-9c65-bd333021a100/w=1350",
+            "date": 1783828800
+          }
+        }
+      ],
+      "process_time": "13ms"
+    },
+    "collData": {
+      "data": [
+        {
+          "collected": 2450,
+          "event": {
+            "id": "doezxpcprf8qtyudvqb1all2wrv9ic44",
+            "name": "JOEZI",
+            "image": "https://fourvenues.com/cdn-cgi/imagedelivery/kWuoTchaMsk7Xnc_FNem7A/a1fc9fa6-faf6-4445-9c65-bd333021a100/w=1350",
+            "date": 1783828800
+          }
+        }
+      ],
+      "process_time": "11ms"
+    },
+    "endpointsCaptured": [
+      "https://api.fourvenues.com/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/collected-by-event?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:20}}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/collected-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/top-events-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:10}}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/sales-number-by-event?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:20}}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/profitability?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/kpis?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/sales-number-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}"
+    ]
   },
   "MILA Lounge": {
-    "salesStatus": 504,
-    "collStatus": 504,
-    "salesJson": null,
-    "collJson": null
+    "salesData": {
+      "data": [],
+      "process_time": "15ms"
+    },
+    "collData": {
+      "data": [],
+      "process_time": "14ms"
+    },
+    "endpointsCaptured": [
+      "https://api.fourvenues.com/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/collected-by-event?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:20}}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/sales-number-by-event?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:20}}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/kpis?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/collected-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/sales-number-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/top-events-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:10}}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/profitability?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}"
+    ]
   },
   "Casa Neos Lounge": {
-    "salesStatus": 504,
-    "collStatus": 504,
-    "salesJson": null,
-    "collJson": null
+    "salesData": {
+      "data": [
+        {
+          "salesNumber": 6,
+          "event": {
+            "id": "epjcuxx9ty1l1ho2z4jof703e9al9c6j",
+            "name": "BEN STERLING",
+            "image": "https://fourvenues.com/cdn-cgi/imagedelivery/kWuoTchaMsk7Xnc_FNem7A/829a9870-d1bf-4aca-327b-4644087b1e00/w=1350",
+            "date": 1784174400
+          }
+        }
+      ],
+      "process_time": "5ms"
+    },
+    "collData": {
+      "data": [
+        {
+          "collected": 900,
+          "event": {
+            "id": "epjcuxx9ty1l1ho2z4jof703e9al9c6j",
+            "name": "BEN STERLING",
+            "image": "https://fourvenues.com/cdn-cgi/imagedelivery/kWuoTchaMsk7Xnc_FNem7A/829a9870-d1bf-4aca-327b-4644087b1e00/w=1350",
+            "date": 1784174400
+          }
+        }
+      ],
+      "process_time": "7ms"
+    },
+    "endpointsCaptured": [
+      "https://api.fourvenues.com/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/sales-number-by-event?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:20}}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/kpis?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/collected-by-event?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:20}}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/collected-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/sales-number-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/top-events-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:10}}&options={}",
+      "https://api.fourvenues.com/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/profitability?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}"
+    ]
   }
 }

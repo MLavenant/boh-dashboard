@@ -191,53 +191,69 @@ Object.keys(hmGuests).forEach(day => {
   });
 });
 
-// ---- workloadOverall using sweep-line ----
-// Per-minute sweep: at each minute, record concurrent count and avg fulfillment
-// time of ALL active tickets. occ = number of minutes at that load level.
-// This is the densest, most stable approach and matches the original Excel methodology.
-const minTime = Math.min(...foodTickets.map(t => t._fired.getTime()));
-const maxTime = Math.max(...foodTickets.map(t => t._fulfilled.getTime()));
-const startMin = Math.floor(minTime / 60000);
-const endMin = Math.ceil(maxTime / 60000);
+// ---- workloadOverall using event-based intervals (matches Python algorithm) ----
+// Step 1: Deduplicate foodTickets by (Check #, Fired Date, Fulfillment Time)
+// A ticket with N stations generates N rows — collapse to 1 logical ticket.
+const seenKeys = new Set();
+const uniqueTickets = foodTickets.filter(t => {
+  const key = `${t['Check #']}||${t['Fired Date']}||${t['Fulfillment Time']}`;
+  if (seenKeys.has(key)) return false;
+  seenKeys.add(key);
+  return true;
+});
+console.log(`Unique tickets (deduped): ${uniqueTickets.length}`);
 
-const eventsByMin = {};
-foodTickets.forEach(t => {
-  const s = Math.floor(t._fired.getTime() / 60000);
-  const ep1 = Math.floor(t._fulfilled.getTime() / 60000) + 1;
-  if (!eventsByMin[s]) eventsByMin[s] = { starts: [], ends: [] };
-  if (!eventsByMin[ep1]) eventsByMin[ep1] = { starts: [], ends: [] };
-  eventsByMin[s].starts.push(t);
-  eventsByMin[ep1].ends.push(t);
+// Step 2: Build events — each ticket opens at _fired, closes at _fulfilled
+// Sort: closes (type=0) before opens (type=1) at same timestamp (matches Python)
+const wlEvents = [];
+uniqueTickets.forEach(t => {
+  wlEvents.push({ time: t._fired.getTime(), type: 1, ticket: t });
+  wlEvents.push({ time: t._fulfilled.getTime(), type: 0, ticket: t });
+});
+wlEvents.sort((a, b) => a.time !== b.time ? a.time - b.time : a.type - b.type);
+
+// Step 3: Walk events, track open set, record intervals
+const intervals = []; // { duration_sec, concurrent_count, avg_fulfillment_sec, ot_guests }
+const openSet = new Set();
+let prevTime = null;
+
+wlEvents.forEach(ev => {
+  if (prevTime !== null && ev.time > prevTime && openSet.size > 0) {
+    const duration_sec = (ev.time - prevTime) / 1000;
+    const concurrent_count = openSet.size;
+    const avg_fulfillment_sec = [...openSet].reduce((s, t) => s + t._fulSec, 0) / openSet.size;
+    const ot_guests = concurrentGuestsAt(new Date(prevTime));
+    intervals.push({ duration_sec, concurrent_count, avg_fulfillment_sec, ot_guests });
+  }
+  if (ev.type === 1) {
+    openSet.add(ev.ticket);
+  } else {
+    openSet.delete(ev.ticket);
+  }
+  prevTime = ev.time;
 });
 
+// Step 4: Duration-weighted aggregation by concurrent_count
 const concMap = {};
-let active = new Set();
-for (let min = startMin; min <= endMin; min++) {
-  const ev = eventsByMin[min];
-  if (ev) {
-    ev.starts.forEach(t => active.add(t));
-    ev.ends.forEach(t => active.delete(t));
+intervals.forEach(iv => {
+  const k = iv.concurrent_count;
+  if (!concMap[k]) concMap[k] = { intervals: 0, sumDur: 0, sumFulWeighted: 0, sumGuestWeighted: 0, guestDur: 0 };
+  concMap[k].intervals++;
+  concMap[k].sumDur += iv.duration_sec;
+  concMap[k].sumFulWeighted += iv.avg_fulfillment_sec * iv.duration_sec;
+  if (iv.ot_guests > 0) {
+    concMap[k].sumGuestWeighted += iv.ot_guests * iv.duration_sec;
+    concMap[k].guestDur += iv.duration_sec;
   }
-  const count = active.size;
-  if (count === 0) continue;
-
-  const avgFul = [...active].reduce((s, t) => s + t._fulSec, 0) / count / 60;
-  const ts = new Date(min * 60000);
-  const guests = concurrentGuestsAt(ts);
-  if (!concMap[count]) concMap[count] = { slots: 0, sumFul: 0, fulCount: 0, guestSum: 0, guestCount: 0 };
-  concMap[count].slots++;
-  concMap[count].sumFul += avgFul;
-  concMap[count].fulCount++;
-  if (guests > 0) { concMap[count].guestSum += guests; concMap[count].guestCount++; }
-}
+});
 
 const curve = Object.keys(concMap).map(k => {
   const d = concMap[k];
   return {
     conc: +k,
-    occ: d.slots,  // minutes at this concurrent load
-    ful: +(d.sumFul / d.fulCount).toFixed(2),
-    guests: d.guestCount > 0 ? +(d.guestSum / d.guestCount).toFixed(1) : 0,
+    occ: d.intervals,  // number of intervals at this concurrent load
+    ful: +(d.sumFulWeighted / d.sumDur / 60).toFixed(2),  // duration-weighted avg in minutes
+    guests: d.guestDur > 0 ? +(d.sumGuestWeighted / d.guestDur).toFixed(1) : 0,
   };
 }).sort((a,b) => a.conc - b.conc);
 
@@ -247,7 +263,7 @@ curve.forEach(r => {
   const bucket = Math.floor(r.conc / 10) * 10;
   const label = `${bucket}-${bucket+10}`;
   if (!tbkMap[label]) tbkMap[label] = { sumFul: 0, sumOcc: 0, low: bucket };
-  tbkMap[label].sumFul += r.ful * r.occ; // weighted
+  tbkMap[label].sumFul += r.ful * r.occ; // weighted by interval count
   tbkMap[label].sumOcc += r.occ;
 });
 const tbk = Object.entries(tbkMap).sort((a,b) => a[1].low - b[1].low).map(([label, d]) => ({
