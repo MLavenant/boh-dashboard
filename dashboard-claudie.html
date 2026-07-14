@@ -120,12 +120,12 @@ table.menu-tbl tr:hover td{background:#1e2533}
 <!-- Visual 1 -->
 <div class="card">
   <h2>Visual 1 — Kitchen Pressure Curve</h2>
-  <p class="note">X-axis = concurrent tickets open. Left Y = occurrences. Right Y = avg fulfillment time (min). Red dashed = 15-min target. Crossing point (≥26 concurrent) is where kitchen falls behind.</p>
+  <p class="note">X-axis = concurrent tickets open. Left Y = occurrences. Right Y = avg fulfillment (gold) and P75 fulfillment (red dashed). Breaking point = where P75 first crosses 15-min target.</p>
   <canvas id="cPressure" style="max-height:400px"></canvas>
   <div class="legend">
     <span><span class="sw" style="background:#5aa9e6"></span>Occurrences</span>
     <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
-    <span><span class="sw" style="background:#e2706a"></span>15-min target</span>
+    <span><span class="sw" style="background:#e2706a;display:inline-block;width:20px;height:2px;vertical-align:middle;border-top:2px dashed #e2706a;background:none"></span>P75 fulfillment (min)</span>
   </div>
   <div class="annotation-box">⚡ Breaking point at <strong>26 concurrent tickets</strong> — avg fulfillment jumps to 16.0 min.</div>
   <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
