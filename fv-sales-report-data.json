@@ -1,0 +1,96 @@
+{
+  "Casa Neos Beach Club": {
+    "downloadedFile": null,
+    "apiEndpoints": [
+      "/sesion/?query={}&options={%22disableCache%22:true}",
+      "/dispositivos",
+      "/no-auth/featuresflags/notices?environment=production&userSlug=matthias-lavenant",
+      "/announcements/latest",
+      "/notificaciones_info/?query={}&options={}",
+      "/notificaciones/?query={}&options={%22skip%22:0,%22limit%22:20,%22sort%22:{%22created_at%22:-1}}",
+      "/pantallas_negocios/?query={%22slug%22:%22casa-neos1%22}&options={}",
+      "/no-auth/featuresflags/new-sales-report?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos1",
+      "/no-auth/featuresflags/commissions-on?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos1",
+      "/no-auth/featuresflags/season-passes?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos1",
+      "/no-auth/featuresflags/rollout-siae?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos1",
+      "/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/sales-number-by-event?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:20}}&options={}",
+      "/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/sales-number-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/top-events-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:10}}&options={}",
+      "/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/collected-by-event?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:20}}&options={}",
+      "/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/collected-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "/no-auth/featuresflags/restrict-service-fees-button?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos1",
+      "/event_calendars/organization/lah0f2isk8qmsg0zapu016rarffvp0xz",
+      "/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/kpis?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "/reports/sales/organization/lah0f2isk8qmsg0zapu016rarffvp0xz/profitability?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "/organizations-hosts/lah0f2isk8qmsg0zapu016rarffvp0xz"
+    ],
+    "breakdownKeys": [
+      "https://api.fourvenues.com/no-auth/featuresflags/new-sales-report?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos1"
+    ],
+    "breakdownSamples": {
+      "https://api.fourvenues.com/no-auth/featuresflags/new-sales-report?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos1": "{\"data\":{\"key\":\"new-sales-report\",\"active\":true},\"process_time\":\"1ms\"}"
+    }
+  },
+  "MILA Lounge": {
+    "downloadedFile": null,
+    "apiEndpoints": [
+      "/sesion/?query={}&options={%22disableCache%22:true}",
+      "/no-auth/featuresflags/notices?environment=production&userSlug=matthias-lavenant",
+      "/announcements/latest",
+      "/notificaciones_info/?query={}&options={}",
+      "/notificaciones/?query={}&options={%22skip%22:0,%22limit%22:20,%22sort%22:{%22created_at%22:-1}}",
+      "/pantallas_negocios/?query={%22slug%22:%22mila1%22}&options={}",
+      "/no-auth/featuresflags/new-sales-report?environment=production&userSlug=matthias-lavenant&organizationSlug=mila1",
+      "/no-auth/featuresflags/season-passes?environment=production&userSlug=matthias-lavenant&organizationSlug=mila1",
+      "/no-auth/featuresflags/commissions-on?environment=production&userSlug=matthias-lavenant&organizationSlug=mila1",
+      "/no-auth/featuresflags/rollout-siae?environment=production&userSlug=matthias-lavenant&organizationSlug=mila1",
+      "/no-auth/featuresflags/restrict-service-fees-button?environment=production&userSlug=matthias-lavenant&organizationSlug=mila1",
+      "/event_calendars/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM",
+      "/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/collected-by-event?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:20}}&options={}",
+      "/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/collected-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/sales-number-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/kpis?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "/organizations-hosts/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM",
+      "/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/sales-number-by-event?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:20}}&options={}",
+      "/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/profitability?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "/reports/sales/organization/Mmgkyvi0903mo01cm3vxg0phrtTEPpSM/top-events-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:10}}&options={}"
+    ],
+    "breakdownKeys": [
+      "https://api.fourvenues.com/no-auth/featuresflags/new-sales-report?environment=production&userSlug=matthias-lavenant&organizationSlug=mila1"
+    ],
+    "breakdownSamples": {
+      "https://api.fourvenues.com/no-auth/featuresflags/new-sales-report?environment=production&userSlug=matthias-lavenant&organizationSlug=mila1": "{\"data\":{\"key\":\"new-sales-report\",\"active\":true},\"process_time\":\"1ms\"}"
+    }
+  },
+  "Casa Neos Lounge": {
+    "downloadedFile": null,
+    "apiEndpoints": [
+      "/sesion/?query={}&options={%22disableCache%22:true}",
+      "/no-auth/featuresflags/notices?environment=production&userSlug=matthias-lavenant",
+      "/announcements/latest",
+      "/notificaciones/?query={}&options={%22skip%22:0,%22limit%22:20,%22sort%22:{%22created_at%22:-1}}",
+      "/notificaciones_info/?query={}&options={}",
+      "/pantallas_negocios/?query={%22slug%22:%22casa-neos-lounge%22}&options={}",
+      "/no-auth/featuresflags/new-sales-report?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos-lounge",
+      "/no-auth/featuresflags/season-passes?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos-lounge",
+      "/no-auth/featuresflags/commissions-on?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos-lounge",
+      "/no-auth/featuresflags/rollout-siae?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos-lounge",
+      "/no-auth/featuresflags/restrict-service-fees-button?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos-lounge",
+      "/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/collected-by-event?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:20}}&options={}",
+      "/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/top-events-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:10}}&options={}",
+      "/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/sales-number-by-event?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false,%22pagination%22:{%22page%22:0,%22pageSize%22:20}}&options={}",
+      "/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/sales-number-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/collected-by-date?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/kpis?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}",
+      "/event_calendars/organization/mrph20a941lojvdykvq598p0b8j3576j",
+      "/organizations-hosts/mrph20a941lojvdykvq598p0b8j3576j",
+      "/reports/sales/organization/mrph20a941lojvdykvq598p0b8j3576j/profitability?where={%22date_from%22:%222026-07-07%22,%22date_until%22:%222026-07-14%2023:59:59%22,%22timezone%22:%22America/New_York%22,%22modeGgdd%22:false,%22modeFeesTaxes%22:false}&options={}"
+    ],
+    "breakdownKeys": [
+      "https://api.fourvenues.com/no-auth/featuresflags/new-sales-report?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos-lounge"
+    ],
+    "breakdownSamples": {
+      "https://api.fourvenues.com/no-auth/featuresflags/new-sales-report?environment=production&userSlug=matthias-lavenant&organizationSlug=casa-neos-lounge": "{\"data\":{\"key\":\"new-sales-report\",\"active\":true},\"process_time\":\"1ms\"}"
+    }
+  }
+}

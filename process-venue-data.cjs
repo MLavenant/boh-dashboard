@@ -273,18 +273,18 @@ const curve = Object.keys(concMap).map(k => {
   };
 }).sort((a,b) => a.conc - b.conc);
 
-// tbk: bucket by 10s
+// tbk: bucket curve by 10 concurrent tickets, weighted by occurrences
 const tbkMap = {};
-foodTickets.forEach(t => {
-  const bucket = Math.floor(t._fulSec / 600) * 10;
+curve.forEach(r => {
+  const bucket = Math.floor(r.conc / 10) * 10;
   const label = `${bucket}-${bucket+10}`;
-  if (!tbkMap[label]) tbkMap[label] = { sum: 0, count: 0, low: bucket };
-  tbkMap[label].sum += t._fulSec / 60;
-  tbkMap[label].count++;
+  if (!tbkMap[label]) tbkMap[label] = { sumFul: 0, sumOcc: 0, low: bucket };
+  tbkMap[label].sumFul += r.ful * r.occ; // weighted
+  tbkMap[label].sumOcc += r.occ;
 });
 const tbk = Object.entries(tbkMap).sort((a,b) => a[1].low - b[1].low).map(([label, d]) => ({
   bucket: label,
-  ful: +(d.sum / d.count).toFixed(2),
+  ful: d.sumOcc > 0 ? +(d.sumFul / d.sumOcc).toFixed(2) : 0,
 }));
 
 // Breaking point — skip first 10 levels, require occ>=5, and 2 consecutive levels above 15 min
