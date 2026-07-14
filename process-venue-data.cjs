@@ -192,74 +192,42 @@ Object.keys(hmGuests).forEach(day => {
 });
 
 // ---- workloadOverall using sweep-line ----
-// For each minute, count concurrent tickets
-// Build events
-const events = [];
-foodTickets.forEach(t => {
-  events.push({ time: t._fired.getTime(), type: 'start', ticket: t });
-  events.push({ time: t._fulfilled.getTime(), type: 'end', ticket: t });
-});
-events.sort((a, b) => a.time - b.time);
-
-// Sweep minute by minute from min to max
+// Per-minute sweep: at each minute, record concurrent count and avg fulfillment
+// time of ALL active tickets. occ = number of minutes at that load level.
+// This is the densest, most stable approach and matches the original Excel methodology.
 const minTime = Math.min(...foodTickets.map(t => t._fired.getTime()));
 const maxTime = Math.max(...foodTickets.map(t => t._fulfilled.getTime()));
-
-// For efficiency, use interval-based approach
-// For each 1-minute slot, find concurrent tickets
-// Group: for each concurrent count, accumulate slots and fulfillment times
-const concMap = {}; // {count: {slots, sumFul, guestSum, guestCount}}
-
-// Collect all unique start/end times to minimize work
-// Build sorted event times
-const allTimes = [...new Set(foodTickets.flatMap(t => [
-  Math.floor(t._fired.getTime() / 60000) * 60000,
-  Math.floor(t._fulfilled.getTime() / 60000) * 60000
-]))].sort((a,b) => a-b);
-
-// Sweep minute by minute using active set
-// But to keep it reasonable, we'll sample every minute between min and max
 const startMin = Math.floor(minTime / 60000);
 const endMin = Math.ceil(maxTime / 60000);
 
-// For large ranges, this could be slow. Let's use a smarter approach:
-// Build events sorted by minute
 const eventsByMin = {};
 foodTickets.forEach(t => {
   const s = Math.floor(t._fired.getTime() / 60000);
-  const e = Math.floor(t._fulfilled.getTime() / 60000);
+  const ep1 = Math.floor(t._fulfilled.getTime() / 60000) + 1;
   if (!eventsByMin[s]) eventsByMin[s] = { starts: [], ends: [] };
-  if (!eventsByMin[e]) eventsByMin[e] = { starts: [], ends: [] };
-  eventsByMin[s].starts.push(t);
-  // end at minute e+1 (exclusive)
-  const ep1 = e + 1;
   if (!eventsByMin[ep1]) eventsByMin[ep1] = { starts: [], ends: [] };
+  eventsByMin[s].starts.push(t);
   eventsByMin[ep1].ends.push(t);
 });
 
+const concMap = {};
 let active = new Set();
-let currentMin = startMin;
-
 for (let min = startMin; min <= endMin; min++) {
   const ev = eventsByMin[min];
   if (ev) {
     ev.starts.forEach(t => active.add(t));
     ev.ends.forEach(t => active.delete(t));
   }
-  
   const count = active.size;
   if (count === 0) continue;
-  
-  // Compute avg fulfillment for active tickets
-  const avgFul = [...active].reduce((s,t) => s + t._fulSec, 0) / count / 60;
-  
-  // Compute concurrent guests at this minute
+
+  const avgFul = [...active].reduce((s, t) => s + t._fulSec, 0) / count / 60;
   const ts = new Date(min * 60000);
   const guests = concurrentGuestsAt(ts);
-  
-  if (!concMap[count]) concMap[count] = { slots: 0, sumFul: 0, guestSum: 0, guestCount: 0 };
+  if (!concMap[count]) concMap[count] = { slots: 0, sumFul: 0, fulCount: 0, guestSum: 0, guestCount: 0 };
   concMap[count].slots++;
   concMap[count].sumFul += avgFul;
+  concMap[count].fulCount++;
   if (guests > 0) { concMap[count].guestSum += guests; concMap[count].guestCount++; }
 }
 
@@ -267,8 +235,8 @@ const curve = Object.keys(concMap).map(k => {
   const d = concMap[k];
   return {
     conc: +k,
-    occ: d.slots,
-    ful: +(d.sumFul / d.slots).toFixed(2),
+    occ: d.slots,  // minutes at this concurrent load
+    ful: +(d.sumFul / d.fulCount).toFixed(2),
     guests: d.guestCount > 0 ? +(d.guestSum / d.guestCount).toFixed(1) : 0,
   };
 }).sort((a,b) => a.conc - b.conc);
@@ -287,11 +255,8 @@ const tbk = Object.entries(tbkMap).sort((a,b) => a[1].low - b[1].low).map(([labe
   ful: d.sumOcc > 0 ? +(d.sumFul / d.sumOcc).toFixed(2) : 0,
 }));
 
-// Breaking point — skip first 10 levels, require occ>=5, and 2 consecutive levels above 15 min
-const breakingPointRow = curve.find((r, i) =>
-  i >= 10 && r.occ >= 5 && r.ful > 15 &&
-  curve[i + 1] && curve[i + 1].ful > 15
-);
+// Breaking point — skip first 10 load levels, require occ>=5, first crossing above 15 min
+const breakingPointRow = curve.find((r, i) => i >= 10 && r.occ >= 5 && r.ful > 15);
 const breakingPoint = breakingPointRow ? breakingPointRow.conc : null;
 const breakingPointGuests = breakingPointRow ? Math.round(breakingPointRow.guests) : null;
 console.log('Breaking point (tickets):', breakingPoint, '| guests:', breakingPointGuests);

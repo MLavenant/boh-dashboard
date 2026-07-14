@@ -1,11 +1,12 @@
 /**
- * FourVenues Direct API Forecast Pull
- * Uses Playwright ctx.request.get() so cookies are passed automatically.
- * Calls collected-by-event and sales-number-by-event for upcoming 90 days.
+ * FourVenues Forecast — in-page fetch for upcoming events
+ * Navigate to the dashboard, then use page.evaluate() so fetch()
+ * runs inside the browser with all cookies, bypassing CORS/auth.
  */
 
 const { chromium } = require("playwright");
 const fs = require("fs");
+const path = require("path");
 
 const SESSION_PATH   = "C:\\Cursor\\toast-mcp-server\\fv-final-session.json";
 const RESULTS_PATH   = "C:\\Cursor\\toast-mcp-server\\fv-api-results.json";
@@ -17,15 +18,6 @@ const VENUES = [
   { name: "Casa Neos Lounge",     id: "mrph20a941lojvdykvq598p0b8j3576j",  slug: "casa-neos-lounge" },
 ];
 
-const APP_HDR = {
-  "app-id":         "ajihln7fc0006jhmmi4lh75s2lI9O3jx",
-  "device-id":      "Q529vp56m4h2q395ia0i6xt0csuPejE3",
-  "storage-bucket": "pro",
-  "accept":         "application/json, text/plain, */*",
-  "content-type":   "application/json",
-  "referer":        "https://pro.fourvenues.com/",
-};
-
 function log(msg) { process.stdout.write(`[${new Date().toLocaleTimeString("en-US",{hour12:false})}] ${msg}\n`); }
 
 function dateStr(offsetDays=0) {
@@ -34,82 +26,94 @@ function dateStr(offsetDays=0) {
 }
 
 (async () => {
-  log("=== FourVenues API Forecast Pull ===");
+  log("=== FourVenues Forecast API ===");
 
   const sd = JSON.parse(fs.readFileSync(SESSION_PATH));
   const browser = await chromium.launch({
     headless: false,
-    args: ["--window-size=1,1","--window-position=-9999,0","--disable-infobars"]
+    args: ["--window-size=800,600","--window-position=0,0","--disable-infobars"]
   });
   const ctx = await browser.newContext({ storageState: sd.storageState });
   const page = await ctx.newPage();
+  page.on("dialog", d => d.dismiss().catch(()=>{}));
 
-  // Warm up session with a quick page visit
+  // Warm up on a venue page to ensure session cookies are live
   log("Warming up session...");
   await page.goto("https://pro.fourvenues.com/mila1/reports/dashboard-sales",
-    { waitUntil:"domcontentloaded", timeout:20000 }).catch(()=>{});
+    { waitUntil:"domcontentloaded", timeout:25000 }).catch(()=>{});
   await page.waitForTimeout(4000);
-
-  // Capture session/user headers from live page requests
-  let sessionId = sd.sessionId||"", userId = sd.userId||"";
-  page.on("request", r => {
-    if (!r.url().includes("api.fourvenues.com")) return;
-    const h = r.headers();
-    if (h["session-id"] && !sessionId) sessionId = h["session-id"];
-    if (h["user-id"]    && !userId)    userId    = h["user-id"];
-  });
-  await page.waitForTimeout(2000);
+  log("Session ready.");
 
   const dateFrom  = dateStr(0);
   const dateUntil = dateStr(90) + " 23:59:59";
-  const where     = { date_from:dateFrom, date_until:dateUntil, timezone:"America/New_York", modeGgdd:false, modeFeesTaxes:false, pagination:{page:0,pageSize:50} };
-  const whereEnc  = encodeURIComponent(JSON.stringify(where));
+  const tz        = "America/New_York";
 
   const allResults = {};
 
   for (const v of VENUES) {
     log(`\n── ${v.name} ──`);
-    const base = `https://api.fourvenues.com/reports/sales/organization/${v.id}`;
 
-    // Ensure session headers are included
-    const hdrs = { ...APP_HDR };
-    if (sessionId) hdrs["session-id"] = sessionId;
-    if (userId)    hdrs["user-id"]    = userId;
+    // Navigate to this venue's sales page (ensures cookies for that org)
+    await page.goto(`https://pro.fourvenues.com/${v.slug}/reports/dashboard-sales`,
+      { waitUntil:"domcontentloaded", timeout:20000 }).catch(()=>{});
+    await page.waitForTimeout(3000);
 
-    // sales-number-by-event: how many tickets/tables sold per event
-    const salesR = await ctx.request.get(`${base}/sales-number-by-event?where=${whereEnc}&options={}`, { headers: hdrs });
-    let salesData = null;
-    try { salesData = await salesR.json(); } catch(e){}
+    // Use page.evaluate so fetch() runs in browser context with all cookies
+    const result = await page.evaluate(async ({ venueId, dateFrom, dateUntil, tz }) => {
+      const base = `https://api.fourvenues.com/reports/sales/organization/${venueId}`;
 
-    // collected-by-event: revenue collected per event
-    const collR = await ctx.request.get(`${base}/collected-by-event?where=${whereEnc}&options={}`, { headers: hdrs });
-    let collData = null;
-    try { collData = await collR.json(); } catch(e){}
+      const where = {
+        date_from: dateFrom,
+        date_until: dateUntil,
+        timezone: tz,
+        modeGgdd: false,
+        modeFeesTaxes: false,
+        pagination: { page: 0, pageSize: 50 }
+      };
+      const q = encodeURIComponent(JSON.stringify(where));
 
-    log(`  sales-number-by-event: HTTP ${salesR.status()}`);
-    log(`  collected-by-event:    HTTP ${collR.status()}`);
+      // Get headers from a page script tag if available
+      let sessionId = "", userId = "";
+      try {
+        const sesR = await fetch(`https://api.fourvenues.com/sesion/?query={}&options={"disableCache":true}`, { credentials: "include" });
+        const sesJ = await sesR.json();
+        // session-id is in the request headers, not response — capture from meta or store
+      } catch(e) {}
 
-    if (salesData?.data) {
-      const rows = Array.isArray(salesData.data) ? salesData.data : [salesData.data];
-      log(`  → ${rows.length} event rows in sales data`);
-      rows.slice(0,3).forEach(r => log(`    ${JSON.stringify(r).slice(0,200)}`));
+      const [salesR, collR] = await Promise.all([
+        fetch(`${base}/sales-number-by-event?where=${q}&options={}`, { credentials: "include" }),
+        fetch(`${base}/collected-by-event?where=${q}&options={}`, { credentials: "include" })
+      ]);
+
+      const [salesStatus, collStatus] = [salesR.status, collR.status];
+      const [salesJson, collJson] = await Promise.all([salesR.json().catch(()=>null), collR.json().catch(()=>null)]);
+
+      return { salesStatus, collStatus, salesJson, collJson };
+    }, { venueId: v.id, dateFrom, dateUntil, tz });
+
+    log(`  sales-number-by-event: HTTP ${result.salesStatus}`);
+    log(`  collected-by-event:    HTTP ${result.collStatus}`);
+
+    if (result.salesStatus === 200 && result.salesJson?.data) {
+      const rows = Array.isArray(result.salesJson.data) ? result.salesJson.data : [result.salesJson.data];
+      log(`  → ${rows.length} events in sales data`);
+      rows.slice(0,5).forEach(r => log(`    ${JSON.stringify(r).slice(0,250)}`));
     } else {
-      log(`  Sales response: ${JSON.stringify(salesData).slice(0,200)}`);
+      log(`  Sales: ${JSON.stringify(result.salesJson).slice(0,200)}`);
     }
 
-    if (collData?.data) {
-      const rows = Array.isArray(collData.data) ? collData.data : [collData.data];
-      log(`  → ${rows.length} event rows in collected data`);
-      rows.slice(0,3).forEach(r => log(`    ${JSON.stringify(r).slice(0,200)}`));
+    if (result.collStatus === 200 && result.collJson?.data) {
+      const rows = Array.isArray(result.collJson.data) ? result.collJson.data : [result.collJson.data];
+      log(`  → ${rows.length} events in collected data`);
+      rows.slice(0,5).forEach(r => log(`    ${JSON.stringify(r).slice(0,250)}`));
     } else {
-      log(`  Collected response: ${JSON.stringify(collData).slice(0,200)}`);
+      log(`  Collected: ${JSON.stringify(result.collJson).slice(0,200)}`);
     }
 
-    allResults[v.name] = { salesData, collData };
+    allResults[v.name] = result;
   }
 
   await browser.close();
-
   fs.writeFileSync(RESULTS_PATH, JSON.stringify(allResults, null, 2));
-  log(`\n✅ Results saved to fv-api-results.json`);
+  log(`\n✅ Saved to fv-api-results.json`);
 })();

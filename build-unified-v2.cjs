@@ -394,9 +394,7 @@ function computeBreakingPoint() {
     const d = curve[i];
     if (d.occ < 5) continue;
     // Require 2 consecutive load levels above threshold
-    if (d.ful >= getThreshold() && curve[i+1] && curve[i+1].ful >= getThreshold()) {
-      bpEntry = d; break;
-    }
+    if (d.ful >= getThreshold()) { bpEntry = d; break; }
   }
   if (!bpEntry) return { tickets: null, guests: null };
   return { tickets: bpEntry.conc, guests: Math.round(bpEntry.guests) };
