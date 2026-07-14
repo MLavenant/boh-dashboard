@@ -94,9 +94,11 @@ let html = htmlPart
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
 <div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
   <span style="color:#9aa0aa">Week:</span>
+  <button id="weekPrev" onclick="changeWeek(-1)" style="background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">&#8249;</button>
   <select id="weekDropdown" onchange="selectWeek(this.value)" style="background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">
     ${rollingWeeks.map((w,i) => `<option value="${i}"${i===rollingWeeks.length-1?' selected':''}>${w.label}</option>`).join('')}
   </select>
+  <button id="weekNext" onclick="changeWeek(1)" style="background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">&#8250;</button>
 </div>`
   );
 
@@ -1990,8 +1992,10 @@ function changeWeek(dir) {
   currentWeekIdx = next;
   const dd = document.getElementById('weekDropdown');
   if (dd) dd.value = currentWeekIdx;
-  document.getElementById('weekPrev').disabled = currentWeekIdx === 0;
-  document.getElementById('weekNext').disabled = currentWeekIdx === WEEKS.length - 1;
+  const wpBtn2 = document.getElementById('weekPrev');
+  const wnBtn2 = document.getElementById('weekNext');
+  if (wpBtn2) wpBtn2.disabled = currentWeekIdx === 0;
+  if (wnBtn2) wnBtn2.disabled = currentWeekIdx === WEEKS.length - 1;
   renderAll();
 }
 
@@ -2000,8 +2004,10 @@ function changeWeek(dir) {
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   initVenuePills();
-  document.getElementById('weekPrev').disabled = currentWeekIdx === 0;
-  document.getElementById('weekNext').disabled = currentWeekIdx >= WEEKS.length - 1;
+  const wpBtn = document.getElementById('weekPrev');
+  const wnBtn = document.getElementById('weekNext');
+  if (wpBtn) wpBtn.disabled = currentWeekIdx === 0;
+  if (wnBtn) wnBtn.disabled = currentWeekIdx >= WEEKS.length - 1;
   renderAll();
 });
 </script>

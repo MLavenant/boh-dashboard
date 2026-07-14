@@ -147,21 +147,66 @@ async function fetchBsSales(venueKey, dates) {
   return byDate;
 }
 
-// Update bs_a for a specific date+venue in the SCHED array
-// SCHED entries: {"d":"2026-07-11","dj":"...","venue":"Casa Neos Beach Club",...,"bs_a":null,...}
-function updateSchedBsA(html, venue, date, value) {
-  const venueEscaped = venue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const valPat = '(?:[\\d.]+|null)';
+// Parse SCHED array from HTML, update entries, re-inject (also fixes beat/_s/roi_a)
+function updateSchedInHtml(html, salesByVenueDate) {
+  // Extract the SCHED array
+  const schedMatch = html.match(/var SCHED = (\[[\s\S]*?\]);/);
+  if (!schedMatch) { log("ERROR: SCHED array not found"); return { html, count: 0 }; }
 
-  // Try: date before venue in the JSON object
-  let p = new RegExp(`("d":"${date}"[^}]*?"venue":"${venueEscaped}"[^}]*?"bs_a":)${valPat}`, 'g');
-  let out = html.replace(p, `$1${value}`);
-  if (out !== html) return out;
+  let sched;
+  try { sched = JSON.parse(schedMatch[1]); }
+  catch (e) { log("ERROR parsing SCHED: " + e.message); return { html, count: 0 }; }
 
-  // Try: venue before date
-  p = new RegExp(`("venue":"${venueEscaped}"[^}]*?"d":"${date}"[^}]*?"bs_a":)${valPat}`, 'g');
-  out = html.replace(p, `$1${value}`);
-  return out;
+  let count = 0;
+  sched.forEach(e => {
+    const venue = e.venue || e.v || "";
+    const date  = e.d || "";
+    const venueKey = Object.keys(salesByVenueDate).find(vk =>
+      BS_CONFIG[vk] && BS_CONFIG[vk].label === venue
+    );
+    if (!venueKey) return;
+    const byDate = salesByVenueDate[venueKey];
+    if (!byDate || byDate[date] === undefined || byDate[date] === 0) return;
+
+    const newBsA = byDate[date];
+    e.bs_a  = newBsA;
+    e.beat  = newBsA >= e.bs_m ? 1 : 0;
+    e._s    = newBsA >= e.bs_m ? "beat" : "miss";
+    e.roi_a = e.fee > 0 ? Math.round(newBsA / e.fee * 10000) / 10000 : 0;
+    count++;
+    log(`  ✅ ${venue} | ${date} → $${newBsA.toLocaleString()} | ${e._s} (min $${(e.bs_m||0).toLocaleString()})`);
+  });
+
+  // Also update the BS array (same structure as SCHED)
+  const bsMatch = html.match(/var BS\s*= (\[[\s\S]*?\]);/);
+  let bs = [];
+  if (bsMatch) {
+    try { bs = JSON.parse(bsMatch[1]); } catch (e) {}
+    bs.forEach(e => {
+      const venue = e.venue || e.v || "";
+      const date  = e.d || "";
+      const venueKey = Object.keys(salesByVenueDate).find(vk =>
+        BS_CONFIG[vk] && BS_CONFIG[vk].label === venue
+      );
+      if (!venueKey) return;
+      const byDate = salesByVenueDate[venueKey];
+      if (!byDate || !byDate[date]) return;
+      const newBsA = byDate[date];
+      e.bs_a  = newBsA;
+      e.beat  = newBsA >= e.bs_m ? 1 : 0;
+      e.roi_a = e.cost > 0 ? Math.round(newBsA / e.cost * 10000) / 10000 : 0;
+    });
+  }
+
+  // Re-inject both arrays
+  const newSchedJS = "var SCHED = " + JSON.stringify(sched) + ";";
+  html = html.replace(/var SCHED = \[[\s\S]*?\];/, newSchedJS);
+  if (bsMatch) {
+    const newBsJS = "var BS    = " + JSON.stringify(bs) + ";";
+    html = html.replace(/var BS\s*= \[[\s\S]*?\];/, newBsJS);
+  }
+
+  return { html, count };
 }
 
 (async () => {
@@ -183,30 +228,16 @@ function updateSchedBsA(html, venue, date, value) {
     }
   }
 
-  // Read dashboard HTML
+  // Read dashboard HTML and update SCHED + BS arrays
   let html = fs.readFileSync(DASHBOARD_PATH, "latin1");
-  let updatedCount = 0;
-
-  for (const vk of venueKeys) {
-    const cfg = BS_CONFIG[vk];
-    const byDate = allResults[vk];
-    for (const [date, sales] of Object.entries(byDate)) {
-      if (sales === 0) continue;
-      const before = html;
-      html = updateSchedBsA(html, cfg.label, date, sales);
-      if (html !== before) {
-        log(`  ✅ Updated SCHED: ${cfg.label} | ${date} → $${sales.toLocaleString()}`);
-        updatedCount++;
-      }
-    }
-  }
-
+  const { html: newHtml, count: updatedCount } = updateSchedInHtml(html, allResults);
+  html = newHtml;
   fs.writeFileSync(DASHBOARD_PATH, html, "latin1");
 
   if (updatedCount === 0) {
-    log("\nNo SCHED entries updated (no matching dates with revenue, or dates not in calendar).");
+    log("\nNo SCHED entries updated.");
   } else {
-    log(`\n✅ Updated ${updatedCount} bs_a values in index.html`);
+    log(`\n✅ Updated ${updatedCount} shows (bs_a + beat + _s + roi_a) in index.html`);
   }
 
   // Git commit & push
