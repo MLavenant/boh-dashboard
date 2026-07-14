@@ -20,7 +20,7 @@ const existing = html.slice(startIdx + startStr.length, endIdx).trim();
 const after    = html.slice(endIdx + 1); // from ; onwards
 
 const newEntries = JSON.stringify(newWeek).slice(1, -1); // strip outer []
-const newBlock = `var VIP_VENUES = [\n/* --- W29 (Jul 7-13, 2026) LIVE TOAST DATA --- */\n${newEntries},\n/* --- W27 (Jul 4-5, 2026) --- */\n${existing}\n]`;
+const newBlock = `var VIP_VENUES = [\n/* --- W28 (Jul 6-12, 2026) LIVE TOAST DATA --- */\n${newEntries},\n/* --- W27 (Jul 4-5, 2026) --- */\n${existing}\n]`;
 
 const newHtml = before + newBlock + after;
 fs.writeFileSync("C:\\Users\\MatthiasLavenant\\Documents\\rdg-dj-dashboard\\index.html", newHtml, "latin1");

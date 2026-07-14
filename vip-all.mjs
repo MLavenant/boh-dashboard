@@ -11,19 +11,16 @@ const token = await getToken();
 
 // CN Lounge tiers
 const CNL_TIERS = {
-  Diamond:  {tables:new Set(["809","808","905","904","903","902"]),               min:2500, color:"#b9f2ff", text:"#0a4a6e"},
-  Platinum: {tables:new Set(["810","906","907","908","909","910","911","912","901"]),min:2000, color:"#e8e8e8", text:"#2d2d2d"},
-  Gold:     {tables:new Set(["807","806","805","804","803"]),                      min:1500, color:"#fff3cd", text:"#7d5a00"},
-  Lounge:   {tables:new Set(["L1","L2","L3","L4","L5","L6","L7","L8","L9","L10","L11","L12","L1A","L2A","L3A","L4A","L5A","L6A","L7A","L8A","L9A","L10A","L11A","L12A"]), min:1000, color:"#d4edda", text:"#155724"},
+  Diamond:  {tables:new Set(["809","808","905","904","903","902"]),                          min:2000, color:"#b9f2ff", text:"#0a4a6e"},
+  Platinum: {tables:new Set(["810","901","906","907","908","909","910","911","912","807"]),  min:1500, color:"#e8e8e8", text:"#2d2d2d"},
+  Gold:     {tables:new Set(["803","804","805","806"]),                                      min:1000, color:"#fff3cd", text:"#7d5a00"},
 };
 
 // MILA tiers
 const MILA_TIERS = {
-  Diamond:  {tables:new Set(["305","306","307","408","408bis","407","405","409","406"]), min:3500, color:"#b9f2ff", text:"#0a4a6e"},
+  Diamond:  {tables:new Set(["305","306","307","405","406","407","408","409"]), min:2000, color:"#b9f2ff", text:"#0a4a6e"},
   Prestige: {tables:new Set(["403","404"]),                                             min:3000, color:"#e8d5ff", text:"#4a0080"},
-  Gold:     {tables:new Set(["402","304","303","302","301","308","410","401"]),          min:2000, color:"#fff3cd", text:"#7d5a00"},
-  Booths:   {tables:new Set(["1","2","3","4","5","6","7","8","9","10","11","12","1A","2A","3A","4A","5A","6A","7A","8A","9A","10A","11A","12A"]), min:1000, color:"#ffeaa7", text:"#6c4f00"},
-  Seating:  {tables:new Set(["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","S21","S22","S23","S24","S25","S26","S27","S28","S29","S30","73"]), min:500, color:"#dfe6e9", text:"#2d3436"},
+  Gold:     {tables:new Set(["301","302","303","304","308","401","402","410"]),          min:1000, color:"#fff3cd", text:"#7d5a00"},
 };
 
 async function calcVenue(venueGuid, tiers, dates, startFrac, endFrac, crossesMidnight, includeNoTable, sundayStartFrac) {

@@ -47,17 +47,14 @@ const TIER_MAPS = {
     Riverwalk: { tables: new Set(["19","20","21","22","23"]),                                                  minPerTable: 1000, color:"#d4edda", textColor:"#155724" },
   },
   "MILA Lounge": {
-    Diamond:  { tables: new Set(["305","306","307","406","407","408","409","410"]),                            minPerTable: 2000, color:"#b9f2ff", textColor:"#0a4a6e" },
+    Diamond:  { tables: new Set(["305","306","307","405","406","407","408","409"]),                            minPerTable: 2000, color:"#b9f2ff", textColor:"#0a4a6e" },
     Prestige: { tables: new Set(["403","404"]),                                                                minPerTable: 3000, color:"#e8d5ff", textColor:"#4a0080" },
-    Gold:     { tables: new Set(["301","302","303","304","308","401"]),                                        minPerTable: 1000, color:"#fff3cd", textColor:"#7d5a00" },
-    Booths:   { tables: new Set(["1","2","3","4","5","6","7","8","9","10","11","12","1A","2A","3A","4A","5A","6A","7A","8A","9A","10A","11A","12A"]), minPerTable: 500, color:"#ffeaa7", textColor:"#6c4f00" },
-    Seating:  { tables: new Set(["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","S21","S22","S23","S24","S25","S26","S27","S28","S29","S30"]), minPerTable: 200, color:"#dfe6e9", textColor:"#2d3436" },
+    Gold:     { tables: new Set(["301","302","303","304","308","401","402","410"]),                            minPerTable: 1000, color:"#fff3cd", textColor:"#7d5a00" },
   },
   "Casa Neos Lounge": {
-    Diamond:  { tables: new Set(["902","903","904","905","808","809"]),                                        minPerTable: 2000, color:"#b9f2ff", textColor:"#0a4a6e" },
-    Platinum: { tables: new Set(["901","906","907","908","909","810"]),                                        minPerTable: 1500, color:"#e8e8e8", textColor:"#2d2d2d" },
-    Gold:     { tables: new Set(["803","804","805","806","807"]),                                              minPerTable: 1000, color:"#fff3cd", textColor:"#7d5a00" },
-    Lounge:   { tables: new Set(["L1","L2","L3","L4","L5","L6","L7","L8","L9","L10","L11","L12","L1A","L2A","L3A","L4A","L5A","L6A","L7A","L8A","L9A","L10A","L11A","L12A"]), minPerTable: 500, color:"#d4edda", textColor:"#155724" },
+    Diamond:  { tables: new Set(["902","903","904","905","808","809"]),                                                minPerTable: 2000, color:"#b9f2ff", textColor:"#0a4a6e" },
+    Platinum: { tables: new Set(["810","901","906","907","908","909","910","911","912","807"]),                        minPerTable: 1500, color:"#e8e8e8", textColor:"#2d2d2d" },
+    Gold:     { tables: new Set(["803","804","805","806"]),                                                            minPerTable: 1000, color:"#fff3cd", textColor:"#7d5a00" },
   },
 };
 
@@ -182,8 +179,8 @@ console.error("Getting Toast token...");
 const token = await getToken();
 console.error("Token OK. Fetching", SHOWS.length, "shows...");
 
-const weekKey = "2026-W29";
-const weekOf  = "Jul 7 \u2013 Jul 13, 2026";
+const weekKey = "2026-W28";
+const weekOf  = "Jul 6 \u2013 Jul 12, 2026";
 const dateOpts = { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" };
 
 const results = {};

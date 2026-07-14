@@ -1,8 +1,8 @@
 [
   {
     "venue": "Casa Neos Beach Club",
-    "weekOf": "Jul 7 – Jul 13, 2026",
-    "weekKey": "2026-W29",
+    "weekOf": "Jul 6 – Jul 12, 2026",
+    "weekKey": "2026-W28",
     "shows": [
       {
         "date": "2026-07-11",
@@ -550,8 +550,8 @@
   },
   {
     "venue": "MILA Lounge",
-    "weekOf": "Jul 7 – Jul 13, 2026",
-    "weekKey": "2026-W29",
+    "weekOf": "Jul 6 – Jul 12, 2026",
+    "weekKey": "2026-W28",
     "shows": [
       {
         "date": "2026-07-08",
@@ -560,8 +560,8 @@
         "fee": 500,
         "bsActual": 105,
         "bsMin": 15000,
-        "tablesActual": 1,
-        "tablesBudget": 70,
+        "tablesActual": 0,
+        "tablesBudget": 18,
         "tiers": {
           "Diamond": {
             "soldTables": 0,
@@ -583,40 +583,15 @@
           },
           "Gold": {
             "soldTables": 0,
-            "totalTables": 6,
+            "totalTables": 8,
             "totalSales": 0,
             "avgPerTable": 0,
             "minPerTable": 1000,
             "color": "#fff3cd",
             "textColor": "#7d5a00"
-          },
-          "Booths": {
-            "soldTables": 1,
-            "totalTables": 24,
-            "totalSales": 32,
-            "avgPerTable": 32,
-            "minPerTable": 500,
-            "color": "#ffeaa7",
-            "textColor": "#6c4f00"
-          },
-          "Seating": {
-            "soldTables": 0,
-            "totalTables": 30,
-            "totalSales": 0,
-            "avgPerTable": 0,
-            "minPerTable": 200,
-            "color": "#dfe6e9",
-            "textColor": "#2d3436"
           }
         },
         "tableDetail": [
-          {
-            "table": "4",
-            "tier": "Booths",
-            "sales": 32,
-            "checks": 1,
-            "minPerTable": 500
-          },
           {
             "table": "305",
             "tier": "Diamond",
@@ -633,6 +608,13 @@
           },
           {
             "table": "307",
+            "tier": "Diamond",
+            "sales": 0,
+            "checks": 0,
+            "minPerTable": 2000
+          },
+          {
+            "table": "405",
             "tier": "Diamond",
             "sales": 0,
             "checks": 0,
@@ -661,13 +643,6 @@
           },
           {
             "table": "409",
-            "tier": "Diamond",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 2000
-          },
-          {
-            "table": "410",
             "tier": "Diamond",
             "sales": 0,
             "checks": 0,
@@ -730,375 +705,18 @@
             "minPerTable": 1000
           },
           {
-            "table": "1",
-            "tier": "Booths",
+            "table": "402",
+            "tier": "Gold",
             "sales": 0,
             "checks": 0,
-            "minPerTable": 500
+            "minPerTable": 1000
           },
           {
-            "table": "2",
-            "tier": "Booths",
+            "table": "410",
+            "tier": "Gold",
             "sales": 0,
             "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "3",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "5",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "6",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "7",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "8",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "9",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "10",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "11",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "12",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "1A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "2A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "3A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "4A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "5A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "6A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "7A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "8A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "9A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "10A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "11A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "12A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "S1",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S2",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S3",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S4",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S5",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S6",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S7",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S8",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S9",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S10",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S11",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S12",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S13",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S14",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S15",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S16",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S17",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S18",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S19",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S20",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S21",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S22",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S23",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S24",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S25",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S26",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S27",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S28",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S29",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S30",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
+            "minPerTable": 1000
           }
         ],
         "roiActual": 0.21,
@@ -1111,8 +729,8 @@
         "fee": 6500,
         "bsActual": 39342,
         "bsMin": 25000,
-        "tablesActual": 31,
-        "tablesBudget": 70,
+        "tablesActual": 11,
+        "tablesBudget": 18,
         "tiers": {
           "Diamond": {
             "soldTables": 6,
@@ -1134,30 +752,12 @@
           },
           "Gold": {
             "soldTables": 4,
-            "totalTables": 6,
+            "totalTables": 8,
             "totalSales": 7704,
             "avgPerTable": 1926,
             "minPerTable": 1000,
             "color": "#fff3cd",
             "textColor": "#7d5a00"
-          },
-          "Booths": {
-            "soldTables": 12,
-            "totalTables": 24,
-            "totalSales": 1838,
-            "avgPerTable": 153,
-            "minPerTable": 500,
-            "color": "#ffeaa7",
-            "textColor": "#6c4f00"
-          },
-          "Seating": {
-            "soldTables": 8,
-            "totalTables": 30,
-            "totalSales": 794,
-            "avgPerTable": 99,
-            "minPerTable": 200,
-            "color": "#dfe6e9",
-            "textColor": "#2d3436"
           }
         },
         "tableDetail": [
@@ -1239,161 +839,14 @@
             "minPerTable": 1000
           },
           {
-            "table": "8",
-            "tier": "Booths",
-            "sales": 472,
-            "checks": 12,
-            "minPerTable": 500
-          },
-          {
-            "table": "S4",
-            "tier": "Seating",
-            "sales": 295,
-            "checks": 6,
-            "minPerTable": 200
-          },
-          {
-            "table": "9",
-            "tier": "Booths",
-            "sales": 276,
-            "checks": 7,
-            "minPerTable": 500
-          },
-          {
-            "table": "7",
-            "tier": "Booths",
-            "sales": 246,
-            "checks": 7,
-            "minPerTable": 500
-          },
-          {
-            "table": "6",
-            "tier": "Booths",
-            "sales": 243,
-            "checks": 6,
-            "minPerTable": 500
-          },
-          {
-            "table": "11A",
-            "tier": "Booths",
-            "sales": 180,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "S5",
-            "tier": "Seating",
-            "sales": 128,
-            "checks": 3,
-            "minPerTable": 200
-          },
-          {
-            "table": "s2",
-            "tier": "Other",
-            "sales": 127,
-            "checks": 2,
-            "minPerTable": 0
-          },
-          {
-            "table": "S3",
-            "tier": "Seating",
-            "sales": 101,
-            "checks": 3,
-            "minPerTable": 200
-          },
-          {
-            "table": "5",
-            "tier": "Booths",
-            "sales": 100,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "S6",
-            "tier": "Seating",
-            "sales": 92,
-            "checks": 2,
-            "minPerTable": 200
-          },
-          {
-            "table": "4A",
-            "tier": "Booths",
-            "sales": 88,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "6A",
-            "tier": "Booths",
-            "sales": 76,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "S7",
-            "tier": "Seating",
-            "sales": 66,
-            "checks": 2,
-            "minPerTable": 200
-          },
-          {
-            "table": "4",
-            "tier": "Booths",
-            "sales": 65,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "S1",
-            "tier": "Seating",
-            "sales": 48,
-            "checks": 1,
-            "minPerTable": 200
-          },
-          {
-            "table": "8A",
-            "tier": "Booths",
-            "sales": 45,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "S9",
-            "tier": "Seating",
-            "sales": 44,
-            "checks": 1,
-            "minPerTable": 200
-          },
-          {
-            "table": "9A",
-            "tier": "Booths",
-            "sales": 25,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "2A",
-            "tier": "Booths",
-            "sales": 22,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "S15",
-            "tier": "Seating",
-            "sales": 20,
-            "checks": 1,
-            "minPerTable": 200
-          },
-          {
-            "table": "406",
+            "table": "405",
             "tier": "Diamond",
             "sales": 0,
             "checks": 0,
             "minPerTable": 2000
           },
           {
-            "table": "410",
+            "table": "406",
             "tier": "Diamond",
             "sales": 0,
             "checks": 0,
@@ -1421,242 +874,18 @@
             "minPerTable": 1000
           },
           {
-            "table": "1",
-            "tier": "Booths",
+            "table": "402",
+            "tier": "Gold",
             "sales": 0,
             "checks": 0,
-            "minPerTable": 500
+            "minPerTable": 1000
           },
           {
-            "table": "2",
-            "tier": "Booths",
+            "table": "410",
+            "tier": "Gold",
             "sales": 0,
             "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "3",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "10",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "11",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "12",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "1A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "3A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "5A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "7A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "10A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "12A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "S2",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S8",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S10",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S11",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S12",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S13",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S14",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S16",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S17",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S18",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S19",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S20",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S21",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S22",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S23",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S24",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S25",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S26",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S27",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S28",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S29",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S30",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
+            "minPerTable": 1000
           }
         ],
         "roiActual": 6.0526,
@@ -1669,14 +898,14 @@
         "fee": 7000,
         "bsActual": 82915.5,
         "bsMin": 45000,
-        "tablesActual": 37,
-        "tablesBudget": 70,
+        "tablesActual": 13,
+        "tablesBudget": 18,
         "tiers": {
           "Diamond": {
-            "soldTables": 6,
+            "soldTables": 5,
             "totalTables": 8,
-            "totalSales": 44791,
-            "avgPerTable": 7465,
+            "totalSales": 42709,
+            "avgPerTable": 8542,
             "minPerTable": 2000,
             "color": "#b9f2ff",
             "textColor": "#0a4a6e"
@@ -1691,31 +920,13 @@
             "textColor": "#4a0080"
           },
           "Gold": {
-            "soldTables": 6,
-            "totalTables": 6,
-            "totalSales": 20911,
-            "avgPerTable": 3485,
+            "soldTables": 7,
+            "totalTables": 8,
+            "totalSales": 22993,
+            "avgPerTable": 3285,
             "minPerTable": 1000,
             "color": "#fff3cd",
             "textColor": "#7d5a00"
-          },
-          "Booths": {
-            "soldTables": 17,
-            "totalTables": 24,
-            "totalSales": 5623,
-            "avgPerTable": 331,
-            "minPerTable": 500,
-            "color": "#ffeaa7",
-            "textColor": "#6c4f00"
-          },
-          "Seating": {
-            "soldTables": 7,
-            "totalTables": 30,
-            "totalSales": 1058,
-            "avgPerTable": 151,
-            "minPerTable": 200,
-            "color": "#dfe6e9",
-            "textColor": "#2d3436"
           }
         },
         "tableDetail": [
@@ -1798,10 +1009,10 @@
           },
           {
             "table": "410",
-            "tier": "Diamond",
+            "tier": "Gold",
             "sales": 2082,
             "checks": 1,
-            "minPerTable": 2000
+            "minPerTable": 1000
           },
           {
             "table": "302",
@@ -1811,182 +1022,14 @@
             "minPerTable": 1000
           },
           {
-            "table": "6A",
-            "tier": "Booths",
-            "sales": 960,
-            "checks": 4,
-            "minPerTable": 500
-          },
-          {
-            "table": "9",
-            "tier": "Booths",
-            "sales": 880,
-            "checks": 17,
-            "minPerTable": 500
-          },
-          {
-            "table": "8",
-            "tier": "Booths",
-            "sales": 573,
-            "checks": 7,
-            "minPerTable": 500
-          },
-          {
-            "table": "5",
-            "tier": "Booths",
-            "sales": 482,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "1A",
-            "tier": "Booths",
-            "sales": 421,
-            "checks": 8,
-            "minPerTable": 500
-          },
-          {
-            "table": "S5",
-            "tier": "Seating",
-            "sales": 340,
-            "checks": 6,
-            "minPerTable": 200
-          },
-          {
-            "table": "9A",
-            "tier": "Booths",
-            "sales": 323,
-            "checks": 8,
-            "minPerTable": 500
-          },
-          {
-            "table": "8A",
-            "tier": "Booths",
-            "sales": 315,
-            "checks": 4,
-            "minPerTable": 500
-          },
-          {
-            "table": "4",
-            "tier": "Booths",
-            "sales": 275,
-            "checks": 4,
-            "minPerTable": 500
-          },
-          {
-            "table": "S6",
-            "tier": "Seating",
-            "sales": 265,
-            "checks": 5,
-            "minPerTable": 200
-          },
-          {
-            "table": "S7",
-            "tier": "Seating",
-            "sales": 227,
-            "checks": 6,
-            "minPerTable": 200
-          },
-          {
-            "table": "11A",
-            "tier": "Booths",
-            "sales": 222,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "7",
-            "tier": "Booths",
-            "sales": 208,
-            "checks": 4,
-            "minPerTable": 500
-          },
-          {
-            "table": "2A",
-            "tier": "Booths",
-            "sales": 203,
-            "checks": 3,
-            "minPerTable": 500
-          },
-          {
-            "table": "4A",
-            "tier": "Booths",
-            "sales": 177,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "S9",
-            "tier": "Seating",
-            "sales": 163,
-            "checks": 2,
-            "minPerTable": 200
-          },
-          {
-            "table": "6",
-            "tier": "Booths",
-            "sales": 161,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "10A",
-            "tier": "Booths",
-            "sales": 124,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "5A",
-            "tier": "Booths",
-            "sales": 122,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "2",
-            "tier": "Booths",
-            "sales": 94,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "3A",
-            "tier": "Booths",
-            "sales": 83,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "s2",
-            "tier": "Other",
-            "sales": 44,
-            "checks": 2,
-            "minPerTable": 0
-          },
-          {
-            "table": "S8",
-            "tier": "Seating",
-            "sales": 40,
-            "checks": 1,
-            "minPerTable": 200
-          },
-          {
-            "table": "S16",
-            "tier": "Seating",
-            "sales": 21,
-            "checks": 1,
-            "minPerTable": 200
-          },
-          {
-            "table": "S17",
-            "tier": "Seating",
-            "sales": 2,
-            "checks": 1,
-            "minPerTable": 200
-          },
-          {
             "table": "307",
+            "tier": "Diamond",
+            "sales": 0,
+            "checks": 0,
+            "minPerTable": 2000
+          },
+          {
+            "table": "405",
             "tier": "Diamond",
             "sales": 0,
             "checks": 0,
@@ -2007,214 +1050,11 @@
             "minPerTable": 3000
           },
           {
-            "table": "1",
-            "tier": "Booths",
+            "table": "402",
+            "tier": "Gold",
             "sales": 0,
             "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "3",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "10",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "11",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "12",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "7A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "12A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "S1",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S2",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S3",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S4",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S10",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S11",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S12",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S13",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S14",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S15",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S18",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S19",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S20",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S21",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S22",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S23",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S24",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S25",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S26",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S27",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S28",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S29",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S30",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
+            "minPerTable": 1000
           }
         ],
         "roiActual": 11.8451,
@@ -2227,14 +1067,14 @@
         "fee": 1000,
         "bsActual": 72141,
         "bsMin": 45000,
-        "tablesActual": 38,
-        "tablesBudget": 70,
+        "tablesActual": 15,
+        "tablesBudget": 18,
         "tiers": {
           "Diamond": {
-            "soldTables": 7,
+            "soldTables": 6,
             "totalTables": 8,
-            "totalSales": 25120,
-            "avgPerTable": 3589,
+            "totalSales": 23410,
+            "avgPerTable": 3902,
             "minPerTable": 2000,
             "color": "#b9f2ff",
             "textColor": "#0a4a6e"
@@ -2249,31 +1089,13 @@
             "textColor": "#4a0080"
           },
           "Gold": {
-            "soldTables": 6,
-            "totalTables": 6,
-            "totalSales": 20008,
-            "avgPerTable": 3335,
+            "soldTables": 8,
+            "totalTables": 8,
+            "totalSales": 23760,
+            "avgPerTable": 2970,
             "minPerTable": 1000,
             "color": "#fff3cd",
             "textColor": "#7d5a00"
-          },
-          "Booths": {
-            "soldTables": 16,
-            "totalTables": 24,
-            "totalSales": 4355,
-            "avgPerTable": 272,
-            "minPerTable": 500,
-            "color": "#ffeaa7",
-            "textColor": "#6c4f00"
-          },
-          "Seating": {
-            "soldTables": 8,
-            "totalTables": 30,
-            "totalSales": 906,
-            "avgPerTable": 113,
-            "minPerTable": 200,
-            "color": "#dfe6e9",
-            "textColor": "#2d3436"
           }
         },
         "tableDetail": [
@@ -2369,186 +1191,25 @@
             "minPerTable": 1000
           },
           {
+            "table": "402",
+            "tier": "Gold",
+            "sales": 2042,
+            "checks": 1,
+            "minPerTable": 1000
+          },
+          {
             "table": "410",
-            "tier": "Diamond",
+            "tier": "Gold",
             "sales": 1710,
             "checks": 1,
+            "minPerTable": 1000
+          },
+          {
+            "table": "405",
+            "tier": "Diamond",
+            "sales": 0,
+            "checks": 0,
             "minPerTable": 2000
-          },
-          {
-            "table": "2",
-            "tier": "Booths",
-            "sales": 1205,
-            "checks": 5,
-            "minPerTable": 500
-          },
-          {
-            "table": "4",
-            "tier": "Booths",
-            "sales": 890,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "6",
-            "tier": "Booths",
-            "sales": 595,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "S9",
-            "tier": "Seating",
-            "sales": 391,
-            "checks": 2,
-            "minPerTable": 200
-          },
-          {
-            "table": "10A",
-            "tier": "Booths",
-            "sales": 279,
-            "checks": 5,
-            "minPerTable": 500
-          },
-          {
-            "table": "5A",
-            "tier": "Booths",
-            "sales": 252,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "4A",
-            "tier": "Booths",
-            "sales": 250,
-            "checks": 3,
-            "minPerTable": 500
-          },
-          {
-            "table": "5",
-            "tier": "Booths",
-            "sales": 161,
-            "checks": 3,
-            "minPerTable": 500
-          },
-          {
-            "table": "S3",
-            "tier": "Seating",
-            "sales": 141,
-            "checks": 1,
-            "minPerTable": 200
-          },
-          {
-            "table": "9A",
-            "tier": "Booths",
-            "sales": 139,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "1A",
-            "tier": "Booths",
-            "sales": 138,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "S4",
-            "tier": "Seating",
-            "sales": 131,
-            "checks": 3,
-            "minPerTable": 200
-          },
-          {
-            "table": "11A",
-            "tier": "Booths",
-            "sales": 128,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "8A",
-            "tier": "Booths",
-            "sales": 98,
-            "checks": 3,
-            "minPerTable": 500
-          },
-          {
-            "table": "S11",
-            "tier": "Seating",
-            "sales": 80,
-            "checks": 1,
-            "minPerTable": 200
-          },
-          {
-            "table": "3A",
-            "tier": "Booths",
-            "sales": 72,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "S6",
-            "tier": "Seating",
-            "sales": 70,
-            "checks": 1,
-            "minPerTable": 200
-          },
-          {
-            "table": "7",
-            "tier": "Booths",
-            "sales": 61,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "2A",
-            "tier": "Booths",
-            "sales": 55,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "S7",
-            "tier": "Seating",
-            "sales": 53,
-            "checks": 1,
-            "minPerTable": 200
-          },
-          {
-            "table": "s2",
-            "tier": "Other",
-            "sales": 50,
-            "checks": 2,
-            "minPerTable": 0
-          },
-          {
-            "table": "8",
-            "tier": "Booths",
-            "sales": 20,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "S8",
-            "tier": "Seating",
-            "sales": 20,
-            "checks": 1,
-            "minPerTable": 200
-          },
-          {
-            "table": "S5",
-            "tier": "Seating",
-            "sales": 20,
-            "checks": 1,
-            "minPerTable": 200
-          },
-          {
-            "table": "7A",
-            "tier": "Booths",
-            "sales": 12,
-            "checks": 1,
-            "minPerTable": 500
           },
           {
             "table": "406",
@@ -2563,216 +1224,6 @@
             "sales": 0,
             "checks": 0,
             "minPerTable": 3000
-          },
-          {
-            "table": "1",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "3",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "9",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "10",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "11",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "12",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "6A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "12A",
-            "tier": "Booths",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "S1",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S2",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S10",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S12",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S13",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S14",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S15",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S16",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S17",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S18",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S19",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S20",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S21",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S22",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S23",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S24",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S25",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S26",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S27",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S28",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S29",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
-          },
-          {
-            "table": "S30",
-            "tier": "Seating",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 200
           }
         ],
         "roiActual": 72.141,
@@ -2782,8 +1233,8 @@
   },
   {
     "venue": "Casa Neos Lounge",
-    "weekOf": "Jul 7 – Jul 13, 2026",
-    "weekKey": "2026-W29",
+    "weekOf": "Jul 6 – Jul 12, 2026",
+    "weekKey": "2026-W28",
     "shows": [
       {
         "date": "2026-07-09",
@@ -2792,8 +1243,8 @@
         "fee": 500,
         "bsActual": 24970,
         "bsMin": 25000,
-        "tablesActual": 17,
-        "tablesBudget": 41,
+        "tablesActual": 11,
+        "tablesBudget": 20,
         "tiers": {
           "Diamond": {
             "soldTables": 6,
@@ -2805,31 +1256,22 @@
             "textColor": "#0a4a6e"
           },
           "Platinum": {
-            "soldTables": 3,
-            "totalTables": 6,
-            "totalSales": 4143,
-            "avgPerTable": 1381,
+            "soldTables": 4,
+            "totalTables": 10,
+            "totalSales": 4923,
+            "avgPerTable": 1231,
             "minPerTable": 1500,
             "color": "#e8e8e8",
             "textColor": "#2d2d2d"
           },
           "Gold": {
-            "soldTables": 2,
-            "totalTables": 5,
-            "totalSales": 2350,
-            "avgPerTable": 1175,
+            "soldTables": 1,
+            "totalTables": 4,
+            "totalSales": 1570,
+            "avgPerTable": 1570,
             "minPerTable": 1000,
             "color": "#fff3cd",
             "textColor": "#7d5a00"
-          },
-          "Lounge": {
-            "soldTables": 6,
-            "totalTables": 24,
-            "totalSales": 2626,
-            "avgPerTable": 438,
-            "minPerTable": 500,
-            "color": "#d4edda",
-            "textColor": "#155724"
           }
         },
         "tableDetail": [
@@ -2897,13 +1339,6 @@
             "minPerTable": 2000
           },
           {
-            "table": "L4",
-            "tier": "Lounge",
-            "sales": 1074,
-            "checks": 21,
-            "minPerTable": 500
-          },
-          {
             "table": "905",
             "tier": "Diamond",
             "sales": 1035,
@@ -2919,45 +1354,17 @@
           },
           {
             "table": "807",
-            "tier": "Gold",
+            "tier": "Platinum",
             "sales": 780,
             "checks": 1,
-            "minPerTable": 1000
+            "minPerTable": 1500
           },
           {
-            "table": "L8A",
-            "tier": "Lounge",
-            "sales": 500,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "L7A",
-            "tier": "Lounge",
-            "sales": 500,
-            "checks": 1,
-            "minPerTable": 500
-          },
-          {
-            "table": "L5A",
-            "tier": "Lounge",
-            "sales": 357,
-            "checks": 13,
-            "minPerTable": 500
-          },
-          {
-            "table": "L4A",
-            "tier": "Lounge",
-            "sales": 185,
-            "checks": 5,
-            "minPerTable": 500
-          },
-          {
-            "table": "L3",
-            "tier": "Lounge",
-            "sales": 10,
-            "checks": 1,
-            "minPerTable": 500
+            "table": "810",
+            "tier": "Platinum",
+            "sales": 0,
+            "checks": 0,
+            "minPerTable": 1500
           },
           {
             "table": "906",
@@ -2974,7 +1381,21 @@
             "minPerTable": 1500
           },
           {
-            "table": "810",
+            "table": "910",
+            "tier": "Platinum",
+            "sales": 0,
+            "checks": 0,
+            "minPerTable": 1500
+          },
+          {
+            "table": "911",
+            "tier": "Platinum",
+            "sales": 0,
+            "checks": 0,
+            "minPerTable": 1500
+          },
+          {
+            "table": "912",
             "tier": "Platinum",
             "sales": 0,
             "checks": 0,
@@ -3000,132 +1421,6 @@
             "sales": 0,
             "checks": 0,
             "minPerTable": 1000
-          },
-          {
-            "table": "L1",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L2",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L5",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L6",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L7",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L8",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L9",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L10",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L11",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L12",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L1A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L2A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L3A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L6A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L9A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L10A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L11A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L12A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
           }
         ],
         "roiActual": 49.94,
@@ -3138,8 +1433,8 @@
         "fee": 12000,
         "bsActual": 53542,
         "bsMin": 52500,
-        "tablesActual": 23,
-        "tablesBudget": 41,
+        "tablesActual": 16,
+        "tablesBudget": 20,
         "tiers": {
           "Diamond": {
             "soldTables": 6,
@@ -3151,31 +1446,22 @@
             "textColor": "#0a4a6e"
           },
           "Platinum": {
-            "soldTables": 4,
-            "totalTables": 6,
-            "totalSales": 12247,
-            "avgPerTable": 3062,
+            "soldTables": 6,
+            "totalTables": 10,
+            "totalSales": 15436,
+            "avgPerTable": 2573,
             "minPerTable": 1500,
             "color": "#e8e8e8",
             "textColor": "#2d2d2d"
           },
           "Gold": {
-            "soldTables": 5,
-            "totalTables": 5,
-            "totalSales": 9822,
-            "avgPerTable": 1964,
+            "soldTables": 4,
+            "totalTables": 4,
+            "totalSales": 7668,
+            "avgPerTable": 1917,
             "minPerTable": 1000,
             "color": "#fff3cd",
             "textColor": "#7d5a00"
-          },
-          "Lounge": {
-            "soldTables": 8,
-            "totalTables": 24,
-            "totalSales": 3766,
-            "avgPerTable": 471,
-            "minPerTable": 500,
-            "color": "#d4edda",
-            "textColor": "#155724"
           }
         },
         "tableDetail": [
@@ -3251,10 +1537,10 @@
           },
           {
             "table": "807",
-            "tier": "Gold",
+            "tier": "Platinum",
             "sales": 2154,
             "checks": 1,
-            "minPerTable": 1000
+            "minPerTable": 1500
           },
           {
             "table": "902",
@@ -3262,13 +1548,6 @@
             "sales": 2000,
             "checks": 1,
             "minPerTable": 2000
-          },
-          {
-            "table": "L3",
-            "tier": "Lounge",
-            "sales": 1122,
-            "checks": 22,
-            "minPerTable": 500
           },
           {
             "table": "906",
@@ -3285,6 +1564,13 @@
             "minPerTable": 1000
           },
           {
+            "table": "910",
+            "tier": "Platinum",
+            "sales": 1035,
+            "checks": 1,
+            "minPerTable": 1500
+          },
+          {
             "table": "804",
             "tier": "Gold",
             "sales": 1000,
@@ -3297,55 +1583,6 @@
             "sales": 914,
             "checks": 1,
             "minPerTable": 1000
-          },
-          {
-            "table": "L5",
-            "tier": "Lounge",
-            "sales": 816,
-            "checks": 9,
-            "minPerTable": 500
-          },
-          {
-            "table": "L5A",
-            "tier": "Lounge",
-            "sales": 513,
-            "checks": 7,
-            "minPerTable": 500
-          },
-          {
-            "table": "L8A",
-            "tier": "Lounge",
-            "sales": 406,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "L7A",
-            "tier": "Lounge",
-            "sales": 314,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "L4A",
-            "tier": "Lounge",
-            "sales": 239,
-            "checks": 4,
-            "minPerTable": 500
-          },
-          {
-            "table": "L2",
-            "tier": "Lounge",
-            "sales": 237,
-            "checks": 2,
-            "minPerTable": 500
-          },
-          {
-            "table": "L4",
-            "tier": "Lounge",
-            "sales": 119,
-            "checks": 4,
-            "minPerTable": 500
           },
           {
             "table": "908",
@@ -3362,116 +1599,18 @@
             "minPerTable": 1500
           },
           {
-            "table": "L1",
-            "tier": "Lounge",
+            "table": "911",
+            "tier": "Platinum",
             "sales": 0,
             "checks": 0,
-            "minPerTable": 500
+            "minPerTable": 1500
           },
           {
-            "table": "L6",
-            "tier": "Lounge",
+            "table": "912",
+            "tier": "Platinum",
             "sales": 0,
             "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L7",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L8",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L9",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L10",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L11",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L12",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L1A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L2A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L3A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L6A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L9A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L10A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L11A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L12A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
+            "minPerTable": 1500
           }
         ],
         "roiActual": 4.4618,
@@ -3484,8 +1623,8 @@
         "fee": 1000,
         "bsActual": 36520,
         "bsMin": 45000,
-        "tablesActual": 16,
-        "tablesBudget": 41,
+        "tablesActual": 12,
+        "tablesBudget": 20,
         "tiers": {
           "Diamond": {
             "soldTables": 5,
@@ -3497,31 +1636,22 @@
             "textColor": "#0a4a6e"
           },
           "Platinum": {
-            "soldTables": 3,
-            "totalTables": 6,
-            "totalSales": 6786,
-            "avgPerTable": 2262,
+            "soldTables": 5,
+            "totalTables": 10,
+            "totalSales": 10390,
+            "avgPerTable": 2078,
             "minPerTable": 1500,
             "color": "#e8e8e8",
             "textColor": "#2d2d2d"
           },
           "Gold": {
-            "soldTables": 3,
-            "totalTables": 5,
-            "totalSales": 6994,
-            "avgPerTable": 2331,
+            "soldTables": 2,
+            "totalTables": 4,
+            "totalSales": 3444,
+            "avgPerTable": 1722,
             "minPerTable": 1000,
             "color": "#fff3cd",
             "textColor": "#7d5a00"
-          },
-          "Lounge": {
-            "soldTables": 5,
-            "totalTables": 24,
-            "totalSales": 2480,
-            "avgPerTable": 496,
-            "minPerTable": 500,
-            "color": "#d4edda",
-            "textColor": "#155724"
           }
         },
         "tableDetail": [
@@ -3541,10 +1671,10 @@
           },
           {
             "table": "807",
-            "tier": "Gold",
+            "tier": "Platinum",
             "sales": 3550,
             "checks": 1,
-            "minPerTable": 1000
+            "minPerTable": 1500
           },
           {
             "table": "903",
@@ -3610,39 +1740,11 @@
             "minPerTable": 1000
           },
           {
-            "table": "L3",
-            "tier": "Lounge",
-            "sales": 952,
-            "checks": 17,
-            "minPerTable": 500
-          },
-          {
-            "table": "L5",
-            "tier": "Lounge",
-            "sales": 880,
-            "checks": 8,
-            "minPerTable": 500
-          },
-          {
-            "table": "L4",
-            "tier": "Lounge",
-            "sales": 480,
-            "checks": 12,
-            "minPerTable": 500
-          },
-          {
-            "table": "L3A",
-            "tier": "Lounge",
-            "sales": 144,
-            "checks": 3,
-            "minPerTable": 500
-          },
-          {
-            "table": "L8A",
-            "tier": "Lounge",
-            "sales": 24,
+            "table": "910",
+            "tier": "Platinum",
+            "sales": 54,
             "checks": 1,
-            "minPerTable": 500
+            "minPerTable": 1500
           },
           {
             "table": "902",
@@ -3673,6 +1775,20 @@
             "minPerTable": 1500
           },
           {
+            "table": "911",
+            "tier": "Platinum",
+            "sales": 0,
+            "checks": 0,
+            "minPerTable": 1500
+          },
+          {
+            "table": "912",
+            "tier": "Platinum",
+            "sales": 0,
+            "checks": 0,
+            "minPerTable": 1500
+          },
+          {
             "table": "803",
             "tier": "Gold",
             "sales": 0,
@@ -3685,139 +1801,6 @@
             "sales": 0,
             "checks": 0,
             "minPerTable": 1000
-          },
-          {
-            "table": "L1",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L2",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L6",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L7",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L8",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L9",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L10",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L11",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L12",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L1A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L2A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L4A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L5A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L6A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L7A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L9A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L10A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L11A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L12A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
           }
         ],
         "roiActual": 36.52,
@@ -3830,8 +1813,8 @@
         "fee": 500,
         "bsActual": 74650,
         "bsMin": 20000,
-        "tablesActual": 23,
-        "tablesBudget": 41,
+        "tablesActual": 17,
+        "tablesBudget": 20,
         "tiers": {
           "Diamond": {
             "soldTables": 6,
@@ -3843,31 +1826,22 @@
             "textColor": "#0a4a6e"
           },
           "Platinum": {
-            "soldTables": 5,
-            "totalTables": 6,
-            "totalSales": 13157,
-            "avgPerTable": 2631,
+            "soldTables": 7,
+            "totalTables": 10,
+            "totalSales": 19572,
+            "avgPerTable": 2796,
             "minPerTable": 1500,
             "color": "#e8e8e8",
             "textColor": "#2d2d2d"
           },
           "Gold": {
-            "soldTables": 5,
-            "totalTables": 5,
-            "totalSales": 13609,
-            "avgPerTable": 2722,
+            "soldTables": 4,
+            "totalTables": 4,
+            "totalSales": 10937,
+            "avgPerTable": 2734,
             "minPerTable": 1000,
             "color": "#fff3cd",
             "textColor": "#7d5a00"
-          },
-          "Lounge": {
-            "soldTables": 7,
-            "totalTables": 24,
-            "totalSales": 7488,
-            "avgPerTable": 1070,
-            "minPerTable": 500,
-            "color": "#d4edda",
-            "textColor": "#155724"
           }
         },
         "tableDetail": [
@@ -3928,6 +1902,13 @@
             "minPerTable": 2000
           },
           {
+            "table": "910",
+            "tier": "Platinum",
+            "sales": 3743,
+            "checks": 2,
+            "minPerTable": 1500
+          },
+          {
             "table": "803",
             "tier": "Gold",
             "sales": 2777,
@@ -3936,10 +1917,10 @@
           },
           {
             "table": "807",
-            "tier": "Gold",
+            "tier": "Platinum",
             "sales": 2672,
             "checks": 1,
-            "minPerTable": 1000
+            "minPerTable": 1500
           },
           {
             "table": "906",
@@ -3963,20 +1944,6 @@
             "minPerTable": 1500
           },
           {
-            "table": "L5",
-            "tier": "Lounge",
-            "sales": 1951,
-            "checks": 42,
-            "minPerTable": 500
-          },
-          {
-            "table": "L3",
-            "tier": "Lounge",
-            "sales": 1880,
-            "checks": 38,
-            "minPerTable": 500
-          },
-          {
             "table": "810",
             "tier": "Platinum",
             "sales": 1542,
@@ -3989,20 +1956,6 @@
             "sales": 1351,
             "checks": 1,
             "minPerTable": 2000
-          },
-          {
-            "table": "L4",
-            "tier": "Lounge",
-            "sales": 1285,
-            "checks": 19,
-            "minPerTable": 500
-          },
-          {
-            "table": "L10A",
-            "tier": "Lounge",
-            "sales": 1163,
-            "checks": 2,
-            "minPerTable": 500
           },
           {
             "table": "804",
@@ -4019,27 +1972,6 @@
             "minPerTable": 1000
           },
           {
-            "table": "L5A",
-            "tier": "Lounge",
-            "sales": 591,
-            "checks": 5,
-            "minPerTable": 500
-          },
-          {
-            "table": "L4A",
-            "tier": "Lounge",
-            "sales": 332,
-            "checks": 5,
-            "minPerTable": 500
-          },
-          {
-            "table": "L2",
-            "tier": "Lounge",
-            "sales": 286,
-            "checks": 10,
-            "minPerTable": 500
-          },
-          {
             "table": "908",
             "tier": "Platinum",
             "sales": 0,
@@ -4047,123 +1979,18 @@
             "minPerTable": 1500
           },
           {
-            "table": "L1",
-            "tier": "Lounge",
+            "table": "911",
+            "tier": "Platinum",
             "sales": 0,
             "checks": 0,
-            "minPerTable": 500
+            "minPerTable": 1500
           },
           {
-            "table": "L6",
-            "tier": "Lounge",
+            "table": "912",
+            "tier": "Platinum",
             "sales": 0,
             "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L7",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L8",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L9",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L10",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L11",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L12",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L1A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L2A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L3A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L6A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L7A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L8A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L9A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L11A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
-          },
-          {
-            "table": "L12A",
-            "tier": "Lounge",
-            "sales": 0,
-            "checks": 0,
-            "minPerTable": 500
+            "minPerTable": 1500
           }
         ],
         "roiActual": 149.3,

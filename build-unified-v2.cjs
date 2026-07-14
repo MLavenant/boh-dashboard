@@ -31,6 +31,12 @@ const VENUE_SLUG_MAP = {
 
 const TARGETS = JSON.parse(fs.readFileSync(path.join(DIR, 'station-targets.json'), 'utf8'));
 
+// Item-level targets from Excel ref files
+let ITEM_TARGETS = {};
+try {
+  ITEM_TARGETS = JSON.parse(fs.readFileSync(path.join(DIR, 'item-targets.json'), 'utf8'));
+} catch(e) { /* file not found, skip */ }
+
 function applyTargets(venueKey, data) {
   const venueTargets = TARGETS[venueKey] || {};
   (data.stations || []).forEach(s => {
@@ -281,7 +287,8 @@ html = html.replace('</style>', `
 </style>`);
 
 // ── Build ALL_DATA JS string ──────────────────────────────────────────────────
-const allDataJS = `const ALL_DATA = ${JSON.stringify(VENUES, null, 0)};`;
+const allDataJS = `const ALL_DATA = ${JSON.stringify(VENUES, null, 0)};
+const ITEM_TARGETS_DATA = ${JSON.stringify(ITEM_TARGETS, null, 0)};`;
 
 // ── Generate the new <script> block ──────────────────────────────────────────
 const newScript = `
@@ -1020,8 +1027,13 @@ function renderStationBreaking() {
       .map(([x, d]) => ({ x: +x, y: +(d.sum / d.cnt).toFixed(2) }))
       .sort((a, b) => a.x - b.x);
 
-    // Only include stations that break 15 min at some load level
-    if (!finalPts.some(p => p.y >= 15)) return;
+    // Fix 3: Apply BP rule — skip first 10 data points, require at least 2 consecutive above threshold
+    const postSkip = finalPts.slice(10);
+    let hasConsecutive = false;
+    for (let i = 0; i < postSkip.length - 1; i++) {
+      if (postSkip[i].y >= 15 && postSkip[i + 1].y >= 15) { hasConsecutive = true; break; }
+    }
+    if (!hasConsecutive) return;
 
     const color = PALETTE[idx % PALETTE.length];
     datasets.push({
@@ -1785,8 +1797,39 @@ function renderMenuItems() {
 // TAB 5: Assignment
 // ============================================================
 function renderAssignment() {
-  const DATA = getD().assignmentData || [];
-  let filtered = DATA;
+  // Fix 4: Use item-targets.json for targets; show ALL food items from item-fulfillment
+  const venueSlugMap = { claudie:'claudie', casaneos:'casa_neos', ava_cg:'ava_cg', ava_wp:'ava_wp', mila:'mila' };
+  const venueTargets = ITEM_TARGETS_DATA[venueSlugMap[currentVenue]] || {};
+  const RAW_DATA = getD().assignmentData || [];
+
+  // Build merged rows: use assignmentData items as base, override target from venueTargets
+  // Also add any items that appear in item-fulfillment summary but not in assignmentData
+  const summary = getD().summary || [];
+  const assignMap = {};
+  RAW_DATA.forEach(r => { assignMap[r.menuItem] = r; });
+
+  // Merge: all items from assignmentData + summary items not already there
+  const allItems = new Set([...RAW_DATA.map(r => r.menuItem), ...summary.map(s => s.menuItem || s.item || '')].filter(Boolean));
+
+  const DATA = [...allItems].map(menuItem => {
+    const base = assignMap[menuItem] || {};
+    const summaryRow = summary.find(s => (s.menuItem || s.item) === menuItem);
+    const avgFulSec = base.avgFulSec || (summaryRow ? summaryRow.avg_sec : null);
+    const count = base.count || (summaryRow ? summaryRow.count : null);
+    const station = base.station || null;
+    // Fix 4: use item-targets.json value if available, otherwise use base.targetSec or null
+    const targetSec = venueTargets[menuItem] || base.targetSec || null;
+    return { menuItem, station, targetSec, avgFulSec, count };
+  });
+
+  // Sort: items WITH station first (sorted by station name), then without station
+  DATA.sort((a, b) => {
+    if (a.station && !b.station) return -1;
+    if (!a.station && b.station) return 1;
+    if (a.station && b.station) return a.station.localeCompare(b.station) || a.menuItem.localeCompare(b.menuItem);
+    return a.menuItem.localeCompare(b.menuItem);
+  });
+
   const searchEl = document.getElementById('assignSearch');
   if (searchEl) { searchEl.value = ''; }
 
@@ -1797,7 +1840,7 @@ function renderAssignment() {
 
   function statusBadge(avgFulSec, targetSec) {
     if (!avgFulSec) return '<span style="color:#6b7280;font-size:11px">—</span>';
-    if (!targetSec) return '<span style="color:#9aa0aa;font-size:11px">no tgt</span>';
+    if (!targetSec) return '<span style="color:#9aa0aa;font-size:11px">● No Target</span>';
     const r = avgFulSec / targetSec;
     if (r > 1.15) return '<span style="color:#ef4444;font-size:11px">● Over</span>';
     if (r > 1.0) return '<span style="color:#f59e0b;font-size:11px">● Watch</span>';
@@ -1808,9 +1851,15 @@ function renderAssignment() {
     let lastStation = null;
     const countEl = document.getElementById('assignCount');
     if (countEl) countEl.textContent = rows.length + ' items';
+    if (!rows.length) {
+      document.getElementById('assignBody').innerHTML =
+        '<tr><td colspan="6" style="text-align:center;padding:40px 20px;color:#9aa0aa;font-size:14px">No assignment data available for this venue/week.</td></tr>';
+      return;
+    }
     document.getElementById('assignBody').innerHTML = rows.map(r => {
+      const stationDisplay = r.station || '—';
       const stationCell = r.station !== lastStation
-        ? '<td style="padding:7px 10px;font-weight:700;color:#d9a441;white-space:nowrap;vertical-align:top">' + (r.station||'—') + '</td>'
+        ? '<td style="padding:7px 10px;font-weight:700;color:' + (r.station ? '#d9a441' : '#6b7280') + ';white-space:nowrap;vertical-align:top">' + stationDisplay + '</td>'
         : '<td style="padding:7px 10px;color:#3a3f4a;border-top:none"></td>';
       lastStation = r.station;
       const avgColor = r.avgFulSec && r.targetSec
@@ -1832,11 +1881,6 @@ function renderAssignment() {
   window.applyAssignFilter = function() {
     renderRows(getRows());
   };
-
-  if (!DATA.length) {
-    document.getElementById('assignBody').innerHTML =
-      '<tr><td colspan="6" style="text-align:center;padding:40px 20px;color:#9aa0aa;font-size:14px">No assignment data available for this venue/week.<br><small style="color:#6b7280">Requires item-fulfillment and item-details files.</small></td></tr>';
-  }
 }
 
 // ============================================================
@@ -2070,6 +2114,70 @@ function renderAll() {
 }
 
 // ============================================================
+// WELCOME POPUP (Fix 2)
+// ============================================================
+function showWeekWelcomePopup(weekKey) {
+  const VENUE_LABELS_WP = ${JSON.stringify(VENUE_LABELS)};
+  // Gather per-venue summary for this week
+  const venueRows = Object.entries(VENUE_LABELS_WP).map(([key, label]) => {
+    const d = ALL_DATA[key]?.[weekKey] || ALL_DATA[key]?.['latest'];
+    if (!d) return null;
+    const stations = (d.stations || []).filter(s => {
+      const n = s.station.toLowerCase();
+      return !['bar','champagne','wine','btg','pos','barista','somm','water','service','beach','btl inside','btl outside'].some(p => n.includes(p));
+    });
+    if (!stations.length) return null;
+    let totalCount = 0, totalSec = 0;
+    stations.forEach(s => { totalCount += s.count; totalSec += s.avg_sec * s.count; });
+    const avgFulMin = totalCount > 0 ? (totalSec / totalCount / 60).toFixed(1) : null;
+
+    // Breaking point
+    const curve = d.curve || [];
+    let bp = null;
+    for (let i = 0; i < curve.length; i++) {
+      if (i < 10) continue;
+      if (curve[i].occ < 5) continue;
+      if (curve[i].occ >= 3 && curve[i].ful >= 15) { bp = curve[i]; break; }
+    }
+    const peakConc = curve.length ? Math.max(...curve.map(c => c.conc)) : null;
+    return { label, bp, peakConc, avgFulMin };
+  }).filter(Boolean);
+
+  const overlay = document.createElement('div');
+  overlay.id = 'weekWelcomeOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+
+  const modal = document.createElement('div');
+  modal.style.cssText = 'background:#181b22;border:1px solid #2d3448;border-radius:14px;padding:28px 32px;max-width:580px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.6)';
+
+  const weekLabel = weekKey.replace(/^(\d{4})-W(\d+)$/, 'W$2');
+  let html = '<div style="font-size:20px;font-weight:700;color:#e8eaed;margin-bottom:6px">Good Morning — Week ' + weekLabel + ' Kitchen Health</div>';
+  html += '<div style="font-size:12px;color:#9aa0aa;margin-bottom:20px;border-bottom:1px solid #262a33;padding-bottom:14px">Here\'s a snapshot of this week\'s BOH performance across all venues.</div>';
+
+  venueRows.forEach(v => {
+    html += '<div style="margin-bottom:16px;padding:14px 16px;background:#13161c;border-radius:10px;border:1px solid #1e2533">';
+    html += '<div style="font-size:14px;font-weight:700;color:#d9a441;margin-bottom:8px">' + v.label + '</div>';
+    if (v.bp) {
+      html += '<div style="font-size:12px;color:#ef4444;margin-bottom:4px">⚡ Breaking Point at <strong style="color:#f87171">' + v.bp.conc + ' tickets</strong> (' + Math.round(v.bp.guests) + ' guests)</div>';
+    } else {
+      html += '<div style="font-size:12px;color:#22c55e;margin-bottom:4px">✅ No breaking point this week</div>';
+    }
+    if (v.peakConc != null) html += '<div style="font-size:12px;color:#9aa0aa;margin-bottom:2px">Peak concurrent: <strong style="color:#e8eaed">' + v.peakConc + ' tickets</strong></div>';
+    if (v.avgFulMin != null) html += '<div style="font-size:12px;color:#9aa0aa">Avg fulfillment: <strong style="color:#e8eaed">' + v.avgFulMin + ' min</strong></div>';
+    html += '</div>';
+  });
+
+  html += '<div style="margin-top:18px;text-align:center">';
+  html += '<button onclick="document.getElementById(\'weekWelcomeOverlay\').remove();localStorage.setItem(\'boh_last_seen_week\',\'' + weekKey + '\')" ';
+  html += 'style="background:#d9a441;color:#0c0e13;border:none;border-radius:8px;padding:10px 32px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Got it</button>';
+  html += '</div>';
+
+  modal.innerHTML = html;
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+// ============================================================
 // VENUE PILLS INIT
 // ============================================================
 const VENUE_LABELS = ${JSON.stringify(VENUE_LABELS)};
@@ -2116,10 +2224,22 @@ function changeWeek(dir) {
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   initVenuePills();
+  // Fix 1: Ensure latest week is selected by default
+  currentWeekIdx = WEEKS.length - 1;
+  const dd = document.getElementById('weekDropdown');
+  if (dd) dd.value = currentWeekIdx;
   const wpBtn = document.getElementById('weekPrev');
   const wnBtn = document.getElementById('weekNext');
   if (wpBtn) wpBtn.disabled = currentWeekIdx === 0;
   if (wnBtn) wnBtn.disabled = currentWeekIdx >= WEEKS.length - 1;
+
+  // Fix 2: First-open-of-week welcome popup
+  const currentWeekKey = WEEKS[currentWeekIdx]?.key || '';
+  const lastSeen = localStorage.getItem('boh_last_seen_week');
+  if (lastSeen !== currentWeekKey && currentWeekKey) {
+    showWeekWelcomePopup(currentWeekKey);
+  }
+
   renderAll();
 });
 </script>
