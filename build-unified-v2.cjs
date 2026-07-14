@@ -1165,14 +1165,23 @@ function renderStations() {
   const STATION_DETAILS = getD().stationDetails;
   const _BEV_KW = [
     'evian','pellegrino','perrier','water','coke','coca','diet',
-    'sprite','soda','juice','lemonade','iced tea',
-    'beer','kronenbourg','heineken','stella','bud','corona',
+    'sprite','soda','juice','lemonade','iced tea','ginger ale',
+    'beer','kronenbourg','heineken','stella','bud','corona','draft',
     'wine','champagne','prosecco','sancerre','pinot','chardonnay',
-    'bordeaux','burgundy','ros\u00e9','rose',
-    'vodka','gin','rum','tequila','whiskey','bourbon','scotch',
-    'tito','martini','negroni','cocktail','spritz',
-    'espresso','coffee','latte','cappuccino','tea','barista',
-    'gl ','benoit',
+    'bordeaux','burgundy','ros\u00e9','rose','chard','chablis','viognier',
+    'malbec','cabernet','merlot','syrah','shiraz','riesling','sauvignon',
+    'mathiasson','vista',
+    'vodka','gin','rum','tequila','whiskey','whisky','bourbon','scotch',
+    'mezcal','espadin','conejos','blanco','reposado','anejo',
+    'tito','belvedere','hendricks','hendrick','johnnie','johnie','walker',
+    'balvenie','macallan','glenlivet','glenfiddich','jameson',
+    'beluga','grey goose','ketel','absolut','tanqueray','bombay',
+    'bacardi','patron','don julio','casamigos','centinela',
+    'martini','negroni','cocktail','spritz','aperol','campari',
+    'cognac','armagnac','calvados','brandy','port','sherry','vermouth',
+    'espresso','coffee','latte','cappuccino','tea','barista','americano',
+    'gl ','benoit','chauveau','et fill',
+    'all in savory','all in dessert','all in ',
   ];
   function isBeverageItem(name) {
     const n = (name || '').toLowerCase();
