@@ -393,8 +393,8 @@ function computeBreakingPoint() {
     if (i < 10) continue;
     const d = curve[i];
     if (d.occ < 5) continue;
-    // Require 2 consecutive load levels above threshold
-    if (d.ful >= getThreshold()) { bpEntry = d; break; }
+    // Use p75 for robust BP detection (outlier-resistant)
+    if ((d.p75 != null ? d.p75 : d.ful) >= getThreshold()) { bpEntry = d; break; }
   }
   if (!bpEntry) return { tickets: null, guests: null };
   return { tickets: bpEntry.conc, guests: Math.round(bpEntry.guests) };
@@ -460,6 +460,8 @@ function renderPressure() {
   const bpObj = computeBreakingPoint();
   if (bp1) bp1.textContent = bpObj.tickets ?? '—';
   if (bp2) bp2.textContent = bpObj.guests ?? '—';
+  const bpNote = document.getElementById('bpMethodNote');
+  if (bpNote) bpNote.textContent = 'BP detected via P75 fulfillment';
 }
 
 // ============================================================
@@ -1422,6 +1424,7 @@ function renderStations() {
           '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+fmtSec(s.avg_sec)+'</div><div class="l">Avg time</div></div>'+
           '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+(s.exp_sec?fmtSec(s.exp_sec):'—')+'</div><div class="l">Target</div></div>'+
           '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px;color:'+ratioColor+'">'+ratioDisp+'</div><div class="l">vs Target</div></div>'+
+          (s.bp_tickets != null ? '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px;color:#e2706a">'+s.bp_tickets+'</div><div class="l">Station BP</div></div>' : '')+
         '</div>'+
       '</div>'+
       '<div style="margin-bottom:16px">'+
@@ -2027,7 +2030,7 @@ finalHtml = finalHtml
   )
   .replace(
     '<div class="annotation-box">⚡ Breaking point at <strong>26 concurrent tickets</strong> — avg fulfillment jumps to 16.0 min.</div>',
-    '<div class="annotation-box" id="bpAnnotation">⚡ Breaking point at <strong>26 concurrent tickets</strong> — avg fulfillment jumps to 16.0 min.</div>'
+    '<div class="annotation-box" id="bpAnnotation">⚡ Breaking point at <strong>26 concurrent tickets</strong> — avg fulfillment jumps to 16.0 min.</div><div id="bpMethodNote" style="font-size:11px;color:#9aa0aa;margin-top:4px">BP detected via P75 fulfillment</div>'
   );
 
 // ── Write output ──────────────────────────────────────────────────────────────
