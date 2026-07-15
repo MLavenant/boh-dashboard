@@ -12,6 +12,8 @@ try {
     const shortLabel = isoMatch ? 'W' + isoMatch[1] : ('Week ' + (i + 1));
     return { label: shortLabel, key: w.weekLabel };
   });
+  // Sort chronologically so the latest week is always last (index = length-1)
+  rollingWeeks.sort((a, b) => String(a.key).localeCompare(String(b.key)));
 } catch(e) {
   // fallback
 }
@@ -35,6 +37,12 @@ const TARGETS = JSON.parse(fs.readFileSync(path.join(DIR, 'station-targets.json'
 let ITEM_TARGETS = {};
 try {
   ITEM_TARGETS = JSON.parse(fs.readFileSync(path.join(DIR, 'item-targets.json'), 'utf8'));
+} catch(e) { /* file not found, skip */ }
+
+// Static Menu Item → Stations + Target from REF sheets (authoritative assignment)
+let ITEM_STATION_MAP = {};
+try {
+  ITEM_STATION_MAP = JSON.parse(fs.readFileSync(path.join(DIR, 'item-station-map.json'), 'utf8'));
 } catch(e) { /* file not found, skip */ }
 
 function applyTargets(venueKey, data) {
@@ -295,7 +303,8 @@ html = html.replace('</style>', `
 
 // ── Build ALL_DATA JS string ──────────────────────────────────────────────────
 const allDataJS = `const ALL_DATA = ${JSON.stringify(VENUES, null, 0)};
-const ITEM_TARGETS_DATA = ${JSON.stringify(ITEM_TARGETS, null, 0)};`;
+const ITEM_TARGETS_DATA = ${JSON.stringify(ITEM_TARGETS, null, 0)};
+const ITEM_STATION_MAP_DATA = ${JSON.stringify(ITEM_STATION_MAP, null, 0)};`;
 
 // ── Generate the new <script> block ──────────────────────────────────────────
 const newScript = `
@@ -306,7 +315,14 @@ const newScript = `
 ${allDataJS}
 
 const WEEKS = ${JSON.stringify(rollingWeeks)};
-let currentWeekIdx = WEEKS.length - 1;
+// Always open on the chronologically latest week
+let currentWeekIdx = (() => {
+  let best = 0;
+  for (let i = 1; i < WEEKS.length; i++) {
+    if (String(WEEKS[i].key) > String(WEEKS[best].key)) best = i;
+  }
+  return WEEKS.length ? best : 0;
+})();
 let currentVenue = 'claudie';
 function getD() {
   const weekKey = WEEKS[currentWeekIdx]?.key;
@@ -320,6 +336,43 @@ const FOOD_EXCL_PATTERNS = ['bar','champagne','wine','btg','pos','barista','somm
 function isFoodStation(name) {
   const n = name.toLowerCase();
   return !FOOD_EXCL_PATTERNS.some(p => n.includes(p));
+}
+
+// Static REF assignment helpers (authoritative item → stations + target)
+function venueSlugForMap() {
+  const map = { claudie:'claudie', casaneos:'casa_neos', ava_cg:'ava_cg', ava_wp:'ava_wp', mila:'mila' };
+  return map[currentVenue] || currentVenue;
+}
+function getStaticItemMap() {
+  return ITEM_STATION_MAP_DATA[venueSlugForMap()] || {};
+}
+function stationNamesMatch(a, b) {
+  const na = String(a || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const nb = String(b || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (!na || !nb) return false;
+  return na === nb || na.includes(nb) || nb.includes(na);
+}
+/** Items for a station — ONLY from static REF map. Live times from weekly summary. */
+function getStaticItemsForStation(stationName) {
+  const map = getStaticItemMap();
+  const summaryByName = {};
+  (getD().summary || []).forEach(d => {
+    const name = d.menuItem || d.item;
+    if (name) summaryByName[name] = d;
+  });
+  const out = [];
+  Object.entries(map).forEach(([menuItem, info]) => {
+    const stations = info.stations || [];
+    if (!stations.some(st => stationNamesMatch(st, stationName))) return;
+    const live = summaryByName[menuItem] || {};
+    out.push({
+      menuItem,
+      qty: live.qty != null ? live.qty : (live.count || 0),
+      avgFulSec: live.avgFulSec != null ? live.avgFulSec : (live.avg_sec || 0),
+      targetSec: info.targetSec || 0,
+    });
+  });
+  return out.sort((a, b) => (b.qty || 0) - (a.qty || 0) || a.menuItem.localeCompare(b.menuItem));
 }
 
 // ============================================================
@@ -1389,7 +1442,8 @@ function renderStations() {
 
   function renderStationDetail(s) {
     const det = STATION_DETAILS[s.station] || {};
-    const items = (STATION_ITEMS[s.station] || []).filter(it => !isBeverageItem(it.menuItem || it.item || ''));
+    // ONLY items from static REF assignment for this station
+    const items = getStaticItemsForStation(s.station);
     const ratio = s.exp_sec > 0 ? s.avg_sec / s.exp_sec : null;
     let statusClass = 'status-red', statusText = 'Over target';
     if (!s.exp_sec) { statusClass=''; statusText='No target'; }
@@ -1461,25 +1515,29 @@ function renderStations() {
     const topItems = items.slice(0, 20);
     let itemsHtml = '';
     if (topItems.length > 0) {
-      const maxSec = Math.max(...topItems.map(i=>i.avgFulSec||0), s.exp_sec||0, 900);
+      const maxSec = Math.max(...topItems.map(i => i.avgFulSec || i.targetSec || 0), 60);
       itemsHtml = '<table class="items-table"><thead><tr><th>Menu Item</th><th>Count</th><th>Avg Time</th><th>vs Target</th><th style="min-width:120px">Bar</th></tr></thead><tbody>';
       topItems.forEach(it => {
         const avg = it.avgFulSec || 0;
         const name = it.menuItem || '—';
         const cnt = it.qty || 0;
-        const over = avg > (s.exp_sec||900);
-        const delta = s.exp_sec ? avg - s.exp_sec : avg - 900;
-        const deltaStr = s.exp_sec
-          ? (delta>0?'<span style="color:#e2706a">+'+fmtSec(delta)+'</span>':'<span style="color:#74d39a">'+fmtSec(-delta)+' under</span>')
-          : '—';
-        const pct = Math.min(100, (avg / maxSec) * 100);
-        const barColor = over ? '#ef4444' : '#22c55e';
-        itemsHtml += '<tr><td>'+(over?'<span style="color:#e2706a">'+name+'</span>':name)+'</td><td style="color:#9aa0aa">'+cnt+'</td><td style="font-weight:600">'+fmtSec(avg)+'</td><td>'+deltaStr+'</td><td><div class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div><span style="font-size:10px;color:#9aa0aa;white-space:nowrap">'+fmtSec(avg)+'</span></div></td></tr>';
+        const tgt = it.targetSec || 0;
+        const over = tgt > 0 && avg > tgt;
+        const deltaStr = !tgt
+          ? '<span style="color:#6b7280">no target</span>'
+          : (avg <= 0
+            ? '<span style="color:#6b7280">no sales</span>'
+            : (avg > tgt
+              ? '<span style="color:#e2706a">+'+fmtSec(avg - tgt)+'</span>'
+              : '<span style="color:#74d39a">'+fmtSec(tgt - avg)+' under</span>'));
+        const pct = tgt > 0 ? Math.min(100, (avg / (tgt * 1.5)) * 100) : Math.min(100, (avg / maxSec) * 100);
+        const barColor = !tgt || avg <= 0 ? '#6b7280' : (over ? '#ef4444' : '#22c55e');
+        itemsHtml += '<tr><td>'+(over?'<span style="color:#e2706a">'+name+'</span>':name)+'</td><td style="color:#9aa0aa">'+cnt+'</td><td style="font-weight:600">'+(avg>0?fmtSec(avg):'—')+'</td><td>'+deltaStr+'</td><td><div class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div><span style="font-size:10px;color:#9aa0aa;white-space:nowrap">'+(tgt?fmtSec(tgt):'—')+'</span></div></td></tr>';
       });
       itemsHtml += '</tbody></table>';
       if (items.length > 20) itemsHtml += '<p style="font-size:11px;color:#9aa0aa;margin:6px 0 0">+'+(items.length-20)+' more items</p>';
     } else {
-      itemsHtml = '<p style="color:#9aa0aa;font-size:12px">No item-level data available from ticket drop for this station.</p>';
+      itemsHtml = '<p style="color:#9aa0aa;font-size:12px">No items assigned to this station in the static REF list.</p>';
     }
 
     const statusSpan = statusClass
@@ -1504,14 +1562,18 @@ function renderStations() {
       '</div>'+
       '<div style="font-size:13px;font-weight:600;color:#d9a441;margin-bottom:4px">Hourly Heatmap (Day × Hour)</div>'+
       hmHtml+
-      '<div style="font-size:13px;font-weight:600;color:#d9a441;margin:16px 0 4px">Menu Items at this station (from ticket drop)</div>'+
+      '<div style="font-size:13px;font-weight:600;color:#d9a441;margin:16px 0 4px">Menu Items at this station (from static REF assignment)</div>'+
       itemsHtml +
       '<details style="margin-top:16px;cursor:pointer"><summary style="font-size:13px;font-weight:600;color:#d9a441;outline:none">❓ WHY is this station slow? (top 3 items)</summary>' +
       '<div style="margin-top:8px;background:#1a1d25;border-radius:8px;padding:10px;border:1px solid #2d3448">' +
-      (items.length > 0 ? '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;color:#9aa0aa;padding:4px 8px">Item</th><th style="text-align:right;color:#9aa0aa;padding:4px 8px">Avg Time</th><th style="text-align:right;color:#9aa0aa;padding:4px 8px">Tickets</th></tr></thead><tbody>' +
-        items.slice(0,3).map(it => '<tr><td style="padding:4px 8px;color:#e8eaed">' + (it.menuItem||'—') + '</td><td style="padding:4px 8px;text-align:right;font-weight:600;color:' + ((it.avgFulSec||0) > (s.exp_sec||900) ? '#ef4444' : '#22c55e') + '">' + fmtSec(it.avgFulSec||0) + '</td><td style="padding:4px 8px;text-align:right;color:#9aa0aa">' + (it.qty||0) + '</td></tr>').join('') +
+      (items.filter(it => (it.avgFulSec||0) > 0).length > 0 ? '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;color:#9aa0aa;padding:4px 8px">Item</th><th style="text-align:right;color:#9aa0aa;padding:4px 8px">Avg Time</th><th style="text-align:right;color:#9aa0aa;padding:4px 8px">Tickets</th></tr></thead><tbody>' +
+        [...items].filter(it => (it.avgFulSec||0) > 0).sort((a,b)=>(b.avgFulSec||0)-(a.avgFulSec||0)).slice(0,3).map(it => {
+          const tgt = it.targetSec || 0;
+          const over = tgt > 0 && (it.avgFulSec||0) > tgt;
+          return '<tr><td style="padding:4px 8px;color:#e8eaed">' + (it.menuItem||'—') + '</td><td style="padding:4px 8px;text-align:right;font-weight:600;color:' + (over ? '#ef4444' : '#22c55e') + '">' + fmtSec(it.avgFulSec||0) + '</td><td style="padding:4px 8px;text-align:right;color:#9aa0aa">' + (it.qty||0) + '</td></tr>';
+        }).join('') +
         '</tbody></table>'
-      : '<p style="color:#9aa0aa;font-size:12px;margin:0">No item data available.</p>') +
+      : '<p style="color:#9aa0aa;font-size:12px;margin:0">No item sales data this week for assigned REF items.</p>') +
       '</div></details>';
   }
 
@@ -1550,30 +1612,44 @@ function renderStations() {
 // TAB 3: Menu Items
 // ============================================================
 function renderMenuItems() {
-  // Normalize field names: process-venue-data writes menuItem/qty/avgFulSec
-  const SUMMARY = (getD().summary || []).map(d => ({
-    item: d.item || d.menuItem || '',
-    count: d.count != null ? d.count : (d.qty || 0),
-    avg_sec: d.avg_sec != null ? d.avg_sec : (d.avgFulSec || 0),
-    exp_sec: d.exp_sec || d.targetSec || 0,
-  })).filter(d => d.item);
-  const STATION_ITEMS = getD().stationItemsArr || {};
+  // ONLY items from static REF assignment; live times from weekly summary
+  const staticMap = getStaticItemMap();
+  const hasStatic = Object.keys(staticMap).length > 0;
+  const liveByName = {};
+  (getD().summary || []).forEach(d => {
+    const name = d.item || d.menuItem || '';
+    if (name) liveByName[name] = d;
+  });
+
+  let SUMMARY;
+  if (hasStatic) {
+    SUMMARY = Object.entries(staticMap).map(([item, info]) => {
+      const live = liveByName[item] || {};
+      return {
+        item,
+        count: live.qty != null ? live.qty : (live.count || 0),
+        avg_sec: live.avgFulSec != null ? live.avgFulSec : (live.avg_sec || 0),
+        exp_sec: info.targetSec || 0,
+      };
+    });
+  } else {
+    SUMMARY = (getD().summary || []).map(d => ({
+      item: d.item || d.menuItem || '',
+      count: d.count != null ? d.count : (d.qty || 0),
+      avg_sec: d.avg_sec != null ? d.avg_sec : (d.avgFulSec || 0),
+      exp_sec: d.exp_sec || d.targetSec || 0,
+    })).filter(d => d.item);
+  }
+
   const THR_SEC = 900;
   let currentSort = 'time';
   let currentSearch = '';
 
-  // Build item→station map from stationItemsArr
+  // Station map from static REF only
   const itemStationMap = {};
-  Object.entries(STATION_ITEMS).forEach(([station, items]) => {
-    if (!isFoodStation(station)) return;
-    (items || []).forEach(it => {
-      const name = it.menuItem || it.item;
-      if (name && !itemStationMap[name]) itemStationMap[name] = station;
-    });
-  });
-  // Also from assignmentData
-  (getD().assignmentData || []).forEach(a => {
-    if (a.menuItem && a.station && !itemStationMap[a.menuItem]) itemStationMap[a.menuItem] = a.station;
+  Object.entries(staticMap).forEach(([item, info]) => {
+    const foodSt = (info.stations || []).find(st => isFoodStation(st));
+    if (foodSt) itemStationMap[item] = foodSt;
   });
 
   if (!SUMMARY.length) {
@@ -1593,26 +1669,13 @@ function renderMenuItems() {
   const bubbleCard = document.getElementById('menuBubbleCard');
   if (bubbleCard) bubbleCard.style.display = '';
 
-  // Build item→exp_sec map from station items (use station's exp_sec as item target proxy)
+  // Targets from static REF only
   const itemExpSecMap = {};
-  const STATIONS_DATA = getD().stations;
-  Object.entries(STATION_ITEMS).forEach(([station, items]) => {
-    if (!isFoodStation(station)) return;
-    const stnData = STATIONS_DATA.find(s => s.station === station);
-    const stnExpSec = stnData ? stnData.exp_sec : 0;
-    (items || []).forEach(it => {
-      const name = it.menuItem || it.item;
-      if (name && !itemExpSecMap[name] && stnExpSec > 0) {
-        itemExpSecMap[name] = stnExpSec;
-      }
-    });
+  Object.entries(staticMap).forEach(([item, info]) => {
+    if (info.targetSec > 0) itemExpSecMap[item] = info.targetSec;
   });
-  // Also check if SUMMARY items have exp_sec field + assignmentData targets
   SUMMARY.forEach(d => {
     if (d.exp_sec && d.exp_sec > 0) itemExpSecMap[d.item] = d.exp_sec;
-  });
-  (getD().assignmentData || []).forEach(a => {
-    if (a.menuItem && a.targetSec > 0 && !itemExpSecMap[a.menuItem]) itemExpSecMap[a.menuItem] = a.targetSec;
   });
 
   function getItemTarget(item) {
@@ -1819,32 +1882,27 @@ function renderMenuItems() {
 // TAB 5: Assignment
 // ============================================================
 function renderAssignment() {
-  // Fix 4: Use item-targets.json for targets; show ALL food items from item-fulfillment
-  const venueSlugMap = { claudie:'claudie', casaneos:'casa_neos', ava_cg:'ava_cg', ava_wp:'ava_wp', mila:'mila' };
-  const venueTargets = ITEM_TARGETS_DATA[venueSlugMap[currentVenue]] || {};
-  const RAW_DATA = getD().assignmentData || [];
-
-  // Build merged rows: use assignmentData items as base, override target from venueTargets
-  // Also add any items that appear in item-fulfillment summary but not in assignmentData
+  // Static REF is source of truth for item → stations + target
+  const staticMap = getStaticItemMap();
   const summary = getD().summary || [];
-  const assignMap = {};
-  RAW_DATA.forEach(r => { assignMap[r.menuItem] = r; });
-
-  // Merge: all items from assignmentData + summary items not already there
-  const allItems = new Set([...RAW_DATA.map(r => r.menuItem), ...summary.map(s => s.menuItem || s.item || '')].filter(Boolean));
-
-  const DATA = [...allItems].map(menuItem => {
-    const base = assignMap[menuItem] || {};
-    const summaryRow = summary.find(s => (s.menuItem || s.item) === menuItem);
-    const avgFulSec = base.avgFulSec || (summaryRow ? summaryRow.avg_sec : null);
-    const count = base.count || (summaryRow ? summaryRow.count : null);
-    const station = base.station || null;
-    // Fix 4: use item-targets.json value if available, otherwise use base.targetSec or null
-    const targetSec = venueTargets[menuItem] || base.targetSec || null;
-    return { menuItem, station, targetSec, avgFulSec, count };
+  const liveByName = {};
+  summary.forEach(s => {
+    const name = s.menuItem || s.item;
+    if (name) liveByName[name] = s;
   });
 
-  // Sort: items WITH station first (sorted by station name), then without station
+  const DATA = Object.entries(staticMap).map(([menuItem, info]) => {
+    const live = liveByName[menuItem] || {};
+    const stations = (info.stations || []).filter(st => isFoodStation(st));
+    return {
+      menuItem,
+      station: stations.length ? stations.join(', ') : null,
+      targetSec: info.targetSec || null,
+      avgFulSec: live.avgFulSec != null ? live.avgFulSec : (live.avg_sec || null),
+      count: live.qty != null ? live.qty : (live.count || null),
+    };
+  });
+
   DATA.sort((a, b) => {
     if (a.station && !b.station) return -1;
     if (!a.station && b.station) return 1;
