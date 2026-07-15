@@ -255,7 +255,7 @@ html = html
 // Add page summary paragraph after KPI row
 html = html.replace(
   '</div>\n\n<!-- Visual 1 -->',
-  '</div>\n<p id="pageSummary" style="color:#9aa0aa;font-size:13px;margin:12px 0 0;line-height:1.6;max-width:780px"></p>\n\n<!-- Visual 1 -->'
+  '</div>\n<p id="pageSummary" style="color:#9aa0aa;font-size:13px;margin:12px 0 0;line-height:1.6;max-width:780px"></p>\n\n<!-- Stations Recap -->\n<div class="card" id="stationsRecapCard" style="margin-top:16px">\n  <h2>Stations Recap — This Week</h2>\n  <p class="note">All food stations ranked worst → best vs target. Click a row to open Stations tab.</p>\n  <div id="stationsRecap" style="overflow-x:auto"></div>\n</div>\n\n<!-- Visual 1 -->'
 );
 
 // Add venue pill styles + new UI styles
@@ -1543,7 +1543,13 @@ function renderStations() {
 // TAB 3: Menu Items
 // ============================================================
 function renderMenuItems() {
-  const SUMMARY = getD().summary || [];
+  // Normalize field names: process-venue-data writes menuItem/qty/avgFulSec
+  const SUMMARY = (getD().summary || []).map(d => ({
+    item: d.item || d.menuItem || '',
+    count: d.count != null ? d.count : (d.qty || 0),
+    avg_sec: d.avg_sec != null ? d.avg_sec : (d.avgFulSec || 0),
+    exp_sec: d.exp_sec || d.targetSec || 0,
+  })).filter(d => d.item);
   const STATION_ITEMS = getD().stationItemsArr || {};
   const THR_SEC = 900;
   let currentSort = 'time';
@@ -1554,8 +1560,13 @@ function renderMenuItems() {
   Object.entries(STATION_ITEMS).forEach(([station, items]) => {
     if (!isFoodStation(station)) return;
     (items || []).forEach(it => {
-      if (!itemStationMap[it.menuItem]) itemStationMap[it.menuItem] = station;
+      const name = it.menuItem || it.item;
+      if (name && !itemStationMap[name]) itemStationMap[name] = station;
     });
+  });
+  // Also from assignmentData
+  (getD().assignmentData || []).forEach(a => {
+    if (a.menuItem && a.station && !itemStationMap[a.menuItem]) itemStationMap[a.menuItem] = a.station;
   });
 
   if (!SUMMARY.length) {
@@ -1583,14 +1594,18 @@ function renderMenuItems() {
     const stnData = STATIONS_DATA.find(s => s.station === station);
     const stnExpSec = stnData ? stnData.exp_sec : 0;
     (items || []).forEach(it => {
-      if (!itemExpSecMap[it.menuItem] && stnExpSec > 0) {
-        itemExpSecMap[it.menuItem] = stnExpSec;
+      const name = it.menuItem || it.item;
+      if (name && !itemExpSecMap[name] && stnExpSec > 0) {
+        itemExpSecMap[name] = stnExpSec;
       }
     });
   });
-  // Also check if SUMMARY items have exp_sec field
+  // Also check if SUMMARY items have exp_sec field + assignmentData targets
   SUMMARY.forEach(d => {
     if (d.exp_sec && d.exp_sec > 0) itemExpSecMap[d.item] = d.exp_sec;
+  });
+  (getD().assignmentData || []).forEach(a => {
+    if (a.menuItem && a.targetSec > 0 && !itemExpSecMap[a.menuItem]) itemExpSecMap[a.menuItem] = a.targetSec;
   });
 
   function getItemTarget(item) {
@@ -2041,7 +2056,10 @@ function renderPageSummary() {
     peakConc = best ? best.conc : null;
   }
   // Top 2 slowest menu items
-  const menuItems = (d.menuItems || d.summary || []);
+  const menuItems = (d.summary || []).map(x => ({
+    item: x.item || x.menuItem || '',
+    avg_sec: x.avg_sec != null ? x.avg_sec : (x.avgFulSec || 0),
+  })).filter(x => x.item);
   const top2 = [...menuItems].sort((a,b) => b.avg_sec - a.avg_sec).slice(0,2);
 
   let html = '';
@@ -2095,10 +2113,82 @@ function renderKPIs() {
 
 
 // ============================================================
+// STATIONS RECAP (Overview)
+// ============================================================
+function renderStationsRecap() {
+  const el = document.getElementById('stationsRecap');
+  if (!el) return;
+  const stations = (getD().stations || [])
+    .filter(s => isFoodStation(s.station))
+    .slice()
+    .sort((a, b) => {
+      const ra = a.exp_sec > 0 ? a.avg_sec / a.exp_sec : -1;
+      const rb = b.exp_sec > 0 ? b.avg_sec / b.exp_sec : -1;
+      return rb - ra;
+    });
+
+  if (!stations.length) {
+    el.innerHTML = '<div style="color:#9aa0aa;padding:12px">No food station data for this week.</div>';
+    return;
+  }
+
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+  html += '<thead><tr style="border-bottom:1px solid #2d3448;color:#9aa0aa;text-align:left">';
+  html += '<th style="padding:8px 10px">Station</th>';
+  html += '<th style="padding:8px 10px;text-align:right">Tickets</th>';
+  html += '<th style="padding:8px 10px;text-align:right">Avg Time</th>';
+  html += '<th style="padding:8px 10px;text-align:right">Target</th>';
+  html += '<th style="padding:8px 10px;text-align:right">vs Target</th>';
+  html += '<th style="padding:8px 10px">Status</th>';
+  html += '<th style="padding:8px 10px;text-align:right">Station BP</th>';
+  html += '</tr></thead><tbody>';
+
+  stations.forEach(s => {
+    const ratio = s.exp_sec > 0 ? s.avg_sec / s.exp_sec : null;
+    let badge = '<span style="color:#9aa0aa">⚪ NO TARGET</span>';
+    let rowColor = '#e8eaed';
+    if (ratio != null) {
+      if (ratio <= 1.0) { badge = '<span style="color:#22c55e">✅ ON TARGET</span>'; rowColor = '#e8eaed'; }
+      else if (ratio <= 1.2) { badge = '<span style="color:#f59e0b">⚠️ WATCH</span>'; rowColor = '#fde68a'; }
+      else { badge = '<span style="color:#ef4444">🔴 BREAKING</span>'; rowColor = '#fca5a5'; }
+    }
+    const vsTxt = ratio != null
+      ? ((ratio - 1) * 100 >= 0 ? '+' : '') + Math.round((ratio - 1) * 100) + '%'
+      : '—';
+    const vsColor = ratio == null ? '#9aa0aa' : (ratio <= 1 ? '#22c55e' : (ratio <= 1.2 ? '#f59e0b' : '#ef4444'));
+    html += '<tr style="border-bottom:1px solid #1e2533;cursor:pointer" onclick="openStationFromRecap(\\'' + s.station.replace(/'/g, '') + '\\')">';
+    html += '<td style="padding:9px 10px;font-weight:600;color:' + rowColor + '">' + s.station + '</td>';
+    html += '<td style="padding:9px 10px;text-align:right;color:#9aa0aa">' + (s.count || 0).toLocaleString() + '</td>';
+    html += '<td style="padding:9px 10px;text-align:right;font-weight:700;color:' + vsColor + '">' + fmtSec(s.avg_sec) + '</td>';
+    html += '<td style="padding:9px 10px;text-align:right;color:#9aa0aa">' + (s.exp_sec > 0 ? fmtSec(s.exp_sec) : '—') + '</td>';
+    html += '<td style="padding:9px 10px;text-align:right;color:' + vsColor + ';font-weight:600">' + vsTxt + '</td>';
+    html += '<td style="padding:9px 10px">' + badge + '</td>';
+    html += '<td style="padding:9px 10px;text-align:right;color:#9aa0aa">' + (s.bp_tickets != null ? s.bp_tickets + ' tix' : '—') + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function openStationFromRecap(stationName) {
+  const btn = document.querySelector('.tab-btn[onclick*="stations"]');
+  if (btn) switchTab('stations', btn);
+  setTimeout(() => {
+    const pills = document.querySelectorAll('#stationPills .station-pill');
+    pills.forEach(p => {
+      const nameEl = p.querySelector('.sp-name');
+      const name = nameEl ? nameEl.textContent.trim() : (p.textContent || '').trim();
+      if (name === stationName) p.click();
+    });
+  }, 80);
+}
+
+// ============================================================
 // RENDER ALL
 // ============================================================
 function renderAll() {
   renderKPIs();
+  renderStationsRecap();
   renderPressure();
   renderBreaking();
   renderLoadPerf();
