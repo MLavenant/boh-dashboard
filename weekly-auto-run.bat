@@ -8,4 +8,8 @@ node intercept.js >> auto-run.log 2>&1
 timeout /t 60 /nobreak
 :: Fetch all venue data and rebuild dashboard
 node weekly-save.js >> auto-run.log 2>&1
+:: Push updated dashboard to GitHub (view-only share link via GitHub Pages)
+git add dashboard.html *-data-*.json data/rolling.json 2>>auto-run.log
+git commit -m "Weekly auto-update: dashboard + venue data" >> auto-run.log 2>&1
+git push origin main >> auto-run.log 2>&1
 echo [%date% %time%] Weekly auto-run complete >> auto-run.log 2>&1

@@ -2254,7 +2254,7 @@ function showWeekWelcomePopup(weekKey) {
 
   const weekLabel = weekKey.replace(/^(d{4})-W(d+)$/, 'W$2');
   let html = '<div style="font-size:20px;font-weight:700;color:#e8eaed;margin-bottom:6px">Good Morning — Week ' + weekLabel + ' Kitchen Health</div>';
-  html += '<div style="font-size:12px;color:#9aa0aa;margin-bottom:20px;border-bottom:1px solid #262a33;padding-bottom:14px">Here's a snapshot of this week's BOH performance across all venues.</div>';
+  html += '<div style="font-size:12px;color:#9aa0aa;margin-bottom:20px;border-bottom:1px solid #262a33;padding-bottom:14px">Snapshot of this week BOH performance across all venues.</div>';
 
   venueRows.forEach(v => {
     html += '<div style="margin-bottom:16px;padding:14px 16px;background:#13161c;border-radius:10px;border:1px solid #1e2533">';
@@ -2270,13 +2270,17 @@ function showWeekWelcomePopup(weekKey) {
   });
 
   html += '<div style="margin-top:18px;text-align:center">';
-  html += '<button onclick="document.getElementById('weekWelcomeOverlay').remove();localStorage.setItem('boh_last_seen_week','' + weekKey + '')" ';
-  html += 'style="background:#d9a441;color:#0c0e13;border:none;border-radius:8px;padding:10px 32px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Got it</button>';
+  html += '<button id="weekWelcomeGotIt" style="background:#d9a441;color:#0c0e13;border:none;border-radius:8px;padding:10px 32px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Got it</button>';
   html += '</div>';
 
   modal.innerHTML = html;
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
+  const gotIt = document.getElementById('weekWelcomeGotIt');
+  if (gotIt) gotIt.onclick = () => {
+    overlay.remove();
+    localStorage.setItem('boh_last_seen_week', weekKey);
+  };
 }
 
 // ============================================================
