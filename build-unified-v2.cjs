@@ -156,6 +156,13 @@ html = html.replace(
   <p id="stationBreakingNote" style="font-size:12px;color:#9aa0aa;margin:8px 0 0"></p>
 </div>
 
+<!-- Stations Recap (between Visual 3 and Visual 4) -->
+<div class="card" id="stationsRecapCard">
+  <h2>Stations Recap — This Week</h2>
+  <p class="note">All food stations ranked worst → best vs target. Click a row to open Stations tab.</p>
+  <div id="stationsRecap" style="overflow-x:auto"></div>
+</div>
+
 <!-- Visual 4: Station WoW -->
 <div class="card">
   <h2>Visual 4 — Station Fulfillment — Week over Week</h2>
@@ -255,7 +262,7 @@ html = html
 // Add page summary paragraph after KPI row
 html = html.replace(
   '</div>\n\n<!-- Visual 1 -->',
-  '</div>\n<p id="pageSummary" style="color:#9aa0aa;font-size:13px;margin:12px 0 0;line-height:1.6;max-width:780px"></p>\n\n<!-- Stations Recap -->\n<div class="card" id="stationsRecapCard" style="margin-top:16px">\n  <h2>Stations Recap — This Week</h2>\n  <p class="note">All food stations ranked worst → best vs target. Click a row to open Stations tab.</p>\n  <div id="stationsRecap" style="overflow-x:auto"></div>\n</div>\n\n<!-- Visual 1 -->'
+  '</div>\n<p id="pageSummary" style="color:#9aa0aa;font-size:13px;margin:12px 0 0;line-height:1.6;max-width:780px"></p>\n\n<!-- Visual 1 -->'
 );
 
 // Add venue pill styles + new UI styles
