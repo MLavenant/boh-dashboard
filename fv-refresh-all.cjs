@@ -206,13 +206,45 @@ function summarizeMapData(mapData) {
   const booked = results.filter(r => r.totalRevenue > 0);
   booked.forEach(r => log(`  ${r.venue} | ${r.date} | ${r.dj} | $${r.totalRevenue.toLocaleString()} committed`));
 
-  // --- Also run Toast BS Actual update ---
-  log("\n--- Running Toast BS Actual update ---");
+  // --- Write pacing snapshots to Firebase ---
+  log("\n--- Writing pacing snapshots to Firebase ---");
   try {
-    execSync(`node "C:\\Cursor\\toast-mcp-server\\toast-bs-update.cjs"`, { stdio: "inherit", shell: "cmd.exe" });
-  } catch (e) {
-    log("Toast BS update error: " + e.message.split("\n")[0]);
+    const https2 = require("https");
+    const FB_DB   = "rdg-dj-dashboard-default-rtdb.firebaseio.com";
+    const today2  = new Date().toISOString().split("T")[0];
+
+    function fbPut(path, payload) {
+      return new Promise((res, rej) => {
+        const body = JSON.stringify(payload);
+        const req = https2.request({
+          hostname: FB_DB, path: path + ".json", method: "PUT",
+          headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) }
+        }, r => { let d=""; r.on("data",c=>d+=c); r.on("end",()=>res(r.statusCode)); });
+        req.on("error", rej); req.write(body); req.end();
+      });
+    }
+
+    for (const r of results) {
+      // Key: venue_YYYY-MM-DD  (spaces→underscore, special chars stripped)
+      const key = (r.venue + "_" + r.date).replace(/[^a-zA-Z0-9_-]/g, "_");
+      const status = await fbPut(`/rdg/pacing/${key}/${today2}`, { tables: r.bookedTables, revenue: Math.round(r.totalRevenue) });
+      log(`  ${r.venue} ${r.date} → HTTP ${status}`);
+    }
+    log("✅ Pacing snapshots written");
+  } catch(e) {
+    log("Pacing write error: " + e.message);
   }
 
-  log("\n=== Refresh Complete ===");
+  // Toast is Monday-only — do NOT run it from the daily FourVenues job
+  const bookedCount = results.filter(r => r.totalRevenue > 0).length;
+  try {
+    execSync(
+      `node "C:\\Cursor\\toast-mcp-server\\fb-scrape-status.cjs" fourvenues ok "Scraped ${results.length} events, ${bookedCount} with bookings"`,
+      { stdio: "inherit", shell: "cmd.exe" }
+    );
+  } catch (e) {
+    log("Status write error: " + e.message.split("\n")[0]);
+  }
+
+  log("\n=== FourVenues Refresh Complete (Toast runs Mondays only) ===");
 })();

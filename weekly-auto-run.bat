@@ -8,8 +8,14 @@ node intercept.js >> auto-run.log 2>&1
 timeout /t 60 /nobreak
 :: Fetch all venue data and rebuild dashboard
 node weekly-save.js >> auto-run.log 2>&1
+:: Refresh static item-station map from Excel REF sheets (if files present)
+node extract-item-stations.cjs >> auto-run.log 2>&1
+:: Sanity check Toast + OpenTable + processed data
+node pipeline-health.cjs >> auto-run.log 2>&1
+:: Rebuild dashboard with latest health status embedded
+node build-unified-v2.cjs >> auto-run.log 2>&1
 :: Push updated dashboard to GitHub (view-only share link via GitHub Pages)
-git add dashboard.html *-data-*.json data/rolling.json 2>>auto-run.log
-git commit -m "Weekly auto-update: dashboard + venue data" >> auto-run.log 2>&1
+git add dashboard.html pipeline-health.json *-data-*.json data/rolling.json item-station-map.json 2>>auto-run.log
+git commit -m "Weekly auto-update: dashboard + venue data + health check" >> auto-run.log 2>&1
 git push origin main >> auto-run.log 2>&1
 echo [%date% %time%] Weekly auto-run complete >> auto-run.log 2>&1

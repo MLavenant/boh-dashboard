@@ -1,0 +1,500 @@
+{
+  "generatedAt": "2026-07-16T14:36:33.954Z",
+  "latestWeek": "2026-W28",
+  "availableWeeks": [
+    "2026-W28",
+    "2026-W27"
+  ],
+  "schedule": {
+    "exists": true,
+    "status": "Ready",
+    "nextRun": "7/20/2026 8:30:00 AM",
+    "lastRun": "11/30/1999 12:00:00 AM",
+    "lastResult": "267011",
+    "startTime": "8:30:00 AM",
+    "days": "MON",
+    "scheduleType": "Weekly",
+    "taskToRun": "cmd.exe /c C:\\Cursor\\toast-mcp-server\\weekly-auto-run.bat",
+    "expected": {
+      "day": "Monday",
+      "time": "08:30",
+      "timezone": "local"
+    },
+    "matchesExpected": true
+  },
+  "files": {
+    "dashboardHtml": {
+      "path": "C:\\Cursor\\toast-mcp-server\\dashboard.html",
+      "mtime": "2026-07-16T14:35:45.943Z",
+      "size": 1159084,
+      "rows": null
+    },
+    "rolling": {
+      "path": "C:\\Cursor\\toast-mcp-server\\data\\rolling.json",
+      "mtime": "2026-07-13T13:30:53.180Z",
+      "size": 92280201,
+      "rows": 1
+    },
+    "sessionToast": {
+      "path": "C:\\Cursor\\toast-mcp-server\\toast-session.json",
+      "mtime": "2026-07-13T14:49:57.065Z",
+      "size": 54414,
+      "rows": 2
+    },
+    "sessionOT": {
+      "path": "C:\\Cursor\\toast-mcp-server\\ot-session.json",
+      "mtime": "2026-07-14T15:43:23.601Z",
+      "size": 6095,
+      "rows": 4
+    },
+    "itemStationMap": {
+      "path": "C:\\Cursor\\toast-mcp-server\\item-station-map.json",
+      "mtime": "2026-07-15T21:36:05.291Z",
+      "size": 57275,
+      "rows": 5
+    }
+  },
+  "venues": [
+    {
+      "slug": "claudie",
+      "label": "Claudie",
+      "checks": [
+        {
+          "id": "toast_kitchen",
+          "source": "Toast",
+          "label": "Kitchen Timing",
+          "status": "pass",
+          "message": "19,000 tickets",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\kitchen-timing-claudie.json",
+            "mtime": "2026-07-13T13:28:41.650Z",
+            "size": 8340061,
+            "rows": 19000
+          }
+        },
+        {
+          "id": "toast_items",
+          "source": "Toast",
+          "label": "Item Details",
+          "status": "pass",
+          "message": "8,221 item rows",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\item-details-claudie.json",
+            "mtime": "2026-07-13T15:25:41.601Z",
+            "size": 2687375,
+            "rows": 8221
+          }
+        },
+        {
+          "id": "toast_fulfillment",
+          "source": "Toast",
+          "label": "Item Fulfillment Report",
+          "status": "pass",
+          "message": "350 items",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\item-fulfillment-claudie.json",
+            "mtime": "2026-07-13T14:59:50.010Z",
+            "size": 32664,
+            "rows": 350
+          }
+        },
+        {
+          "id": "ot_covers",
+          "source": "OpenTable",
+          "label": "Covers Export",
+          "status": "pass",
+          "message": "526 covers",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\covers-claudie.json",
+            "mtime": "2026-07-13T13:30:38.615Z",
+            "size": 94822,
+            "rows": 526
+          }
+        },
+        {
+          "id": "processed",
+          "source": "Pipeline",
+          "label": "Processed Venue JSON",
+          "status": "pass",
+          "message": "12 stations, curve=47, BP=30",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\claudie-data-2026-W28.json",
+            "mtime": "2026-07-14T18:02:59.613Z",
+            "size": 122749,
+            "rows": 12
+          }
+        }
+      ],
+      "summary": {
+        "pass": 5,
+        "warn": 0,
+        "fail": 0
+      },
+      "overall": "pass"
+    },
+    {
+      "slug": "casa_neos",
+      "label": "Casa Neos",
+      "checks": [
+        {
+          "id": "toast_kitchen",
+          "source": "Toast",
+          "label": "Kitchen Timing",
+          "status": "pass",
+          "message": "28,014 tickets",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\kitchen-timing-casa_neos.json",
+            "mtime": "2026-07-13T13:29:48.564Z",
+            "size": 11946740,
+            "rows": 28014
+          }
+        },
+        {
+          "id": "toast_items",
+          "source": "Toast",
+          "label": "Item Details",
+          "status": "pass",
+          "message": "14,783 item rows",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\item-details-casa_neos.json",
+            "mtime": "2026-07-13T15:26:12.018Z",
+            "size": 4874535,
+            "rows": 14783
+          }
+        },
+        {
+          "id": "toast_fulfillment",
+          "source": "Toast",
+          "label": "Item Fulfillment Report",
+          "status": "pass",
+          "message": "443 items",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\item-fulfillment-casa_neos.json",
+            "mtime": "2026-07-13T15:00:17.165Z",
+            "size": 41141,
+            "rows": 443
+          }
+        },
+        {
+          "id": "ot_covers",
+          "source": "OpenTable",
+          "label": "Covers Export",
+          "status": "pass",
+          "message": "910 covers",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\covers-casa_neos.json",
+            "mtime": "2026-07-13T13:30:43.446Z",
+            "size": 165088,
+            "rows": 910
+          }
+        },
+        {
+          "id": "processed",
+          "source": "Pipeline",
+          "label": "Processed Venue JSON",
+          "status": "pass",
+          "message": "31 stations, curve=73, BP=59",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\casa_neos-data-2026-W28.json",
+            "mtime": "2026-07-14T18:03:06.180Z",
+            "size": 185422,
+            "rows": 31
+          }
+        }
+      ],
+      "summary": {
+        "pass": 5,
+        "warn": 0,
+        "fail": 0
+      },
+      "overall": "pass"
+    },
+    {
+      "slug": "ava_coconut_grove",
+      "label": "AVA Coconut Grove",
+      "checks": [
+        {
+          "id": "toast_kitchen",
+          "source": "Toast",
+          "label": "Kitchen Timing",
+          "status": "pass",
+          "message": "6,726 tickets",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\kitchen-timing-ava_coconut_grove.json",
+            "mtime": "2026-07-13T13:28:57.372Z",
+            "size": 3141989,
+            "rows": 6726
+          }
+        },
+        {
+          "id": "toast_items",
+          "source": "Toast",
+          "label": "Item Details",
+          "status": "pass",
+          "message": "5,638 item rows",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\item-details-ava_coconut_grove.json",
+            "mtime": "2026-07-13T15:26:34.569Z",
+            "size": 1839329,
+            "rows": 5638
+          }
+        },
+        {
+          "id": "toast_fulfillment",
+          "source": "Toast",
+          "label": "Item Fulfillment Report",
+          "status": "pass",
+          "message": "287 items",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\item-fulfillment-ava_coconut_grove.json",
+            "mtime": "2026-07-13T15:00:20.520Z",
+            "size": 27025,
+            "rows": 287
+          }
+        },
+        {
+          "id": "ot_covers",
+          "source": "OpenTable",
+          "label": "Covers Export",
+          "status": "pass",
+          "message": "377 covers",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\covers-ava_coconut_grove.json",
+            "mtime": "2026-07-13T13:30:44.913Z",
+            "size": 68565,
+            "rows": 377
+          }
+        },
+        {
+          "id": "processed",
+          "source": "Pipeline",
+          "label": "Processed Venue JSON",
+          "status": "pass",
+          "message": "15 stations, curve=50, BP=11",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\ava_coconut_grove-data-2026-W28.json",
+            "mtime": "2026-07-14T18:03:08.028Z",
+            "size": 104558,
+            "rows": 15
+          }
+        }
+      ],
+      "summary": {
+        "pass": 5,
+        "warn": 0,
+        "fail": 0
+      },
+      "overall": "pass"
+    },
+    {
+      "slug": "ava_winter_park",
+      "label": "AVA Winter Park",
+      "checks": [
+        {
+          "id": "toast_kitchen",
+          "source": "Toast",
+          "label": "Kitchen Timing",
+          "status": "pass",
+          "message": "8,903 tickets",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\kitchen-timing-ava_winter_park.json",
+            "mtime": "2026-07-13T13:29:10.213Z",
+            "size": 3820185,
+            "rows": 8903
+          }
+        },
+        {
+          "id": "toast_items",
+          "source": "Toast",
+          "label": "Item Details",
+          "status": "pass",
+          "message": "7,415 item rows",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\item-details-ava_winter_park.json",
+            "mtime": "2026-07-13T15:28:22.404Z",
+            "size": 2389014,
+            "rows": 7415
+          }
+        },
+        {
+          "id": "toast_fulfillment",
+          "source": "Toast",
+          "label": "Item Fulfillment Report",
+          "status": "pass",
+          "message": "144 items",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\item-fulfillment-ava_winter_park.json",
+            "mtime": "2026-07-13T15:00:03.836Z",
+            "size": 13513,
+            "rows": 144
+          }
+        },
+        {
+          "id": "ot_covers",
+          "source": "OpenTable",
+          "label": "Covers Export",
+          "status": "pass",
+          "message": "369 covers",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\covers-ava_winter_park.json",
+            "mtime": "2026-07-13T13:30:47.195Z",
+            "size": 66804,
+            "rows": 369
+          }
+        },
+        {
+          "id": "processed",
+          "source": "Pipeline",
+          "label": "Processed Venue JSON",
+          "status": "pass",
+          "message": "9 stations, curve=42, BP=11",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\ava_winter_park-data-2026-W28.json",
+            "mtime": "2026-07-14T18:03:10.031Z",
+            "size": 90737,
+            "rows": 9
+          }
+        }
+      ],
+      "summary": {
+        "pass": 5,
+        "warn": 0,
+        "fail": 0
+      },
+      "overall": "pass"
+    },
+    {
+      "slug": "mila",
+      "label": "MILA",
+      "checks": [
+        {
+          "id": "toast_kitchen",
+          "source": "Toast",
+          "label": "Kitchen Timing",
+          "status": "pass",
+          "message": "20,094 tickets",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\kitchen-timing-mila.json",
+            "mtime": "2026-07-13T13:30:29.733Z",
+            "size": 8626669,
+            "rows": 20094
+          }
+        },
+        {
+          "id": "toast_items",
+          "source": "Toast",
+          "label": "Item Details",
+          "status": "pass",
+          "message": "16,528 item rows",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\item-details-mila.json",
+            "mtime": "2026-07-13T15:29:22.273Z",
+            "size": 5402110,
+            "rows": 16528
+          }
+        },
+        {
+          "id": "toast_fulfillment",
+          "source": "Toast",
+          "label": "Item Fulfillment Report",
+          "status": "pass",
+          "message": "591 items",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\item-fulfillment-mila.json",
+            "mtime": "2026-07-13T15:00:00.578Z",
+            "size": 56335,
+            "rows": 591
+          }
+        },
+        {
+          "id": "ot_covers",
+          "source": "OpenTable",
+          "label": "Covers Export",
+          "status": "pass",
+          "message": "1,077 covers",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W28\\covers-mila.json",
+            "mtime": "2026-07-13T13:30:51.877Z",
+            "size": 195361,
+            "rows": 1077
+          }
+        },
+        {
+          "id": "processed",
+          "source": "Pipeline",
+          "label": "Processed Venue JSON",
+          "status": "pass",
+          "message": "12 stations, curve=72, BP=none",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\mila-data-2026-W28.json",
+            "mtime": "2026-07-14T18:03:20.246Z",
+            "size": 137984,
+            "rows": 12
+          }
+        }
+      ],
+      "summary": {
+        "pass": 5,
+        "warn": 0,
+        "fail": 0
+      },
+      "overall": "pass"
+    }
+  ],
+  "totals": {
+    "pass": 25,
+    "warn": 0,
+    "fail": 0
+  },
+  "overall": "pass",
+  "pipelineSteps": [
+    {
+      "step": 1,
+      "name": "Refresh Toast session",
+      "how": "intercept.js (Playwright login)",
+      "when": "Monday 8:30 AM"
+    },
+    {
+      "step": 2,
+      "name": "Fetch Toast Kitchen Timing",
+      "how": "weekly-save.js → kitchen-timing-{venue}.json",
+      "when": "Monday 8:30 AM"
+    },
+    {
+      "step": 3,
+      "name": "Fetch Toast Item Details",
+      "how": "weekly-save.js → item-details-{venue}.json",
+      "when": "Monday 8:30 AM"
+    },
+    {
+      "step": 4,
+      "name": "Fetch Toast Item Fulfillment",
+      "how": "weekly-save.js → item-fulfillment-{venue}.json",
+      "when": "Monday 8:30 AM"
+    },
+    {
+      "step": 5,
+      "name": "Fetch OpenTable Covers",
+      "how": "weekly-save.js → covers-{venue}.json",
+      "when": "Monday 8:30 AM"
+    },
+    {
+      "step": 6,
+      "name": "Process venue metrics",
+      "how": "process-venue-data.cjs per venue",
+      "when": "Monday 8:30 AM"
+    },
+    {
+      "step": 7,
+      "name": "Rebuild dashboard.html",
+      "how": "build-unified-v2.cjs",
+      "when": "Monday 8:30 AM"
+    },
+    {
+      "step": 8,
+      "name": "Sanity check + push GitHub Pages",
+      "how": "pipeline-health.cjs + git push",
+      "when": "Monday 8:30 AM"
+    }
+  ]
+}

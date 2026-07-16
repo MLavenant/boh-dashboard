@@ -45,6 +45,12 @@ try {
   ITEM_STATION_MAP = JSON.parse(fs.readFileSync(path.join(DIR, 'item-station-map.json'), 'utf8'));
 } catch(e) { /* file not found, skip */ }
 
+// Pipeline health / sanity check status
+let PIPELINE_HEALTH = {};
+try {
+  PIPELINE_HEALTH = JSON.parse(fs.readFileSync(path.join(DIR, 'pipeline-health.json'), 'utf8'));
+} catch(e) { /* file not found, skip */ }
+
 function applyTargets(venueKey, data) {
   const venueTargets = TARGETS[venueKey] || {};
   (data.stations || []).forEach(s => {
@@ -140,10 +146,10 @@ html = html.replace(
 <div class="station-pills" id="stationPills"></div>`
 );
 
-// Add Assignment + Group tabs to nav
+// Add Assignment + Group + Settings tabs to nav
 html = html.replace(
   '<button class="tab-btn" onclick="switchTab(\'menu\',this)">Menu Items</button>\n</nav>',
-  '<button class="tab-btn" onclick="switchTab(\'menu\',this)">Menu Items</button>\n  <button class="tab-btn" onclick="switchTab(\'assignment\',this)">📋 Assignment</button>\n  <button class="tab-btn" onclick="switchTab(\'group\',this)">🏢 Group</button>\n</nav>'
+  '<button class="tab-btn" onclick="switchTab(\'menu\',this)">Menu Items</button>\n  <button class="tab-btn" onclick="switchTab(\'assignment\',this)">📋 Assignment</button>\n  <button class="tab-btn" onclick="switchTab(\'group\',this)">🏢 Group</button>\n  <button class="tab-btn" onclick="switchTab(\'settings\',this)">⚙️ Settings</button>\n</nav>'
 );
 
 // Add Visual 4 (WoW) + Station Breaking Lines before Visual 5 (3D)
@@ -249,6 +255,12 @@ html = html.replace(
 <div class="coming-note" id="groupWowNote">📅 Week-over-week comparison: available from Week 2 (Jul 14)</div>
 </section>
 
+<!-- ========== TAB: SETTINGS / SANITY ========== -->
+<section id="tab-settings" class="tab-section">
+<div class="section-title">Settings — Pipeline Health</div>
+<div id="settingsHealthRoot"></div>
+</section>
+
 <footer>`
 );
 
@@ -304,7 +316,8 @@ html = html.replace('</style>', `
 // ── Build ALL_DATA JS string ──────────────────────────────────────────────────
 const allDataJS = `const ALL_DATA = ${JSON.stringify(VENUES, null, 0)};
 const ITEM_TARGETS_DATA = ${JSON.stringify(ITEM_TARGETS, null, 0)};
-const ITEM_STATION_MAP_DATA = ${JSON.stringify(ITEM_STATION_MAP, null, 0)};`;
+const ITEM_STATION_MAP_DATA = ${JSON.stringify(ITEM_STATION_MAP, null, 0)};
+const PIPELINE_HEALTH_DATA = ${JSON.stringify(PIPELINE_HEALTH, null, 0)};`;
 
 // ── Generate the new <script> block ──────────────────────────────────────────
 const newScript = `
@@ -2249,6 +2262,119 @@ function openStationFromRecap(stationName) {
 }
 
 // ============================================================
+// TAB: SETTINGS / PIPELINE HEALTH
+// ============================================================
+function renderSettings() {
+  const root = document.getElementById('settingsHealthRoot');
+  if (!root) return;
+  const H = PIPELINE_HEALTH_DATA || {};
+  if (!H.generatedAt) {
+    root.innerHTML = '<div class="card"><p class="note">No pipeline-health.json yet. Run <code>node pipeline-health.cjs</code> after a weekly fetch.</p></div>';
+    return;
+  }
+
+  const overallColor = H.overall === 'pass' ? '#22c55e' : (H.overall === 'warn' ? '#f59e0b' : '#ef4444');
+  const overallLabel = H.overall === 'pass' ? 'ALL CLEAR' : (H.overall === 'warn' ? 'NEEDS ATTENTION' : 'FAILED CHECKS');
+  const sched = H.schedule || {};
+  const schedOk = !!sched.matchesExpected;
+  const fmtWhen = (iso) => {
+    if (!iso) return '—';
+    try { return new Date(iso).toLocaleString(); } catch(e) { return iso; }
+  };
+  const badge = (st) => {
+    if (st === 'pass') return '<span style="color:#22c55e">✅ PASS</span>';
+    if (st === 'warn') return '<span style="color:#f59e0b">⚠️ WARN</span>';
+    return '<span style="color:#ef4444">❌ FAIL</span>';
+  };
+
+  let html = '';
+
+  // Overall status
+  html += '<div class="card" style="border-color:' + overallColor + '40">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">';
+  html += '<div><h2 style="margin:0">Pipeline Status</h2><p class="note" style="margin:6px 0 0">Latest week checked: <strong style="color:#e8eaed">' + (H.latestWeek || '—') + '</strong> · Generated ' + fmtWhen(H.generatedAt) + '</p></div>';
+  html += '<div style="font-size:18px;font-weight:800;color:' + overallColor + '">' + overallLabel + '</div>';
+  html += '</div>';
+  html += '<div class="kpis" style="margin-top:14px;grid-template-columns:repeat(3,1fr)">';
+  html += '<div class="kpi"><div class="v" style="color:#22c55e">' + ((H.totals&&H.totals.pass)||0) + '</div><div class="l">Passed</div></div>';
+  html += '<div class="kpi"><div class="v" style="color:#f59e0b">' + ((H.totals&&H.totals.warn)||0) + '</div><div class="l">Warnings</div></div>';
+  html += '<div class="kpi"><div class="v" style="color:#ef4444">' + ((H.totals&&H.totals.fail)||0) + '</div><div class="l">Failures</div></div>';
+  html += '</div></div>';
+
+  // Schedule card
+  html += '<div class="card">';
+  html += '<h2>Automatic Update Schedule</h2>';
+  html += '<p class="note">Expected: every Monday at 8:30 AM (local). Pulls last week Toast + OpenTable data, rebuilds dashboard, pushes GitHub Pages.</p>';
+  html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Task registered</td><td style="padding:8px 0;text-align:right;font-weight:600;color:' + (sched.exists?'#22c55e':'#ef4444') + '">' + (sched.exists?'Yes':'No') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.days||'—') + ' ' + (sched.startTime||'') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Matches Monday 8:30</td><td style="padding:8px 0;text-align:right;font-weight:700;color:' + (schedOk?'#22c55e':'#ef4444') + '">' + (schedOk?'✅ Yes':'❌ No') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Next run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.nextRun||'—') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Last run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.lastRun||'—') + '</td></tr>';
+  html += '<tr><td style="padding:8px 0;color:#9aa0aa">Task status</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.status||'—') + '</td></tr>';
+  html += '</table></div>';
+
+  // What gets updated
+  html += '<div class="card">';
+  html += '<h2>What Updates Automatically</h2>';
+  html += '<p class="note">Full pipeline run by <code>weekly-auto-run.bat</code> every Monday 8:30 AM.</p>';
+  html += '<ol style="margin:0;padding-left:18px;color:#e8eaed;font-size:13px;line-height:1.7">';
+  (H.pipelineSteps || []).forEach(s => {
+    html += '<li><strong style="color:#d9a441">' + s.name + '</strong> — <span style="color:#9aa0aa">' + s.how + '</span></li>';
+  });
+  html += '</ol></div>';
+
+  // Per-venue sanity
+  html += '<div class="card">';
+  html += '<h2>Sanity Check by Venue — ' + (H.latestWeek||'') + '</h2>';
+  html += '<p class="note">Toast kitchen timing, item details, item fulfillment, OpenTable covers, and processed JSON.</p>';
+
+  (H.venues || []).forEach(v => {
+    const vColor = v.overall === 'pass' ? '#22c55e' : (v.overall === 'warn' ? '#f59e0b' : '#ef4444');
+    html += '<div style="margin:14px 0;padding:12px 14px;background:#13161c;border:1px solid #1e2533;border-radius:10px">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    html += '<div style="font-weight:700;color:#d9a441">' + v.label + '</div>';
+    html += '<div style="font-size:12px;font-weight:700;color:' + vColor + '">' + String(v.overall||'').toUpperCase() + '</div>';
+    html += '</div>';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px">';
+    (v.checks || []).forEach(c => {
+      html += '<tr style="border-top:1px solid #1e2533">';
+      html += '<td style="padding:6px 0;color:#9aa0aa;width:90px">' + c.source + '</td>';
+      html += '<td style="padding:6px 0;color:#e8eaed">' + c.label + '</td>';
+      html += '<td style="padding:6px 0;color:#9aa0aa">' + c.message + '</td>';
+      html += '<td style="padding:6px 0;text-align:right;white-space:nowrap">' + badge(c.status) + '</td>';
+      html += '</tr>';
+    });
+    html += '</table></div>';
+  });
+  html += '</div>';
+
+  // File freshness
+  const files = H.files || {};
+  html += '<div class="card">';
+  html += '<h2>Key Files Freshness</h2>';
+  html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+  const fileRows = [
+    ['Dashboard HTML', files.dashboardHtml],
+    ['Rolling data', files.rolling],
+    ['Toast session', files.sessionToast],
+    ['OpenTable session', files.sessionOT],
+    ['Item–Station REF map', files.itemStationMap],
+  ];
+  fileRows.forEach(([label, meta]) => {
+    html += '<tr style="border-bottom:1px solid #1e2533">';
+    html += '<td style="padding:8px 0;color:#9aa0aa">' + label + '</td>';
+    html += '<td style="padding:8px 0;text-align:right;color:#e8eaed">' + (meta ? fmtWhen(meta.mtime) : '<span style="color:#ef4444">Missing</span>') + '</td>';
+    html += '</tr>';
+  });
+  html += '</table>';
+  html += '<p class="note" style="margin-top:12px">Manual re-check anytime: <code>node pipeline-health.cjs</code> then <code>node build-unified-v2.cjs</code></p>';
+  html += '</div>';
+
+  root.innerHTML = html;
+}
+
+// ============================================================
 // RENDER ALL
 // ============================================================
 function renderAll() {
@@ -2265,6 +2391,7 @@ function renderAll() {
   renderMenuItems();
   renderAssignment();
   renderGroup();
+  renderSettings();
   renderPageSummary();
 }
 
