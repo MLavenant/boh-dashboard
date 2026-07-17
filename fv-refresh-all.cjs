@@ -1,12 +1,16 @@
 /**
  * RDG Dashboard — FourVenues Full Refresh
- * Scrapes all 3 venues, rebuilds FORECAST_DATA in index.html, commits & pushes.
- * Run manually or via Task Scheduler (nightly).
+ * 1) Floor map → table counts / tiers
+ * 2) totalRevenue = Sales export math: Base price (Accepted + Not completed)
+ *    with reservation created_at in Period Last 7 days (matches Sales Excel export).
+ * Never invent BS Actual from full-event map / rate_original_price.
  */
 
 const { chromium } = require("playwright");
 const fs = require("fs");
 const { execSync } = require("child_process");
+const { pullSalesExports } = require("./fv-sales-export-lib.cjs");
+const { salesPeriodLast7Days, summarizeMapData, buildForecastFromMaps } = require("./fv-sales-period.cjs");
 
 const DASHBOARD_PATH = "C:\\Users\\MatthiasLavenant\\Documents\\rdg-dj-dashboard\\index.html";
 const SESSION_PATH   = "C:\\Cursor\\toast-mcp-server\\fv-final-session.json";
@@ -34,30 +38,132 @@ function log(msg) {
   console.log(`[${ts}] ${msg}`);
 }
 
-function summarizeMapData(mapData) {
-  const zones = Array.isArray(mapData.data) ? mapData.data : [mapData.data];
-  let totalTables = 0, bookedTables = 0, totalRevenue = 0;
-  const tierSummary = {};
-  for (const z of zones) {
-    const tipos = {};
-    (z.tipos || []).forEach(t => { tipos[t.slug] = t.nombre; });
-    for (const esp of (z.espacios || [])) {
-      if (esp.bloqueado) continue;
-      totalTables++;
-      const tier = esp.tipos_slugs?.[0] ? (tipos[esp.tipos_slugs[0]] || "Other") : "Other";
-      if (!tierSummary[tier]) tierSummary[tier] = { total: 0, booked: 0, revenue: 0 };
-      tierSummary[tier].total++;
-      if (esp.ocupado) { bookedTables++; tierSummary[tier].booked++; }
+/** Theme modal: choose Dark, then Accept (blocks scraping if left open). */
+async function dismissPopups(page) {
+  try {
+    const darkModal = page.getByText(/New dark mode available|dark mode available/i).first();
+    if (await darkModal.isVisible({ timeout: 1200 }).catch(() => false)) {
+      log("  Theme modal → choosing Dark…");
+      const darkBySub = page.getByText(/Interface in dark tones/i).first();
+      if (await darkBySub.isVisible().catch(() => false)) {
+        await darkBySub.click({ timeout: 2000 }).catch(() => {});
+      } else {
+        const darkCard = page.locator("label, [role='radio'], button, div").filter({ hasText: /^Dark$/i }).first();
+        if (await darkCard.isVisible().catch(() => false)) {
+          await darkCard.click({ timeout: 2000 }).catch(() => {});
+        } else {
+          await page.getByText(/^Dark$/i).first().click({ timeout: 2000 }).catch(() => {});
+        }
+      }
+      await page.waitForTimeout(400);
+      await page.getByRole("button", { name: /^Accept$/i }).click({ timeout: 3000 }).catch(() =>
+        page.getByText(/^Accept$/i).first().click().catch(() => {})
+      );
+      await page.waitForTimeout(800);
+      return;
     }
-    for (const res of (z.reservas || [])) {
-      if (res.estado !== "aceptada") continue;
-      const tier = res.tipo_slug ? (tipos[res.tipo_slug] || "Other") : "Other";
-      const rev = res.precio || 0;
-      totalRevenue += rev;
-      if (tierSummary[tier]) tierSummary[tier].revenue += rev;
-    }
+  } catch (_) {}
+
+  await page.getByRole("button", { name: /^Accept$/i }).click({ timeout: 1500 }).catch(() =>
+    page.evaluate(() => {
+      const cards = [...document.querySelectorAll("label, [role='radio'], button, div")];
+      const dark = cards.find(el => /^Dark$/i.test(((el.textContent || "").trim().split("\n")[0]) || ""));
+      if (dark) dark.click();
+      for (const b of document.querySelectorAll("button")) {
+        const t = (b.textContent || "").trim();
+        if (/^Accept$/i.test(t) || /^Aceptar$/i.test(t)) { b.click(); break; }
+      }
+    }).catch(() => {})
+  );
+}
+
+async function scrapeEventBookings(page, slug, eventId) {
+  const bookingUrl = `https://pro.fourvenues.com/${slug}/${eventId}/sales/bookings`;
+
+  async function captureOnce() {
+    const captured = {};
+    const captureHandler = async (r) => {
+      const u = r.url();
+      if (!u.includes("api.fourvenues.com") || r.status() !== 200) return;
+      if (u.includes("listado_reservados_mapa") || u.includes("reservados_mapa") ||
+          u.includes("listado_bookings_kpis") || u.includes("bookings_kpis")) {
+        const body = await r.text().catch(() => "");
+        if (body.length > 10) captured[u] = body;
+      }
+    };
+    page.on("response", captureHandler);
+    await page.goto(bookingUrl, { waitUntil: "domcontentloaded", timeout: 25000 }).catch(() => {});
+    await dismissPopups(page);
+    await page.waitForTimeout(4500);
+    page.off("response", captureHandler);
+    return captured;
   }
-  return { totalTables, bookedTables, totalRevenue, tierSummary };
+
+  let captured = await captureOnce();
+  let hasListado = Object.keys(captured).some(u => u.includes("listado_reservados_mapa"));
+  for (let attempt = 0; !hasListado && attempt < 2; attempt++) {
+    const retryHandler = async (r) => {
+      const u = r.url();
+      if (u.includes("listado_reservados_mapa") && r.status() === 200) {
+        const body = await r.text().catch(() => "");
+        if (body.length > 10) captured[u] = body;
+      }
+    };
+    page.on("response", retryHandler);
+    await page.reload({ waitUntil: "domcontentloaded", timeout: 25000 }).catch(() => {});
+    await page.waitForTimeout(5000);
+    page.off("response", retryHandler);
+    hasListado = Object.keys(captured).some(u => u.includes("listado_reservados_mapa"));
+  }
+  if (!hasListado) {
+    captured = await captureOnce();
+  }
+
+  let mapData = null, kpiData = null;
+  for (const [url, body] of Object.entries(captured)) {
+    try {
+      if (url.includes("listado_reservados_mapa")) mapData = JSON.parse(body);
+      else if (!mapData && url.includes("reservados_mapa")) mapData = JSON.parse(body);
+      if (url.includes("listado_bookings_kpis") || url.includes("bookings_kpis")) kpiData = JSON.parse(body);
+    } catch (e) {}
+  }
+  return { mapData, kpiData };
+}
+
+function _fvCountableStatus(estado) {
+  // Sales-report style: Accepted OR Not completed (exclude cancelled / completed / rejected / invites)
+  const e = String(estado || "").toLowerCase().trim().replace(/_/g, "-");
+  if (!e) return false;
+  if (e === "aceptada" || e === "accepted") return true;
+  if (e === "no-completada" || e === "no completada" || e === "not-completed" || e === "not completed") return true;
+  return false;
+}
+
+// summarizeMapData / salesPeriodLast7Days imported from fv-sales-period.cjs
+
+/** Overlay Sales-export Base price totals onto Forecast rows (venue+date+DJ). */
+function applySalesExportOverlay(results, forecastRows) {
+  const byKey = new Map();
+  for (const r of forecastRows) {
+    if (!r.date || !r.venue) continue;
+    byKey.set(`${r.venue}|${r.date}|${String(r.dj || "").toUpperCase()}`, r);
+    const vd = `${r.venue}|${r.date}`;
+    if (!byKey.has(vd)) byKey.set(vd, r);
+    else byKey.set(vd + "|#multi", true);
+  }
+  let hit = 0;
+  for (const e of results) {
+    const djKey = `${e.venue}|${e.date}|${String(e.dj || "").toUpperCase()}`;
+    let row = byKey.get(djKey);
+    if (!row && !byKey.get(`${e.venue}|${e.date}|#multi`)) row = byKey.get(`${e.venue}|${e.date}`);
+    if (!row) continue;
+    e.totalRevenue = row.totalRevenue;
+    if (row.bookings != null) e.bookedTables = row.bookings;
+    e.hasData = true;
+    e._source = "sales_export";
+    hit++;
+  }
+  return hit;
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -86,6 +192,7 @@ function summarizeMapData(mapData) {
   await page.goto("https://pro.fourvenues.com/mila1/reports/sales-overview", {
     waitUntil: "domcontentloaded", timeout: 30000
   }).catch(() => {});
+  await dismissPopups(page);
   await page.waitForTimeout(3000);
 
   const todaySec = Math.floor(Date.now() / 1000);
@@ -108,42 +215,11 @@ function summarizeMapData(mapData) {
     const eventsData = [];
     for (const evt of events) {
       const evDate = new Date(evt.fecha * 1000).toISOString().split("T")[0];
-
-      // Navigate to event booking page and capture map data
-      const captured = {};
-      const captureHandler = async (r) => {
-        const u = r.url();
-        if (u.includes("api.fourvenues.com") && r.status() === 200 &&
-            (u.includes("reservados_mapa") || u.includes("bookings_kpis"))) {
-          const body = await r.text().catch(() => "");
-          if (body.length > 10) captured[u] = body;
-        }
-      };
-      page.on("response", captureHandler);
-      await page.goto(
-        `https://pro.fourvenues.com/${v.slug}/${evt._id}/sales/bookings`,
-        { waitUntil: "domcontentloaded", timeout: 20000 }
-      ).catch(() => {});
-
-      // Dismiss any popup that appears
-      await page.evaluate(() => {
-        const btns = document.querySelectorAll("button");
-        btns.forEach(b => { if (b.textContent.includes("Accept") || b.textContent.includes("Aceptar")) b.click(); });
-      }).catch(() => {});
-
-      await page.waitForTimeout(3000);
-      page.off("response", captureHandler);
-
-      let mapData = null, kpiData = null;
-      for (const [url, body] of Object.entries(captured)) {
-        try {
-          if (url.includes("reservados_mapa")) mapData = JSON.parse(body);
-          if (url.includes("bookings_kpis")) kpiData = JSON.parse(body);
-        } catch (e) {}
-      }
-
-      const icon = (mapData || kpiData) ? "✅" : "⚪";
-      log(`  ${icon} ${evDate} ${evt.nombre}`);
+      const { mapData, kpiData } = await scrapeEventBookings(page, v.slug, evt._id);
+      const summary = mapData ? summarizeMapData(mapData, salesPeriodLast7Days()) : null;
+      const icon = mapData ? "✅" : "⚪";
+      const tbl = summary ? ` ${summary.bookedTables}/${summary.totalTables} tables` : "";
+      log(`  ${icon} ${evDate} ${evt.nombre}${tbl}`);
       eventsData.push({ date: evDate, name: evt.nombre, id: evt._id, mapData, kpiData });
     }
     allData[v.name] = eventsData;
@@ -155,41 +231,49 @@ function summarizeMapData(mapData) {
   // Save raw booking data
   fs.writeFileSync(DATA_PATH, JSON.stringify(allData, null, 2));
 
-  // Build FORECAST_DATA entries
-  const VENUE_ORDER = ["Casa Neos Beach Club", "MILA Lounge", "Casa Neos Lounge"];
-  const results = [];
+  // Build FORECAST_DATA using Sales Period window (= Excel export math)
+  const { results, period } = buildForecastFromMaps(allData);
+  log(`Sales Period: ${period.date_from} → ${period.date_until} (${period.label})`);
+  results.filter(r => r.totalRevenue > 0).forEach(r =>
+    log(`  📊 ${r.venue} | ${r.date} | ${r.dj} | $${r.totalRevenue.toLocaleString()} (period window = export math)`)
+  );
 
-  for (const venueName of VENUE_ORDER) {
-    const events = allData[venueName] || [];
-    for (const e of events) {
-      const summary = e.mapData ? summarizeMapData(e.mapData) : { totalTables: 0, bookedTables: 0, totalRevenue: 0, tierSummary: {} };
-      results.push({
-        venue: venueName,
-        date: e.date,
-        dj: e.name,
-        bookedTables: summary.bookedTables,
-        totalTables: summary.totalTables,
-        totalRevenue: summary.totalRevenue,
-        tierSummary: summary.tierSummary,
-        hasData: !!e.mapData
-      });
-    }
-  }
+  // Excel export is email-only (POST ventas_cliente_imprimir). Use MCP parse_sales_export_file
+  // when an XLS arrives. Period window above already matches that export.
 
   // Generate JS
   const newDataJS = "var FORECAST_DATA = [\n" +
     results.map(r => "  " + JSON.stringify(r)).join(",\n") +
     "\n];";
 
-  // Read HTML and replace FORECAST_DATA block
+  // Replace ONLY the FORECAST_DATA array (bracket-balanced) — never touch JS below it.
+  // A naive /[\s\S]*?\n];/ regex previously swallowed renderForecast + HELP_FAQ.
   const htmlRaw = fs.readFileSync(DASHBOARD_PATH, "latin1");
-  const pattern = /var FORECAST_DATA = \[[\s\S]*?\n\];/;
-  const match = htmlRaw.match(pattern);
-  if (!match) {
+  const startToken = "var FORECAST_DATA = [";
+  const start = htmlRaw.indexOf(startToken);
+  if (start < 0) {
     log("ERROR: Could not find FORECAST_DATA in index.html");
     process.exit(1);
   }
-  const htmlNew = htmlRaw.replace(pattern, newDataJS);
+  let depth = 0;
+  let end = -1;
+  for (let i = start + startToken.length - 1; i < htmlRaw.length; i++) {
+    const ch = htmlRaw[i];
+    if (ch === "[") depth++;
+    else if (ch === "]") {
+      depth--;
+      if (depth === 0) {
+        // include trailing semicolon if present
+        end = htmlRaw[i + 1] === ";" ? i + 2 : i + 1;
+        break;
+      }
+    }
+  }
+  if (end < 0) {
+    log("ERROR: Could not find end of FORECAST_DATA array");
+    process.exit(1);
+  }
+  const htmlNew = htmlRaw.slice(0, start) + newDataJS + htmlRaw.slice(end);
   fs.writeFileSync(DASHBOARD_PATH, htmlNew, "latin1");
   log(`Updated index.html — ${results.length} events, ${results.filter(r => r.totalRevenue > 0).length} with bookings`);
 
@@ -235,6 +319,44 @@ function summarizeMapData(mapData) {
     log("Pacing write error: " + e.message);
   }
 
+  // Enrich performance DB with D-n pace from today's map reservations (created_at)
+  try {
+    log("\n--- Updating FV performance DB ---");
+    const { buildPerfRecord } = require("./fv-perf-lib.cjs");
+    const cachePath = __dirname + "\\fv-perf-scrape-cache.json";
+    let cache = { events: [], doneIds: {} };
+    if (fs.existsSync(cachePath)) {
+      try { cache = JSON.parse(fs.readFileSync(cachePath, "utf8")); } catch (e) {}
+    }
+    cache.events = cache.events || [];
+    cache.doneIds = cache.doneIds || {};
+    const byId = new Map(cache.events.map((e, i) => [e.id, i]));
+    for (const venueName of VENUE_ORDER) {
+      for (const e of (allData[venueName] || [])) {
+        if (!e.mapData || !e.id) continue;
+        const rec = buildPerfRecord({
+          venue: venueName, date: e.date, dj: e.name, fee: null,
+          finalBs: null, finalSrc: null, mapData: e.mapData, eventId: e.id
+        });
+        const row = {
+          venue: rec.venue, date: rec.date, dj: rec.dj, id: rec.eventId,
+          finalBs: null, finalSrc: null, fee: null,
+          d14Rev: rec.d14Rev, d7Rev: rec.d7Rev, d4Rev: rec.d4Rev, d1Rev: rec.d1Rev, d0Rev: rec.d0Rev,
+          tablesD4: rec.tablesD4, tablesFinal: rec.tablesFinal, multD4: null,
+          scrapedAt: rec.scrapedAt, hasMap: true
+        };
+        if (byId.has(e.id)) cache.events[byId.get(e.id)] = Object.assign({}, cache.events[byId.get(e.id)], row);
+        else { cache.events.push(row); byId.set(e.id, cache.events.length - 1); }
+        cache.doneIds[e.id] = true;
+      }
+    }
+    fs.writeFileSync(cachePath, JSON.stringify(cache));
+    execSync(`node "${__dirname}\\fv-build-perf-db.cjs"`, { stdio: "inherit", shell: "cmd.exe", cwd: __dirname });
+    log("✅ Performance DB updated");
+  } catch (e) {
+    log("Perf DB note: " + (e.message || "").split("\n")[0]);
+  }
+
   // Toast is Monday-only — do NOT run it from the daily FourVenues job
   const bookedCount = results.filter(r => r.totalRevenue > 0).length;
   try {
@@ -246,5 +368,13 @@ function summarizeMapData(mapData) {
     log("Status write error: " + e.message.split("\n")[0]);
   }
 
-  log("\n=== FourVenues Refresh Complete (Toast runs Mondays only) ===");
+  // Toast BS Actual: daily for operating nights (MILA Wed–Sat, Lounge Thu–Sun, Beach Sat–Sun)
+  try {
+    log("\n--- Daily Toast BS Actual ---");
+    execSync(`node "${__dirname}\\toast-bs-update.cjs"`, { stdio: "inherit", shell: "cmd.exe", cwd: __dirname });
+  } catch (e) {
+    log("Toast BS note: " + (e.message || "").split("\n")[0]);
+  }
+
+  log("\n=== FourVenues Refresh Complete (Toast BS runs daily after FV) ===");
 })();
