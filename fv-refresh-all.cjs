@@ -1,16 +1,16 @@
 /**
  * RDG Dashboard — FourVenues Full Refresh
- * 1) Floor map → table counts / tiers
- * 2) totalRevenue = Sales export math: Base price (Accepted + Not completed)
- *    with reservation created_at in Period Last 7 days (matches Sales Excel export).
- * Never invent BS Actual from full-event map / rate_original_price.
+ * 1) Floor map → table counts / tiers (layout only)
+ * 2) SOURCE OF TRUTH: Sales Overview → Upcoming → ⋮ Export → email XLS → Outlook download
+ *    Base price (Accepted + Not completed) applied to FORECAST_DATA
+ * Fallback only if email export fails: period-window map math (Last 7 days)
  */
 
 const { chromium } = require("playwright");
 const fs = require("fs");
 const { execSync } = require("child_process");
 const { pullSalesExports } = require("./fv-sales-export-lib.cjs");
-const { salesPeriodLast7Days, summarizeMapData, buildForecastFromMaps } = require("./fv-sales-period.cjs");
+const { buildForecastFromMaps, summarizeMapData, salesPeriodLast7Days } = require("./fv-sales-period.cjs");
 
 const DASHBOARD_PATH = "C:\\Users\\MatthiasLavenant\\Documents\\rdg-dj-dashboard\\index.html";
 const SESSION_PATH   = "C:\\Cursor\\toast-mcp-server\\fv-final-session.json";
@@ -161,9 +161,27 @@ function applySalesExportOverlay(results, forecastRows) {
     if (row.bookings != null) e.bookedTables = row.bookings;
     e.hasData = true;
     e._source = "sales_export";
+    if (e.tierSummary && typeof e.tierSummary === "object") {
+      for (const t of Object.keys(e.tierSummary)) {
+        if (e.tierSummary[t] && typeof e.tierSummary[t] === "object") e.tierSummary[t].revenue = 0;
+      }
+    }
     hit++;
   }
   return hit;
+}
+
+/** Zero revenue before export overlay — map is layout only until email XLS lands. */
+function zeroForecastRevenue(results) {
+  for (const e of results) {
+    e.totalRevenue = 0;
+    e._source = undefined;
+    if (e.tierSummary && typeof e.tierSummary === "object") {
+      for (const t of Object.keys(e.tierSummary)) {
+        if (e.tierSummary[t] && typeof e.tierSummary[t] === "object") e.tierSummary[t].revenue = 0;
+      }
+    }
+  }
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -231,15 +249,38 @@ function applySalesExportOverlay(results, forecastRows) {
   // Save raw booking data
   fs.writeFileSync(DATA_PATH, JSON.stringify(allData, null, 2));
 
-  // Build FORECAST_DATA using Sales Period window (= Excel export math)
-  const { results, period } = buildForecastFromMaps(allData);
-  log(`Sales Period: ${period.date_from} → ${period.date_until} (${period.label})`);
-  results.filter(r => r.totalRevenue > 0).forEach(r =>
-    log(`  📊 ${r.venue} | ${r.date} | ${r.dj} | $${r.totalRevenue.toLocaleString()} (period window = export math)`)
-  );
+  // Skeleton from maps (tables/layout). Revenue filled by real Sales email export next.
+  let { results, period } = buildForecastFromMaps(allData);
+  zeroForecastRevenue(results);
+  log(`Map layout ready (${results.length} events). Period window kept as fallback: ${period.date_from} → ${period.date_until}`);
 
-  // Excel export is email-only (POST ventas_cliente_imprimir). Use MCP parse_sales_export_file
-  // when an XLS arrives. Period window above already matches that export.
+  // SOURCE OF TRUTH: Overview → Upcoming → ⋮ Export → email → Outlook → XLS
+  log("\n=== Pulling FourVenues Sales Excel via email (Outlook) ===");
+  let exportOk = false;
+  try {
+    const pulled = await pullSalesExports({ venue: "all", headless: false });
+    const n = applySalesExportOverlay(results, pulled.forecastRows);
+    exportOk = pulled.forecastRows.length > 0;
+    log(`Sales email export: ${pulled.forecastRows.length} event totals, ${n}/${results.length} Forecast rows matched`);
+    pulled.forecastRows.forEach(r =>
+      log(`  📧 ${r.venue} | ${r.date} | ${r.dj} | $${Number(r.totalRevenue).toLocaleString()} (export)`)
+    );
+    (pulled.results || []).filter(r => r.error).forEach(r =>
+      log(`  ⚠️ Export error ${r.venue}: ${r.error}`)
+    );
+  } catch (e) {
+    log("ERROR Sales email export failed: " + e.message);
+  }
+
+  if (!exportOk) {
+    log("⚠️ Falling back to period-window map math (Last 7 days) — email export returned no rows");
+    const fb = buildForecastFromMaps(allData);
+    results = fb.results;
+    period = fb.period;
+    results.filter(r => r.totalRevenue > 0).forEach(r =>
+      log(`  📊 ${r.venue} | ${r.date} | ${r.dj} | $${r.totalRevenue.toLocaleString()} (fallback period math)`)
+    );
+  }
 
   // Generate JS
   const newDataJS = "var FORECAST_DATA = [\n" +
@@ -275,7 +316,7 @@ function applySalesExportOverlay(results, forecastRows) {
   }
   const htmlNew = htmlRaw.slice(0, start) + newDataJS + htmlRaw.slice(end);
   fs.writeFileSync(DASHBOARD_PATH, htmlNew, "latin1");
-  log(`Updated index.html — ${results.length} events, ${results.filter(r => r.totalRevenue > 0).length} with bookings`);
+  log(`Updated index.html — ${results.length} events, ${results.filter(r => r.totalRevenue > 0).length} with bookings (source=${exportOk ? "sales_export_email" : "period_fallback"})`);
 
   // Git commit and push
   const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -311,7 +352,11 @@ function applySalesExportOverlay(results, forecastRows) {
     for (const r of results) {
       // Key: venue_YYYY-MM-DD  (spaces→underscore, special chars stripped)
       const key = (r.venue + "_" + r.date).replace(/[^a-zA-Z0-9_-]/g, "_");
-      const status = await fbPut(`/rdg/pacing/${key}/${today2}`, { tables: r.bookedTables, revenue: Math.round(r.totalRevenue) });
+      const status = await fbPut(`/rdg/pacing/${key}/${today2}`, {
+        tables: r.bookedTables,
+        revenue: Math.round(r.totalRevenue),
+        source: r._source || (exportOk ? "sales_export" : "period_fallback")
+      });
       log(`  ${r.venue} ${r.date} → HTTP ${status}`);
     }
     log("✅ Pacing snapshots written");
