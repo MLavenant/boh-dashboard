@@ -255,7 +255,10 @@ function updateSchedInHtml(html, salesByVenueDate) {
     log(`\n✅ Updated ${updatedCount} shows (bs_a + beat + _s + roi_a) in index.html`);
   }
 
-  // Git commit & push
+  // Git commit & push (skip on GitHub Actions — workflow pushes)
+  if (process.env.GITHUB_ACTIONS) {
+    log("GitHub Actions: skip local git push (workflow handles it)");
+  } else {
   const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   try {
     execSync(
@@ -265,6 +268,7 @@ function updateSchedInHtml(html, salesByVenueDate) {
     log("✅ Pushed to GitHub");
   } catch (e) {
     log("Git: " + e.message.split("\n")[0]);
+  }
   }
 
   log("\n=== Toast BS Update Complete ===");
