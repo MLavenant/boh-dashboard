@@ -9,10 +9,10 @@ const fs     = require("fs");
 const { execSync } = require("child_process");
 
 const TOAST_BASE     = "https://ws-api.toasttab.com";
-const DASHBOARD_PATH = "C:\\Users\\MatthiasLavenant\\Documents\\rdg-dj-dashboard\\index.html";
+const DASHBOARD_PATH = process.env.DASHBOARD_PATH || "C:\\Users\\MatthiasLavenant\\Documents\\rdg-dj-dashboard\\index.html";
 
-const CLIENT_ID  = "jsS6dB6QotBhmPsOAyBTfl0jFyhAE9ZC";
-const API_SECRET = "nyUrcOs_cG4V4YN5f82Z-3esSdg_-mtw7BgtFi59MIypXpuRsquUqOSkHMYy8MA9";
+const CLIENT_ID  = process.env.TOAST_CLIENT_ID  || "jsS6dB6QotBhmPsOAyBTfl0jFyhAE9ZC";
+const API_SECRET = process.env.TOAST_API_SECRET || "nyUrcOs_cG4V4YN5f82Z-3esSdg_-mtw7BgtFi59MIypXpuRsquUqOSkHMYy8MA9";
 
 const VENUES = {
   casa_neos:        "c3f36849-5105-44ab-9168-62be1f89a59e",
@@ -20,9 +20,11 @@ const VENUES = {
   casa_neos_lounge: "f1f95f8b-80b9-42de-a8ba-47a5fb8aac70",
 };
 
+// Operating DJ nights (matches Venue ROI rules): only these days get BS Actual written
 const BS_CONFIG = {
   casa_neos: {
     label: "Casa Neos Beach Club",
+    days: [6, 0], // Saturday, Sunday
     tables: new Set(["34","51","52","31","41","32","33","35","36","42","43","46","48","49",
                      "53","54","55","56","45","44","47","24","25","26","27","28","19","20",
                      "21","22","23","C1","C2","C3","C4","C5","C6","C7","C8","C9","C10",
@@ -32,6 +34,7 @@ const BS_CONFIG = {
   },
   mm_mila: {
     label: "MILA Lounge",
+    days: [3, 4, 5, 6], // Wednesday–Saturday
     tables: new Set(["402","304","303","302","301","308","410","401","403","404","305","306",
                      "307","408","408bis","407","405","409","406","1","2","3","4","5","6","7",
                      "8","9","10","11","12","1A","2A","3A","4A","5A","6A","7A","8A","9A",
@@ -42,6 +45,7 @@ const BS_CONFIG = {
   },
   casa_neos_lounge: {
     label: "Casa Neos Lounge",
+    days: [4, 5, 6, 0], // Thursday–Sunday
     tables: new Set(["809","808","905","904","903","902","810","906","907","908","909","910",
                      "911","912","901","807","806","805","804","803","L1","L2","L3","L4",
                      "L5","L6","L7","L8","L9","L10","L11","L12","L1A","L2A","L3A","L4A",
@@ -50,6 +54,13 @@ const BS_CONFIG = {
     includeNoTable: true, sundayStartFrac: 0.75,
   },
 };
+
+function isOperatingDay(venueKey, dateStr) {
+  const cfg = BS_CONFIG[venueKey];
+  if (!cfg || !cfg.days) return true;
+  const dow = new Date(dateStr + "T12:00:00").getDay();
+  return cfg.days.includes(dow);
+}
 
 function log(msg) {
   const ts = new Date().toLocaleTimeString("en-US", { hour12: false });
@@ -116,6 +127,10 @@ async function fetchBsSales(venueKey, dates) {
   const byDate = {};
 
   for (const date of dates) {
+    if (!isOperatingDay(venueKey, date)) {
+      byDate[date] = 0;
+      continue;
+    }
     const orders = await getAllOrders(token, guid, date);
     let total = 0;
     for (const order of orders) {
