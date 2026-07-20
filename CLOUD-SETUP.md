@@ -1,60 +1,85 @@
 # Cloud automation — laptop can stay OFF
 
-FourVenues Forecast + Toast BS run on **GitHub Actions** (GitHub's servers), every day ~8:30 AM Miami time. Everyone still sees live numbers on https://mlavenant.github.io/rdg-dj/ via Firebase.
+## How GitHub fits (yes, it’s involved)
 
-## One-time setup (15 minutes)
+| Piece | Repo / place | Role |
+|--------|----------------|------|
+| **GitHub Pages** | `MLavenant/rdg-dj` → https://mlavenant.github.io/rdg-dj/ | The published website |
+| **GitHub Actions** | `MLavenant/boh-dashboard` | Cloud robot that pulls data on a schedule |
+| **Firebase** | `rdg-dj-dashboard` RTDB | Instant overlays (Forecast Actuals, LIVE, Sanity) |
+| **Your laptop** | optional | Only needed to re-login FourVenues if the session expires |
 
-### 1. Create a GitHub Personal Access Token
-1. Open https://github.com/settings/tokens?type=beta (Fine-grained) or classic
-2. Token needs:
-   - Repo **MLavenant/boh-dashboard**: Read + write (Actions / contents)
-   - Repo **MLavenant/rdg-dj**: Read + write (contents) — for Toast BS push
-3. Copy the token (you'll paste it twice below)
+So: GitHub **hosts** the app and **runs** the daily jobs. Azure / Microsoft Graph are optional extras (email Sales Report, Live Refresh HTTP host).
 
-### 2. Encode your FourVenues session (on this PC, once)
-Open **PowerShell** (normal is fine):
+## Schedules
+
+| Job | When | Writes |
+|-----|------|--------|
+| FourVenues Forecast | Daily ~8:30 AM ET | Firebase `rdg/forecastLive` |
+| Toast BS Actual | Wed–Sun ~8:30 AM ET | `index.html` → push `rdg-dj` (Pages) |
+| Toast LIVE | **On demand only** (Refresh button) | Firebase `rdg/liveNight` |
+
+## One-time setup (secrets)
+
+Open https://github.com/MLavenant/boh-dashboard/settings/secrets/actions
+
+| Secret | Value |
+|--------|--------|
+| `FV_SESSION_B64` | Base64 of `fv-final-session.json` (see below) |
+| `TOAST_CLIENT_ID` | From `.env` |
+| `TOAST_API_SECRET` | From `.env` |
+| `RDG_DJ_TOKEN` | GitHub PAT with push access to `rdg-dj` |
+
+Encode FV session:
 
 ```powershell
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\Cursor\toast-mcp-server\fv-final-session.json")) | Set-Clipboard
-Write-Host "Copied FV_SESSION_B64 to clipboard"
+powershell -ExecutionPolicy Bypass -File C:\Cursor\toast-mcp-server\prepare-cloud-secret.ps1
 ```
 
-### 3. Add GitHub secrets on boh-dashboard
-Open: https://github.com/MLavenant/boh-dashboard/settings/secrets/actions
+## Wire Live Refresh (required for the button)
 
-Add these secrets:
+Pick **one**:
 
-| Secret name | Value |
-|-------------|--------|
-| `FV_SESSION_B64` | Paste from clipboard (step 2) |
-| `TOAST_CLIENT_ID` | From `C:\Cursor\toast-mcp-server\.env` |
-| `TOAST_API_SECRET` | From `C:\Cursor\toast-mcp-server\.env` |
-| `RDG_DJ_TOKEN` | Same GitHub PAT from step 1 |
+### A) GitHub dispatch (no Azure)
 
-### 4. Push workflow + enable Actions
-If not already pushed, from this PC:
+1. Create a fine-grained PAT with **Actions: Read and write** on `boh-dashboard` only.
+2. In Firebase RTDB set:
+
+```
+rdg/config/githubDispatchToken = "<PAT>"
+rdg/config/githubDispatchRepo = "MLavenant/boh-dashboard"
+```
+
+Refresh then fires workflow **RDG Live Refresh**.
+
+### B) HTTP endpoint (Azure App Service / any Node host)
 
 ```powershell
 cd C:\Cursor\toast-mcp-server
-git add .github/workflows/rdg-daily.yml fv-refresh-cloud.cjs toast-bs-cloud.cjs toast-bs-update.cjs CLOUD-SETUP.md
-git commit -m "Add GitHub Actions cloud daily FourVenues + Toast"
-git push origin main
+$env:PORT=8787
+$env:LIVE_REFRESH_KEY="pick-a-secret"
+$env:TOAST_CLIENT_ID="..."
+$env:TOAST_API_SECRET="..."
+node live-refresh-http.cjs
 ```
 
-Then open https://github.com/MLavenant/boh-dashboard/actions → enable workflows if asked → **RDG Daily Forecast + Toast** → **Run workflow** (test once).
+Firebase:
 
-### 5. Done
-- Laptop can be closed / powered off
-- Schedule: daily **12:30 UTC** (~8:30 AM ET)
-- Forecast updates Firebase → all users see it live
-- Toast updates GitHub Pages via push to `rdg-dj`
+```
+rdg/config/liveRefreshUrl = "https://YOUR-HOST"
+rdg/config/liveRefreshKey = "pick-a-secret"
+```
 
-## If Forecast goes empty later
-FourVenues session expired. On any PC with a browser login:
+## Disable old night LIVE task on this PC
 
-1. Re-capture `fv-final-session.json` (Playwright login once)
-2. Re-run the base64 clipboard command
-3. Update secret `FV_SESSION_B64` on GitHub
+```powershell
+powershell -ExecutionPolicy Bypass -File C:\Cursor\toast-mcp-server\disable-live-night-task.ps1
+```
 
-## Optional: disable local Task Scheduler
-You no longer need `RDG DJ FourVenues Daily 830` on this laptop.
+## Sanity page
+
+In the app sidebar → **Sanity**: overall health, what each job pulls, last run time, and flags if Live Refresh isn’t configured or a job is stale/failed.
+
+## If Forecast goes empty
+
+FourVenues session expired → re-run `node fv-relogin-save.cjs`, then `prepare-cloud-secret.ps1`, update `FV_SESSION_B64`.

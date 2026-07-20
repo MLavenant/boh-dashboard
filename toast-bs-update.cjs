@@ -262,7 +262,7 @@ function updateSchedInHtml(html, salesByVenueDate) {
   const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   try {
     execSync(
-      `cd "${DASHBOARD_PATH.replace("index.html","")}" && git add -A && git commit -m "Auto-refresh: Toast BS Actual — ${today}" && git push origin main`,
+      `cd "${DASHBOARD_PATH.replace("index.html","")}" && git add index.html && git commit -m "Auto-refresh: Toast BS Actual — ${today}" && git push origin main`,
       { stdio: "inherit", shell: "cmd.exe" }
     );
     log("✅ Pushed to GitHub");

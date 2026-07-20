@@ -1,0 +1,37 @@
+name: RDG Live Refresh (Toast on demand)
+
+# Triggered when someone hits Refresh on the LIVE page (via repository_dispatch)
+# or manually from the Actions tab. Does NOT run on a night schedule.
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [live-refresh]
+
+jobs:
+  toast-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: npm ci || npm install
+
+      - name: Checkout DJ dashboard (for SCHED tonight)
+        uses: actions/checkout@v4
+        with:
+          repository: MLavenant/rdg-dj
+          token: ${{ secrets.RDG_DJ_TOKEN }}
+          path: rdg-dj
+
+      - name: Pull Toast LIVE → Firebase
+        env:
+          TOAST_CLIENT_ID: ${{ secrets.TOAST_CLIENT_ID }}
+          TOAST_API_SECRET: ${{ secrets.TOAST_API_SECRET }}
+          DASHBOARD_PATH: ${{ github.workspace }}/rdg-dj/index.html
+        run: node -e "require('./toast-live-lib.cjs').pullToastLive({ force: true, trigger: 'github_actions' }).then(r=>{ console.log(JSON.stringify({ok:r.ok,skipped:r.skipped,bizDate:r.payload&&r.payload.date},null,2)); if(!r.ok&&!r.skipped) process.exit(1); }).catch(e=>{ console.error(e); process.exit(1); })"

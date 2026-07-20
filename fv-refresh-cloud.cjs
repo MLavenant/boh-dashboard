@@ -230,10 +230,16 @@ function replaceForecastInHtml(results, dashPath) {
     log(ok ? 'Updated dashboard FORECAST_DATA' : 'Dashboard HTML not updated');
   }
 
+  const now = new Date();
   await fbPut('/rdg/scrapeStatus/fourvenues', {
-    ok: true,
-    at: new Date().toISOString(),
-    msg: `Cloud: ${results.length} events, ${with$.length} with $`
+    ok: with$.length > 0,
+    at: now.toISOString(),
+    atLocal: now.toLocaleString('en-US', { timeZone: 'America/New_York' }),
+    schedule: 'Daily ~8:30 AM ET (GitHub Actions)',
+    what: 'FourVenues Sales-period Base price (Accepted + Not completed) → Firebase forecastLive',
+    message: `Cloud: ${results.length} events, ${with$.length} with $`,
+    events: results.length,
+    withRevenue: with$.length
   }).catch(() => {});
 
   with$.forEach(r => log(`  ${r.venue} | ${r.date} | ${r.dj} | $${r.totalRevenue}`));
@@ -245,8 +251,14 @@ function replaceForecastInHtml(results, dashPath) {
 })().catch(async (e) => {
   console.error(e);
   try {
+    const now = new Date();
     await fbPut('/rdg/scrapeStatus/fourvenues', {
-      ok: false, at: new Date().toISOString(), msg: String(e.message || e).slice(0, 200)
+      ok: false,
+      at: now.toISOString(),
+      atLocal: now.toLocaleString('en-US', { timeZone: 'America/New_York' }),
+      schedule: 'Daily ~8:30 AM ET (GitHub Actions)',
+      what: 'FourVenues Sales-period Base price → Firebase forecastLive',
+      message: String(e.message || e).slice(0, 200)
     });
   } catch (_) {}
   process.exit(1);
