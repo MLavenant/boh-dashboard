@@ -96,6 +96,8 @@ const VENUE_LABELS = {
 
 // ── Read template ────────────────────────────────────────────────────────────
 const template = fs.readFileSync(path.join(DIR, 'dashboard-claudie.html'), 'utf8');
+const buildStamp = new Date().toISOString();
+const latestWeekKey = rollingWeeks.length ? rollingWeeks[rollingWeeks.length - 1].key : 'unknown';
 
 // ── Split at <script> ─────────────────────────────────────────────────────────
 const scriptTagIdx = template.indexOf('\n<script>');
@@ -103,12 +105,16 @@ const htmlPart = template.slice(0, scriptTagIdx);
 
 // ── Modify HTML header to add venue pills + week selector ────────────────────
 let html = htmlPart
-  .replace('<title>Claudie · BOH Dashboard</title>', '<title>BOH Dashboard</title>')
+  .replace('<title>Claudie · BOH Dashboard</title>',
+    `<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">\n` +
+    `<meta http-equiv="Pragma" content="no-cache">\n` +
+    `<meta http-equiv="Expires" content="0">\n` +
+    `<title>BOH Dashboard · ${latestWeekKey}</title>`)
   .replace(
     '<header>\n  <h1>Claudie · BOH Dashboard</h1>\n  <span class="badge">Week of Jun 29 – Jul 5, 2026 · Updated Jul 6, 2026</span>\n</header>',
     `<header>
   <h1 id="dashTitle">BOH Dashboard</h1>
-  <span class="badge" id="dashBadge">${rollingWeeks[rollingWeeks.length-1].label}</span>
+  <span class="badge" id="dashBadge">Latest ${latestWeekKey} · Built ${buildStamp.slice(0, 16).replace('T', ' ')} UTC</span>
 </header>
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
 <div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">

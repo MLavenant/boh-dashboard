@@ -43,9 +43,9 @@ if %ERR% NEQ 0 (
   exit /b %ERR%
 )
 
-git add dashboard.html pipeline-health.json *-data-*.json data/rolling.json item-station-map.json data/2026-W* 2>>auto-run.log
+git add dashboard.html pipeline-health.json *-data-*.json item-station-map.json 2>>auto-run.log
 git commit -m "Weekly auto-update: dashboard + venue data + health check" >> auto-run.log 2>&1
 git push origin main >> auto-run.log 2>&1
-
+echo [%date% %time%] Live link: https://mlavenant.github.io/boh-dashboard/dashboard.html >> auto-run.log 2>&1
 echo [%date% %time%] Weekly auto-run complete >> auto-run.log 2>&1
 exit /b 0
