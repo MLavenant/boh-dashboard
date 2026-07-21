@@ -41,11 +41,25 @@ jobs:
           FV_SESSION_B64: ${{ secrets.FV_SESSION_B64 }}
         run: |
           if [ -z "$FV_SESSION_B64" ]; then
-            echo "Missing secret FV_SESSION_B64 — add base64 of fv-final-session.json"
+            echo "Missing secret FV_SESSION_B64"
             exit 1
           fi
-          echo "$FV_SESSION_B64" | base64 -d > fv-final-session.json
-          node -e "JSON.parse(require('fs').readFileSync('fv-final-session.json','utf8')); console.log('session ok')"
+          node -e "
+          const fs=require('fs'); const zlib=require('zlib');
+          const b64=process.env.FV_SESSION_B64;
+          const buf=Buffer.from(b64,'base64');
+          let raw;
+          if (buf[0]===0x1f && buf[1]===0x8b) {
+            raw=zlib.gunzipSync(buf);
+            console.log('decoded gzip session', raw.length, 'bytes');
+          } else {
+            raw=buf;
+            console.log('decoded raw session', raw.length, 'bytes');
+          }
+          const j=JSON.parse(raw.toString('utf8'));
+          fs.writeFileSync('fv-final-session.json', JSON.stringify(j));
+          console.log('session ok');
+          "
 
       - name: FourVenues Forecast → Firebase live
         env:

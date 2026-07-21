@@ -42,17 +42,27 @@ function miamiToday() {
 }
 
 function loadSession() {
-  if (process.env.FV_SESSION_JSON) {
-    const raw = process.env.FV_SESSION_B64
-      ? Buffer.from(process.env.FV_SESSION_B64, 'base64').toString('utf8')
-      : process.env.FV_SESSION_JSON;
-    return JSON.parse(raw);
-  }
+  const tryParse = (buf) => {
+    let raw = buf;
+    if (Buffer.isBuffer(buf) && buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b) {
+      raw = require('zlib').gunzipSync(buf);
+    }
+    const text = Buffer.isBuffer(raw) ? raw.toString('utf8') : String(raw);
+    return JSON.parse(text);
+  };
   if (process.env.FV_SESSION_B64) {
-    return JSON.parse(Buffer.from(process.env.FV_SESSION_B64, 'base64').toString('utf8'));
+    return tryParse(Buffer.from(process.env.FV_SESSION_B64, 'base64'));
+  }
+  if (process.env.FV_SESSION_JSON) {
+    return JSON.parse(process.env.FV_SESSION_JSON);
   }
   if (!fs.existsSync(SESSION_PATH)) throw new Error('Missing FV session. Set FV_SESSION_B64 secret or file.');
-  return JSON.parse(fs.readFileSync(SESSION_PATH, 'utf8'));
+  const fileBuf = fs.readFileSync(SESSION_PATH);
+  try {
+    return tryParse(fileBuf);
+  } catch (_) {
+    return JSON.parse(fileBuf.toString('utf8'));
+  }
 }
 
 function fbPut(fbPath, payload) {
