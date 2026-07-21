@@ -1,16 +1,49 @@
-name: RDG Toast BS (cloud)
+name: RDG Daily Forecast + Toast
 
-# Simple path: Toast only (works reliably).
-# FourVenues Forecast is NOT run here — use local refresh-forecast.bat on your PC.
-# Schedule: Wed–Sun ~8:30 AM ET (Mon/Tue skipped)
+# Laptop OFF.
+# FourVenues: Microsoft Graph reads Sales Report emails → Firebase forecastLive (daily)
+# Toast BS: Wed–Sun (Mon/Tue skipped)
 
 on:
   schedule:
     - cron: "30 12 * * *"
   workflow_dispatch:
+    inputs:
+      job:
+        description: "Which job to run"
+        required: true
+        default: both
+        type: choice
+        options:
+          - both
+          - fourvenues
+          - toast
 
 jobs:
+  fourvenues-forecast:
+    if: github.event_name == 'schedule' || github.event.inputs.job == 'both' || github.event.inputs.job == 'fourvenues'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: npm ci || npm install
+
+      - name: FourVenues Forecast via Graph mailbox
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          GRAPH_MAILBOX: ${{ secrets.GRAPH_MAILBOX }}
+        run: node fv-refresh-graph.cjs
+
   toast-bs:
+    if: github.event_name == 'schedule' || github.event.inputs.job == 'both' || github.event.inputs.job == 'toast'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
