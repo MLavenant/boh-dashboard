@@ -649,9 +649,70 @@ function applyExportToForecast(forecastRows, dashboardPath) {
   return { updated, total: FORECAST.length };
 }
 
+/**
+ * Trigger Sales Overview → Export to Excel email only (no Outlook/Graph wait).
+ * Used by cloud daily job; Graph picks up the email afterward.
+ */
+async function triggerVenueExportEmail(page, venue) {
+  log(`── trigger export ${venue.name}`);
+  await ensureSalesOverview(page, venue);
+  await dismissPopups(page);
+
+  const fe = page.locator('filter-events').first();
+  if (await fe.isVisible().catch(() => false)) {
+    await fe.click({ timeout: 8000 });
+  } else {
+    await page.getByText(/Event(?:s)?\s*\(\d+\)/i).first().click({ timeout: 8000 }).catch(() =>
+      page.getByRole('button', { name: /^Event/i }).first().click({ timeout: 8000 })
+    );
+  }
+  await page.waitForTimeout(1200);
+
+  await page.getByRole('tab', { name: /^Upcoming$/i }).click({ timeout: 5000 }).catch(() =>
+    page.getByText(/^Upcoming$/i).first().click({ timeout: 8000 })
+  );
+  await page.waitForTimeout(1000);
+
+  await page.evaluate(() => {
+    const label = [...document.querySelectorAll('label, span, div, p')].find(el =>
+      /^Select all$/i.test((el.textContent || '').replace(/\s+/g, ' ').trim())
+    );
+    if (!label) return;
+    const root = label.closest('div, label, section') || label.parentElement || label;
+    const sw = root.querySelector('[role="switch"]') || root.querySelector('input[type="checkbox"]');
+    if (sw) {
+      const on = sw.getAttribute('aria-checked') === 'true' || sw.checked === true;
+      if (!on) sw.click();
+    } else {
+      label.click();
+    }
+  });
+  await page.waitForTimeout(600);
+
+  await page.getByRole('button', { name: /^Apply$/i }).click({ timeout: 8000 }).catch(() =>
+    page.getByText(/^Apply$/i).first().click({ timeout: 8000 })
+  );
+  await page.waitForTimeout(3500);
+  await ensureSalesOverview(page, venue);
+
+  const sinceMs = Date.now();
+  let postSeen = false;
+  const onReq = (r) => {
+    if (r.url().includes('ventas_cliente_imprimir')) postSeen = true;
+  };
+  page.on('request', onReq);
+  const ok = await clickExportToExcel(page);
+  await page.waitForTimeout(2500);
+  page.off('request', onReq);
+  if (!ok) throw new Error('Export to Excel menu item not found');
+  log(`  ✅ export queued for ${venue.name} (apiPost=${postSeen})`);
+  return { venue: venue.name, venueKey: venue.key, venueId: venue.id, sinceMs, apiPost: postSeen };
+}
+
 module.exports = {
   VENUES, parseSalesExportFile, pullSalesExports, applyExportToForecast,
-  isCountableStatus, fetchSalesReportFromOutlook, fetchSalesReportViaGraph
+  isCountableStatus, fetchSalesReportFromOutlook, fetchSalesReportViaGraph,
+  triggerVenueExportEmail, dismissPopups, ensureSalesOverview, clickExportToExcel
 };
 
 if (require.main === module) {

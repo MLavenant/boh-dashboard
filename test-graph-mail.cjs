@@ -4,13 +4,23 @@
  */
 'use strict';
 
-const { getAppToken, listSalesReportMessages, pickReportForVenue } = require('./ms-graph-mail.cjs');
+const {
+  getAppToken,
+  resolveMailboxPath,
+  listSalesReportMessages,
+  pickReportForVenue,
+  getResolvedMailboxInfo
+} = require('./ms-graph-mail.cjs');
 const { VENUES } = require('./fv-sales-export-lib.cjs');
 
 (async () => {
   console.log('Getting app token…');
   const token = await getAppToken();
   console.log('Token OK');
+
+  console.log('Resolving GRAPH_MAILBOX…');
+  await resolveMailboxPath(token);
+  console.log('Mailbox:', getResolvedMailboxInfo());
 
   console.log('Listing Sales Report emails (14 days)…');
   const messages = await listSalesReportMessages({ token, top: 40, maxAgeDays: 14 });

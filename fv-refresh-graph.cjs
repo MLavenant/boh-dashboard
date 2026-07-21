@@ -109,11 +109,16 @@ function buildLiveFromExports(parsedByVenue) {
   log('=== FourVenues Forecast via Microsoft Graph ===');
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
-  const { messagesFound, results } = await downloadLatestSalesReports({
+  const sinceMs = process.env.GRAPH_SINCE_MS ? Number(process.env.GRAPH_SINCE_MS) : null;
+  const { messagesFound, results, mailbox } = await downloadLatestSalesReports({
     venues: VENUES,
     outDir: OUT_DIR,
-    maxAgeDays: Number(process.env.GRAPH_MAX_AGE_DAYS || 14)
+    maxAgeDays: Number(process.env.GRAPH_MAX_AGE_DAYS || 14),
+    sinceMs: Number.isFinite(sinceMs) ? sinceMs : null
   });
+  if (mailbox) {
+    log(`Mailbox UPN=${mailbox.userPrincipalName} mail=${mailbox.mail || '(none)'}`);
+  }
   log(`Inbox Sales Report candidates: ${messagesFound}`);
 
   const parsedByVenue = [];
@@ -142,7 +147,7 @@ function buildLiveFromExports(parsedByVenue) {
       ok: false,
       at: new Date().toISOString(),
       atLocal: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }),
-      schedule: 'Daily ~8:30 AM ET · GitHub Actions + Microsoft Graph',
+      schedule: 'Daily ~8:30 AM ET · Export trigger + Microsoft Graph',
       what: 'FourVenues Sales Report email → Firebase forecastLive',
       message: msg
     });
@@ -165,15 +170,15 @@ function buildLiveFromExports(parsedByVenue) {
   const oldestAge = Math.max(...okVenues.map(v => v.emailAgeHours || 0));
   const stale = oldestAge > 36;
   const statusMsg = stale
-    ? `OK but emails up to ${oldestAge}h old — trigger a fresh Sales export in FourVenues if Actuals look behind`
+    ? `OK but emails up to ${oldestAge}h old — export trigger may have failed`
     : `Graph OK: ${okVenues.length}/${VENUES.length} venues, ${eventCount} events`;
 
   await fbPut('/rdg/scrapeStatus/fourvenues', {
     ok: !stale,
     at: new Date().toISOString(),
     atLocal: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }),
-    schedule: 'Daily ~8:30 AM ET · GitHub Actions + Microsoft Graph',
-    what: 'FourVenues Sales Report email → Firebase forecastLive',
+    schedule: 'Daily ~8:30 AM ET · Export trigger + Microsoft Graph',
+    what: 'FourVenues Sales Overview Export email → Firebase forecastLive',
     message: statusMsg,
     emailAgeHoursMax: oldestAge,
     venuesOk: okVenues.length
@@ -189,8 +194,8 @@ function buildLiveFromExports(parsedByVenue) {
       ok: false,
       at: new Date().toISOString(),
       atLocal: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }),
-      schedule: 'Daily ~8:30 AM ET · GitHub Actions + Microsoft Graph',
-      what: 'FourVenues Sales Report email → Firebase forecastLive',
+      schedule: 'Daily ~8:30 AM ET · Export trigger + Microsoft Graph',
+      what: 'FourVenues Sales Overview Export email → Firebase forecastLive',
       message: String(e.message || e).slice(0, 200)
     });
   } catch (_) {}
