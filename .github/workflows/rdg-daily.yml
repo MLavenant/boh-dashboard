@@ -44,22 +44,60 @@ jobs:
             echo "Missing secret FV_SESSION_B64"
             exit 1
           fi
-          node -e "
-          const fs=require('fs'); const zlib=require('zlib');
-          const b64=process.env.FV_SESSION_B64;
-          const buf=Buffer.from(b64,'base64');
-          let raw;
-          if (buf[0]===0x1f && buf[1]===0x8b) {
-            raw=zlib.gunzipSync(buf);
-            console.log('decoded gzip session', raw.length, 'bytes');
-          } else {
-            raw=buf;
-            console.log('decoded raw session', raw.length, 'bytes');
+          node <<'NODE'
+          const fs = require('fs');
+          const zlib = require('zlib');
+          const b64 = String(process.env.FV_SESSION_B64 || '').replace(/\s+/g, '');
+          if (!b64) { console.error('FV_SESSION_B64 empty after trim'); process.exit(1); }
+          const buf = Buffer.from(b64, 'base64');
+          console.log('decoded bytes', buf.length, 'head', buf.slice(0, 2).toString('hex'));
+          function asJson(bufOrStr) {
+            const text = Buffer.isBuffer(bufOrStr) ? bufOrStr.toString('utf8') : String(bufOrStr);
+            return JSON.parse(text);
           }
-          const j=JSON.parse(raw.toString('utf8'));
-          fs.writeFileSync('fv-final-session.json', JSON.stringify(j));
-          console.log('session ok');
-          "
+          let parsed = null;
+          let mode = '';
+          // 1) gzip
+          if (buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b) {
+            try {
+              parsed = asJson(zlib.gunzipSync(buf));
+              mode = 'gzip';
+            } catch (e) {
+              console.error('gunzip/parse failed:', e.message);
+            }
+          }
+          // 2) plain JSON bytes
+          if (!parsed) {
+            try {
+              parsed = asJson(buf);
+              mode = 'json-bytes';
+            } catch (_) {}
+          }
+          // 3) maybe env was raw JSON (not base64)
+          if (!parsed) {
+            try {
+              parsed = asJson(process.env.FV_SESSION_B64);
+              mode = 'raw-json-env';
+            } catch (_) {}
+          }
+          // 4) last resort: gunzip anyway
+          if (!parsed) {
+            try {
+              parsed = asJson(zlib.gunzipSync(buf));
+              mode = 'force-gunzip';
+            } catch (e) {
+              console.error('Could not parse FV session (mode attempts failed).');
+              console.error('Tip: re-run prepare-fv-session-slim.cjs and Update secret FV_SESSION_B64 with a fresh Ctrl+V.');
+              process.exit(1);
+            }
+          }
+          if (!parsed.storageState && !parsed.cookies) {
+            console.error('Session JSON missing storageState/cookies');
+            process.exit(1);
+          }
+          fs.writeFileSync('fv-final-session.json', JSON.stringify(parsed));
+          console.log('session ok mode=' + mode);
+          NODE
 
       - name: FourVenues Forecast → Firebase live
         env:
