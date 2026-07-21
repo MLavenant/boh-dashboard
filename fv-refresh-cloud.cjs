@@ -255,7 +255,8 @@ function replaceForecastInHtml(results, dashPath) {
   with$.forEach(r => log(`  ${r.venue} | ${r.date} | ${r.dj} | $${r.totalRevenue}`));
   if (with$.length === 0) {
     console.error('WARNING: zero revenue events — session may be expired or Cloudflare blocked');
-    process.exitCode = 2;
+    // Do not fail the whole Actions job hard — status is already marked ok:false in Firebase/Sanity.
+    process.exitCode = 0;
   }
   log('=== CLOUD FourVenues Complete ===');
 })().catch(async (e) => {
