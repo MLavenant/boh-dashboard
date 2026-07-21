@@ -1,113 +1,16 @@
-name: RDG Daily Forecast + Toast
+name: RDG Toast BS (cloud)
 
-# Laptop can stay OFF. Publishes via Firebase (Forecast) + git push to rdg-dj (Toast → GitHub Pages).
-# FourVenues: every day ~8:30 AM ET
-# Toast BS: Wed–Sun only (Mon/Tue skipped inside the job)
+# Simple path: Toast only (works reliably).
+# FourVenues Forecast is NOT run here — use local refresh-forecast.bat on your PC.
+# Schedule: Wed–Sun ~8:30 AM ET (Mon/Tue skipped)
 
 on:
   schedule:
     - cron: "30 12 * * *"
   workflow_dispatch:
-    inputs:
-      job:
-        description: "Which job to run"
-        required: true
-        default: both
-        type: choice
-        options:
-          - both
-          - fourvenues
-          - toast
 
 jobs:
-  fourvenues-forecast:
-    if: github.event_name == 'schedule' || github.event.inputs.job == 'both' || github.event.inputs.job == 'fourvenues'
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install deps + Playwright Chromium
-        run: |
-          npm ci || npm install
-          npx playwright install --with-deps chromium
-
-      - name: Write FourVenues session from secret
-        env:
-          FV_SESSION_B64: ${{ secrets.FV_SESSION_B64 }}
-        run: |
-          if [ -z "$FV_SESSION_B64" ]; then
-            echo "Missing secret FV_SESSION_B64"
-            exit 1
-          fi
-          node <<'NODE'
-          const fs = require('fs');
-          const zlib = require('zlib');
-          const b64 = String(process.env.FV_SESSION_B64 || '').replace(/\s+/g, '');
-          if (!b64) { console.error('FV_SESSION_B64 empty after trim'); process.exit(1); }
-          const buf = Buffer.from(b64, 'base64');
-          console.log('decoded bytes', buf.length, 'head', buf.slice(0, 2).toString('hex'));
-          function asJson(bufOrStr) {
-            const text = Buffer.isBuffer(bufOrStr) ? bufOrStr.toString('utf8') : String(bufOrStr);
-            return JSON.parse(text);
-          }
-          let parsed = null;
-          let mode = '';
-          // 1) gzip
-          if (buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b) {
-            try {
-              parsed = asJson(zlib.gunzipSync(buf));
-              mode = 'gzip';
-            } catch (e) {
-              console.error('gunzip/parse failed:', e.message);
-            }
-          }
-          // 2) plain JSON bytes
-          if (!parsed) {
-            try {
-              parsed = asJson(buf);
-              mode = 'json-bytes';
-            } catch (_) {}
-          }
-          // 3) maybe env was raw JSON (not base64)
-          if (!parsed) {
-            try {
-              parsed = asJson(process.env.FV_SESSION_B64);
-              mode = 'raw-json-env';
-            } catch (_) {}
-          }
-          // 4) last resort: gunzip anyway
-          if (!parsed) {
-            try {
-              parsed = asJson(zlib.gunzipSync(buf));
-              mode = 'force-gunzip';
-            } catch (e) {
-              console.error('Could not parse FV session (mode attempts failed).');
-              console.error('Tip: re-run prepare-fv-session-slim.cjs and Update secret FV_SESSION_B64 with a fresh Ctrl+V.');
-              process.exit(1);
-            }
-          }
-          if (!parsed.storageState && !parsed.cookies) {
-            console.error('Session JSON missing storageState/cookies');
-            process.exit(1);
-          }
-          fs.writeFileSync('fv-final-session.json', JSON.stringify(parsed));
-          console.log('session ok mode=' + mode);
-          NODE
-
-      - name: FourVenues Forecast → Firebase live
-        env:
-          FV_SESSION_PATH: ${{ github.workspace }}/fv-final-session.json
-          FV_DATA_PATH: ${{ github.workspace }}/fv-bookings-data.json
-          FV_HEADLESS: "1"
-        run: node fv-refresh-cloud.cjs
-
   toast-bs:
-    if: github.event_name == 'schedule' || github.event.inputs.job == 'both' || github.event.inputs.job == 'toast'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -118,7 +21,7 @@ jobs:
           echo "dow=$DOW" >> "$GITHUB_OUTPUT"
           if [ "$DOW" = "1" ] || [ "$DOW" = "2" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "Mon/Tue ET — Toast BS job skipped"
+            echo "Mon/Tue ET — Toast BS skipped"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
