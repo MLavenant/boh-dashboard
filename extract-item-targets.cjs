@@ -65,21 +65,64 @@ function readRefSheet(filePath, venueName) {
   return result;
 }
 
+function readCasaNeos() {
+  const filePath = 'C:/Dell/data extraction100 casa neos.xlsx';
+  if (!fs.existsSync(filePath)) { console.warn('Casa Neos file not found'); return {}; }
+  const wb = xlsx.readFile(filePath);
+  const ws = wb.Sheets['ref'] || wb.Sheets['REF'];
+  if (!ws) { console.warn('Casa Neos: ref sheet not found'); return {}; }
+  const rows = xlsx.utils.sheet_to_json(ws, { header: 1 });
+  let headerRowIdx = -1;
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i][0] === 'Menu Items' && String(rows[i][1] || '').includes('Stations')) {
+      headerRowIdx = i; break;
+    }
+  }
+  if (headerRowIdx < 0) { console.warn('Casa Neos: header not found'); return {}; }
+  const result = {};
+  for (let i = headerRowIdx + 1; i < rows.length; i++) {
+    const row = rows[i];
+    const item = row[0];
+    const prepMin = row[10];
+    if (item && typeof item === 'string' && item.trim() && typeof prepMin === 'number' && prepMin > 0) {
+      const cleanItem = item.trim().replace(/^\r\n/, '').replace(/\r\n/g, ' ').trim();
+      if (cleanItem) result[cleanItem] = Math.round(prepMin * 60);
+    }
+  }
+  console.log(`Casa Neos: ${Object.keys(result).length} items extracted`);
+  return result;
+}
+
+function readTargetItemsTargets(filePath, sheetName, venueName) {
+  if (!fs.existsSync(filePath)) { console.warn(`${venueName} file not found`); return {}; }
+  const wb = xlsx.readFile(filePath);
+  const ws = wb.Sheets[sheetName];
+  if (!ws) { console.warn(`${venueName}: sheet missing`); return {}; }
+  const rows = xlsx.utils.sheet_to_json(ws, { header: 1, defval: null });
+  if (!rows.length) return {};
+  const hdr = rows[0].map(h => String(h || '').trim());
+  const targetCol = hdr.findIndex(h => /^target$/i.test(h));
+  if (targetCol < 0) return {};
+  const result = {};
+  for (let i = 1; i < rows.length; i++) {
+    const item = String(rows[i][0] || '').replace(/\u00a0/g, ' ').trim();
+    const prepMin = rows[i][targetCol];
+    if (item && typeof prepMin === 'number' && prepMin > 0) {
+      result[item] = Math.round(prepMin * 60);
+    }
+  }
+  console.log(`${venueName}: ${Object.keys(result).length} items extracted`);
+  return result;
+}
+
+const TARGET_ITEMS_XLSX = path.join(__dirname, 'data', 'Target items.xlsx');
+
 const targets = {
   claudie: readClaudie(),
-  casa_neos: {},  // No file available
-  ava_cg: readRefSheet(
-    'C:/Users/MatthiasLavenant/mila-group.com/Riviera Dining Group Current - CEO DASHBOARD/OPERATIONS DASHBOARD/ops/AVA CG/AVA CG - BOH DASHBOARD.xlsx',
-    'AVA CG'
-  ),
-  ava_wp: readRefSheet(
-    'C:/Users/MatthiasLavenant/mila-group.com/Riviera Dining Group Current - CEO DASHBOARD/OPERATIONS DASHBOARD/ops/AVA/AVA WP - BOH DASHBOARD.xlsx',
-    'AVA WP'
-  ),
-  mila: readRefSheet(
-    'C:/Users/MatthiasLavenant/mila-group.com/Riviera Dining Group Current - CEO DASHBOARD/OPERATIONS DASHBOARD/ops/MILA/MILA - BOH DASHBOARD.xlsx',
-    'MILA'
-  ),
+  casa_neos: readCasaNeos(),
+  ava_cg: readTargetItemsTargets(TARGET_ITEMS_XLSX, 'AVA CG', 'AVA CG'),
+  ava_wp: readTargetItemsTargets(TARGET_ITEMS_XLSX, 'AVA WP', 'AVA WP'),
+  mila: {}, // not ready yet
 };
 
 fs.writeFileSync(OUT_PATH, JSON.stringify(targets, null, 2));

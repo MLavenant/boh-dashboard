@@ -67,6 +67,30 @@ function getScheduleInfo() {
   }
 }
 
+function getMonthlyPrepScheduleInfo() {
+  try {
+    const out = execSync('schtasks /query /tn "BOH Dashboard Monthly Prep Stations" /fo LIST /v', { encoding: 'utf8' });
+    const get = (label) => {
+      const m = out.match(new RegExp(label + ':\\s*(.+)', 'i'));
+      return m ? m[1].trim() : null;
+    };
+    return {
+      exists: true,
+      status: get('Status'),
+      nextRun: get('Next Run Time'),
+      lastRun: get('Last Run Time'),
+      lastResult: get('Last Result'),
+      startTime: get('Start Time'),
+      days: get('Days'),
+      months: get('Months'),
+      scheduleType: get('Schedule Type'),
+      taskToRun: get('Task To Run'),
+    };
+  } catch (e) {
+    return { exists: false, error: e.message };
+  }
+}
+
 function checkVenueWeek(slug, week) {
   const weekDir = path.join(DATA_ROOT, week);
   const checks = [];
@@ -138,6 +162,12 @@ function checkVenueWeek(slug, week) {
 const weeks = latestWeekDirs();
 const latestWeek = weeks[0] || null;
 const schedule = getScheduleInfo();
+const monthlyPrepSchedule = getMonthlyPrepScheduleInfo();
+
+const prepStationFiles = ['claudie', 'ava_cg', 'ava_wp', 'casa_neos'].map(v => ({
+  venue: v,
+  ...fileMeta(path.join(DATA_ROOT, `prep-stations-${v}.json`), 'items'),
+}));
 
 const venueResults = latestWeek
   ? VENUES.map(v => ({ ...v, ...checkVenueWeek(v.slug, latestWeek) }))
@@ -165,6 +195,13 @@ const pipelineSteps = [
   { step: 8, name: 'Sanity check + push GitHub Pages', how: 'pipeline-health.cjs + git push', when: 'Monday 8:30 AM' },
 ];
 
+const monthlyPrepSteps = [
+  { step: 1, name: 'Refresh Toast session', how: 'intercept.js', when: '1st of month 9:00 AM' },
+  { step: 2, name: 'Scrape prep stations (all venues)', how: 'scrape-prep-stations-all.cjs', when: '1st of month 9:00 AM' },
+  { step: 3, name: 'Merge REF + Toast stations', how: 'extract-item-stations.cjs', when: '1st of month 9:00 AM' },
+  { step: 4, name: 'Rebuild dashboard + push', how: 'build-unified-v2.cjs + git push', when: '1st of month 9:00 AM' },
+];
+
 const health = {
   generatedAt: new Date().toISOString(),
   latestWeek,
@@ -174,6 +211,12 @@ const health = {
     expected: { day: 'Monday', time: '08:30', timezone: 'local' },
     matchesExpected: !!(schedule.exists && /MON/i.test(schedule.days || '') && /8:30/i.test(schedule.startTime || '')),
   },
+  monthlyPrepSchedule: {
+    ...monthlyPrepSchedule,
+    expected: { day: '1st', time: '09:00', timezone: 'local' },
+    matchesExpected: !!(monthlyPrepSchedule.exists && /every month/i.test(monthlyPrepSchedule.months || '') && /9:00/i.test(monthlyPrepSchedule.startTime || '')),
+  },
+  prepStationFiles,
   files: {
     dashboardHtml,
     rolling,
@@ -185,6 +228,7 @@ const health = {
   totals,
   overall: totals.fail ? 'fail' : (totals.warn ? 'warn' : 'pass'),
   pipelineSteps,
+  monthlyPrepSteps,
 };
 
 fs.writeFileSync(OUT, JSON.stringify(health, null, 2));

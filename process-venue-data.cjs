@@ -5,16 +5,15 @@ const path = require('path');
 const venueArg = process.argv[2];
 if (!venueArg) { console.error('Usage: node process-venue-data.cjs <venue_slug>'); process.exit(1); }
 
-// Load station targets config
-let STATION_TARGETS = {};
+// Load authoritative item assignments + targets (REF, then chef overrides).
+let ITEM_ASSIGNMENTS = {};
 try {
-  const targetsPath = path.join(__dirname, 'station-targets.json');
-  const allTargets = JSON.parse(fs.readFileSync(targetsPath, 'utf8'));
-  // Map venue slug variants to config keys
-  const keyMap = { claudie: 'claudie', casaneos: 'casaneos', ava_coconut_grove: 'ava_cg', ava_winter_park: 'ava_wp', mila: 'mila' };
+  const mapPath = path.join(__dirname, 'item-station-map.json');
+  const allAssignments = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
+  const keyMap = { claudie: 'claudie', casa_neos: 'casa_neos', casaneos: 'casa_neos', ava_coconut_grove: 'ava_cg', ava_winter_park: 'ava_wp', mila: 'mila' };
   const configKey = keyMap[venueArg] || venueArg;
-  STATION_TARGETS = allTargets[configKey] || {};
-} catch(e) { /* targets file optional */ }
+  ITEM_ASSIGNMENTS = allAssignments[configKey] || {};
+} catch(e) { /* item assignment file optional */ }
 
 // Use explicit week arg (e.g. 2026-W28) or auto-detect latest week directory
 const weekArg = process.argv[3];
@@ -124,6 +123,28 @@ const hmFul = {};
 workloadDayHourly.forEach(r => {
   if (!hmFul[r.Day]) hmFul[r.Day] = {};
   hmFul[r.Day][r['Hour Window']] = r.avg_fulfillment_min;
+});
+
+// Hour-of-day profile (10am → 4am): avg occurrences + avg fulfillment across days
+const SERVICE_HOURS = [10,11,12,13,14,15,16,17,18,19,20,21,22,23,0,1,2,3];
+const hourProfile = SERVICE_HOURS.map(hr => {
+  const hrKey = `${hr}-${hr + 1}`;
+  let sumOcc = 0, sumFulWeighted = 0, daysWithData = 0;
+  Object.keys(dayHourMap).forEach(day => {
+    const cell = dayHourMap[day][hrKey];
+    if (!cell || !cell.count) return;
+    sumOcc += cell.count;
+    sumFulWeighted += cell.sumFul; // already in minutes * count
+    daysWithData++;
+  });
+  return {
+    hour: hrKey,
+    label: hr === 0 ? '12a' : hr < 12 ? hr + 'a' : hr === 12 ? '12p' : (hr - 12) + 'p',
+    avgOcc: daysWithData ? +(sumOcc / daysWithData).toFixed(1) : 0,
+    avgFulMin: sumOcc ? +(sumFulWeighted / sumOcc).toFixed(2) : null,
+    days: daysWithData,
+    totalOcc: sumOcc,
+  };
 });
 
 // ---- covers -> concurrent guests per minute ----
@@ -279,6 +300,41 @@ const breakingPointGuests = breakingPointRow ? Math.round(breakingPointRow.guest
 console.log('Breaking point (intervals):', breakingPoint, '| guests:', breakingPointGuests);
 
 // ---- Stations ----
+// A station target is the item-volume-weighted average of all targeted items
+// assigned to that station for the selected week.
+const itemVolume = {};
+itemDetails.forEach(item => {
+  if (!item.menuItem) return;
+  itemVolume[item.menuItem] = (itemVolume[item.menuItem] || 0) + (item.qty || 1);
+});
+
+function stationNamesMatch(a, b) {
+  const na = String(a || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const nb = String(b || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  return !!na && !!nb && (na === nb || na.includes(nb) || nb.includes(na));
+}
+
+function deriveStationTarget(stationName) {
+  let weighted = 0;
+  let volume = 0;
+  const fallbackTargets = [];
+  Object.entries(ITEM_ASSIGNMENTS).forEach(([item, info]) => {
+    if (!(info.stations || []).some(st => stationNamesMatch(st, stationName))) return;
+    if (!(info.targetSec > 0)) return;
+    fallbackTargets.push(info.targetSec);
+    const qty = itemVolume[item] || 0;
+    if (qty > 0) {
+      weighted += info.targetSec * qty;
+      volume += qty;
+    }
+  });
+  if (volume > 0) return weighted / volume;
+  return fallbackTargets.length
+    ? fallbackTargets.reduce((sum, value) => sum + value, 0) / fallbackTargets.length
+    : 0;
+}
+
+const derivedStationTargets = {};
 const stationAgg = {};
 foodTickets.forEach(t => {
   const st = t['Station'];
@@ -290,7 +346,7 @@ const stations = Object.entries(stationAgg).map(([station, d]) => ({
   station,
   count: d.count,
   avg_sec: +(d.totalSec / d.count).toFixed(2),
-  exp_sec: STATION_TARGETS[station] || 0,
+  exp_sec: derivedStationTargets[station] = deriveStationTarget(station),
 })).sort((a,b) => b.count - a.count);
 
 // ---- Per-station breaking point using duration-weighted intervals ----
@@ -339,8 +395,8 @@ Object.keys(stationDetails).forEach(st => {
     Object.keys(stationDetails[st][day]).forEach(hr => {
       const d = stationDetails[st][day][hr];
       const avg_sec = +(d.totalSec / d.count).toFixed(1);
-      byDayHour[day][hr] = { count: d.count, avg_sec, exp_sec: STATION_TARGETS[st] || 0 };
-      allRows.push({ day, hr, count: d.count, avg_sec, exp_sec: STATION_TARGETS[st] || 0 });
+      byDayHour[day][hr] = { count: d.count, avg_sec, exp_sec: derivedStationTargets[st] || 0 };
+      allRows.push({ day, hr, count: d.count, avg_sec, exp_sec: derivedStationTargets[st] || 0 });
       if (!hourlyAgg[hr]) hourlyAgg[hr] = { tw: 0, tc: 0 };
       hourlyAgg[hr].tw += d.totalSec;
       hourlyAgg[hr].tc += d.count;
@@ -349,7 +405,7 @@ Object.keys(stationDetails).forEach(st => {
   const hourly = {};
   Object.keys(hourlyAgg).forEach(hr => {
     const d = hourlyAgg[hr];
-    hourly[hr] = { avg_sec: +(d.tw / d.tc).toFixed(1), exp_sec: STATION_TARGETS[st] || 0 };
+    hourly[hr] = { avg_sec: +(d.tw / d.tc).toFixed(1), exp_sec: derivedStationTargets[st] || 0 };
   });
   const breakingHours = allRows.filter(r => r.avg_sec > 900 && r.count > 0).slice(0, 20);
   stationDetailsOut[st] = { byDayHour, hourly, breakingHours };
@@ -469,7 +525,7 @@ const assignmentData = itemFulfillmentItems
   .filter(it => it.menuItem && !isBeverageItem(it.menuItem))
   .map(it => {
     const station = itemToStation[it.menuItem] || null;
-    const targetSec = station ? (STATION_TARGETS[station] || null) : null;
+    const targetSec = station ? (derivedStationTargets[station] || null) : null;
     return {
       menuItem: it.menuItem,
       station,
@@ -504,8 +560,7 @@ const summary = Object.entries(menuItemsMap)
     qty: d.qty,
     avgFulSec: d.count > 0 ? +(d.totalFulSec / d.count).toFixed(1) : null,
   }))
-  .sort((a, b) => b.qty - a.qty)
-  .slice(0, 200);
+  .sort((a, b) => b.qty - a.qty);
 
 // ---- Output ----
 const output = {
@@ -513,6 +568,7 @@ const output = {
   summary,
   hmFul,
   hmGuests: hmGuestsFlat,
+  hourProfile,
   curve,
   tbk,
   breakingPoint,

@@ -31,8 +31,6 @@ const VENUE_SLUG_MAP = {
   mila:     'mila',
 };
 
-const TARGETS = JSON.parse(fs.readFileSync(path.join(DIR, 'station-targets.json'), 'utf8'));
-
 // Item-level targets from Excel ref files
 let ITEM_TARGETS = {};
 try {
@@ -45,6 +43,11 @@ try {
   ITEM_STATION_MAP = JSON.parse(fs.readFileSync(path.join(DIR, 'item-station-map.json'), 'utf8'));
 } catch(e) { /* file not found, skip */ }
 
+let CHEF_TARGET_OVERRIDES = {};
+try {
+  CHEF_TARGET_OVERRIDES = JSON.parse(fs.readFileSync(path.join(DIR, 'chef-target-overrides.json'), 'utf8'));
+} catch(e) { /* file not found, skip */ }
+
 // Pipeline health / sanity check status
 let PIPELINE_HEALTH = {};
 try {
@@ -52,10 +55,6 @@ try {
 } catch(e) { /* file not found, skip */ }
 
 function applyTargets(venueKey, data) {
-  const venueTargets = TARGETS[venueKey] || {};
-  (data.stations || []).forEach(s => {
-    if (venueTargets[s.station]) s.exp_sec = venueTargets[s.station];
-  });
   return data;
 }
 
@@ -220,10 +219,19 @@ html = html.replace(
 <div class="section-title">Item–Station Assignment</div>
 <div class="card">
   <h2>Menu Item → Station Mapping</h2>
-  <p class="note">All food items assigned to their canonical kitchen station. Target = station fulfillment target. Avg Actual = current week avg from Toast. Searchable and sorted by station.</p>
+  <p class="note">Stations from Toast Bulk Editor (monthly refresh). <strong>Target</strong> = item should be fulfilled in X minutes — click to edit; chefs set targets for new items. Saves in your browser; use <em>Export chef targets</em> then drop file into repo as <code>chef-target-overrides.json</code>. REF/TARGET values are never overwritten by the scrape.</p>
   <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
     <input id="assignSearch" type="text" placeholder="Search items…" oninput="applyAssignFilter()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;width:220px;outline:none">
+    <select id="assignTargetFilter" onchange="applyAssignFilter()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;outline:none">
+      <option value="all">All items</option>
+      <option value="no-target">No chef target</option>
+      <option value="has-target">Has chef target</option>
+      <option value="no-station">No station</option>
+    </select>
+    <button type="button" onclick="exportChefTargets()" style="padding:6px 14px;background:#2d3448;border:1px solid #3d4458;color:#e8eaed;border-radius:8px;font-size:13px;cursor:pointer">Export chef targets</button>
+    <button type="button" id="assignRefreshBtn" onclick="refreshAssignmentFromToast()" style="padding:6px 14px;background:#1e3a2f;border:1px solid #2d6a4f;color:#86efac;border-radius:8px;font-size:13px;cursor:pointer" title="Scrapes Toast prep stations + rebuilds assignment map for this venue">↻ Refresh from Toast</button>
     <span id="assignCount" style="font-size:12px;color:#9aa0aa"></span>
+    <span id="assignSaveStatus" style="font-size:12px;color:#22c55e"></span>
   </div>
   <div style="overflow-x:auto">
     <table id="assignTable" style="width:100%;border-collapse:collapse;font-size:13px">
@@ -231,7 +239,7 @@ html = html.replace(
         <tr style="background:#1e2533;text-align:left">
           <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;white-space:nowrap">Station</th>
           <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Menu Item</th>
-          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;text-align:right;white-space:nowrap">Target</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;text-align:right;white-space:nowrap">Target (min)</th>
           <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;text-align:right;white-space:nowrap">Avg Actual</th>
           <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;text-align:right;white-space:nowrap">Count</th>
           <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;text-align:center;white-space:nowrap">Status</th>
@@ -285,6 +293,24 @@ html = html.replace(
   '</div>\n<p id="pageSummary" style="color:#9aa0aa;font-size:13px;margin:12px 0 0;line-height:1.6;max-width:780px"></p>\n\n<!-- Visual 1 -->'
 );
 
+// Insert Visual TEST (hour-of-day profile) right after Visual 1 card
+html = html.replace(
+  '<!-- Visual 2+3 -->',
+  `<!-- Visual TEST -->
+<div class="card">
+  <h2>Visual TEST — Time-of-Day Profile (10am → 4am)</h2>
+  <p class="note">X-axis = hour of day across the week (service window). Left Y = average ticket occurrences at that hour. Right Y = average fulfillment time (gold). Same dual-axis layout as Visual 1.</p>
+  <canvas id="cHourProfile" style="max-height:400px"></canvas>
+  <div class="legend">
+    <span><span class="sw" style="background:#5aa9e6"></span>Avg occurrences / day</span>
+    <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
+  </div>
+  <div class="annotation-box" id="hourProfileNote">Peak hour computed from weekly kitchen timing.</div>
+</div>
+
+<!-- Visual 2+3 -->`
+);
+
 // Add venue pill styles + new UI styles
 html = html.replace('</style>', `
 /* Venue pills */
@@ -317,6 +343,7 @@ html = html.replace('</style>', `
 const allDataJS = `const ALL_DATA = ${JSON.stringify(VENUES, null, 0)};
 const ITEM_TARGETS_DATA = ${JSON.stringify(ITEM_TARGETS, null, 0)};
 const ITEM_STATION_MAP_DATA = ${JSON.stringify(ITEM_STATION_MAP, null, 0)};
+const CHEF_TARGET_OVERRIDES = ${JSON.stringify(CHEF_TARGET_OVERRIDES, null, 0)};
 const PIPELINE_HEALTH_DATA = ${JSON.stringify(PIPELINE_HEALTH, null, 0)};`;
 
 // ── Generate the new <script> block ──────────────────────────────────────────
@@ -356,8 +383,26 @@ function venueSlugForMap() {
   const map = { claudie:'claudie', casaneos:'casa_neos', ava_cg:'ava_cg', ava_wp:'ava_wp', mila:'mila' };
   return map[currentVenue] || currentVenue;
 }
+function chefStorageKey() {
+  return 'bohChefTargets_' + venueSlugForMap();
+}
+function loadChefLocal() {
+  try { return JSON.parse(localStorage.getItem(chefStorageKey()) || '{}'); } catch { return {}; }
+}
+function getEffectiveTargetSec(menuItem, refSec) {
+  const local = loadChefLocal();
+  if (local[menuItem] != null && local[menuItem] > 0) return local[menuItem];
+  const embedded = (CHEF_TARGET_OVERRIDES[venueSlugForMap()] || {})[menuItem];
+  if (embedded > 0) return embedded;
+  return refSec || 0;
+}
 function getStaticItemMap() {
-  return ITEM_STATION_MAP_DATA[venueSlugForMap()] || {};
+  const base = ITEM_STATION_MAP_DATA[venueSlugForMap()] || {};
+  const out = {};
+  for (const [k, v] of Object.entries(base)) {
+    out[k] = { ...v, targetSec: getEffectiveTargetSec(k, v.targetSec || 0) };
+  }
+  return out;
 }
 function stationNamesMatch(a, b) {
   const na = String(a || '').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -388,6 +433,56 @@ function getStaticItemsForStation(stationName) {
   return out.sort((a, b) => (b.qty || 0) - (a.qty || 0) || a.menuItem.localeCompare(b.menuItem));
 }
 
+/**
+ * Derive each station target from the targets of its assigned items.
+ * Target = sum(item target × weekly item quantity) / sum(weekly item quantity).
+ * Untargeted items are excluded. Without weekly volume, use the simple average.
+ */
+function applyDerivedStationTargets() {
+  const data = getD();
+  const itemMap = getStaticItemMap();
+  const volumeByItem = {};
+  (data.summary || []).forEach(row => {
+    const name = row.menuItem || row.item;
+    if (name) volumeByItem[name] = Number(row.qty != null ? row.qty : row.count) || 0;
+  });
+
+  (data.stations || []).forEach(station => {
+    let weightedTarget = 0;
+    let targetedVolume = 0;
+    let allAssignedVolume = 0;
+    const targetValues = [];
+
+    Object.entries(itemMap).forEach(([item, info]) => {
+      if (!(info.stations || []).some(s => stationNamesMatch(s, station.station))) return;
+      const volume = volumeByItem[item] || 0;
+      allAssignedVolume += volume;
+      if (!(info.targetSec > 0)) return;
+      targetValues.push(info.targetSec);
+      if (volume > 0) {
+        weightedTarget += info.targetSec * volume;
+        targetedVolume += volume;
+      }
+    });
+
+    station.exp_sec = targetedVolume > 0
+      ? weightedTarget / targetedVolume
+      : (targetValues.length
+          ? targetValues.reduce((sum, value) => sum + value, 0) / targetValues.length
+          : 0);
+    station.target_source = 'assigned-items';
+    station.target_coverage = allAssignedVolume > 0 ? targetedVolume / allAssignedVolume : null;
+
+    const detail = (data.stationDetails || {})[station.station];
+    if (detail) {
+      Object.values(detail.hourly || {}).forEach(row => { row.exp_sec = station.exp_sec; });
+      Object.values(detail.byDayHour || {}).forEach(hours => {
+        Object.values(hours || {}).forEach(row => { row.exp_sec = station.exp_sec; });
+      });
+    }
+  });
+}
+
 // ============================================================
 // UTILS
 // ============================================================
@@ -401,7 +496,8 @@ const HM_DAYS_SHORT = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 
 function fmtSec(s) {
   if (s == null || s === 0) return '—';
-  const m = Math.floor(s / 60), sec = Math.round(s % 60);
+  const rounded = Math.round(s);
+  const m = Math.floor(rounded / 60), sec = rounded % 60;
   return m + ':' + String(sec).padStart(2, '0');
 }
 function fmtMin(s) {
@@ -570,6 +666,103 @@ function renderPressure() {
   if (bp2) bp2.textContent = bpObj.guests ?? '—';
   const bpNote = document.getElementById('bpMethodNote');
   if (bpNote) bpNote.textContent = 'BP detected via P75 fulfillment';
+}
+
+// ============================================================
+// VISUAL TEST: Time-of-day profile (10am → 4am)
+// ============================================================
+function renderHourProfile() {
+  const profile = getD().hourProfile || [];
+  const existing = Chart.getChart('cHourProfile');
+  if (existing) existing.destroy();
+  const canvas = document.getElementById('cHourProfile');
+  if (!canvas) return;
+  if (!profile.length) {
+    const note = document.getElementById('hourProfileNote');
+    if (note) note.textContent = 'No hour-profile data yet — reprocess venue week to enable.';
+    return;
+  }
+
+  const labels = profile.map(p => p.label || p.hour);
+  const occ = profile.map(p => p.avgOcc || 0);
+  const ful = profile.map(p => p.avgFulMin);
+  const thr = getThreshold();
+  let peakIdx = 0;
+  for (let i = 1; i < occ.length; i++) if (occ[i] > occ[peakIdx]) peakIdx = i;
+  const peak = profile[peakIdx];
+
+  const thrPlugin = {
+    id: 'hourThr',
+    beforeDraw(chart) {
+      const { ctx, chartArea: a, scales } = chart;
+      if (!a || !scales.y1) return;
+      const yThr = scales.y1.getPixelForValue(thr);
+      if (yThr < a.top || yThr > a.bottom) return;
+      ctx.save();
+      ctx.strokeStyle = '#e2706a';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      ctx.moveTo(a.left, yThr);
+      ctx.lineTo(a.right, yThr);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#e2706a';
+      ctx.font = '11px sans-serif';
+      ctx.fillText(thr + ' min target', a.left + 4, yThr - 4);
+      ctx.restore();
+    }
+  };
+
+  new Chart(canvas, {
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Avg occurrences / day',
+          data: occ,
+          backgroundColor: labels.map((_, i) => i === peakIdx ? 'rgba(226,112,106,0.7)' : 'rgba(74,159,255,0.55)'),
+          borderColor: labels.map((_, i) => i === peakIdx ? '#e2706a' : '#4a9eff'),
+          borderWidth: 1,
+          yAxisID: 'y',
+          order: 2,
+          borderRadius: 2,
+        },
+        {
+          type: 'line',
+          label: 'Avg fulfillment (min)',
+          data: ful,
+          borderColor: '#d9a441',
+          backgroundColor: 'rgba(217,164,65,0)',
+          tension: 0.3,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          borderWidth: 2.5,
+          yAxisID: 'y1',
+          order: 1,
+          spanGaps: true,
+        },
+      ],
+    },
+    options: {
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: { title: { display: true, text: 'Hour of day (10am → 4am)' }, grid: { color: gc } },
+        y: { position: 'left', title: { display: true, text: 'Avg occurrences / day' }, grid: { color: gc }, min: 0 },
+        y1: { position: 'right', title: { display: true, text: 'Fulfillment time (min)' }, grid: { display: false }, min: 0, suggestedMax: 24 },
+      },
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+    },
+    plugins: [thrPlugin],
+  });
+
+  const note = document.getElementById('hourProfileNote');
+  if (note && peak) {
+    const fulTxt = peak.avgFulMin != null ? peak.avgFulMin.toFixed(1) + ' min avg fulfillment' : 'no fulfillment data';
+    note.innerHTML = '⚡ Peak volume at <strong>' + (peak.label || peak.hour) + '</strong> — ' +
+      peak.avgOcc + ' tickets/day on average · ' + fulTxt + '.';
+  }
 }
 
 // ============================================================
@@ -817,7 +1010,8 @@ function render3D() {
     if (!s.exp_sec) { sc = '#9aa0aa'; st = 'No target'; }
     else if (s.avg_sec / s.exp_sec > 1.15) { sc = '#e2706a'; st = 'Over target'; }
     else if (s.avg_sec > s.exp_sec) { sc = '#c99a2e'; st = 'Slightly over'; }
-    document.getElementById('kDetail').innerHTML = '<div style="border-top:1px solid #262a33;padding-top:14px"><h2 style="font-size:15px;margin:0 0 10px">' + s.station + '</h2><div class="kpis" style="margin-bottom:0"><div class="kpi"><div class="v" style="font-size:19px">' + s.count + '</div><div class="l">Tickets</div></div><div class="kpi"><div class="v" style="font-size:19px">' + fmtSec(s.avg_sec) + '</div><div class="l">Avg time</div></div><div class="kpi"><div class="v" style="font-size:19px">' + (s.exp_sec > 0 ? fmtSec(s.exp_sec) : '—') + '</div><div class="l">Target</div></div><div class="kpi"><div class="v" style="font-size:19px;color:' + sc + '">' + ratio + '</div><div class="l">' + st + '</div></div></div></div>';
+    const targetCoverageLabel = s.target_coverage != null ? 'Target · ' + Math.round(s.target_coverage * 100) + '% mix covered' : 'Target';
+    document.getElementById('kDetail').innerHTML = '<div style="border-top:1px solid #262a33;padding-top:14px"><h2 style="font-size:15px;margin:0 0 10px">' + s.station + '</h2><div class="kpis" style="margin-bottom:0"><div class="kpi"><div class="v" style="font-size:19px">' + s.count + '</div><div class="l">Tickets</div></div><div class="kpi"><div class="v" style="font-size:19px">' + fmtSec(s.avg_sec) + '</div><div class="l">Avg time</div></div><div class="kpi"><div class="v" style="font-size:19px">' + (s.exp_sec > 0 ? fmtSec(s.exp_sec) : '—') + '</div><div class="l">' + targetCoverageLabel + '</div></div><div class="kpi"><div class="v" style="font-size:19px;color:' + sc + '">' + ratio + '</div><div class="l">' + st + '</div></div></div></div>';
   }
 
   if (window._threeLoopId) cancelAnimationFrame(window._threeLoopId);
@@ -1564,7 +1758,7 @@ function renderStations() {
         '<div class="kpis" style="margin:0 0 0 auto;grid-template-columns:repeat(4,auto)">'+
           '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+s.count+'</div><div class="l">Tickets</div></div>'+
           '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+fmtSec(s.avg_sec)+'</div><div class="l">Avg time</div></div>'+
-          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+(s.exp_sec?fmtSec(s.exp_sec):'—')+'</div><div class="l">Target</div></div>'+
+          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+(s.exp_sec?fmtSec(s.exp_sec):'—')+'</div><div class="l">Target'+(s.target_coverage != null?' · '+Math.round(s.target_coverage*100)+'% mix':'')+'</div></div>'+
           '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px;color:'+ratioColor+'">'+ratioDisp+'</div><div class="l">vs Target</div></div>'+
           (s.bp_tickets != null ? '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px;color:#e2706a">'+s.bp_tickets+'</div><div class="l">Station BP</div></div>' : '')+
         '</div>'+
@@ -1895,7 +2089,6 @@ function renderMenuItems() {
 // TAB 5: Assignment
 // ============================================================
 function renderAssignment() {
-  // Static REF is source of truth for item → stations + target
   const staticMap = getStaticItemMap();
   const summary = getD().summary || [];
   const liveByName = {};
@@ -1907,10 +2100,12 @@ function renderAssignment() {
   const DATA = Object.entries(staticMap).map(([menuItem, info]) => {
     const live = liveByName[menuItem] || {};
     const stations = (info.stations || []).filter(st => isFoodStation(st));
+    const targetSec = info.targetSec || null;
     return {
       menuItem,
       station: stations.length ? stations.join(', ') : null,
-      targetSec: info.targetSec || null,
+      targetSec,
+      targetMin: targetSec ? Math.round(targetSec / 60 * 10) / 10 : '',
       avgFulSec: live.avgFulSec != null ? live.avgFulSec : (live.avg_sec || null),
       count: live.qty != null ? live.qty : (live.count || null),
     };
@@ -1925,10 +2120,21 @@ function renderAssignment() {
 
   const searchEl = document.getElementById('assignSearch');
   if (searchEl) { searchEl.value = ''; }
+  const filterEl = document.getElementById('assignTargetFilter');
+  if (filterEl) { filterEl.value = 'all'; }
+  const saveEl = document.getElementById('assignSaveStatus');
+  if (saveEl) saveEl.textContent = '';
 
   function getRows() {
     const q = (document.getElementById('assignSearch')?.value || '').toLowerCase();
-    return q ? DATA.filter(r => r.menuItem.toLowerCase().includes(q) || (r.station||'').toLowerCase().includes(q)) : DATA;
+    const mode = document.getElementById('assignTargetFilter')?.value || 'all';
+    return DATA.filter(r => {
+      if (mode === 'no-target' && r.targetSec) return false;
+      if (mode === 'has-target' && !r.targetSec) return false;
+      if (mode === 'no-station' && r.station) return false;
+      if (!q) return true;
+      return r.menuItem.toLowerCase().includes(q) || (r.station||'').toLowerCase().includes(q);
+    });
   }
 
   function statusBadge(avgFulSec, targetSec) {
@@ -1958,10 +2164,12 @@ function renderAssignment() {
       const avgColor = r.avgFulSec && r.targetSec
         ? (r.avgFulSec > r.targetSec * 1.15 ? '#ef4444' : r.avgFulSec > r.targetSec ? '#f59e0b' : '#22c55e')
         : '#9aa0aa';
+      const esc = r.menuItem.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+      const tgtInput = '<input type="number" min="0" step="0.5" class="chef-target-inp" data-item="' + esc + '" value="' + (r.targetMin !== '' ? r.targetMin : '') + '" placeholder="min" title="Fulfillment target in minutes" style="width:72px;padding:4px 6px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:6px;font-size:12px;text-align:right" onchange="updateChefTarget(this)">';
       return '<tr style="border-top:1px solid #1e2533">' +
         stationCell +
         '<td style="padding:7px 10px;color:#e8eaed">' + r.menuItem + '</td>' +
-        '<td style="padding:7px 10px;text-align:right;color:#9aa0aa">' + (r.targetSec ? fmtSec(r.targetSec) : '—') + '</td>' +
+        '<td style="padding:7px 10px;text-align:right">' + tgtInput + '</td>' +
         '<td style="padding:7px 10px;text-align:right;font-weight:600;color:' + avgColor + '">' + (r.avgFulSec ? fmtSec(r.avgFulSec) : '—') + '</td>' +
         '<td style="padding:7px 10px;text-align:right;color:#9aa0aa">' + (r.count || '—') + '</td>' +
         '<td style="padding:7px 10px;text-align:center">' + statusBadge(r.avgFulSec, r.targetSec) + '</td>' +
@@ -1973,6 +2181,78 @@ function renderAssignment() {
 
   window.applyAssignFilter = function() {
     renderRows(getRows());
+  };
+
+  window.updateChefTarget = function(inp) {
+    const item = inp.getAttribute('data-item');
+    const min = parseFloat(inp.value);
+    const store = loadChefLocal();
+    const row = DATA.find(d => d.menuItem === item);
+    if (min > 0 && !isNaN(min)) {
+      const sec = Math.round(min * 60);
+      store[item] = sec;
+      if (row) { row.targetSec = sec; row.targetMin = min; }
+    } else {
+      delete store[item];
+      if (row) { row.targetSec = getEffectiveTargetSec(item, ITEM_STATION_MAP_DATA[venueSlugForMap()]?.[item]?.targetSec || 0) || null; row.targetMin = row.targetSec ? row.targetSec / 60 : ''; }
+    }
+    localStorage.setItem(chefStorageKey(), JSON.stringify(store));
+    const st = document.getElementById('assignSaveStatus');
+    if (st) st.textContent = 'Saved locally · station targets recalculated';
+    applyDerivedStationTargets();
+    renderStationsRecap();
+    renderStations();
+    renderRows(getRows());
+  };
+
+  window.exportChefTargets = function() {
+    const venue = venueSlugForMap();
+    const merged = { ...(CHEF_TARGET_OVERRIDES[venue] || {}), ...loadChefLocal() };
+    const out = { ...CHEF_TARGET_OVERRIDES, [venue]: merged };
+    const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'chef-target-overrides.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    const st = document.getElementById('assignSaveStatus');
+    if (st) st.textContent = 'Exported — replace chef-target-overrides.json in repo';
+  };
+
+  window.refreshAssignmentFromToast = async function() {
+    const st = document.getElementById('assignSaveStatus');
+    const btn = document.getElementById('assignRefreshBtn');
+    const venue = venueSlugForMap();
+    const weekKey = WEEKS[currentWeekIdx]?.key || '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Refreshing…'; }
+    if (st) { st.style.color = '#f59e0b'; st.textContent = 'Calling local Toast refresh helper…'; }
+    try {
+      const resp = await fetch('http://127.0.0.1:3855/refresh-assignment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ venue, week: weekKey }),
+      });
+      const body = await resp.json().catch(() => ({}));
+      if (!resp.ok) throw new Error(body.error || ('HTTP ' + resp.status));
+      if (st) { st.style.color = '#22c55e'; st.textContent = 'Refreshed ' + (body.items || '?') + ' items — reload dashboard.html'; }
+      if (confirm('Toast assignment refreshed.\\n\\nReload this page to see new stations/items?')) {
+        location.reload();
+      }
+    } catch (e) {
+      if (st) {
+        st.style.color = '#ef4444';
+        st.textContent = 'Refresh helper offline — start: node assignment-refresh-server.cjs';
+      }
+      alert(
+        'Could not reach the local Toast refresh helper.\\n\\n' +
+        '1) In a terminal, run:\\n   node assignment-refresh-server.cjs\\n' +
+        '2) Keep that window open\\n' +
+        '3) Click Refresh from Toast again\\n\\n' +
+        'Detail: ' + (e && e.message ? e.message : e)
+      );
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = '↻ Refresh from Toast'; }
+    }
   };
 }
 
@@ -2314,6 +2594,31 @@ function renderSettings() {
   html += '<tr><td style="padding:8px 0;color:#9aa0aa">Task status</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.status||'—') + '</td></tr>';
   html += '</table></div>';
 
+  const msched = H.monthlyPrepSchedule || {};
+  const mschedOk = !!msched.matchesExpected;
+  html += '<div class="card">';
+  html += '<h2>Monthly Prep Stations Scrape</h2>';
+  html += '<p class="note">Expected: 1st of every month at 9:00 AM. Scrapes Toast Bulk Editor for Claudie, AVA CG, AVA WP, Casa Neos — updates stations only; REF targets preserved.</p>';
+  html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Task registered</td><td style="padding:8px 0;text-align:right;font-weight:600;color:' + (msched.exists?'#22c55e':'#ef4444') + '">' + (msched.exists?'Yes':'No') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (msched.months||'—') + ' day ' + (msched.days||'—') + ' @ ' + (msched.startTime||'') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Matches 1st @ 9:00</td><td style="padding:8px 0;text-align:right;font-weight:700;color:' + (mschedOk?'#22c55e':'#ef4444') + '">' + (mschedOk?'✅ Yes':'❌ No') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Next run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (msched.nextRun||'—') + '</td></tr>';
+  html += '<tr><td style="padding:8px 0;color:#9aa0aa">Last scrape files</td><td style="padding:8px 0;text-align:right;color:#e8eaed;font-size:12px">';
+  (H.prepStationFiles || []).forEach((f, i) => {
+    if (i) html += '<br>';
+    html += f.venue + ': ' + (f.mtime ? fmtWhen(f.mtime) + ' (' + (f.rows||0) + ' items)' : '<span style="color:#ef4444">not scraped</span>');
+  });
+  html += '</td></tr></table>';
+  if ((H.monthlyPrepSteps || []).length) {
+    html += '<ol style="margin:12px 0 0;padding-left:18px;color:#e8eaed;font-size:13px;line-height:1.7">';
+    H.monthlyPrepSteps.forEach(s => {
+      html += '<li><strong style="color:#d9a441">' + s.name + '</strong> — <span style="color:#9aa0aa">' + s.how + '</span></li>';
+    });
+    html += '</ol>';
+  }
+  html += '</div>';
+
   // What gets updated
   html += '<div class="card">';
   html += '<h2>What Updates Automatically</h2>';
@@ -2378,9 +2683,11 @@ function renderSettings() {
 // RENDER ALL
 // ============================================================
 function renderAll() {
+  applyDerivedStationTargets();
   renderKPIs();
   renderStationsRecap();
   renderPressure();
+  renderHourProfile();
   renderBreaking();
   renderLoadPerf();
   render3D();
