@@ -1,65 +1,42 @@
 # Laptop-off automation (Toast + FourVenues)
 
 Website: https://mlavenant.github.io/rdg-dj/  
-Robot repo: this repo (`boh-dashboard`) via GitHub Actions.
+Robot: this repo via GitHub Actions.
 
 ## Toast BS (working)
 Wed–Sun ~8:30 AM ET. Secrets: `TOAST_CLIENT_ID`, `TOAST_API_SECRET`, `RDG_DJ_TOKEN`.
 
-## FourVenues Forecast (Sales Report email = the API)
-
-Same numbers as Sales → Overview → Export to Excel (Base price, Accepted + Not completed).
-
-Daily ~8:30 AM ET:
-
-1. **Trigger** — Playwright logs into FourVenues and clicks Export for 3 venues (emails go to Outlook)
-2. **Read** — Microsoft Graph reads those **Sales Report** emails from your mailbox
-3. **Publish** — parse Excel → Firebase `forecastLive` (dashboard overlays for everyone)
+## FourVenues (Sales Report email = the API)
 
 ```
-Actions → FourVenues Export → Outlook mailbox → Graph → Firebase → DJ Dashboard
+Actions → FourVenues Export (saved session) → Outlook Sales Report email
+       → Microsoft Graph reads mailbox → Firebase forecastLive → Dashboard
 ```
 
-### GitHub secrets required
+### Why not Google login in the cloud?
+Google blocks headless login on GitHub Actions. We use a **saved FourVenues session** (`FV_SESSION_B64`) only to click Export. Graph reads the email (like Toast’s API).
+
+### Secrets
 
 | Secret | Purpose |
 |--------|---------|
-| `AZURE_TENANT_ID` | Entra directory ID |
-| `AZURE_CLIENT_ID` | App `RDG-DJ-FourVenues-Graph` |
-| `AZURE_CLIENT_SECRET` | App client secret **Value** |
-| `GRAPH_MAILBOX` | Exact Entra **User principal name** (Azure → Users → your user). Not a guessed alias. |
-| `FV_EMAIL` | Google email used for FourVenues |
-| `FV_PASSWORD` | Google password for that account |
-| `FV_SESSION_B64` | Optional backup session if Google blocks headless login |
+| `AZURE_TENANT_ID` / `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET` | Graph app |
+| `GRAPH_MAILBOX` | Exact Entra UPN, e.g. `matthias@rivieradininggroup.com` |
+| `FV_SESSION_B64` | Playwright session to click Export (refresh when expired) |
 
-Toast secrets stay as they are.
+App needs **Mail.Read** (Application) + **Grant admin consent**. Do **not** require User.Read.All — we call `/users/{UPN}/messages` directly.
 
-### Fix GRAPH_MAILBOX 404 (“user is invalid”)
+### Refresh FourVenues session (when Export trigger says expired)
 
-1. Azure Portal → **Microsoft Entra ID** → **Users** → open your account  
-2. Copy **User principal name** exactly (often `…@mila-group.com`)  
-3. Update GitHub secret `GRAPH_MAILBOX` to that value  
-4. Re-run Actions → job `fourvenues`
+On your PC:
 
-### Azure app (once)
-
-1. App registration `RDG-DJ-FourVenues-Graph` (single tenant)
-2. Client secret
-3. Application permission **Mail.Read** + **Grant admin consent**
-
-### Manual test
-
-```bash
-# Graph only (needs AZURE_* + GRAPH_MAILBOX in env)
-node test-graph-mail.cjs
-node fv-refresh-graph.cjs
-
-# Full daily path
-node fv-daily-cloud.cjs
+```bat
+cd /d C:\Cursor\toast-mcp-server
+node fv-relogin-save.cjs
 ```
 
-Or Actions → **RDG Daily Forecast + Toast** → Run workflow → `fourvenues`.
+Log in in the browser window. Then set secret `FV_SESSION_B64` (gzipped base64 of `fv-final-session.json`), or run `set-fv-secret.ps1` if you use that helper.
 
-### Sanity
+### Run
 
-Dashboard → **Sanity** shows FourVenues = Export email + Graph (daily, laptop off).
+Actions → **RDG Daily Forecast + Toast** → **fourvenues**

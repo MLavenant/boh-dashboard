@@ -65,71 +65,34 @@ async function graphGet(token, apiPath) {
 }
 
 /**
- * Resolve GRAPH_MAILBOX to a Graph /users/{id} path.
- * Accepts UPN, mail, or object id. On 404, searches directory by mail/UPN.
+ * Mailbox path for Graph.
+ * Mail.Read alone can read /users/{UPN}/messages — it cannot call /users/{id}?$select=...
+ * (that needs User.Read.All). So we use GRAPH_MAILBOX UPN directly.
  */
 async function resolveMailboxPath(token) {
   if (_resolvedMailboxPath) return _resolvedMailboxPath;
 
   const raw = env('GRAPH_MAILBOX');
-  if (!raw) throw new Error('Missing GRAPH_MAILBOX (Entra User principal name, e.g. you@mila-group.com)');
+  if (!raw) throw new Error('Missing GRAPH_MAILBOX (Entra User principal name)');
 
-  const candidates = [raw];
-  // Common alias mistakes: rivieradining.com vs mila-group.com etc.
-  if (raw.includes('@')) {
-    const local = raw.split('@')[0];
-    const domain = raw.split('@')[1].toLowerCase();
-    if (domain.includes('riviera')) {
-      candidates.push(`${local}@mila-group.com`);
-      candidates.push(`${local}@mila-group.com`.replace(/group/i, 'group'));
-    }
-  }
-
-  for (const cand of [...new Set(candidates)]) {
-    try {
-      const u = await graphGet(token, `/users/${encodeURIComponent(cand)}?$select=id,userPrincipalName,mail,displayName`);
-      _resolvedMailboxInfo = {
-        id: u.id,
-        userPrincipalName: u.userPrincipalName,
-        mail: u.mail,
-        displayName: u.displayName,
-        requested: raw
-      };
-      _resolvedMailboxPath = `/users/${encodeURIComponent(u.id)}`;
-      log(`Mailbox resolved: requested=${raw} → UPN=${u.userPrincipalName} mail=${u.mail || '(none)'} id=${u.id}`);
-      return _resolvedMailboxPath;
-    } catch (e) {
-      if (e.status !== 404) throw e;
-    }
-  }
-
-  // Directory search (needs User.Read.All OR Directory.Read.All ideally; Mail.Read alone may not allow)
-  // Still try filter — works if app has User.Read.All; otherwise clear error.
+  const mb = `/users/${encodeURIComponent(raw)}`;
+  // Probe with a cheap messages list (Mail.Read) — not a user-profile GET
   try {
-    const filter = encodeURIComponent(`mail eq '${raw.replace(/'/g, "''")}' or userPrincipalName eq '${raw.replace(/'/g, "''")}'`);
-    const found = await graphGet(token, `/users?$filter=${filter}&$select=id,userPrincipalName,mail,displayName&$top=5`);
-    const u = (found.value || [])[0];
-    if (u) {
-      _resolvedMailboxInfo = {
-        id: u.id,
-        userPrincipalName: u.userPrincipalName,
-        mail: u.mail,
-        displayName: u.displayName,
-        requested: raw
-      };
-      _resolvedMailboxPath = `/users/${encodeURIComponent(u.id)}`;
-      log(`Mailbox resolved via search: UPN=${u.userPrincipalName}`);
-      return _resolvedMailboxPath;
-    }
+    await graphGet(token, `${mb}/messages?$top=1&$select=id`);
   } catch (e) {
-    log(`Directory search skipped/failed: ${e.message}`);
+    const hint =
+      e.status === 403
+        ? 'App needs Application permission Mail.Read + admin consent (Azure → API permissions → Grant admin consent).'
+        : e.status === 404
+          ? 'GRAPH_MAILBOX UPN not found — use exact User principal name from Entra → Users.'
+          : e.message;
+    throw new Error(`Cannot open mailbox '${raw}': ${hint}`);
   }
 
-  throw new Error(
-    `GRAPH_MAILBOX '${raw}' is invalid in this tenant (Graph 404). ` +
-    `Fix: Azure Portal → Microsoft Entra ID → Users → your user → copy exact User principal name → GitHub secret GRAPH_MAILBOX. ` +
-    `Do not guess aliases (e.g. @rivieradining.com vs @mila-group.com).`
-  );
+  _resolvedMailboxInfo = { userPrincipalName: raw, mail: raw, requested: raw, id: null };
+  _resolvedMailboxPath = mb;
+  log(`Mailbox OK (direct UPN): ${raw}`);
+  return _resolvedMailboxPath;
 }
 
 async function mailboxPath(token) {
