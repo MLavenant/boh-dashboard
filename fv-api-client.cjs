@@ -115,18 +115,45 @@ async function listEvents(venue, { start, end } = {}) {
   return { venue: venue.name, venueKey: venue.key, ...range, events: data.data || [] };
 }
 
+/** Inclusive YYYY-MM-DD day list (UTC date math on calendar strings). */
+function eachDateInclusive(start, end) {
+  const out = [];
+  const s = isoDate(start);
+  const e = isoDate(end);
+  const cur = new Date(s + 'T12:00:00Z');
+  const last = new Date(e + 'T12:00:00Z');
+  while (cur <= last) {
+    out.push(cur.toISOString().slice(0, 10));
+    cur.setUTCDate(cur.getUTCDate() + 1);
+  }
+  return out;
+}
+
+/**
+ * List bookings for a venue.
+ * Prefer per-day `?date=` — FourVenues `start_date`/`end_date` often returns a
+ * truncated/incomplete set (e.g. Marian 7/25 showed ~$3k instead of $13.5k accepted).
+ */
 async function listBookings(venue, { start, end, date } = {}) {
   const apiKey = getApiKey(venue);
   if (!apiKey) throw new Error(`Missing ${venue.envKey} for ${venue.name}`);
-  let path;
+
   if (date) {
-    path = `/bookings/?date=${encodeURIComponent(isoDate(date))}`;
-  } else {
-    const range = { start: start || defaultDateRange().start, end: end || defaultDateRange().end };
-    path = `/bookings/?start_date=${encodeURIComponent(range.start)}&end_date=${encodeURIComponent(range.end)}`;
+    const data = await apiGet(apiKey, `/bookings/?date=${encodeURIComponent(isoDate(date))}`);
+    return { venue: venue.name, venueKey: venue.key, bookings: data.data || [] };
   }
-  const data = await apiGet(apiKey, path);
-  return { venue: venue.name, venueKey: venue.key, bookings: data.data || [] };
+
+  const range = { start: start || defaultDateRange().start, end: end || defaultDateRange().end };
+  const days = eachDateInclusive(range.start, range.end);
+  const byId = new Map();
+  for (const day of days) {
+    const data = await apiGet(apiKey, `/bookings/?date=${encodeURIComponent(day)}`);
+    for (const b of data.data || []) {
+      const id = b._id || b.id || `${b.event_id}|${b.date}|${b.price}|${b.status}|${b.local_date}`;
+      byId.set(id, b);
+    }
+  }
+  return { venue: venue.name, venueKey: venue.key, bookings: [...byId.values()] };
 }
 
 function isCountableStatus(status) {
@@ -233,5 +260,6 @@ module.exports = {
   getForecastActuals,
   isCountableStatus,
   defaultDateRange,
-  isoDate
+  isoDate,
+  eachDateInclusive
 };
