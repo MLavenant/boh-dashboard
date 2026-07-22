@@ -598,7 +598,9 @@ function switchTab(name, btn) {
 // HEATMAP TOGGLE
 // ============================================================
 function showHM(which, btn) {
-  document.querySelectorAll('.hm-toggle button').forEach(b => b.classList.remove('active'));
+  const group = btn && btn.closest ? btn.closest('.hm-toggle') : null;
+  if (group) group.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  else document.querySelectorAll('.hm-toggle button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('hmFul').style.display = which === 'ful' ? '' : 'none';
   document.getElementById('hmGuests').style.display = which === 'guests' ? '' : 'none';
@@ -614,26 +616,60 @@ Chart.defaults.font.family = 'inherit';
 // ============================================================
 // BREAKING POINT (re-derived at render time, min 5 occurrences)
 // ============================================================
-function computeBreakingPoint() {
-  const curve = getD().curve || [];
+let pressureDay = 'Total';
+
+function getPressureCurve(day) {
+  const d = getD();
+  const byDay = d.curveByDay || {};
+  if (day && day !== 'Total' && byDay[day] && byDay[day].length) return byDay[day];
+  if (byDay.Total && byDay.Total.length) return byDay.Total;
+  return d.curve || [];
+}
+
+function computeBreakingPoint(curveOverride) {
+  const curve = curveOverride || getPressureCurve('Total');
   let bpEntry = null;
   for (let i = 0; i < curve.length; i++) {
     if (i < 10) continue;
-    const d = curve[i];
-    if (d.occ < 5) continue;
-    if (d.occ >= 3 && d.ful >= getThreshold()) { bpEntry = d; break; }
+    const row = curve[i];
+    if (row.occ < 5) continue;
+    if (row.occ >= 3 && row.ful >= getThreshold()) { bpEntry = row; break; }
   }
   if (!bpEntry) return { tickets: null, guests: null };
   return { tickets: bpEntry.conc, guests: Math.round(bpEntry.guests) };
+}
+
+function setPressureDay(day, btn) {
+  pressureDay = day || 'Total';
+  const wrap = document.getElementById('pressureDayToggle');
+  if (wrap) {
+    wrap.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-day') === pressureDay);
+    });
+  } else if (btn) {
+    btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  renderPressure();
 }
 
 // ============================================================
 // VISUAL 1: Kitchen Pressure Curve
 // ============================================================
 function renderPressure() {
-  const CURVE = getD().curve;
-  if (!CURVE || !CURVE.length) { const ex = Chart.getChart('cPressure'); if (ex) ex.destroy(); return; }
-  const BP = computeBreakingPoint().tickets;
+  const CURVE = getPressureCurve(pressureDay);
+  if (!CURVE || !CURVE.length) {
+    const ex = Chart.getChart('cPressure');
+    if (ex) ex.destroy();
+    const annEl = document.getElementById('bpAnnotation');
+    if (annEl) {
+      annEl.innerHTML = pressureDay === 'Total'
+        ? 'No pressure-curve data for this week.'
+        : 'No pressure-curve data for <strong>' + pressureDay + '</strong>.';
+    }
+    return;
+  }
+  const BP = computeBreakingPoint(CURVE).tickets;
   const labels = CURVE.map(d => d.conc);
   const bpPlugin = {
     id:'bpZone',
@@ -675,21 +711,23 @@ function renderPressure() {
     options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent tickets open'},grid:{color:gc}},y:{position:'left',title:{display:true,text:'Occurrences'},grid:{color:gc},min:0},y1:{position:'right',title:{display:true,text:'Fulfillment time (min)'},grid:{display:false},min:0,suggestedMax:24}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
     plugins:[bpPlugin]
   });
+  const dayLabel = pressureDay === 'Total' ? 'all days' : pressureDay;
   const annEl = document.getElementById('bpAnnotation');
   if (annEl) {
     if (BP != null) {
-      annEl.innerHTML = '⚡ Breaking point at <strong>'+BP+' concurrent tickets</strong> — avg fulfillment jumps to '+(CURVE.find(d=>d.conc===BP)||{ful:'?'}).ful+' min.';
+      annEl.innerHTML = '⚡ Breaking point at <strong>'+BP+' concurrent tickets</strong> ('+dayLabel+') — avg fulfillment jumps to '+(CURVE.find(d=>d.conc===BP)||{ful:'?'}).ful+' min.';
     } else {
-      annEl.innerHTML = 'No breaking point detected — avg fulfillment stays below threshold across all observed load levels.';
+      annEl.innerHTML = 'No breaking point detected for <strong>'+dayLabel+'</strong> — avg fulfillment stays below threshold across observed load levels.';
     }
   }
+  const bpNote = document.getElementById('bpMethodNote');
+  if (bpNote) bpNote.textContent = 'BP = first load level (skip 1–10) where avg fulfillment crosses the target · view: ' + dayLabel;
+  // Page KPIs stay on week Total so day toggle only changes Visual 1
+  const bpObj = computeBreakingPoint(getPressureCurve('Total'));
   const bp1 = document.getElementById('kpiBP1');
   const bp2 = document.getElementById('kpiBP2');
-  const bpObj = computeBreakingPoint();
   if (bp1) bp1.textContent = bpObj.tickets ?? '—';
   if (bp2) bp2.textContent = bpObj.guests ?? '—';
-  const bpNote = document.getElementById('bpMethodNote');
-  if (bpNote) bpNote.textContent = 'BP detected via P75 fulfillment';
 }
 
 // ============================================================
@@ -2699,6 +2737,13 @@ function renderSettings() {
 // ============================================================
 function renderAll() {
   applyDerivedStationTargets();
+  // Keep day selection; sync toggle UI to current pressureDay
+  const wrap = document.getElementById('pressureDayToggle');
+  if (wrap) {
+    wrap.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-day') === pressureDay);
+    });
+  }
   renderKPIs();
   renderStationsRecap();
   renderPressure();

@@ -120,7 +120,17 @@ table.menu-tbl tr:hover td{background:#1e2533}
 <!-- Visual 1 -->
 <div class="card">
   <h2>Visual 1 — Kitchen Pressure Curve</h2>
-  <p class="note">X-axis = concurrent tickets open. Left Y = occurrences. Right Y = avg fulfillment (gold) and P75 fulfillment (red dashed). Breaking point = where P75 first crosses 15-min target.</p>
+  <p class="note">X-axis = concurrent tickets open. Left Y = occurrences. Right Y = avg fulfillment (gold) and P75 fulfillment (red dashed). Breaking point = where avg fulfillment first crosses the 15-min target under load. Toggle a day to see that weekday only.</p>
+  <div class="hm-toggle" id="pressureDayToggle">
+    <button type="button" class="active" data-day="Total" onclick="setPressureDay('Total',this)">Total</button>
+    <button type="button" data-day="Monday" onclick="setPressureDay('Monday',this)">Mon</button>
+    <button type="button" data-day="Tuesday" onclick="setPressureDay('Tuesday',this)">Tue</button>
+    <button type="button" data-day="Wednesday" onclick="setPressureDay('Wednesday',this)">Wed</button>
+    <button type="button" data-day="Thursday" onclick="setPressureDay('Thursday',this)">Thu</button>
+    <button type="button" data-day="Friday" onclick="setPressureDay('Friday',this)">Fri</button>
+    <button type="button" data-day="Saturday" onclick="setPressureDay('Saturday',this)">Sat</button>
+    <button type="button" data-day="Sunday" onclick="setPressureDay('Sunday',this)">Sun</button>
+  </div>
   <canvas id="cPressure" style="max-height:400px"></canvas>
   <div class="legend">
     <span><span class="sw" style="background:#5aa9e6"></span>Occurrences</span>

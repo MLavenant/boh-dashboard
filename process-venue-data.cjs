@@ -279,6 +279,15 @@ function buildIntervalCurve(ticketList) {
 
 const curve = buildIntervalCurve(uniqueTickets);
 
+// Per-day pressure curves (same algorithm, tickets filtered by fired weekday)
+const DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const curveByDay = { Total: curve };
+DAY_ORDER.forEach(day => {
+  const dayTickets = uniqueTickets.filter(t => DAYS[t._fired.getDay()] === day);
+  curveByDay[day] = dayTickets.length ? buildIntervalCurve(dayTickets) : [];
+});
+console.log('curveByDay:', DAY_ORDER.map(d => `${d}(${curveByDay[d].length})`).join(', '));
+
 // tbk: bucket curve by 10 concurrent tickets, weighted by duration (occ × ful proxy)
 const tbkMap = {};
 curve.forEach(r => {
@@ -588,6 +597,7 @@ const output = {
   hmGuests: hmGuestsFlat,
   hourProfile,
   curve,
+  curveByDay,
   tbk,
   breakingPoint,
   breakingPointGuests,
