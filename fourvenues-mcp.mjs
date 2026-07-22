@@ -1,9 +1,10 @@
 /**
- * FourVenues MCP — Sales export is the Forecast source of truth.
- * UI path: Sales → sales-overview (NEVER sales-tickets) → Events → Upcoming → Select all → Apply
- *          → ⋮ next to Compare events → Export to Excel → Export data
- * Note: Export emails XLS via POST /ventas_cliente_imprimir (no-reply@fourvenues.com, subject Sales Report).
- * MCP recovers the file via Outlook COM (TitanHQ→S3), optional Graph token, or Downloads.
+ * FourVenues MCP — Integrations API (X-Api-Key).
+ * Forecast rule: sum booking.price for status accepted | not-completed
+ * (same as Sales Overview export Base price).
+ *
+ * Env: FV_API_KEY_MILA, FV_API_KEY_CASA_NEOS, FV_API_KEY_CASA_NEOS_BC
+ * Optional: FV_API_KEY_AVA. Keys load from process.env or .env (gitignored).
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -13,44 +14,215 @@ import fs from "fs";
 
 const require = createRequire(import.meta.url);
 const {
-  pullSalesExports,
-  parseSalesExportFile,
-  applyExportToForecast,
-  VENUES
-} = require("./fv-sales-export-lib.cjs");
-const {
-  salesPeriodLast7Days,
-  buildForecastFromMaps,
-  summarizeMapData
-} = require("./fv-sales-period.cjs");
+  VENUES,
+  getApiKey,
+  venuesWithKeys,
+  resolveVenue,
+  listEvents,
+  listBookings,
+  getForecastActuals,
+  defaultDateRange
+} = require("./fv-api-client.cjs");
 
-process.stderr.write("=== FOURVENUES MCP LOADED ===\n");
+let applyExportToForecast = null;
+try {
+  applyExportToForecast = require("./fv-sales-export-lib.cjs").applyExportToForecast;
+} catch (_) {}
 
-const server = new McpServer({ name: "fourvenues", version: "1.1.0" });
-const DASHBOARD = "C:\\Users\\MatthiasLavenant\\Documents\\rdg-dj-dashboard\\index.html";
-const BOOKINGS = "C:\\Cursor\\toast-mcp-server\\fv-bookings-data.json";
+process.stderr.write("=== FOURVENUES MCP (Integrations API) LOADED ===\n");
+
+const server = new McpServer({ name: "fourvenues", version: "2.0.0" });
+const DASHBOARD = process.env.RDG_DASHBOARD_PATH
+  || "C:\\Users\\MatthiasLavenant\\Documents\\rdg-dj-dashboard\\index.html";
+
+const venueEnum = z.enum(["all", "casa_neos_bc", "mila_lounge", "casa_neos_lounge", "ava_lounge"]);
+
+function writeForecastLive(forecastRows, period) {
+  const https = require("https");
+  const FB_DB = "rdg-dj-dashboard-default-rtdb.firebaseio.com";
+  const miamiDay = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit"
+  }).format(new Date());
+
+  const livePayload = {
+    updatedAt: new Date().toISOString(),
+    miamiDay,
+    source: "integrations_api",
+    period: period || { label: "Integrations API bookings (accepted + not-completed price)" },
+    events: {}
+  };
+
+  for (const r of forecastRows || []) {
+    if (!r.date || !r.venue) continue;
+    const totalRevenue = Math.round(Number(r.totalRevenue) || 0);
+    const payload = {
+      venue: r.venue,
+      date: r.date,
+      dj: r.dj,
+      totalRevenue,
+      bookedTables: r.bookings || 0,
+      hasData: true,
+      _source: "integrations_api"
+    };
+    const keyDate = (r.venue + "_" + r.date).replace(/[^a-zA-Z0-9_-]/g, "_");
+    const keyDj = (r.venue + "_" + r.date + "_" + String(r.dj || "")).replace(/[^a-zA-Z0-9_-]/g, "_");
+    livePayload.events[keyDj] = payload;
+    const prev = livePayload.events[keyDate];
+    if (!prev || (prev.totalRevenue || 0) < totalRevenue) {
+      livePayload.events[keyDate] = payload;
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify(livePayload);
+    const req = https.request({
+      hostname: FB_DB,
+      path: "/rdg/forecastLive.json",
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) }
+    }, r => {
+      let d = "";
+      r.on("data", c => d += c);
+      r.on("end", () => resolve({ http: r.statusCode, eventKeys: Object.keys(livePayload.events).length, livePayload }));
+    });
+    req.on("error", reject);
+    req.write(body);
+    req.end();
+  });
+}
 
 server.tool(
-  "get_sales_export",
-  "Run FourVenues Overview sales-overview export: Events→Upcoming→Select all→Apply→⋮→Export to Excel. File is EMAILED (no-reply@fourvenues.com Sales Report). MCP polls Outlook, unwraps TitanHQ→S3, downloads Booking-sheet xlsx, sums Base price paid for Accepted+Not completed. NEVER use Tickets tab. Forecast source of truth.",
+  "list_fourvenues_venues",
+  "List RDG FourVenues venues and which Integrations API keys are configured (keys never returned).",
+  {},
+  async () => {
+    const list = VENUES.map(v => ({
+      key: v.key,
+      name: v.name,
+      envKey: v.envKey,
+      optional: !!v.optional,
+      apiKeyConfigured: !!getApiKey(v)
+    }));
+    return {
+      content: [{
+        type: "text",
+        text: JSON.stringify({
+          base: "https://api.fourvenues.com/integrations",
+          venues: list,
+          ready: venuesWithKeys({ includeOptional: false }).map(v => v.key)
+        }, null, 2)
+      }]
+    };
+  }
+);
+
+server.tool(
+  "get_events",
+  "List FourVenues events via Integrations API for a date range (default: last 7 days through +21 days).",
   {
-    venue: z.enum(["all", "casa_neos_bc", "mila_lounge", "casa_neos_lounge"]).default("all"),
+    venue: venueEnum.default("all"),
+    start: z.string().optional().describe("YYYY-MM-DD"),
+    end: z.string().optional().describe("YYYY-MM-DD")
+  },
+  async ({ venue, start, end }) => {
+    const range = { start: start || defaultDateRange().start, end: end || defaultDateRange().end };
+    const want = venue === "all"
+      ? venuesWithKeys({ includeOptional: false })
+      : [resolveVenue(venue)].filter(Boolean);
+    if (!want.length) throw new Error("No API keys configured for requested venue(s)");
+    const results = [];
+    for (const v of want) {
+      results.push(await listEvents(v, range));
+    }
+    return { content: [{ type: "text", text: JSON.stringify({ range, results }, null, 2) }] };
+  }
+);
+
+server.tool(
+  "get_bookings",
+  "List FourVenues bookings via Integrations API (optional venue + date range).",
+  {
+    venue: venueEnum.default("all"),
+    start: z.string().optional().describe("YYYY-MM-DD"),
+    end: z.string().optional().describe("YYYY-MM-DD"),
+    date: z.string().optional().describe("Single day YYYY-MM-DD (overrides start/end)")
+  },
+  async ({ venue, start, end, date }) => {
+    const want = venue === "all"
+      ? venuesWithKeys({ includeOptional: false })
+      : [resolveVenue(venue)].filter(Boolean);
+    if (!want.length) throw new Error("No API keys configured for requested venue(s)");
+    const results = [];
+    for (const v of want) {
+      const pulled = await listBookings(v, { start, end, date });
+      results.push({
+        venue: pulled.venue,
+        venueKey: pulled.venueKey,
+        count: pulled.bookings.length,
+        bookings: pulled.bookings
+      });
+    }
+    return { content: [{ type: "text", text: JSON.stringify({ results }, null, 2) }] };
+  }
+);
+
+server.tool(
+  "get_forecast_actuals",
+  "Export-equivalent Forecast totals from Integrations API: sum booking price for accepted + not-completed, by venue/date/event. Optionally write Firebase forecastLive and/or patch local FORECAST_DATA.",
+  {
+    venue: venueEnum.default("all"),
+    start: z.string().optional(),
+    end: z.string().optional(),
+    write_firebase: z.boolean().default(false),
     apply_to_forecast: z.boolean().default(false)
   },
-  async ({ venue, apply_to_forecast }) => {
-    const pulled = await pullSalesExports({ venue, headless: false });
+  async ({ venue, start, end, write_firebase, apply_to_forecast }) => {
+    const pulled = await getForecastActuals({ venue, start, end });
+    let firebase = null;
     let applied = null;
+    if (write_firebase && pulled.forecastRows.length) {
+      firebase = await writeForecastLive(pulled.forecastRows, pulled.period);
+    }
     if (apply_to_forecast && pulled.forecastRows.length) {
+      if (!applyExportToForecast) throw new Error("applyExportToForecast unavailable");
+      if (!fs.existsSync(DASHBOARD)) throw new Error("Dashboard not found: " + DASHBOARD);
       applied = applyExportToForecast(pulled.forecastRows, DASHBOARD);
     }
     return {
       content: [{
         type: "text",
         text: JSON.stringify({
-          note: "Export is emailed to the FourVenues account. If forecastRows is empty, use parse_sales_export_file on the downloaded XLS, or get_forecast_base_prices for export-equivalent totals.",
-          pulledAt: pulled.pulledAt,
-          forecastRows: pulled.forecastRows,
-          errors: pulled.results.filter(r => r.error).map(r => ({ venue: r.venue, error: r.error })),
+          ...pulled,
+          firebase: firebase ? { http: firebase.http, eventKeys: firebase.eventKeys } : null,
+          applied
+        }, null, 2)
+      }]
+    };
+  }
+);
+
+/* Deprecated aliases — prefer get_forecast_actuals (API). */
+server.tool(
+  "get_sales_export",
+  "DEPRECATED: use get_forecast_actuals. Previously triggered Playwright Sales export + email. Now returns Integrations API forecast totals.",
+  {
+    venue: venueEnum.default("all"),
+    apply_to_forecast: z.boolean().default(false)
+  },
+  async ({ venue, apply_to_forecast }) => {
+    const pulled = await getForecastActuals({ venue });
+    let applied = null;
+    if (apply_to_forecast && pulled.forecastRows.length && applyExportToForecast && fs.existsSync(DASHBOARD)) {
+      applied = applyExportToForecast(pulled.forecastRows, DASHBOARD);
+    }
+    return {
+      content: [{
+        type: "text",
+        text: JSON.stringify({
+          deprecated: true,
+          useInstead: "get_forecast_actuals",
+          note: "Integrations API path (no email/Playwright).",
+          ...pulled,
           applied
         }, null, 2)
       }]
@@ -59,14 +231,34 @@ server.tool(
 );
 
 server.tool(
+  "get_forecast_base_prices",
+  "DEPRECATED alias of get_forecast_actuals (Integrations API).",
+  { apply_to_forecast: z.boolean().default(false) },
+  async ({ apply_to_forecast }) => {
+    const pulled = await getForecastActuals({ venue: "all" });
+    let applied = null;
+    if (apply_to_forecast && pulled.forecastRows.length && applyExportToForecast && fs.existsSync(DASHBOARD)) {
+      applied = applyExportToForecast(pulled.forecastRows, DASHBOARD);
+    }
+    return {
+      content: [{
+        type: "text",
+        text: JSON.stringify({ deprecated: true, useInstead: "get_forecast_actuals", ...pulled, applied }, null, 2)
+      }]
+    };
+  }
+);
+
+server.tool(
   "parse_sales_export_file",
-  "Parse a FourVenues sales_*.xls export. Sums Base price (reservations) for Status = accepted OR not-completed per event. Optionally writes into FORECAST_DATA.",
+  "DEPRECATED: parse a local Sales Overview XLS export (Accepted + Not completed Base price). Prefer get_forecast_actuals.",
   {
     file_path: z.string(),
     apply_to_forecast: z.boolean().default(false)
   },
   async ({ file_path, apply_to_forecast }) => {
     if (!fs.existsSync(file_path)) throw new Error("File not found: " + file_path);
+    const { parseSalesExportFile } = require("./fv-sales-export-lib.cjs");
     const parsed = parseSalesExportFile(file_path);
     const map = new Map();
     for (const r of parsed.rows) {
@@ -85,48 +277,14 @@ server.tool(
       ...g, totalRevenue: Math.round(g.totalRevenue * 100) / 100, source: "fourvenues_sales_export_file"
     }));
     let applied = null;
-    if (apply_to_forecast) applied = applyExportToForecast(forecastRows, DASHBOARD);
+    if (apply_to_forecast && applyExportToForecast) applied = applyExportToForecast(forecastRows, DASHBOARD);
     return {
       content: [{
         type: "text",
-        text: JSON.stringify({ file_path, byEvent: parsed.byEvent, forecastRows, applied }, null, 2)
+        text: JSON.stringify({ deprecated: true, file_path, byEvent: parsed.byEvent, forecastRows, applied }, null, 2)
       }]
     };
   }
-);
-
-server.tool(
-  "get_forecast_base_prices",
-  "Export-equivalent Forecast totals without waiting for email: Base price (Accepted + Not completed) where reservation created_at falls in Sales Period Last 7 days. Uses latest fv-bookings-data.json map scrape. Optionally apply to FORECAST_DATA.",
-  {
-    apply_to_forecast: z.boolean().default(false)
-  },
-  async ({ apply_to_forecast }) => {
-    if (!fs.existsSync(BOOKINGS)) throw new Error("Missing bookings scrape: " + BOOKINGS + " — run fv-refresh-all.cjs first");
-    const allData = JSON.parse(fs.readFileSync(BOOKINGS, "utf8"));
-    const { results, period } = buildForecastFromMaps(allData);
-    const booked = results.filter(r => r.totalRevenue > 0);
-    let applied = null;
-    if (apply_to_forecast) {
-      applied = applyExportToForecast(
-        results.map(r => ({ venue: r.venue, date: r.date, dj: r.dj, totalRevenue: r.totalRevenue, bookings: r.bookedTables })),
-        DASHBOARD
-      );
-    }
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify({ period, bookedCount: booked.length, booked, applied }, null, 2)
-      }]
-    };
-  }
-);
-
-server.tool(
-  "list_fourvenues_venues",
-  "List RDG FourVenues venues configured for Sales export.",
-  {},
-  async () => ({ content: [{ type: "text", text: JSON.stringify(VENUES, null, 2) }] })
 );
 
 const transport = new StdioServerTransport();

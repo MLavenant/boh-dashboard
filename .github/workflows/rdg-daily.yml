@@ -1,7 +1,7 @@
 name: RDG Daily Forecast + Toast
 
 # Laptop OFF.
-# FourVenues: trigger Sales Export emails → Microsoft Graph reads mailbox → Firebase forecastLive
+# FourVenues: Integrations API (X-Api-Key) → Firebase forecastLive
 # Toast BS: Wed–Sun (Mon/Tue skipped)
 
 on:
@@ -23,7 +23,7 @@ jobs:
   fourvenues-forecast:
     if: github.event_name == 'schedule' || github.event.inputs.job == 'both' || github.event.inputs.job == 'fourvenues'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -31,23 +31,15 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install deps + Playwright Chromium
-        run: |
-          npm ci || npm install
-          npx playwright install --with-deps chromium
+      - name: Install deps
+        run: npm ci || npm install
 
-      - name: FourVenues daily (trigger export → Graph → Firebase)
+      - name: FourVenues daily (Integrations API → Firebase)
         env:
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          GRAPH_MAILBOX: ${{ secrets.GRAPH_MAILBOX }}
-          FV_EMAIL: ${{ secrets.FV_EMAIL }}
-          FV_PASSWORD: ${{ secrets.FV_PASSWORD }}
-          FV_SESSION_B64: ${{ secrets.FV_SESSION_B64 }}
-          FV_HEADLESS: "1"
-          FV_EMAIL_WAIT_SEC: "120"
-        run: node fv-daily-cloud.cjs
+          FV_API_KEY_MILA: ${{ secrets.FV_API_KEY_MILA }}
+          FV_API_KEY_CASA_NEOS: ${{ secrets.FV_API_KEY_CASA_NEOS }}
+          FV_API_KEY_CASA_NEOS_BC: ${{ secrets.FV_API_KEY_CASA_NEOS_BC }}
+        run: node fv-refresh-api.cjs
 
   toast-bs:
     if: github.event_name == 'schedule' || github.event.inputs.job == 'both' || github.event.inputs.job == 'toast'

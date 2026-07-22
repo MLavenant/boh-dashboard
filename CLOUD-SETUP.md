@@ -1,42 +1,40 @@
 # Laptop-off automation (Toast + FourVenues)
 
 Website: https://mlavenant.github.io/rdg-dj/  
-Robot: this repo via GitHub Actions.
+Robot: this repo (`boh-dashboard`) via GitHub Actions.
 
 ## Toast BS (working)
+
 Wed–Sun ~8:30 AM ET. Secrets: `TOAST_CLIENT_ID`, `TOAST_API_SECRET`, `RDG_DJ_TOKEN`.
 
-## FourVenues (Sales Report email = the API)
+## FourVenues (Integrations API)
 
 ```
-Actions → FourVenues Export (saved session) → Outlook Sales Report email
-       → Microsoft Graph reads mailbox → Firebase forecastLive → Dashboard
+Actions → FourVenues Integrations API (X-Api-Key)
+       → bookings price (accepted + not-completed)
+       → Firebase forecastLive → Dashboard
 ```
 
-### Why not Google login in the cloud?
-Google blocks headless login on GitHub Actions. We use a **saved FourVenues session** (`FV_SESSION_B64`) only to click Export. Graph reads the email (like Toast’s API).
+No Outlook, Graph, Playwright, or `FV_SESSION_B64`. Same metric as Sales Overview export Base price.
 
-### Secrets
+### Secrets (GitHub → Settings → Secrets → Actions)
 
-| Secret | Purpose |
-|--------|---------|
-| `AZURE_TENANT_ID` / `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET` | Graph app |
-| `GRAPH_MAILBOX` | Exact Entra UPN, e.g. `matthias@rivieradininggroup.com` |
-| `FV_SESSION_B64` | Playwright session to click Export (refresh when expired) |
+| Secret | Venue |
+|--------|--------|
+| `FV_API_KEY_MILA` | MILA Lounge |
+| `FV_API_KEY_CASA_NEOS` | Casa Neos Lounge |
+| `FV_API_KEY_CASA_NEOS_BC` | Casa Neos Beach Club |
 
-App needs **Mail.Read** (Application) + **Grant admin consent**. Do **not** require User.Read.All — we call `/users/{UPN}/messages` directly.
+Optional later: `FV_API_KEY_AVA` (AVA Lounge — not used for DJ Forecast today).
 
-### Refresh FourVenues session (when Export trigger says expired)
+Create keys in the FourVenues Developer Portal. **Never commit keys** to git. If a key was pasted into chat, rotate it after wiring works.
 
-On your PC:
+### Local / Cursor MCP
 
-```bat
-cd /d C:\Cursor\toast-mcp-server
-node fv-relogin-save.cjs
-```
+Put the same three vars in `C:\Cursor\toast-mcp-server\.env` (gitignored). MCP server `fourvenues` loads them via `fv-api-client.cjs`.
 
-Log in in the browser window. Then set secret `FV_SESSION_B64` (gzipped base64 of `fv-final-session.json`), or run `set-fv-secret.ps1` if you use that helper.
+Tools: `list_fourvenues_venues`, `get_events`, `get_bookings`, `get_forecast_actuals`.
 
 ### Run
 
-Actions → **RDG Daily Forecast + Toast** → **fourvenues**
+Actions → **RDG Daily Forecast + Toast** → job **fourvenues** (or wait for daily ~8:30 AM ET schedule).
