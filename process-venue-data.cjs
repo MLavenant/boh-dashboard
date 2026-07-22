@@ -554,13 +554,31 @@ itemDetails.forEach(item => {
   }
 });
 
+// Volume from item-details; Avg Time from Toast custom item-fulfillment report
+// (not ticket-level kitchen-timing join — that understates item cook time).
+const fulAvgByItem = {};
+itemFulfillmentItems.forEach(it => {
+  if (it.menuItem && it.avgSeconds != null && Number(it.avgSeconds) > 0) {
+    fulAvgByItem[it.menuItem] = +Number(it.avgSeconds).toFixed(1);
+  }
+});
+
 const summary = Object.entries(menuItemsMap)
   .map(([menuItem, d]) => ({
     menuItem,
     qty: d.qty,
-    avgFulSec: d.count > 0 ? +(d.totalFulSec / d.count).toFixed(1) : null,
+    avgFulSec: fulAvgByItem[menuItem] != null
+      ? fulAvgByItem[menuItem]
+      : (d.count > 0 ? +(d.totalFulSec / d.count).toFixed(1) : null),
   }))
   .sort((a, b) => b.qty - a.qty);
+
+// Items in fulfillment with no item-details rows this week (still show Avg Time)
+Object.entries(fulAvgByItem).forEach(([menuItem, avgFulSec]) => {
+  if (!menuItemsMap[menuItem]) {
+    summary.push({ menuItem, qty: 0, avgFulSec });
+  }
+});
 
 // ---- Output ----
 const output = {

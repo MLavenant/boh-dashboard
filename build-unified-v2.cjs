@@ -416,23 +416,41 @@ function stationNamesMatch(a, b) {
   if (!na || !nb) return false;
   return na === nb || na.includes(nb) || nb.includes(na);
 }
-/** Items for a station — ONLY from static REF map. Live times from weekly summary. */
-function getStaticItemsForStation(stationName) {
-  const map = getStaticItemMap();
-  const summaryByName = {};
+/** Prefer Toast item-fulfillment avg (assignmentData); fall back to summary. */
+function getItemLiveByName() {
+  const byName = {};
   (getD().summary || []).forEach(d => {
     const name = d.menuItem || d.item;
-    if (name) summaryByName[name] = d;
+    if (!name) return;
+    byName[name] = {
+      qty: d.qty != null ? d.qty : (d.count || 0),
+      avgFulSec: d.avgFulSec != null ? d.avgFulSec : (d.avg_sec || null),
+    };
   });
+  // assignmentData.avgFulSec is from custom item-fulfillment report — preferred Avg Time
+  (getD().assignmentData || []).forEach(d => {
+    if (!d.menuItem) return;
+    const prev = byName[d.menuItem] || { qty: 0, avgFulSec: null };
+    byName[d.menuItem] = {
+      qty: prev.qty || d.count || 0,
+      avgFulSec: d.avgFulSec != null ? d.avgFulSec : prev.avgFulSec,
+    };
+  });
+  return byName;
+}
+/** Items for a station — ONLY from static REF map. Avg Time from item-fulfillment. */
+function getStaticItemsForStation(stationName) {
+  const map = getStaticItemMap();
+  const liveByName = getItemLiveByName();
   const out = [];
   Object.entries(map).forEach(([menuItem, info]) => {
     const stations = info.stations || [];
     if (!stations.some(st => stationNamesMatch(st, stationName))) return;
-    const live = summaryByName[menuItem] || {};
+    const live = liveByName[menuItem] || {};
     out.push({
       menuItem,
-      qty: live.qty != null ? live.qty : (live.count || 0),
-      avgFulSec: live.avgFulSec != null ? live.avgFulSec : (live.avg_sec || 0),
+      qty: live.qty || 0,
+      avgFulSec: live.avgFulSec || 0,
       targetSec: info.targetSec || 0,
     });
   });
@@ -1825,14 +1843,10 @@ function renderStations() {
 // TAB 3: Menu Items
 // ============================================================
 function renderMenuItems() {
-  // ONLY items from static REF assignment; live times from weekly summary
+  // ONLY items from static REF assignment; Avg Time from item-fulfillment
   const staticMap = getStaticItemMap();
   const hasStatic = Object.keys(staticMap).length > 0;
-  const liveByName = {};
-  (getD().summary || []).forEach(d => {
-    const name = d.item || d.menuItem || '';
-    if (name) liveByName[name] = d;
-  });
+  const liveByName = getItemLiveByName();
 
   let SUMMARY;
   if (hasStatic) {
@@ -1840,8 +1854,8 @@ function renderMenuItems() {
       const live = liveByName[item] || {};
       return {
         item,
-        count: live.qty != null ? live.qty : (live.count || 0),
-        avg_sec: live.avgFulSec != null ? live.avgFulSec : (live.avg_sec || 0),
+        count: live.qty || 0,
+        avg_sec: live.avgFulSec || 0,
         exp_sec: info.targetSec || 0,
       };
     });
@@ -2096,12 +2110,7 @@ function renderMenuItems() {
 // ============================================================
 function renderAssignment() {
   const staticMap = getStaticItemMap();
-  const summary = getD().summary || [];
-  const liveByName = {};
-  summary.forEach(s => {
-    const name = s.menuItem || s.item;
-    if (name) liveByName[name] = s;
-  });
+  const liveByName = getItemLiveByName();
 
   const DATA = Object.entries(staticMap).map(([menuItem, info]) => {
     const live = liveByName[menuItem] || {};
@@ -2112,8 +2121,8 @@ function renderAssignment() {
       station: stations.length ? stations.join(', ') : null,
       targetSec,
       targetMin: targetSec ? Math.round(targetSec / 60 * 10) / 10 : '',
-      avgFulSec: live.avgFulSec != null ? live.avgFulSec : (live.avg_sec || null),
-      count: live.qty != null ? live.qty : (live.count || null),
+      avgFulSec: live.avgFulSec || null,
+      count: live.qty || null,
     };
   });
 
