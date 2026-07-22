@@ -18,6 +18,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: npm
 
       - name: Install deps
         run: npm ci || npm install
@@ -28,7 +29,9 @@ jobs:
           repository: MLavenant/rdg-dj
           token: ${{ secrets.RDG_DJ_TOKEN }}
           path: rdg-dj
-
+          sparse-checkout: |
+            index.html
+          sparse-checkout-cone-mode: false
       - name: Pull Toast LIVE → Firebase
         env:
           TOAST_CLIENT_ID: ${{ secrets.TOAST_CLIENT_ID }}

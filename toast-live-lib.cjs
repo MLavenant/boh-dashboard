@@ -87,7 +87,8 @@ function shiftDate(dateStr, days) {
 }
 
 function liveBusinessDate(parts) {
-  if (parts.hour < 3) return shiftDate(parts.dateStr, -1);
+  // After midnight until 5am still belongs to last night's show (matches dashboard)
+  if (parts.hour < 5) return shiftDate(parts.dateStr, -1);
   return parts.dateStr;
 }
 
@@ -137,25 +138,32 @@ async function getAllOrders(token, venueGuid, date) {
   const businessDate = date.replace(/-/g, '');
   const headers = { Authorization: `Bearer ${token}`, 'Toast-Restaurant-External-ID': venueGuid };
   const all = [];
-  for (let page = 1; page <= 100; page++) {
+  // Larger pages = fewer round-trips (same orders, still complete)
+  for (let page = 1; page <= 50; page++) {
     const res = await axios.get(
-      `${TOAST_BASE}/orders/v2/ordersBulk?businessDate=${businessDate}&pageSize=100&page=${page}`,
-      { headers }
+      `${TOAST_BASE}/orders/v2/ordersBulk?businessDate=${businessDate}&pageSize=200&page=${page}`,
+      { headers, timeout: 45000 }
     );
     const batch = Array.isArray(res.data) ? res.data : Object.values(res.data || {});
     all.push(...batch);
-    if (batch.length < 100) break;
+    if (batch.length < 200) break;
   }
   return all;
 }
 
-async function fetchBsForDate(venueKey, date) {
+async function fetchBsForDate(venueKey, date, token, opts = {}) {
   const cfg = BS_CONFIG[venueKey];
   const guid = VENUES[venueKey];
-  if (!isOperatingDay(venueKey, date)) return { total: 0, activeTables: 0 };
-  const token = await getToken();
-  const bsGuids = await getTableGuids(token, guid, cfg.tables);
-  const orders = await getAllOrders(token, guid, date);
+  // On forced LIVE refresh always hit Toast (all locations, day-of).
+  // Outside force, skip known dark nights to save API calls.
+  if (!opts.force && !isOperatingDay(venueKey, date)) {
+    return { total: 0, activeTables: 0, skipped: true };
+  }
+  const auth = token || await getToken();
+  const [bsGuids, orders] = await Promise.all([
+    getTableGuids(auth, guid, cfg.tables),
+    getAllOrders(auth, guid, date)
+  ]);
   let total = 0;
   const active = new Set();
   for (const order of orders) {
@@ -227,17 +235,27 @@ async function pullToastLive(opts = {}) {
   const sales = {};
   const stats = {};
   const errors = [];
-  for (const vk of venueKeys) {
+
+  // One auth token + all three venues in parallel (much faster, same accuracy)
+  const token = await getToken();
+  const settled = await Promise.all(venueKeys.map(async (vk) => {
     try {
-      const res = await fetchBsForDate(vk, bizDate);
-      sales[vk] = res.total;
-      stats[vk] = { activeTables: res.activeTables };
-      log(`  ${BS_CONFIG[vk].label} ${bizDate} → $${res.total.toLocaleString()} · ${res.activeTables} active tables`);
+      const res = await fetchBsForDate(vk, bizDate, token, { force: force || active });
+      log(`  ${BS_CONFIG[vk].label} ${bizDate} → $${(res.total || 0).toLocaleString()} · ${res.activeTables} active tables${res.skipped ? ' (dark night skip)' : ''}`);
+      return { vk, ok: true, res };
     } catch (e) {
       log(`  ERROR ${vk}: ${e.message}`);
-      sales[vk] = null;
-      stats[vk] = { activeTables: 0 };
-      errors.push({ venue: vk, message: e.message });
+      return { vk, ok: false, error: e.message };
+    }
+  }));
+  for (const row of settled) {
+    if (row.ok) {
+      sales[row.vk] = row.res.total;
+      stats[row.vk] = { activeTables: row.res.activeTables };
+    } else {
+      sales[row.vk] = null;
+      stats[row.vk] = { activeTables: 0 };
+      errors.push({ venue: row.vk, message: row.error });
     }
   }
 
