@@ -3,10 +3,14 @@ name: RDG Daily Forecast + Toast
 # Laptop OFF.
 # FourVenues: Integrations API (X-Api-Key) → Firebase forecastLive
 # Toast BS: Wed–Sun (Mon/Tue skipped)
+# Both jobs fire on the same cron so FV and Toast stay in sync.
 
 on:
   schedule:
+    # ~8:30 AM America/New_York (EST=13:30 UTC / EDT=12:30 UTC)
     - cron: "30 12 * * *"
+    # Backup ~9:00 AM ET in case the first schedule is delayed/skipped by GitHub
+    - cron: "0 13 * * *"
   workflow_dispatch:
     inputs:
       job:
@@ -35,11 +39,35 @@ jobs:
         run: npm ci || npm install
 
       - name: FourVenues daily (Integrations API → Firebase)
+        id: fv
         env:
           FV_API_KEY_MILA: ${{ secrets.FV_API_KEY_MILA }}
           FV_API_KEY_CASA_NEOS: ${{ secrets.FV_API_KEY_CASA_NEOS }}
           FV_API_KEY_CASA_NEOS_BC: ${{ secrets.FV_API_KEY_CASA_NEOS_BC }}
         run: node fv-refresh-api.cjs
+
+      - name: Mark FourVenues failed if job crashed before status write
+        if: failure()
+        run: |
+          node -e "
+          const https=require('https');
+          const now=new Date();
+          const miami=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
+          const payload=JSON.stringify({
+            ok:false,
+            at: now.toISOString(),
+            miamiDay: miami,
+            error: 'GitHub Actions fourvenues-forecast job failed',
+            what: 'FourVenues Integrations API → Firebase forecastLive'
+          });
+          const req=https.request({
+            hostname:'rdg-dj-dashboard-default-rtdb.firebaseio.com',
+            path:'/rdg/scrapeStatus/fourvenues.json', method:'PUT',
+            headers:{'Content-Type':'application/json','Content-Length':Buffer.byteLength(payload)}
+          }, r=>{ r.resume(); r.on('end',()=>process.exit(0)); });
+          req.on('error',()=>process.exit(0));
+          req.write(payload); req.end();
+          "
 
   toast-bs:
     if: github.event_name == 'schedule' || github.event.inputs.job == 'both' || github.event.inputs.job == 'toast'
