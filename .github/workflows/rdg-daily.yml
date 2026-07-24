@@ -7,10 +7,14 @@ name: RDG Daily Forecast + Toast
 
 on:
   schedule:
-    # ~8:30 AM America/New_York (EST=13:30 UTC / EDT=12:30 UTC)
+    # ~8:30 AM America/New_York (EDT=12:30 UTC / EST=13:30 UTC)
     - cron: "30 12 * * *"
-    # Backup ~9:00 AM ET in case the first schedule is delayed/skipped by GitHub
+    # Backup ~9:00 AM ET
     - cron: "0 13 * * *"
+    # Backup ~10:00 AM ET (GitHub schedule can delay the morning windows)
+    - cron: "0 14 * * *"
+    # Afternoon catch-up ~2:00 PM ET for late Toast settlements
+    - cron: "0 18 * * *"
   workflow_dispatch:
     inputs:
       job:
@@ -114,22 +118,19 @@ jobs:
           DASHBOARD_PATH: ${{ github.workspace }}/rdg-dj/index.html
         run: node toast-bs-cloud.cjs
 
-      - name: Write scrape status
-        if: always() && steps.dow.outputs.skip != 'true'
-        env:
-          JOB_STATUS: ${{ job.status }}
+      - name: Mark Toast failed if job crashed before status write
+        if: failure() && steps.dow.outputs.skip != 'true'
         run: |
           node -e "
           const https=require('https');
-          const ok=process.env.JOB_STATUS==='success';
           const now=new Date();
           const payload=JSON.stringify({
-            ok,
+            ok:false,
             at: now.toISOString(),
             atLocal: now.toLocaleString('en-US',{timeZone:'America/New_York'}),
             schedule: 'Wed–Sun ~8:30 AM ET (GitHub Actions)',
-            what: 'Toast bottle-service Actual → index.html SCHED/BS → GitHub Pages',
-            message: ok ? 'Toast BS cloud OK' : 'Toast BS cloud FAILED'
+            what: 'Toast bottle-service Actual → Firebase toastActuals + index.html',
+            message: 'Toast BS cloud FAILED'
           });
           const req=https.request({
             hostname:'rdg-dj-dashboard-default-rtdb.firebaseio.com',

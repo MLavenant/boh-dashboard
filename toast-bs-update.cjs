@@ -6,10 +6,12 @@
 
 const axios  = require("axios");
 const fs     = require("fs");
+const https  = require("https");
 const { execSync } = require("child_process");
 
 const TOAST_BASE     = "https://ws-api.toasttab.com";
 const DASHBOARD_PATH = process.env.DASHBOARD_PATH || "C:\\Users\\MatthiasLavenant\\Documents\\rdg-dj-dashboard\\index.html";
+const FB_DB          = "rdg-dj-dashboard-default-rtdb.firebaseio.com";
 
 const CLIENT_ID  = process.env.TOAST_CLIENT_ID  || "jsS6dB6QotBhmPsOAyBTfl0jFyhAE9ZC";
 const API_SECRET = process.env.TOAST_API_SECRET || "nyUrcOs_cG4V4YN5f82Z-3esSdg_-mtw7BgtFi59MIypXpuRsquUqOSkHMYy8MA9";
@@ -73,13 +75,36 @@ function shift(dateStr, days) {
   return d.toISOString().slice(0, 10);
 }
 
+function miamiToday() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit"
+  }).format(new Date());
+}
+
 // Returns last 14 days of dates (catches any recent shows)
 function getRelevantDates() {
-  const nowLocal = new Date(Date.now() - 4 * 60 * 60 * 1000);
-  const todayStr = nowLocal.toISOString().slice(0, 10);
+  const todayStr = miamiToday();
   const dates = [];
   for (let i = 13; i >= 0; i--) dates.push(shift(todayStr, -i));
   return dates;
+}
+
+function fbPut(fbPath, payload) {
+  return new Promise((resolve) => {
+    const body = JSON.stringify(payload);
+    const req = https.request({
+      hostname: FB_DB,
+      path: fbPath + ".json",
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) }
+    }, (r) => {
+      r.resume();
+      r.on("end", () => resolve(r.statusCode || 0));
+    });
+    req.on("error", () => resolve(0));
+    req.write(body);
+    req.end();
+  });
 }
 
 async function getToken() {
@@ -162,17 +187,34 @@ async function fetchBsSales(venueKey, dates) {
   return byDate;
 }
 
+function applyBsActual(entry, newBsA) {
+  const fee = entry.fee || entry.cost || 0;
+  const prev = entry.bs_a;
+  entry.bs_a = newBsA;
+  if (entry.bs_m != null) {
+    entry.beat = newBsA >= entry.bs_m ? 1 : 0;
+    entry._s = newBsA >= entry.bs_m ? "beat" : "miss";
+  } else if (fee > 0) {
+    entry._s = "nd";
+  }
+  entry.roi_a = fee > 0 ? Math.round(newBsA / fee * 10000) / 10000 : 0;
+  return prev !== newBsA;
+}
+
 // Parse SCHED array from HTML, update entries, re-inject (also fixes beat/_s/roi_a)
 function updateSchedInHtml(html, salesByVenueDate) {
   // Extract the SCHED array
   const schedMatch = html.match(/var SCHED = (\[[\s\S]*?\]);/);
-  if (!schedMatch) { log("ERROR: SCHED array not found"); return { html, count: 0 }; }
+  if (!schedMatch) { log("ERROR: SCHED array not found"); return { html, count: 0, changed: 0, zeros: [] }; }
 
   let sched;
   try { sched = JSON.parse(schedMatch[1]); }
-  catch (e) { log("ERROR parsing SCHED: " + e.message); return { html, count: 0 }; }
+  catch (e) { log("ERROR parsing SCHED: " + e.message); return { html, count: 0, changed: 0, updates: [] }; }
 
+  const today = miamiToday();
   let count = 0;
+  let changed = 0;
+  const updates = [];
   sched.forEach(e => {
     const venue = e.venue || e.v || "";
     const date  = e.d || "";
@@ -181,15 +223,17 @@ function updateSchedInHtml(html, salesByVenueDate) {
     );
     if (!venueKey) return;
     const byDate = salesByVenueDate[venueKey];
-    if (!byDate || byDate[date] === undefined || byDate[date] === 0) return;
+    if (!byDate || byDate[date] === undefined) return;
+    // Write $0 for completed past nights so blanks don't look "not updated".
+    // Skip today (night may still be open).
+    if (byDate[date] === 0 && date >= today) return;
 
     const newBsA = byDate[date];
-    e.bs_a  = newBsA;
-    e.beat  = newBsA >= e.bs_m ? 1 : 0;
-    e._s    = newBsA >= e.bs_m ? "beat" : "miss";
-    e.roi_a = e.fee > 0 ? Math.round(newBsA / e.fee * 10000) / 10000 : 0;
+    const didChange = applyBsActual(e, newBsA);
     count++;
-    log(`  ✅ ${venue} | ${date} → $${newBsA.toLocaleString()} | ${e._s} (min $${(e.bs_m||0).toLocaleString()})`);
+    if (didChange) changed++;
+    updates.push({ venue, date, bs_a: newBsA, dj: e.dj || null });
+    log(`  ✅ ${venue} | ${date} → $${newBsA.toLocaleString()} | ${e._s || "nd"} (min $${(e.bs_m||0).toLocaleString()})`);
   });
 
   // Also update the BS array (same structure as SCHED)
@@ -205,11 +249,9 @@ function updateSchedInHtml(html, salesByVenueDate) {
       );
       if (!venueKey) return;
       const byDate = salesByVenueDate[venueKey];
-      if (!byDate || !byDate[date]) return;
-      const newBsA = byDate[date];
-      e.bs_a  = newBsA;
-      e.beat  = newBsA >= e.bs_m ? 1 : 0;
-      e.roi_a = e.cost > 0 ? Math.round(newBsA / e.cost * 10000) / 10000 : 0;
+      if (!byDate || byDate[date] === undefined) return;
+      if (byDate[date] === 0 && date >= today) return;
+      applyBsActual(e, byDate[date]);
     });
   }
 
@@ -221,7 +263,7 @@ function updateSchedInHtml(html, salesByVenueDate) {
     html = html.replace(/var BS\s*= \[[\s\S]*?\];/, newBsJS);
   }
 
-  return { html, count };
+  return { html, count, changed, updates };
 }
 
 (async () => {
@@ -243,17 +285,49 @@ function updateSchedInHtml(html, salesByVenueDate) {
     }
   }
 
-  // Read dashboard HTML and update SCHED + BS arrays
-  let html = fs.readFileSync(DASHBOARD_PATH, "latin1");
-  const { html: newHtml, count: updatedCount } = updateSchedInHtml(html, allResults);
+  // Read dashboard HTML and update SCHED + BS arrays (UTF-8 — never latin1)
+  let html = fs.readFileSync(DASHBOARD_PATH, "utf8");
+  const { html: newHtml, count: updatedCount, changed, updates } = updateSchedInHtml(html, allResults);
   html = newHtml;
-  fs.writeFileSync(DASHBOARD_PATH, html, "latin1");
+  fs.writeFileSync(DASHBOARD_PATH, html, "utf8");
 
   if (updatedCount === 0) {
     log("\nNo SCHED entries updated.");
   } else {
-    log(`\n✅ Updated ${updatedCount} shows (bs_a + beat + _s + roi_a) in index.html`);
+    log(`\n✅ Matched ${updatedCount} shows (${changed} value changes) in index.html`);
   }
+
+  // Live overlay for every browser (does not depend on git push succeeding)
+  const byVenueDate = {};
+  for (const vk of Object.keys(allResults)) {
+    const label = BS_CONFIG[vk].label;
+    byVenueDate[label] = allResults[vk];
+  }
+  const toastLivePayload = {
+    updatedAt: new Date().toISOString(),
+    miamiDay: miamiToday(),
+    source: "toast_api_cloud",
+    byVenueDate,
+    updates
+  };
+  const toastCode = await fbPut("/rdg/toastActuals", toastLivePayload);
+  log(`Firebase toastActuals HTTP ${toastCode}`);
+
+  const positives = updates.filter(u => (u.bs_a || 0) > 0).length;
+  const zeros = updates.filter(u => (u.bs_a || 0) === 0).length;
+  const statusCode = await fbPut("/rdg/scrapeStatus/toast", {
+    ok: true,
+    at: new Date().toISOString(),
+    atLocal: new Date().toLocaleString("en-US", { timeZone: "America/New_York" }),
+    schedule: "Wed–Sun ~8:30 AM ET (GitHub Actions)",
+    what: "Toast bottle-service Actual → Firebase toastActuals + index.html SCHED/BS → GitHub Pages",
+    message: `Toast BS cloud OK · ${positives} with sales · ${zeros} zero nights · ${changed} changed in file`,
+    matched: updatedCount,
+    changed,
+    positives,
+    zeros
+  });
+  log(`Firebase scrapeStatus/toast HTTP ${statusCode}`);
 
   // Git commit & push (skip on GitHub Actions — workflow pushes)
   if (process.env.GITHUB_ACTIONS) {
