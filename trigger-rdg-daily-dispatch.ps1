@@ -2,7 +2,7 @@
 <#
   Punctual trigger for RDG Daily Forecast + Toast.
 
-  GitHub schedule crons are often hours late. workflow_dispatch starts within ~1–2 minutes.
+  GitHub schedule crons are often hours late. workflow_dispatch starts within ~1-2 minutes.
   Use this from:
     - Windows Task Scheduler (8:25 AM local)
     - Manual run
@@ -21,12 +21,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-Write-Host "[$ts] Dispatching '$Workflow' job=$Job → $Repo"
+Write-Host "[$ts] Dispatching '$Workflow' job=$Job -> $Repo"
 
 if (Get-Command gh -ErrorAction SilentlyContinue) {
   gh workflow run $Workflow --repo $Repo -f "job=$Job"
   if ($LASTEXITCODE -ne 0) { throw "gh workflow run failed (exit $LASTEXITCODE)" }
-  Write-Host "[$ts] OK — workflow_dispatch accepted. Runners should start within ~1–2 minutes."
+  Write-Host "[$ts] OK - workflow_dispatch accepted. Runners should start within ~1-2 minutes."
   exit 0
 }
 
@@ -52,4 +52,4 @@ $headers = @{
 }
 
 Invoke-RestMethod -Method Post -Uri $uri -Headers $headers -Body $body -ContentType 'application/json'
-Write-Host "[$ts] OK — workflow_dispatch accepted via REST."
+Write-Host "[$ts] OK - workflow_dispatch accepted via REST."
