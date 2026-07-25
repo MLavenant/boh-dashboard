@@ -319,7 +319,7 @@ function updateSchedInHtml(html, salesByVenueDate) {
     ok: true,
     at: new Date().toISOString(),
     atLocal: new Date().toLocaleString("en-US", { timeZone: "America/New_York" }),
-    schedule: "Wed–Sun ~8:30 AM ET (GitHub Actions)",
+    schedule: "Punctual dispatch ~8:25 ET · GitHub schedule = late backup",
     what: "Toast bottle-service Actual → Firebase toastActuals + index.html SCHED/BS → GitHub Pages",
     message: `Toast BS cloud OK · ${positives} with sales · ${zeros} zero nights · ${changed} changed in file`,
     matched: updatedCount,

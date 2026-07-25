@@ -150,6 +150,7 @@ function buildLivePayload(forecastRows, period) {
     revenueSum: Math.round(revenueSum),
     period: pulled.period,
     errors: pulled.errors || [],
+    schedule: 'Punctual dispatch ~8:25 ET · GitHub schedule = late backup',
     what: 'FourVenues Integrations API (accepted + not-completed price) → Firebase forecastLive'
   });
   log(`Firebase scrapeStatus/fourvenues HTTP ${statusCode}`);

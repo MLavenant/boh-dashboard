@@ -3,15 +3,17 @@ name: RDG Daily Forecast + Toast
 # Laptop OFF.
 # FourVenues: Integrations API (X-Api-Key) → Firebase forecastLive
 # Toast BS: Wed–Sun (Mon/Tue skipped)
-# Both jobs fire on the same cron so FV and Toast stay in sync.
+#
+# TIMING: GitHub schedule crons are often HOURS late — do not treat them as 8:30 AM.
+# Primary on-time trigger = workflow_dispatch at ~8:25 AM ET
+#   (cron-job.org + Windows task "RDG Daily Cloud Dispatch 825" — see CLOUD-SETUP.md).
+# schedule: below is LATE BACKUP / catch-up only.
 
 on:
   schedule:
-    # ~8:30 AM America/New_York (EDT=12:30 UTC / EST=13:30 UTC)
+    # LATE BACKUP only (GitHub often delays these by hours)
     - cron: "30 12 * * *"
-    # Backup ~9:00 AM ET
     - cron: "0 13 * * *"
-    # Backup ~10:00 AM ET (GitHub schedule can delay the morning windows)
     - cron: "0 14 * * *"
     # Afternoon catch-up ~2:00 PM ET for late Toast settlements
     - cron: "0 18 * * *"
@@ -128,7 +130,7 @@ jobs:
             ok:false,
             at: now.toISOString(),
             atLocal: now.toLocaleString('en-US',{timeZone:'America/New_York'}),
-            schedule: 'Wed–Sun ~8:30 AM ET (GitHub Actions)',
+            schedule: 'Punctual dispatch ~8:25 ET · GitHub schedule = late backup',
             what: 'Toast bottle-service Actual → Firebase toastActuals + index.html',
             message: 'Toast BS cloud FAILED'
           });
