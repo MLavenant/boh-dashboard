@@ -1,0 +1,109 @@
+name: BOH Weekly Refresh
+
+# Laptop OFF (self-hosted Windows runner with durable Toast session).
+# Primary: cron-job.org → workflow_dispatch Monday 8:25 AM ET
+# Backup: GitHub schedule (often late — do not rely on it alone)
+
+on:
+  schedule:
+    # Late Monday morning ET backup (~11:30 AM EDT = 15:30 UTC / EST = 16:30 UTC)
+    - cron: "30 15 * * 1"
+    - cron: "0 17 * * 1"
+  workflow_dispatch:
+    inputs:
+      week:
+        description: "ISO week to fetch (use last for previous full week)"
+        required: true
+        default: last
+        type: string
+
+jobs:
+  boh-weekly:
+    runs-on: [self-hosted, windows, boh]
+    timeout-minutes: 120
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore durable Toast session
+        shell: cmd
+        run: |
+          if exist C:\boh-runner\secrets\toast-session.json copy /Y C:\boh-runner\secrets\toast-session.json toast-session.json
+          if exist C:\boh-runner\secrets\toast-web-token.json copy /Y C:\boh-runner\secrets\toast-web-token.json toast-web-token.json
+          if exist C:\boh-runner\secrets\ot-session.json copy /Y C:\boh-runner\secrets\ot-session.json ot-session.json
+          if exist C:\boh-runner\secrets\.env copy /Y C:\boh-runner\secrets\.env .env
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        shell: cmd
+        run: npm ci || npm install
+
+      - name: Fetch + process week (Toast + OpenTable)
+        id: fetch
+        shell: cmd
+        env:
+          BOH_ROOT: ${{ github.workspace }}
+          OT_USERNAME: ${{ secrets.OT_USERNAME }}
+          OT_PASSWORD: ${{ secrets.OT_PASSWORD }}
+          OT_CLIENT_ID: ${{ secrets.OT_CLIENT_ID }}
+        run: node weekly-save-cloud.cjs ${{ github.event.inputs.week || 'last' }}
+
+      - name: Pipeline health gate
+        id: health
+        shell: cmd
+        env:
+          BOH_ROOT: ${{ github.workspace }}
+        run: node pipeline-health.cjs
+
+      - name: Publish processed weeks to Firebase
+        id: firebase
+        shell: cmd
+        env:
+          BOH_ROOT: ${{ github.workspace }}
+        run: node boh-publish-firebase.cjs
+
+      - name: Rebuild dashboard shell
+        shell: cmd
+        env:
+          BOH_ROOT: ${{ github.workspace }}
+        run: node build-unified-v2.cjs
+
+      - name: Persist refreshed sessions
+        if: always()
+        shell: cmd
+        run: |
+          if not exist C:\boh-runner\secrets mkdir C:\boh-runner\secrets
+          if exist toast-session.json copy /Y toast-session.json C:\boh-runner\secrets\toast-session.json
+          if exist toast-web-token.json copy /Y toast-web-token.json C:\boh-runner\secrets\toast-web-token.json
+          if exist ot-session.json copy /Y ot-session.json C:\boh-runner\secrets\ot-session.json
+
+      - name: Commit + push GitHub Pages
+        shell: powershell
+        run: |
+          git config user.name "rdg-bot"
+          git config user.email "rdg-bot@users.noreply.github.com"
+          git add dashboard.html pipeline-health.json item-station-map.json
+          Get-ChildItem -Name "*-data-*.json","*-data.json" -ErrorAction SilentlyContinue | ForEach-Object { git add -- $_ }
+          $staged = @(git diff --staged --name-only)
+          if ($staged.Count -eq 0) { Write-Host "No dashboard changes"; exit 0 }
+          git commit -m "BOH weekly auto-update (cloud)"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git pull --rebase origin main
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git push origin HEAD:main
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Mark scrapeStatus failed
+        if: failure()
+        shell: cmd
+        run: node fb-scrape-status.cjs bohWeekly fail "BOH weekly GitHub Actions job failed" "{\"schedule\":\"Mon ~8:25 AM ET (cron-job.org → workflow_dispatch)\",\"what\":\"BOH weekly Toast+OT → Firebase + Pages\"}"

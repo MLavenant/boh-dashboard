@@ -1,7 +1,7 @@
 /**
  * Write scrape health status to Firebase so the dashboard System page can show it.
  * Usage: node fb-scrape-status.cjs <source> <ok|fail> [message] [extraJson]
- * source: fourvenues | toast
+ * source: fourvenues | toast | bohWeekly | toastLive
  */
 const https = require("https");
 

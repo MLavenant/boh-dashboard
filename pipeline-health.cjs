@@ -185,14 +185,14 @@ const totals = venueResults.reduce((a, v) => {
 }, { pass: 0, warn: 0, fail: 0 });
 
 const pipelineSteps = [
-  { step: 1, name: 'Refresh Toast session', how: 'intercept.js (Playwright login)', when: 'Monday 8:30 AM' },
-  { step: 2, name: 'Fetch Toast Kitchen Timing', how: 'weekly-save.js → kitchen-timing-{venue}.json', when: 'Monday 8:30 AM' },
-  { step: 3, name: 'Fetch Toast Item Details', how: 'weekly-save.js → item-details-{venue}.json', when: 'Monday 8:30 AM' },
-  { step: 4, name: 'Fetch Toast Item Fulfillment', how: 'weekly-save.js → item-fulfillment-{venue}.json', when: 'Monday 8:30 AM' },
-  { step: 5, name: 'Fetch OpenTable Covers', how: 'weekly-save.js → covers-{venue}.json', when: 'Monday 8:30 AM' },
-  { step: 6, name: 'Process venue metrics', how: 'process-venue-data.cjs per venue', when: 'Monday 8:30 AM' },
-  { step: 7, name: 'Rebuild dashboard.html', how: 'build-unified-v2.cjs', when: 'Monday 8:30 AM' },
-  { step: 8, name: 'Sanity check + push GitHub Pages', how: 'pipeline-health.cjs + git push', when: 'Monday 8:30 AM' },
+  { step: 1, name: 'Dispatch (primary)', how: 'cron-job.org → workflow_dispatch boh-weekly.yml', when: 'Monday 8:25 AM ET' },
+  { step: 2, name: 'Refresh Toast session', how: 'durable toast-session.json on self-hosted runner (intercept.js if expired)', when: 'Monday cloud job' },
+  { step: 3, name: 'Fetch Toast Kitchen Timing', how: 'weekly-save-cloud.cjs → kitchen-timing-{venue}.json', when: 'Monday cloud job' },
+  { step: 4, name: 'Fetch Toast Item Details', how: 'weekly-save-cloud.cjs → item-details-{venue}.json', when: 'Monday cloud job' },
+  { step: 5, name: 'Fetch Toast Item Fulfillment', how: 'weekly-save-cloud.cjs → item-fulfillment-{venue}.json', when: 'Monday cloud job' },
+  { step: 6, name: 'Fetch OpenTable Covers', how: 'weekly-save-cloud.cjs → covers-{venue}.json', when: 'Monday cloud job' },
+  { step: 7, name: 'Process venue metrics', how: 'process-venue-data.cjs per venue', when: 'Monday cloud job' },
+  { step: 8, name: 'Publish Firebase + Pages', how: 'boh-publish-firebase.cjs + build-unified-v2.cjs + git push', when: 'Monday cloud job' },
 ];
 
 const monthlyPrepSteps = [

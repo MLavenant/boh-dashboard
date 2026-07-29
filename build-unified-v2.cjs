@@ -361,6 +361,9 @@ const newScript = `
 ${allDataJS}
 
 const WEEKS = ${JSON.stringify(rollingWeeks)};
+const FB_BOH_DB = 'https://rdg-dj-dashboard-default-rtdb.firebaseio.com';
+let BOH_CLOUD_STATUS = null; // /rdg/scrapeStatus/bohWeekly
+let BOH_CLOUD_META = null;   // /rdg/boh/meta
 // Always open on the chronologically latest week
 let currentWeekIdx = (() => {
   let best = 0;
@@ -373,6 +376,77 @@ let currentVenue = 'claudie';
 function getD() {
   const weekKey = WEEKS[currentWeekIdx]?.key;
   return ALL_DATA[currentVenue]?.[weekKey] || ALL_DATA[currentVenue]?.['latest'] || {};
+}
+
+function weekShortLabel(weekKey) {
+  const s = String(weekKey || '');
+  const i = s.lastIndexOf('W');
+  return i >= 0 ? s.slice(i) : s;
+}
+
+function ensureWeekInList(weekKey) {
+  if (!weekKey) return;
+  if (WEEKS.some(w => w.key === weekKey)) return;
+  WEEKS.push({ label: weekShortLabel(weekKey), key: weekKey });
+  WEEKS.sort((a, b) => String(a.key).localeCompare(String(b.key)));
+}
+
+async function fbGetJson(path) {
+  const url = FB_BOH_DB + path + '.json';
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error('Firebase GET ' + path + ' HTTP ' + res.status);
+  return res.json();
+}
+
+/** Prefer Firebase live weeks over embedded Pages payload (DJ-style). */
+async function loadBohFromFirebase() {
+  try {
+    const meta = await fbGetJson('/rdg/boh/meta');
+    if (!meta || !meta.latestWeek) return false;
+    BOH_CLOUD_META = meta;
+    const venues = meta.venues || ['claudie', 'casaneos', 'ava_cg', 'ava_wp', 'mila'];
+    const weekKey = meta.latestWeek;
+    ensureWeekInList(weekKey);
+
+    // Also pull the prior 2 weeks if present under /rdg/boh/weeks
+    const weekKeys = new Set([weekKey]);
+    WEEKS.forEach(w => weekKeys.add(w.key));
+
+    for (const wk of weekKeys) {
+      for (const venueKey of venues) {
+        try {
+          const data = await fbGetJson('/rdg/boh/weeks/' + encodeURIComponent(wk) + '/' + encodeURIComponent(venueKey));
+          if (!data || typeof data !== 'object') continue;
+          if (!ALL_DATA[venueKey]) ALL_DATA[venueKey] = {};
+          ALL_DATA[venueKey][wk] = data;
+          ensureWeekInList(wk);
+        } catch (e) { /* week/venue may not exist yet */ }
+      }
+    }
+
+    // Select latest week from meta
+    let best = 0;
+    for (let i = 1; i < WEEKS.length; i++) {
+      if (String(WEEKS[i].key) > String(WEEKS[best].key)) best = i;
+    }
+    currentWeekIdx = best;
+    const dd = document.getElementById('weekDropdown');
+    if (dd) {
+      dd.innerHTML = WEEKS.map((w, i) =>
+        '<option value="' + i + '"' + (i === currentWeekIdx ? ' selected' : '') + '>' + w.label + '</option>'
+      ).join('');
+    }
+    const badge = document.getElementById('dashBadge');
+    if (badge && meta.updatedAt) {
+      badge.textContent = 'Latest ' + weekKey + ' · Cloud ' + new Date(meta.updatedAt).toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+    }
+    try { BOH_CLOUD_STATUS = await fbGetJson('/rdg/scrapeStatus/bohWeekly'); } catch (e) { BOH_CLOUD_STATUS = null; }
+    return true;
+  } catch (e) {
+    console.warn('BOH Firebase live load skipped:', e.message || e);
+    try { BOH_CLOUD_STATUS = await fbGetJson('/rdg/scrapeStatus/bohWeekly'); } catch (_) {}
+    return false;
+  }
 }
 
 // ============================================================
@@ -2601,15 +2675,7 @@ function renderSettings() {
   const root = document.getElementById('settingsHealthRoot');
   if (!root) return;
   const H = PIPELINE_HEALTH_DATA || {};
-  if (!H.generatedAt) {
-    root.innerHTML = '<div class="card"><p class="note">No pipeline-health.json yet. Run <code>node pipeline-health.cjs</code> after a weekly fetch.</p></div>';
-    return;
-  }
-
-  const overallColor = H.overall === 'pass' ? '#22c55e' : (H.overall === 'warn' ? '#f59e0b' : '#ef4444');
-  const overallLabel = H.overall === 'pass' ? 'ALL CLEAR' : (H.overall === 'warn' ? 'NEEDS ATTENTION' : 'FAILED CHECKS');
-  const sched = H.schedule || {};
-  const schedOk = !!sched.matchesExpected;
+  const cloud = BOH_CLOUD_STATUS || {};
   const fmtWhen = (iso) => {
     if (!iso) return '—';
     try { return new Date(iso).toLocaleString(); } catch(e) { return iso; }
@@ -2622,10 +2688,39 @@ function renderSettings() {
 
   let html = '';
 
+  // Cloud automation (DJ-style scrapeStatus) — source of truth for laptop-off
+  const cloudOk = cloud.ok === true;
+  const cloudColor = cloud.at ? (cloudOk ? '#22c55e' : '#ef4444') : '#f59e0b';
+  const cloudLabel = !cloud.at ? 'NO CLOUD STATUS YET' : (cloudOk ? 'CLOUD OK' : 'CLOUD FAILED');
+  html += '<div class="card" style="border-color:' + cloudColor + '40">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">';
+  html += '<div><h2 style="margin:0">Cloud Automation (Firebase)</h2>';
+  html += '<p class="note" style="margin:6px 0 0">Primary: cron-job.org → GitHub Actions (self-hosted) Mon ~8:25 AM ET · laptop optional</p></div>';
+  html += '<div style="font-size:18px;font-weight:800;color:' + cloudColor + '">' + cloudLabel + '</div>';
+  html += '</div>';
+  html += '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:12px">';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Last cloud run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.atLocal || fmtWhen(cloud.at)) + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Week published</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.weekLabel || (BOH_CLOUD_META && BOH_CLOUD_META.latestWeek) || '—') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.schedule || 'Mon ~8:25 AM ET') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">What</td><td style="padding:8px 0;text-align:right;color:#e8eaed;max-width:420px">' + (cloud.what || '—') + '</td></tr>';
+  html += '<tr><td style="padding:8px 0;color:#9aa0aa">Message</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.message || '—') + '</td></tr>';
+  html += '</table></div>';
+
+  if (!H.generatedAt) {
+    html += '<div class="card"><p class="note">No embedded pipeline-health.json yet. Cloud status above is live from Firebase when available.</p></div>';
+    root.innerHTML = html;
+    return;
+  }
+
+  const overallColor = H.overall === 'pass' ? '#22c55e' : (H.overall === 'warn' ? '#f59e0b' : '#ef4444');
+  const overallLabel = H.overall === 'pass' ? 'ALL CLEAR' : (H.overall === 'warn' ? 'NEEDS ATTENTION' : 'FAILED CHECKS');
+  const sched = H.schedule || {};
+  const schedOk = !!sched.matchesExpected;
+
   // Overall status
   html += '<div class="card" style="border-color:' + overallColor + '40">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">';
-  html += '<div><h2 style="margin:0">Pipeline Status</h2><p class="note" style="margin:6px 0 0">Latest week checked: <strong style="color:#e8eaed">' + (H.latestWeek || '—') + '</strong> · Generated ' + fmtWhen(H.generatedAt) + '</p></div>';
+  html += '<div><h2 style="margin:0">Pipeline Status (embedded)</h2><p class="note" style="margin:6px 0 0">Latest week checked: <strong style="color:#e8eaed">' + (H.latestWeek || '—') + '</strong> · Generated ' + fmtWhen(H.generatedAt) + '</p></div>';
   html += '<div style="font-size:18px;font-weight:800;color:' + overallColor + '">' + overallLabel + '</div>';
   html += '</div>';
   html += '<div class="kpis" style="margin-top:14px;grid-template-columns:repeat(3,1fr)">';
@@ -2637,14 +2732,14 @@ function renderSettings() {
   // Schedule card
   html += '<div class="card">';
   html += '<h2>Automatic Update Schedule</h2>';
-  html += '<p class="note">Expected: every Monday at 8:30 AM (local). Pulls last week Toast + OpenTable data, rebuilds dashboard, pushes GitHub Pages.</p>';
+  html += '<p class="note">Primary: cron-job.org → <code>boh-weekly.yml</code> Mon 8:25 AM ET on self-hosted runner. Laptop Task Scheduler is emergency-only.</p>';
   html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Task registered</td><td style="padding:8px 0;text-align:right;font-weight:600;color:' + (sched.exists?'#22c55e':'#ef4444') + '">' + (sched.exists?'Yes':'No') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.days||'—') + ' ' + (sched.startTime||'') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Matches Monday 8:30</td><td style="padding:8px 0;text-align:right;font-weight:700;color:' + (schedOk?'#22c55e':'#ef4444') + '">' + (schedOk?'✅ Yes':'❌ No') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Next run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.nextRun||'—') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Last run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.lastRun||'—') + '</td></tr>';
-  html += '<tr><td style="padding:8px 0;color:#9aa0aa">Task status</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.status||'—') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Laptop task registered</td><td style="padding:8px 0;text-align:right;font-weight:600;color:' + (sched.exists?'#22c55e':'#ef4444') + '">' + (sched.exists?'Yes':'No') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Laptop schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.days||'—') + ' ' + (sched.startTime||'') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Matches Monday 8:30 (legacy)</td><td style="padding:8px 0;text-align:right;font-weight:700;color:' + (schedOk?'#22c55e':'#ef4444') + '">' + (schedOk?'✅ Yes':'❌ No') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Next laptop run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.nextRun||'—') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Last laptop run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.lastRun||'—') + '</td></tr>';
+  html += '<tr><td style="padding:8px 0;color:#9aa0aa">Laptop task status</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.status||'—') + '</td></tr>';
   html += '</table></div>';
 
   const msched = H.monthlyPrepSchedule || {};
@@ -2675,7 +2770,7 @@ function renderSettings() {
   // What gets updated
   html += '<div class="card">';
   html += '<h2>What Updates Automatically</h2>';
-  html += '<p class="note">Full pipeline run by <code>weekly-auto-run.bat</code> every Monday 8:30 AM.</p>';
+  html += '<p class="note">Cloud pipeline: <code>boh-weekly.yml</code> → <code>weekly-save-cloud.cjs</code> → Firebase <code>/rdg/boh</code> + Pages. Emergency local: <code>weekly-auto-run.bat</code>.</p>';
   html += '<ol style="margin:0;padding-left:18px;color:#e8eaed;font-size:13px;line-height:1.7">';
   (H.pipelineSteps || []).forEach(s => {
     html += '<li><strong style="color:#d9a441">' + s.name + '</strong> — <span style="color:#9aa0aa">' + s.how + '</span></li>';
@@ -2875,9 +2970,9 @@ function changeWeek(dir) {
 // ============================================================
 // INIT
 // ============================================================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initVenuePills();
-  // Fix 1: Ensure latest week is selected by default
+  // Embedded fallback first, then prefer Firebase live weeks (DJ-style)
   currentWeekIdx = WEEKS.length - 1;
   const dd = document.getElementById('weekDropdown');
   if (dd) dd.value = currentWeekIdx;
@@ -2886,14 +2981,26 @@ document.addEventListener('DOMContentLoaded', () => {
   if (wpBtn) wpBtn.disabled = currentWeekIdx === 0;
   if (wnBtn) wnBtn.disabled = currentWeekIdx >= WEEKS.length - 1;
 
-  // Fix 2: First-open-of-week welcome popup
+  renderAll();
+  try {
+    const loaded = await loadBohFromFirebase();
+    if (loaded) {
+      if (wpBtn) wpBtn.disabled = currentWeekIdx === 0;
+      if (wnBtn) wnBtn.disabled = currentWeekIdx >= WEEKS.length - 1;
+      renderAll();
+    } else {
+      renderSettings();
+    }
+  } catch (e) {
+    console.warn(e);
+    renderSettings();
+  }
+
   const currentWeekKey = WEEKS[currentWeekIdx]?.key || '';
   const lastSeen = localStorage.getItem('boh_last_seen_week');
   if (lastSeen !== currentWeekKey && currentWeekKey) {
     showWeekWelcomePopup(currentWeekKey);
   }
-
-  renderAll();
 });
 </script>
 </body>

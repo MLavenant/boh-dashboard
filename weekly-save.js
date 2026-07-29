@@ -3,35 +3,44 @@
  * Fetches Toast kitchen timing + OpenTable covers for last week across all venues,
  * saves per-week JSON files, and maintains a rolling 3-week summary.
  *
- * Run: node C:\Cursor\toast-mcp-server\weekly-save.js
- * Scheduled: every Monday at 6am via Windows Task Scheduler
+ * Portable for local laptop + self-hosted Actions runner.
+ * Run: node weekly-save.js
+ * Env: BOH_ROOT, TOAST_SESSION_FILE, OT_SESSION_FILE, DATA_DIR,
+ *      OT_USERNAME, OT_PASSWORD, OT_CLIENT_ID, PLAYWRIGHT_BROWSERS_PATH
  */
 
 import axios from "axios";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import { exec as execCb } from "child_process";
 import { promisify } from "util";
 import dotenv from "dotenv";
 
 const exec = promisify(execCb);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT = process.env.BOH_ROOT || __dirname;
 
-dotenv.config({ path: "C:\\Cursor\\toast-mcp-server\\.env", override: true });
+dotenv.config({ path: path.join(ROOT, ".env"), override: true });
 
 // ── Config ─────────────────────────────────────────────────────────────────
 
-const SESSION_FILE    = "C:\\Cursor\\toast-mcp-server\\toast-session.json";
-const OT_SESSION_FILE = "C:\\Cursor\\toast-mcp-server\\ot-session.json";
-const DATA_DIR        = "C:\\Cursor\\toast-mcp-server\\data";
+const SESSION_FILE    = process.env.TOAST_SESSION_FILE || path.join(ROOT, "toast-session.json");
+const OT_SESSION_FILE = process.env.OT_SESSION_FILE || path.join(ROOT, "ot-session.json");
+const DATA_DIR        = process.env.DATA_DIR || path.join(ROOT, "data");
 const ROLLING_FILE    = path.join(DATA_DIR, "rolling.json");
 const TOAST_ADMIN     = "https://www.toasttab.com";
 
-const OT_USERNAME  = "matthias@rivieradininggroup.com";
-const OT_PASSWORD  = "MattLondon0401!";
-const OT_CLIENT_ID = "0oabit60qvY1wTxAv5d6";
+const OT_USERNAME  = process.env.OT_USERNAME || "";
+const OT_PASSWORD  = process.env.OT_PASSWORD || "";
+const OT_CLIENT_ID = process.env.OT_CLIENT_ID || "0oabit60qvY1wTxAv5d6";
 
-process.env.PLAYWRIGHT_BROWSERS_PATH =
-  "C:\\Users\\MatthiasLavenant\\AppData\\Local\\Temp\\cursor-sandbox-cache\\512227bcefb0bd4bdf65a710870dd5b5\\playwright";
+if (process.env.PLAYWRIGHT_BROWSERS_PATH) {
+  // keep caller-provided Playwright browser cache (CI / sandbox)
+} else {
+  delete process.env.PLAYWRIGHT_BROWSERS_PATH;
+}
 
 const KITCHEN_VENUES = [
   "claudie", "ava_coconut_grove", "ava_winter_park", "mm_ava",
@@ -55,7 +64,7 @@ const FULFILLMENT_VENUE_GUIDS = {
   mila:              "38e76bee-b844-427c-b078-260aa025f556",
 };
 
-const TOAST_WEB_TOKEN_FILE = "C:\\Cursor\\toast-mcp-server\\toast-web-token.json";
+const TOAST_WEB_TOKEN_FILE = process.env.TOAST_WEB_TOKEN_FILE || path.join(ROOT, "toast-web-token.json");
 // Organization-wide restaurant-set GUID (constant for RDG across all venues)
 const TOAST_RESTAURANT_SET_GUID = "96e8e2b8-d95d-4432-b574-ceee10cf17d5";
 // Panel output name for the MENU_ITEM_NAME table in all fulfillment custom reports
@@ -385,6 +394,9 @@ async function refreshOTSession() {
 
 async function _doRefreshOTSession() {
   console.log("  [OT] Refreshing session token via Okta + OAuth...");
+  if (!OT_USERNAME || !OT_PASSWORD) {
+    throw new Error("OT_USERNAME / OT_PASSWORD env vars required (do not hardcode credentials)");
+  }
   const { chromium } = await import("playwright");
 
   const authRes = await axios.post("https://restauth.opentable.com/api/v1/authn",
@@ -594,7 +606,7 @@ async function main() {
   // ── Step 4: Build dashboard data from rolling.json ────────────────────────
   console.log("\n─── Building dashboard data from rolling.json ───");
   try {
-    const { stdout: s4, stderr: e4 } = await exec("node C:\\Cursor\\toast-mcp-server\\build-dashboard-from-json.js");
+    const { stdout: s4, stderr: e4 } = await exec(`node "${path.join(ROOT, "build-dashboard-from-json.js")}"`, { cwd: ROOT });
     if (s4) console.log(s4.trim());
     if (e4) console.error(e4.trim());
   } catch (err) {
@@ -604,31 +616,38 @@ async function main() {
   // ── Step 4b: Process per-venue data into venue JSON files ─────────────────
   console.log("\n─── Processing venue data files ───");
   const PROCESS_VENUES = ["casa_neos", "ava_coconut_grove", "ava_winter_park", "mila", "claudie"];
+  let processFailures = 0;
   for (const v of PROCESS_VENUES) {
     try {
       const { stdout: sv, stderr: ev } = await exec(
-        `node C:\\Cursor\\toast-mcp-server\\process-venue-data.cjs ${v} ${weekLabel}`
+        `node "${path.join(ROOT, "process-venue-data.cjs")}" ${v} ${weekLabel}`,
+        { cwd: ROOT }
       );
       if (sv) console.log(sv.trim());
       if (ev) console.error(ev.trim());
     } catch (err) {
+      processFailures++;
       console.error(`ERROR processing venue data for ${v}:`, err.message);
     }
+  }
+  if (processFailures > 0) {
+    throw new Error(`Venue processing failed for ${processFailures} venue(s)`);
   }
 
   // ── Step 5: Rebuild the HTML dashboard ───────────────────────────────────
   console.log("\n─── Rebuilding HTML dashboard ───");
   try {
-    const { stdout: s5, stderr: e5 } = await exec("node C:\\Cursor\\toast-mcp-server\\build-unified-v2.cjs");
+    const { stdout: s5, stderr: e5 } = await exec(`node "${path.join(ROOT, "build-unified-v2.cjs")}"`, { cwd: ROOT });
     if (s5) console.log(s5.trim());
     if (e5) console.error(e5.trim());
   } catch (err) {
     console.error("ERROR rebuilding dashboard:", err.message);
+    throw err;
   }
 
   console.log("\n=== Done! ===");
   console.log(`Data saved to:  ${weekDir}`);
-  console.log("Dashboard updated: C:\\Cursor\\toast-mcp-server\\dashboard.html");
+  console.log(`Dashboard updated: ${path.join(ROOT, "dashboard.html")}`);
 }
 
 main().catch(err => {
