@@ -45,7 +45,28 @@ if %ERR% NEQ 0 (
 
 git add dashboard.html pipeline-health.json *-data-*.json item-station-map.json 2>>auto-run.log
 git commit -m "Weekly auto-update: dashboard + venue data + health check" >> auto-run.log 2>&1
+if errorlevel 1 (
+  :: A no-change commit is valid; any staged changes left behind indicate a real failure.
+  git diff --cached --quiet
+  if errorlevel 1 (
+    echo [%date% %time%] ERROR: git commit failed >> auto-run.log 2>&1
+    exit /b 1
+  )
+)
+
+:: Cloud DJ jobs also update this repository. Rebase the BOH commit onto the
+:: newest remote main before pushing so concurrent automation cannot block Pages.
+git pull --rebase origin main >> auto-run.log 2>&1
+if errorlevel 1 (
+  echo [%date% %time%] ERROR: git pull --rebase failed >> auto-run.log 2>&1
+  exit /b 1
+)
+
 git push origin main >> auto-run.log 2>&1
+if errorlevel 1 (
+  echo [%date% %time%] ERROR: git push failed >> auto-run.log 2>&1
+  exit /b 1
+)
 echo [%date% %time%] Live link: https://mlavenant.github.io/boh-dashboard/dashboard.html >> auto-run.log 2>&1
 echo [%date% %time%] Weekly auto-run complete >> auto-run.log 2>&1
 exit /b 0

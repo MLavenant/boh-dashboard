@@ -236,3 +236,9 @@ console.log(`✅ Written ${OUT}`);
 console.log(`Week: ${latestWeek} | PASS ${totals.pass} WARN ${totals.warn} FAIL ${totals.fail} | overall=${health.overall}`);
 console.log(`Schedule: ${schedule.exists ? `${schedule.days} ${schedule.startTime} (next ${schedule.nextRun})` : 'NOT FOUND'}`);
 console.log(`Matches Monday 8:30: ${health.schedule.matchesExpected}`);
+
+// Automation must not publish a dashboard that is labeled as the latest week
+// when one or more required venue inputs are missing.
+if (health.overall === 'fail') {
+  process.exitCode = 1;
+}
