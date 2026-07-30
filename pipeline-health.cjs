@@ -153,6 +153,51 @@ function checkVenueWeek(slug, week) {
     }
   }
 
+  // Station-family staffing (food venues only; Claudie uses different labor system)
+  const STAFFING_SLUGS = new Set(['casa_neos', 'mila', 'ava_coconut_grove', 'ava_winter_park']);
+  const FOOD_FAMILIES = new Set(['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep']);
+  if (STAFFING_SLUGS.has(slug)) {
+    const labor = fileMeta(path.join(weekDir, `labor-${slug}.json`), 'entries');
+    const staffingRaw = fileMeta(path.join(weekDir, `staffing-${slug}.json`));
+    const mapFile = fileMeta(path.join(ROOT, `station-family-map-${slug}.json`));
+    if (!mapFile) {
+      checks.push({ id: 'staffing_map', source: 'Staffing', label: 'Station Family Map', status: 'fail', message: 'Missing station-family-map file' });
+    } else {
+      checks.push({ id: 'staffing_map', source: 'Staffing', label: 'Station Family Map', status: 'pass', message: 'Map present', meta: mapFile });
+    }
+    if (!labor) {
+      checks.push({ id: 'staffing_labor', source: 'Staffing', label: 'Toast Labor Week', status: 'warn', message: 'Missing labor file' });
+    } else {
+      checks.push({ id: 'staffing_labor', source: 'Staffing', label: 'Toast Labor Week', status: 'pass', message: `${(labor.rows || 0).toLocaleString()} entries`, meta: labor });
+    }
+    try {
+      const d = JSON.parse(fs.readFileSync(path.join(ROOT, `${slug}-data-${week}.json`), 'utf8'));
+      const st = d.staffing;
+      if (!st || !st.byFamily) {
+        checks.push({ id: 'staffing_join', source: 'Staffing', label: 'Staffing Join', status: 'warn', message: 'No staffing block in venue JSON' });
+      } else {
+        const families = Object.keys(st.byFamily);
+        const nonFood = families.filter(f => !FOOD_FAMILIES.has(f));
+        const hasNames = JSON.stringify(st).includes('"names"');
+        const badNum = families.some(f => {
+          const fam = st.byFamily[f];
+          return fam.weekItemsPerStaffHour != null && !Number.isFinite(fam.weekItemsPerStaffHour);
+        });
+        if (nonFood.length) {
+          checks.push({ id: 'staffing_join', source: 'Staffing', label: 'Staffing Join', status: 'fail', message: `FOH families leaked: ${nonFood.slice(0,5).join(', ')}` });
+        } else if (hasNames) {
+          checks.push({ id: 'staffing_join', source: 'Staffing', label: 'Staffing Join', status: 'fail', message: 'Public staffing payload contains names (PII)' });
+        } else if (badNum) {
+          checks.push({ id: 'staffing_join', source: 'Staffing', label: 'Staffing Join', status: 'fail', message: 'Non-finite IPSH metric' });
+        } else {
+          checks.push({ id: 'staffing_join', source: 'Staffing', label: 'Staffing Join', status: 'pass', message: `${families.length} food families · matched ${st.matchStats?.laborShiftsMatched ?? '?'}`, meta: staffingRaw });
+        }
+      }
+    } catch (e) {
+      checks.push({ id: 'staffing_join', source: 'Staffing', label: 'Staffing Join', status: 'warn', message: e.message });
+    }
+  }
+
   const fail = checks.filter(c => c.status === 'fail').length;
   const warn = checks.filter(c => c.status === 'warn').length;
   const pass = checks.filter(c => c.status === 'pass').length;
@@ -192,7 +237,8 @@ const pipelineSteps = [
   { step: 5, name: 'Fetch Toast Item Fulfillment', how: 'weekly-save-cloud.cjs → item-fulfillment-{venue}.json', when: 'Monday cloud job' },
   { step: 6, name: 'Fetch OpenTable Covers', how: 'weekly-save-cloud.cjs → covers-{venue}.json', when: 'Monday cloud job' },
   { step: 7, name: 'Process venue metrics', how: 'process-venue-data.cjs per venue', when: 'Monday cloud job' },
-  { step: 8, name: 'Publish Firebase + Pages', how: 'boh-publish-firebase.cjs + build-unified-v2.cjs + git push', when: 'Monday cloud job' },
+  { step: 8, name: 'Food staffing join', how: 'weekly-staffing.cjs (FTE × Toast labor × volume)', when: 'Local Monday task after venue process' },
+  { step: 9, name: 'Publish Firebase + Pages', how: 'boh-publish-firebase.cjs + build-unified-v2.cjs + git push', when: 'Monday cloud/local job' },
 ];
 
 const monthlyPrepSteps = [

@@ -26,6 +26,12 @@ if errorlevel 1 (
 :: Refresh static item-station map from Excel REF sheets when present
 node extract-item-stations.cjs >> auto-run.log 2>&1
 
+:: Food-station staffing join (FTE drop × Toast labor). Missing FTE → warn only.
+node weekly-staffing.cjs >> auto-run.log 2>&1
+if errorlevel 1 (
+  echo [%date% %time%] WARN: weekly-staffing.cjs failed — continuing with prior staffing if any >> auto-run.log 2>&1
+)
+
 :: Sanity check
 node pipeline-health.cjs >> auto-run.log 2>&1
 if errorlevel 1 set ERR=1

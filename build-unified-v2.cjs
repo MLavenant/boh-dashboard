@@ -167,7 +167,7 @@ html = html.replace(
 <div class="station-pills" id="stationPills"></div>
 <div class="card" id="staffingCard" style="margin-top:18px;display:none">
   <h2 style="margin:0 0 4px">Staffing by Station Family</h2>
-  <p class="note" id="staffingNote" style="margin-top:0">FTE Matrix assignment × Toast clock-ins × kitchen item volume. Heads = people who worked that day on that family.</p>
+  <p class="note" id="staffingNote" style="margin-top:0">Food-production families only (no FOH). Cell = heads · items/staff-hour. Hover for hours, volume, fulfillment, and staffing signal. Compare Tuesday vs Friday in station detail.</p>
   <div id="staffingGrid" style="overflow-x:auto"></div>
   <p id="staffingMatchNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
 </div>`
@@ -279,14 +279,25 @@ html = html.replace(
 </div>
 </section>
 
-<!-- ========== TAB 4: GROUP ========== -->
+<!-- ========== TAB 4: GROUP / RDG PORTFOLIO ========== -->
 <section id="tab-group" class="tab-section">
-<div class="section-title" id="groupTitle">RDG Group — ${rollingWeeks[rollingWeeks.length-1].label} Performance</div>
+<div class="section-title" id="groupTitle">RDG Portfolio — ${rollingWeeks[rollingWeeks.length-1].label} Performance</div>
+<p class="note" id="groupSubtitle" style="margin-top:-8px">Location vs location across RDG food venues (Claudie excluded from portfolio staffing). Breaking point, guests seated, fulfillment, and station-family efficiency.</p>
 <div class="row three" id="groupCards" style="margin-bottom:18px"></div>
 <div class="card">
   <h2>Venue Comparison — Avg Fulfillment Time</h2>
   <p class="note">Horizontal bars per venue. Reference line at 15 min target. Color: green ≤10 min, yellow 10–15 min, red &gt;15 min.</p>
   <canvas id="cGroupBar" style="max-height:280px"></canvas>
+</div>
+<div class="card" style="margin-top:16px">
+  <h2>Portfolio Scoreboard</h2>
+  <p class="note">Breaking point, guests seated, food-station avg fulfillment, and Saute items/staff-hour when staffing is available.</p>
+  <div id="groupPortfolioTable" style="overflow-x:auto"></div>
+</div>
+<div class="card" style="margin-top:16px">
+  <h2>Stations Comparison across RDG</h2>
+  <p class="note">Same-family staffing efficiency (week items/staff-hour) where food FTE × labor join exists.</p>
+  <div id="groupFamilyTable" style="overflow-x:auto"></div>
 </div>
 <div class="coming-note" id="groupWowNote">📅 Week-over-week comparison: available from Week 2 (Jul 14)</div>
 </section>
@@ -1628,11 +1639,24 @@ function renderStationBreaking() {
 // ============================================================
 // TAB 2: Station Selector & Detail
 // ============================================================
+function signalColor(code) {
+  if (code === 'understaffed_pressure') return '#ef4444';
+  if (code === 'overstaffed_slack') return '#38bdf8';
+  if (code === 'process_issue') return '#f59e0b';
+  if (code === 'efficient_busy') return '#22c55e';
+  if (code === 'in_band') return '#a3e635';
+  return '#9aa0aa';
+}
+function fmtFulMin(sec) {
+  if (sec == null || !isFinite(sec)) return '—';
+  return (sec / 60).toFixed(1) + 'm';
+}
 function renderStaffingGrid() {
   const card = document.getElementById('staffingCard');
   const grid = document.getElementById('staffingGrid');
   const matchNote = document.getElementById('staffingMatchNote');
   if (!card || !grid) return;
+  if (currentVenue === 'rdg_portfolio') { card.style.display = 'none'; return; }
   const staffing = getD().staffing;
   if (!staffing || !staffing.byFamily) {
     card.style.display = 'none';
@@ -1642,12 +1666,6 @@ function renderStaffingGrid() {
   const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
   const FOOD_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
   const families = FOOD_FAMILIES.filter(f => staffing.byFamily[f]);
-  // Also include any other families that had worked heads
-  Object.keys(staffing.byFamily).forEach(f => {
-    if (families.includes(f)) return;
-    const any = DAYS.some(d => (staffing.byFamily[f].days[d]||{}).heads > 0);
-    if (any) families.push(f);
-  });
   if (!families.length) {
     grid.innerHTML = '<p style="color:#9aa0aa;font-size:13px">No BOH station-family staffing for this week.</p>';
     return;
@@ -1659,29 +1677,46 @@ function renderStaffingGrid() {
     if (h <= 7) return '#1e3a5f';
     return '#3b2f1a';
   }
-  let html = '<table style="border-collapse:collapse;font-size:12px;min-width:720px;width:100%">';
+  const guests = staffing.guestsSeated || getD().guestsSeated;
+  let html = '';
+  if (guests && guests.total != null) {
+    html += '<div style="font-size:12px;color:#9aa0aa;margin-bottom:8px">Guests seated this week: <strong style="color:#e8eaed">'+(guests.total||0).toLocaleString()+'</strong></div>';
+  }
+  html += '<table style="border-collapse:collapse;font-size:12px;min-width:780px;width:100%">';
   html += '<thead><tr><th style="text-align:left;padding:6px 8px;color:#9aa0aa;background:#1e2533">Family</th>';
   DAYS.forEach(d => { html += '<th style="padding:6px 8px;color:#9aa0aa;background:#1e2533;text-align:center">'+d.slice(0,3)+'</th>'; });
-  html += '<th style="padding:6px 8px;color:#9aa0aa;background:#1e2533;text-align:center">Week items/head-day</th></tr></thead><tbody>';
+  html += '<th style="padding:6px 8px;color:#9aa0aa;background:#1e2533;text-align:center">Week IPSH</th></tr></thead><tbody>';
   families.forEach(f => {
     const fam = staffing.byFamily[f];
     html += '<tr><td style="padding:6px 8px;color:#e8eaed;font-weight:600;white-space:nowrap">'+f+
-      '<div style="font-size:10px;color:#9aa0aa;font-weight:400">roster '+fam.rosterCount+' · worked '+fam.weekHeadsUnique+'</div></td>';
+      '<div style="font-size:10px;color:#9aa0aa;font-weight:400">roster '+fam.rosterCount+' · worked '+fam.weekHeadsUnique+
+      (fam.weekAvgFulSec!=null?' · avg '+fmtFulMin(fam.weekAvgFulSec):'')+'</div></td>';
     DAYS.forEach(day => {
       const c = fam.days[day] || {};
-      const tip = (c.heads||0)+' staff · '+(c.hours||0)+' labor hours';
-      const iph = c.itemsPerHead != null ? c.itemsPerHead+' items/head' : '—';
-      html += '<td title="'+tip.replace(/"/g,'&quot;')+' · '+iph+'" style="padding:6px 8px;text-align:center;background:'+headColor(c.heads||0)+';color:#e8eaed;cursor:default">'+
+      const sig = c.signal || {};
+      const tip = [
+        (c.heads||0)+' staff',
+        (c.hours||0)+' labor hours',
+        'volume '+(c.volume!=null?c.volume:(c.itemCount||0)),
+        'IPSH '+(c.itemsPerStaffHour!=null?c.itemsPerStaffHour:'—'),
+        'ful '+fmtFulMin(c.avgFulSec),
+        sig.label || ''
+      ].filter(Boolean).join(' · ');
+      html += '<td title="'+tip.replace(/"/g,'&quot;')+'" style="padding:6px 8px;text-align:center;background:'+headColor(c.heads||0)+';color:#e8eaed;cursor:default">'+
         '<div style="font-weight:700;font-size:14px">'+(c.heads||0)+'</div>'+
-        '<div style="font-size:10px;color:#9aa0aa">'+(c.itemsPerHead!=null?c.itemsPerHead+'/hd':'—')+'</div></td>';
+        '<div style="font-size:10px;color:#9aa0aa">'+(c.itemsPerStaffHour!=null?c.itemsPerStaffHour+'/h':'—')+'</div>'+
+        (sig.label && sig.code && sig.code !== 'closed_or_empty' && sig.code !== 'insufficient_data'
+          ? '<div style="font-size:9px;color:'+signalColor(sig.code)+';margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72px">'+(sig.label.split(' ').pop())+'</div>'
+          : '')+
+        '</td>';
     });
-    html += '<td style="padding:6px 8px;text-align:center;color:#d9a441;font-weight:600">'+(fam.weekItemsPerHeadDay!=null?fam.weekItemsPerHeadDay:'—')+'</td></tr>';
+    html += '<td style="padding:6px 8px;text-align:center;color:#d9a441;font-weight:600">'+(fam.weekItemsPerStaffHour!=null?fam.weekItemsPerStaffHour:(fam.weekItemsPerHeadDay!=null?fam.weekItemsPerHeadDay+'/hd':'—'))+'</td></tr>';
   });
   html += '</tbody></table>';
   grid.innerHTML = html;
   if (matchNote && staffing.matchStats) {
     const ms = staffing.matchStats;
-    matchNote.textContent = 'Matched '+ms.laborShiftsMatched+' labor days · unmatched '+ms.laborShiftsUnmatched+' · unused roster '+ms.rosterUnused+'/'+ms.rosterTotal;
+    matchNote.textContent = 'Food families only · matched '+ms.laborShiftsMatched+' labor days · unmatched '+ms.laborShiftsUnmatched+' · unused roster '+ms.rosterUnused+'/'+ms.rosterTotal;
   }
 }
 
@@ -1973,30 +2008,51 @@ function renderStations() {
     const ratioColor = ratio ? (ratio>1.15?'#ef4444':ratio>1?'#f59e0b':'#22c55e') : '#9aa0aa';
     const ratioDisp = ratio ? (ratio*100).toFixed(0)+'%' : '—';
 
-    // Staffing strip for this Toast station's FTE family (Casa Neos+)
+    // Staffing strip for this Toast station's FTE family — daily efficiency compare
     let staffingHtml = '';
     const staffing = getD().staffing;
     const famName = staffing && staffing.toastStationFamily ? staffing.toastStationFamily[s.station] : null;
     if (famName && staffing.byFamily && staffing.byFamily[famName]) {
       const fam = staffing.byFamily[famName];
       const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+      const tue = fam.days.Tuesday || {};
+      const fri = fam.days.Friday || {};
+      const tueIpsh = tue.itemsPerStaffHour;
+      const friIpsh = fri.itemsPerStaffHour;
+      let tueFriNote = '';
+      if (tueIpsh != null && friIpsh != null && tueIpsh > 0) {
+        const ratio = friIpsh / tueIpsh;
+        const faster = friIpsh > tueIpsh;
+        tueFriNote = 'Tue vs Fri IPSH: <strong style="color:#e8eaed">'+tueIpsh+'</strong> → <strong style="color:#e8eaed">'+friIpsh+'</strong> ('+
+          (faster ? 'Friday +' : 'Friday ')+((ratio-1)*100).toFixed(0)+'% vs Tuesday). ' +
+          'Heads Tue/Fri: '+(tue.heads||0)+'/'+(fri.heads||0)+' · Ful '+fmtFulMin(tue.avgFulSec)+' / '+fmtFulMin(fri.avgFulSec)+'.';
+      }
       staffingHtml = '<div style="margin-bottom:16px;padding:12px;background:#13161c;border:1px solid #262a33;border-radius:10px">'+
-        '<div style="font-size:13px;font-weight:600;color:#d9a441;margin-bottom:6px">Staffing · '+famName+' family</div>'+
+        '<div style="font-size:13px;font-weight:600;color:#d9a441;margin-bottom:6px">Staffing performance · '+famName+' family</div>'+
         '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px">'+
           '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+fam.weekHeadsUnique+'</div><div class="l">Unique cooks worked</div></div>'+
           '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+fam.rosterCount+'</div><div class="l">On FTE roster</div></div>'+
-          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px;color:#d9a441">'+(fam.weekItemsPerHeadDay!=null?fam.weekItemsPerHeadDay:'—')+'</div><div class="l">Items / head-day</div></div>'+
+          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px;color:#d9a441">'+(fam.weekItemsPerStaffHour!=null?fam.weekItemsPerStaffHour:(fam.weekItemsPerHeadDay??'—'))+'</div><div class="l">Items / staff-hour</div></div>'+
+          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+(fam.weekAvgFulSec!=null?fmtFulMin(fam.weekAvgFulSec):'—')+'</div><div class="l">Avg fulfillment</div></div>'+
         '</div>'+
-        '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">'+
+        (tueFriNote ? '<div style="font-size:12px;color:#9aa0aa;margin-bottom:10px">'+tueFriNote+'</div>' : '')+
+        '<div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:11px;width:100%;min-width:640px">'+
+        '<thead><tr style="color:#9aa0aa;text-align:center">'+
+        '<th style="text-align:left;padding:4px 6px">Day</th><th style="padding:4px 6px">Staff</th><th style="padding:4px 6px">Hours</th><th style="padding:4px 6px">Volume</th><th style="padding:4px 6px">IPSH</th><th style="padding:4px 6px">Ful</th><th style="padding:4px 6px">Signal</th></tr></thead><tbody>'+
         DAYS.map(day => {
           const c = fam.days[day] || {};
-          const tip = (c.heads||0)+' staff · '+(c.hours||0)+' labor hours';
-          return '<div title="'+tip.replace(/"/g,'&quot;')+'" style="background:#181b22;border-radius:6px;padding:6px 4px;text-align:center">'+
-            '<div style="font-size:10px;color:#9aa0aa">'+day.slice(0,3)+'</div>'+
-            '<div style="font-size:15px;font-weight:700;color:#e8eaed">'+(c.heads||0)+'</div>'+
-            '<div style="font-size:10px;color:#9aa0aa">'+(c.itemsPerHead!=null?c.itemsPerHead+'/hd':'—')+'</div></div>';
+          const sig = c.signal || {};
+          const highlight = (day === 'Tuesday' || day === 'Friday') ? 'background:#1a2030;' : '';
+          return '<tr style="'+highlight+'border-top:1px solid #262a33">'+
+            '<td style="padding:5px 6px;color:#e8eaed;font-weight:600;text-align:left">'+day.slice(0,3)+'</td>'+
+            '<td style="padding:5px 6px;text-align:center;color:#e8eaed">'+(c.heads||0)+'</td>'+
+            '<td style="padding:5px 6px;text-align:center;color:#9aa0aa">'+(c.hours||0)+'</td>'+
+            '<td style="padding:5px 6px;text-align:center;color:#9aa0aa">'+(c.volume!=null?c.volume:(c.itemCount||0))+'</td>'+
+            '<td style="padding:5px 6px;text-align:center;color:#d9a441;font-weight:600">'+(c.itemsPerStaffHour!=null?c.itemsPerStaffHour:'—')+'</td>'+
+            '<td style="padding:5px 6px;text-align:center;color:#9aa0aa">'+fmtFulMin(c.avgFulSec)+'</td>'+
+            '<td style="padding:5px 6px;text-align:center;color:'+signalColor(sig.code)+'" title="'+(sig.note||'').replace(/"/g,'&quot;')+'">'+(sig.label||'—')+'</td></tr>';
         }).join('')+
-        '</div></div>';
+        '</tbody></table></div></div>';
     } else if (staffing) {
       staffingHtml = '<div style="margin-bottom:12px;font-size:12px;color:#9aa0aa">No FTE staffing map for this Toast station.</div>';
     }
@@ -2498,48 +2554,53 @@ function renderAssignment() {
 }
 
 // ============================================================
-// TAB 4: Group Summary
+// TAB 4: Group / RDG Portfolio Summary (client-side aggregator)
 // ============================================================
+const PORTFOLIO_VENUE_KEYS = ['casaneos','ava_cg','ava_wp','mila'];
+function buildVenueWeekScorecard(key, label, weekKey) {
+  const d = ALL_DATA[key]?.[weekKey] || ALL_DATA[key]?.['latest'] || {};
+  const stations = (d.stations || []).filter(s => isFoodStation(s.station));
+  let totalCount = 0, totalSec = 0;
+  stations.forEach(s => { totalCount += s.count; totalSec += s.avg_sec * s.count; });
+  const avgFulSec = totalCount > 0 ? totalSec / totalCount : null;
+  const avgFulMin = avgFulSec != null ? avgFulSec / 60 : null;
+  const totalTickets = stations.reduce((acc, s) => acc + s.count, 0);
+  const bp = d.breakingPoint || null;
+  const bpGuests = d.breakingPointGuests || null;
+  const guestsSeated = (d.guestsSeated && d.guestsSeated.total != null)
+    ? d.guestsSeated.total
+    : ((d.staffing && d.staffing.guestsSeated && d.staffing.guestsSeated.total != null) ? d.staffing.guestsSeated.total : null);
+  const summary = d.summary || [];
+  const overCount = summary.filter(x => (x.avg_sec != null ? x.avg_sec : x.avgFulSec) >= 900).length;
+  const overPct = summary.length > 0 ? (overCount / summary.length * 100).toFixed(0) : null;
+  const withTarget = stations.filter(s => s.exp_sec > 0);
+  const overTarget = withTarget.filter(s => s.avg_sec > s.exp_sec).length;
+  const overTargetPct = withTarget.length > 0 ? (overTarget / withTarget.length * 100).toFixed(0) : null;
+  const top3 = [...stations].sort((a,b)=>b.avg_sec-a.avg_sec).slice(0,3);
+  const staffing = d.staffing;
+  const saute = staffing && staffing.byFamily ? staffing.byFamily.Saute : null;
+  const sauteIpsh = saute ? saute.weekItemsPerStaffHour : null;
+  const familyIpsh = {};
+  if (staffing && staffing.byFamily) {
+    Object.keys(staffing.byFamily).forEach(f => {
+      familyIpsh[f] = staffing.byFamily[f].weekItemsPerStaffHour;
+    });
+  }
+  return { key, label, avgFulMin, avgFulSec, totalTickets, bp, bpGuests, guestsSeated, overPct, overTargetPct, top3, withTarget, sauteIpsh, familyIpsh, hasStaffing: !!staffing };
+}
 function renderGroup() {
   const VENUE_LABELS_LOCAL = ${JSON.stringify(VENUE_LABELS)};
   const weekLabel = WEEKS[currentWeekIdx] ? WEEKS[currentWeekIdx].label : 'Week 1';
+  const weekKey = WEEKS[currentWeekIdx]?.key;
+  const portfolioMode = currentVenue === 'rdg_portfolio';
 
   const titleEl = document.getElementById('groupTitle');
-  if (titleEl) titleEl.textContent = 'RDG Group — ' + weekLabel + ' Performance';
+  if (titleEl) titleEl.textContent = (portfolioMode ? 'RDG Portfolio — ' : 'RDG Group — ') + weekLabel + ' Performance';
 
-  // Build venue summary data
-  const venueData = Object.entries(VENUE_LABELS_LOCAL).map(([key, label]) => {
-    const weekKey = WEEKS[currentWeekIdx]?.key;
-    const d = ALL_DATA[key]?.[weekKey] || ALL_DATA[key]?.['latest'] || {};
-    const stations = (d.stations || []).filter(s => isFoodStation(s.station));
-    // Weighted avg fulfillment across food stations
-    let totalCount = 0, totalSec = 0;
-    stations.forEach(s => { totalCount += s.count; totalSec += s.avg_sec * s.count; });
-    const avgFulSec = totalCount > 0 ? totalSec / totalCount : null;
-    const avgFulMin = avgFulSec ? avgFulSec / 60 : null;
-
-    // Total tickets (station tickets sum)
-    const totalTickets = stations.reduce((acc, s) => acc + s.count, 0);
-
-    // Breaking point
-    const bp = d.breakingPoint || null;
-    const bpGuests = d.breakingPointGuests || null;
-
-    // % over 15 min: use SUMMARY if available
-    const summary = d.summary || [];
-    const overCount = summary.filter(x => x.avg_sec >= 900).length;
-    const overPct = summary.length > 0 ? (overCount / summary.length * 100).toFixed(0) : null;
-
-    // Stations with targets
-    const withTarget = stations.filter(s => s.exp_sec > 0);
-    const overTarget = withTarget.filter(s => s.avg_sec > s.exp_sec).length;
-    const overTargetPct = withTarget.length > 0 ? (overTarget / withTarget.length * 100).toFixed(0) : null;
-
-    // Top 3 slowest stations
-    const top3 = [...stations].sort((a,b)=>b.avg_sec-a.avg_sec).slice(0,3);
-
-    return { key, label, avgFulMin, avgFulSec, totalTickets, bp, bpGuests, overPct, overTargetPct, top3, withTarget };
-  });
+  const entries = portfolioMode
+    ? PORTFOLIO_VENUE_KEYS.map(k => [k, VENUE_LABELS_LOCAL[k]]).filter(([,l]) => l)
+    : Object.entries(VENUE_LABELS_LOCAL);
+  const venueData = entries.map(([key, label]) => buildVenueWeekScorecard(key, label, weekKey));
 
   // ── Venue scorecards ──
   const cardsEl = document.getElementById('groupCards');
@@ -2552,7 +2613,7 @@ function renderGroup() {
         '<span style="color:'+perfColorHex(s.avg_sec,s.exp_sec)+'">●</span> '+
         s.station+' <strong style="color:#e8eaed">'+fmtSec(s.avg_sec)+'</strong></div>'
       ).join('');
-      return '<div class="group-card">'+
+      return '<div class="group-card" style="cursor:pointer" onclick="selectVenueFromPortfolio(\\''+v.key+'\\')">'+
         '<div class="venue-name">'+v.label+'</div>'+
         '<div style="text-align:center;margin:10px 0">'+
           '<div class="big-num" style="color:'+avgColor+'">'+avgDisp+'</div>'+
@@ -2561,8 +2622,8 @@ function renderGroup() {
         '<div class="row4">'+
           '<div class="mini-kpi"><div class="v">'+v.totalTickets.toLocaleString()+'</div><div class="l">Food tickets</div></div>'+
           '<div class="mini-kpi"><div class="v">'+(v.bp||'—')+(v.bp?' / '+(v.bpGuests||'?')+'g':'')+'</div><div class="l">Breaking point</div></div>'+
-          '<div class="mini-kpi"><div class="v" style="color:#ef4444">'+(v.overPct!=null?v.overPct+'%':'—')+'</div><div class="l">&gt;15 min items</div></div>'+
-          '<div class="mini-kpi"><div class="v" style="color:#f59e0b">'+(v.overTargetPct!=null?v.overTargetPct+'%':'—')+'</div><div class="l">Stations over target</div></div>'+
+          '<div class="mini-kpi"><div class="v">'+(v.guestsSeated!=null?v.guestsSeated.toLocaleString():'—')+'</div><div class="l">Guests seated</div></div>'+
+          '<div class="mini-kpi"><div class="v" style="color:#d9a441">'+(v.sauteIpsh!=null?v.sauteIpsh:'—')+'</div><div class="l">Saute IPSH</div></div>'+
         '</div>'+
         '<div style="margin-top:12px;border-top:1px solid #262a33;padding-top:8px">'+
           '<div style="font-size:11px;font-weight:600;color:#d9a441;margin-bottom:4px">Top 3 slowest stations</div>'+
@@ -2570,6 +2631,47 @@ function renderGroup() {
         '</div>'+
       '</div>';
     }).join('');
+  }
+
+  // Portfolio tables
+  const scoreEl = document.getElementById('groupPortfolioTable');
+  if (scoreEl) {
+    let th = '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
+      '<th style="text-align:left;padding:8px">Venue</th><th style="padding:8px;text-align:right">BP</th><th style="padding:8px;text-align:right">Guests @ BP</th><th style="padding:8px;text-align:right">Guests seated</th><th style="padding:8px;text-align:right">Avg ful</th><th style="padding:8px;text-align:right">Food tickets</th><th style="padding:8px;text-align:right">Saute IPSH</th></tr></thead><tbody>';
+    venueData.forEach(v => {
+      th += '<tr style="border-top:1px solid #262a33;cursor:pointer" onclick="selectVenueFromPortfolio(\\''+v.key+'\\')">'+
+        '<td style="padding:8px;color:#e8eaed;font-weight:600">'+v.label+'</td>'+
+        '<td style="padding:8px;text-align:right">'+(v.bp??'—')+'</td>'+
+        '<td style="padding:8px;text-align:right">'+(v.bpGuests??'—')+'</td>'+
+        '<td style="padding:8px;text-align:right">'+(v.guestsSeated!=null?v.guestsSeated.toLocaleString():'—')+'</td>'+
+        '<td style="padding:8px;text-align:right;color:'+(v.avgFulMin!=null?avgFulColorByMin(v.avgFulMin):'#9aa0aa')+'">'+(v.avgFulMin!=null?v.avgFulMin.toFixed(1)+'m':'—')+'</td>'+
+        '<td style="padding:8px;text-align:right">'+v.totalTickets.toLocaleString()+'</td>'+
+        '<td style="padding:8px;text-align:right;color:#d9a441">'+(v.sauteIpsh!=null?v.sauteIpsh:'—')+'</td></tr>';
+    });
+    scoreEl.innerHTML = th + '</tbody></table>';
+  }
+
+  const famEl = document.getElementById('groupFamilyTable');
+  if (famEl) {
+    const FOOD_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
+    let fh = '<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:640px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:8px">Family</th>';
+    venueData.forEach(v => { fh += '<th style="padding:8px;text-align:right">'+v.label+'</th>'; });
+    fh += '</tr></thead><tbody>';
+    FOOD_FAMILIES.forEach(f => {
+      const any = venueData.some(v => v.familyIpsh[f] != null);
+      if (!any) return;
+      fh += '<tr style="border-top:1px solid #262a33"><td style="padding:8px;color:#e8eaed;font-weight:600">'+f+'</td>';
+      venueData.forEach(v => {
+        const val = v.familyIpsh[f];
+        fh += '<td style="padding:8px;text-align:right;color:#d9a441">'+(val!=null?val:'—')+'</td>';
+      });
+      fh += '</tr>';
+    });
+    fh += '</tbody></table>';
+    if (!venueData.some(v => v.hasStaffing)) {
+      fh = '<p style="color:#9aa0aa;font-size:13px">Staffing efficiency appears after FTE × labor join for each venue.</p>' + fh;
+    }
+    famEl.innerHTML = fh;
   }
 
   // ── Group comparison bar chart ──
@@ -2623,6 +2725,17 @@ function renderGroup() {
       plugins: [thrLine]
     });
   }
+}
+function selectVenueFromPortfolio(key) {
+  currentVenue = key;
+  document.querySelectorAll('.venue-pill').forEach(b => {
+    b.classList.toggle('active', b.dataset.venue === key);
+  });
+  const label = (${JSON.stringify(VENUE_LABELS)})[key] || key;
+  document.getElementById('dashTitle').textContent = label + ' · BOH Dashboard';
+  const groupBtn = document.querySelector('.tab-btn[onclick*="group"]');
+  // Stay on Group if coming from scorecard click while browsing portfolio; otherwise re-render venue tabs
+  renderAll();
 }
 
 // ============================================================
@@ -2945,6 +3058,14 @@ function renderSettings() {
 // RENDER ALL
 // ============================================================
 function renderAll() {
+  // RDG Portfolio is not a real venue week — only render Group aggregator + settings
+  if (currentVenue === 'rdg_portfolio') {
+    renderGroup();
+    renderSettings();
+    const pageSum = document.getElementById('pageSummary');
+    if (pageSum) pageSum.innerHTML = 'RDG Portfolio compares Casa Neos, AVA Coconut Grove, AVA Winter Park, and MILA for the selected week. Pick a location pill to drill into station detail.';
+    return;
+  }
   applyDerivedStationTargets();
   // Keep day selection; sync toggle UI to current pressureDay
   const wrap = document.getElementById('pressureDayToggle');
@@ -3045,7 +3166,8 @@ function showWeekWelcomePopup(weekKey) {
 const VENUE_LABELS = ${JSON.stringify(VENUE_LABELS)};
 function initVenuePills() {
   const container = document.getElementById('venuePills');
-  Object.entries(VENUE_LABELS).forEach(([key, label]) => {
+  const pills = [...Object.entries(VENUE_LABELS), ['rdg_portfolio', 'RDG Portfolio']];
+  pills.forEach(([key, label]) => {
     const btn = document.createElement('button');
     btn.className = 'venue-pill' + (key === currentVenue ? ' active' : '');
     btn.textContent = label;
@@ -3055,6 +3177,11 @@ function initVenuePills() {
       document.querySelectorAll('.venue-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('dashTitle').textContent = label + ' · BOH Dashboard';
+      if (key === 'rdg_portfolio') {
+        // Portfolio is a client-side aggregator — open Group tab, never feed empty getD() into charts
+        const groupBtn = [...document.querySelectorAll('.tab-btn')].find(b => (b.getAttribute('onclick')||'').includes("'group'"));
+        if (groupBtn) switchTab('group', groupBtn);
+      }
       renderAll();
     };
     container.appendChild(btn);

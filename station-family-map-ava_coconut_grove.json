@@ -1,0 +1,37 @@
+{
+  "venue": "ava_coconut_grove",
+  "description": "Maps Toast prep-station names → FTE Matrix station families for staffing join.",
+  "families": {
+    "Saute": {
+      "match": ["saute", "pasta"]
+    },
+    "Fry": {
+      "match": ["fry"]
+    },
+    "Garde Manger": {
+      "match": ["salad", "garde manger", "mezze"]
+    },
+    "Raw": {
+      "match": ["crudo", "raw", "fish market", "fish", "meat"]
+    },
+    "Sushi": {
+      "match": ["sushi", "maki"]
+    },
+    "Robata": {
+      "match": ["oven", "grill", "robata", "plancha", "roast"]
+    },
+    "Pastry": {
+      "match": ["pastry"]
+    },
+    "Expo": {
+      "match": ["expo", "hot expo", "cold expo"]
+    },
+    "Pizza": {
+      "match": ["pizza"]
+    },
+    "Prep": {
+      "match": ["prep", "butcher", "condiments"]
+    }
+  },
+  "ignore": ["no print", "event", "ico", "dock"]
+}

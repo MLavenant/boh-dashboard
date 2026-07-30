@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-30T17:18:37.266Z",
+  "generatedAt": "2026-07-30T21:26:53.058Z",
   "latestWeek": "2026-W30",
   "availableWeeks": [
     "2026-W30",
@@ -75,8 +75,8 @@
   "files": {
     "dashboardHtml": {
       "path": "C:\\Cursor\\toast-mcp-server\\dashboard.html",
-      "mtime": "2026-07-30T17:13:44.069Z",
-      "size": 2922227,
+      "mtime": "2026-07-30T20:31:12.372Z",
+      "size": 2945735,
       "rows": null
     },
     "rolling": {
@@ -87,15 +87,15 @@
     },
     "sessionToast": {
       "path": "C:\\Cursor\\toast-mcp-server\\toast-session.json",
-      "mtime": "2026-07-29T17:29:54.113Z",
-      "size": 52684,
+      "mtime": "2026-07-30T18:55:24.130Z",
+      "size": 12252,
       "rows": 2
     },
     "sessionOT": {
       "path": "C:\\Cursor\\toast-mcp-server\\ot-session.json",
-      "mtime": "2026-07-29T19:19:15.493Z",
-      "size": 8547,
-      "rows": 3
+      "mtime": "2026-07-30T20:51:53.356Z",
+      "size": 8940,
+      "rows": 4
     },
     "itemStationMap": {
       "path": "C:\\Cursor\\toast-mcp-server\\item-station-map.json",
@@ -246,14 +246,53 @@
           "message": "31 stations, curve=101, BP=55",
           "meta": {
             "path": "C:\\Cursor\\toast-mcp-server\\casa_neos-data-2026-W30.json",
-            "mtime": "2026-07-29T17:31:40.842Z",
-            "size": 250340,
+            "mtime": "2026-07-30T21:26:25.138Z",
+            "size": 568673,
             "rows": 31
+          }
+        },
+        {
+          "id": "staffing_map",
+          "source": "Staffing",
+          "label": "Station Family Map",
+          "status": "pass",
+          "message": "Map present",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\station-family-map-casa_neos.json",
+            "mtime": "2026-07-30T20:18:02.948Z",
+            "size": 805,
+            "rows": 4
+          }
+        },
+        {
+          "id": "staffing_labor",
+          "source": "Staffing",
+          "label": "Toast Labor Week",
+          "status": "pass",
+          "message": "870 entries",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W30\\labor-casa_neos.json",
+            "mtime": "2026-07-30T21:24:47.282Z",
+            "size": 391585,
+            "rows": 870
+          }
+        },
+        {
+          "id": "staffing_join",
+          "source": "Staffing",
+          "label": "Staffing Join",
+          "status": "pass",
+          "message": "10 food families · matched 252",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W30\\staffing-casa_neos.json",
+            "mtime": "2026-07-30T21:26:25.173Z",
+            "size": 135595,
+            "rows": 10
           }
         }
       ],
       "summary": {
-        "pass": 5,
+        "pass": 8,
         "warn": 0,
         "fail": 0
       },
@@ -323,14 +362,53 @@
           "message": "14 stations, curve=63, BP=12",
           "meta": {
             "path": "C:\\Cursor\\toast-mcp-server\\ava_coconut_grove-data-2026-W30.json",
-            "mtime": "2026-07-29T17:31:42.712Z",
-            "size": 162356,
+            "mtime": "2026-07-30T21:26:25.366Z",
+            "size": 363068,
             "rows": 14
+          }
+        },
+        {
+          "id": "staffing_map",
+          "source": "Staffing",
+          "label": "Station Family Map",
+          "status": "pass",
+          "message": "Map present",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\station-family-map-ava_coconut_grove.json",
+            "mtime": "2026-07-30T21:18:52.756Z",
+            "size": 844,
+            "rows": 4
+          }
+        },
+        {
+          "id": "staffing_labor",
+          "source": "Staffing",
+          "label": "Toast Labor Week",
+          "status": "pass",
+          "message": "418 entries",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W30\\labor-ava_coconut_grove.json",
+            "mtime": "2026-07-30T21:25:00.934Z",
+            "size": 187675,
+            "rows": 418
+          }
+        },
+        {
+          "id": "staffing_join",
+          "source": "Staffing",
+          "label": "Staffing Join",
+          "status": "pass",
+          "message": "9 food families · matched 99",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W30\\staffing-ava_coconut_grove.json",
+            "mtime": "2026-07-30T21:26:25.386Z",
+            "size": 92314,
+            "rows": 10
           }
         }
       ],
       "summary": {
-        "pass": 5,
+        "pass": 8,
         "warn": 0,
         "fail": 0
       },
@@ -400,14 +478,53 @@
           "message": "9 stations, curve=45, BP=11",
           "meta": {
             "path": "C:\\Cursor\\toast-mcp-server\\ava_winter_park-data-2026-W30.json",
-            "mtime": "2026-07-29T17:31:44.660Z",
-            "size": 130494,
+            "mtime": "2026-07-30T21:26:25.436Z",
+            "size": 288001,
             "rows": 9
+          }
+        },
+        {
+          "id": "staffing_map",
+          "source": "Staffing",
+          "label": "Station Family Map",
+          "status": "pass",
+          "message": "Map present",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\station-family-map-ava_winter_park.json",
+            "mtime": "2026-07-30T21:18:53.763Z",
+            "size": 834,
+            "rows": 4
+          }
+        },
+        {
+          "id": "staffing_labor",
+          "source": "Staffing",
+          "label": "Toast Labor Week",
+          "status": "pass",
+          "message": "451 entries",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W30\\labor-ava_winter_park.json",
+            "mtime": "2026-07-30T21:25:12.595Z",
+            "size": 201226,
+            "rows": 451
+          }
+        },
+        {
+          "id": "staffing_join",
+          "source": "Staffing",
+          "label": "Staffing Join",
+          "status": "pass",
+          "message": "7 food families · matched 133",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W30\\staffing-ava_winter_park.json",
+            "mtime": "2026-07-30T21:26:25.451Z",
+            "size": 90433,
+            "rows": 10
           }
         }
       ],
       "summary": {
-        "pass": 5,
+        "pass": 8,
         "warn": 0,
         "fail": 0
       },
@@ -477,14 +594,53 @@
           "message": "12 stations, curve=86, BP=none",
           "meta": {
             "path": "C:\\Cursor\\toast-mcp-server\\mila-data-2026-W30.json",
-            "mtime": "2026-07-29T17:31:57.190Z",
-            "size": 192033,
+            "mtime": "2026-07-30T21:26:25.296Z",
+            "size": 417105,
             "rows": 12
+          }
+        },
+        {
+          "id": "staffing_map",
+          "source": "Staffing",
+          "label": "Station Family Map",
+          "status": "pass",
+          "message": "Map present",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\station-family-map-mila.json",
+            "mtime": "2026-07-30T21:18:52.639Z",
+            "size": 767,
+            "rows": 4
+          }
+        },
+        {
+          "id": "staffing_labor",
+          "source": "Staffing",
+          "label": "Toast Labor Week",
+          "status": "pass",
+          "message": "860 entries",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W30\\labor-mila.json",
+            "mtime": "2026-07-30T21:24:51.536Z",
+            "size": 385708,
+            "rows": 860
+          }
+        },
+        {
+          "id": "staffing_join",
+          "source": "Staffing",
+          "label": "Staffing Join",
+          "status": "pass",
+          "message": "9 food families · matched 217",
+          "meta": {
+            "path": "C:\\Cursor\\toast-mcp-server\\data\\2026-W30\\staffing-mila.json",
+            "mtime": "2026-07-30T21:26:25.316Z",
+            "size": 122693,
+            "rows": 10
           }
         }
       ],
       "summary": {
-        "pass": 5,
+        "pass": 8,
         "warn": 0,
         "fail": 0
       },
@@ -492,7 +648,7 @@
     }
   ],
   "totals": {
-    "pass": 25,
+    "pass": 37,
     "warn": 0,
     "fail": 0
   },
@@ -542,9 +698,15 @@
     },
     {
       "step": 8,
+      "name": "Food staffing join",
+      "how": "weekly-staffing.cjs (FTE × Toast labor × volume)",
+      "when": "Local Monday task after venue process"
+    },
+    {
+      "step": 9,
       "name": "Publish Firebase + Pages",
       "how": "boh-publish-firebase.cjs + build-unified-v2.cjs + git push",
-      "when": "Monday cloud job"
+      "when": "Monday cloud/local job"
     }
   ],
   "monthlyPrepSteps": [

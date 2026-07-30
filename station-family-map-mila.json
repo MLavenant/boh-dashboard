@@ -1,0 +1,37 @@
+{
+  "venue": "mila",
+  "description": "Maps Toast prep-station names → FTE Matrix station families for staffing join.",
+  "families": {
+    "Saute": {
+      "match": ["saute"]
+    },
+    "Fry": {
+      "match": ["tempura", "fry"]
+    },
+    "Garde Manger": {
+      "match": ["garde manger"]
+    },
+    "Raw": {
+      "match": ["crudo", "raw"]
+    },
+    "Sushi": {
+      "match": ["sushi", "maki", "omakase"]
+    },
+    "Robata": {
+      "match": ["robata", "grill"]
+    },
+    "Pastry": {
+      "match": ["pastry"]
+    },
+    "Expo": {
+      "match": ["expo", "hot expo", "cold expo"]
+    },
+    "Pizza": {
+      "match": ["pizza"]
+    },
+    "Prep": {
+      "match": ["prep", "butcher", "condiments"]
+    }
+  },
+  "ignore": ["no print", "event", "ico", "dock"]
+}

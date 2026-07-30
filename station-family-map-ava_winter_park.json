@@ -1,0 +1,37 @@
+{
+  "venue": "ava_winter_park",
+  "description": "Maps Toast prep-station names → FTE Matrix station families for staffing join.",
+  "families": {
+    "Saute": {
+      "match": ["saute", "fry / saute", "pasta"]
+    },
+    "Fry": {
+      "match": ["fry"]
+    },
+    "Garde Manger": {
+      "match": ["mezze", "salad", "garde manger"]
+    },
+    "Raw": {
+      "match": ["crudo", "raw", "fish", "meat"]
+    },
+    "Sushi": {
+      "match": ["sushi", "maki"]
+    },
+    "Robata": {
+      "match": ["grill", "plancha", "roast", "robata"]
+    },
+    "Pastry": {
+      "match": ["pastry"]
+    },
+    "Expo": {
+      "match": ["expo", "cold expo", "hot expo"]
+    },
+    "Pizza": {
+      "match": ["pizza"]
+    },
+    "Prep": {
+      "match": ["prep", "butcher", "condiments"]
+    }
+  },
+  "ignore": ["no print", "event", "ico", "dock"]
+}

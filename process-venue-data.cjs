@@ -589,12 +589,73 @@ Object.entries(fulAvgByItem).forEach(([menuItem, avgFulSec]) => {
   }
 });
 
+// ---- guestsSeated: OpenTable party-size totals (privacy-safe aggregates) ----
+const guestsSeatedByDay = {};
+let guestsSeatedTotal = 0;
+parsedCovers.forEach(c => {
+  if (!c.seated || isNaN(c.seated.getTime())) return;
+  const day = DAYS[c.seated.getDay()];
+  const size = Number(c.size) || 0;
+  guestsSeatedByDay[day] = (guestsSeatedByDay[day] || 0) + size;
+  guestsSeatedTotal += size;
+});
+const guestsSeated = {
+  total: guestsSeatedTotal,
+  byDay: guestsSeatedByDay,
+  coverCount: parsedCovers.length,
+};
+
+// ---- stationDayVolume: ticket fires + item qty + weighted ful by station/day ----
+const stationDayVolume = {};
+Object.keys(stationDetailsOut).forEach(st => {
+  stationDayVolume[st] = {};
+  const byDayHour = stationDetailsOut[st].byDayHour || {};
+  Object.keys(byDayHour).forEach(day => {
+    let ticketCount = 0;
+    let fulSecSum = 0;
+    Object.values(byDayHour[day] || {}).forEach(cell => {
+      ticketCount += cell.count || 0;
+      fulSecSum += (cell.avg_sec || 0) * (cell.count || 0);
+    });
+    stationDayVolume[st][day] = {
+      ticketCount,
+      itemQty: 0,
+      avgFulSec: ticketCount > 0 ? +(fulSecSum / ticketCount).toFixed(1) : null,
+    };
+  });
+});
+
+// Roll food item qty onto canonical station + day when item-details join exists
+itemDetails.forEach(item => {
+  if (!item.menuItem || isBeverageItem(item.menuItem)) return;
+  const fired = parseDate(item.sentDate);
+  if (!fired) return;
+  const day = DAYS[fired.getDay()];
+  const datePfx = (item.sentDate || '').slice(0, 6);
+  const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
+  const matches = ticketByKey[key] || [];
+  let station = itemFirstStation[item.menuItem] || null;
+  if (!station && matches.length) {
+    station = matches[0]['Station'];
+    if (station && isFood(station) && !itemFirstStation[item.menuItem]) {
+      itemFirstStation[item.menuItem] = station;
+    }
+  }
+  if (!station || !isFood(station)) return;
+  if (!stationDayVolume[station]) stationDayVolume[station] = {};
+  if (!stationDayVolume[station][day]) {
+    stationDayVolume[station][day] = { ticketCount: 0, itemQty: 0, avgFulSec: null };
+  }
+  stationDayVolume[station][day].itemQty += (item.qty || 1);
+});
+
 // ---- Output ----
 const output = {
   stations,
   summary,
   hmFul,
   hmGuests: hmGuestsFlat,
+  guestsSeated,
   hourProfile,
   curve,
   curveByDay,
@@ -603,15 +664,26 @@ const output = {
   breakingPointGuests,
   stationItemsArr,
   stationDetails: stationDetailsOut,
+  stationDayVolume,
   assignmentData,
 };
 
+// Preserve previously joined staffing aggregates if present (rebuilt by weekly-staffing)
+function mergePreserveStaffing(outObj, existingPath) {
+  if (!fs.existsSync(existingPath)) return outObj;
+  try {
+    const prev = JSON.parse(fs.readFileSync(existingPath, 'utf8'));
+    if (prev && prev.staffing && !outObj.staffing) outObj.staffing = prev.staffing;
+  } catch (_) { /* ignore */ }
+  return outObj;
+}
+
 const outPath = path.join(__dirname, `${venueArg}-data.json`);
-fs.writeFileSync(outPath, JSON.stringify(output), 'utf8');
+fs.writeFileSync(outPath, JSON.stringify(mergePreserveStaffing(output, outPath)), 'utf8');
 console.log(`Written to ${outPath}`);
 if (weekArg) {
   const weekOutPath = path.join(__dirname, `${venueArg}-data-${weekArg}.json`);
-  fs.writeFileSync(weekOutPath, JSON.stringify(output), 'utf8');
+  fs.writeFileSync(weekOutPath, JSON.stringify(mergePreserveStaffing({ ...output }, weekOutPath)), 'utf8');
   console.log(`Written to ${weekOutPath}`);
 }
 console.log('Stations:', stations.map(s => `${s.station}(${s.count})`).join(', '));

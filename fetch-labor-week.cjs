@@ -3,8 +3,10 @@
  *
  * Usage:
  *   node fetch-labor-week.cjs casa_neos 2026-W30
+ *   node fetch-labor-week.cjs --all 2026-W30
  *
- * Env: TOAST_CLIENT_ID, TOAST_API_SECRET, GUID_CASA_NEOS (or built-in GUID map)
+ * Env: TOAST_CLIENT_ID, TOAST_API_SECRET
+ * GUIDs are hardcoded to match kitchen FULFILLMENT_VENUE_GUIDS (env overrides still work).
  */
 'use strict';
 
@@ -12,17 +14,20 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 require('dotenv').config({ path: path.join(__dirname, '.env'), override: true });
+const { STAFFING_VENUES, resolveVenueSlug } = require('./boh-staffing-shared.cjs');
 
 const ROOT = process.env.BOH_ROOT || __dirname;
 const TOAST_BASE = 'https://ws-api.toasttab.com';
 
+/** Authoritative kitchen location GUIDs (same as weekly-save.js FULFILLMENT_VENUE_GUIDS). */
 const VENUE_GUIDS = {
   casa_neos: process.env.GUID_CASA_NEOS || 'c3f36849-5105-44ab-9168-62be1f89a59e',
   casa_neos_lounge: process.env.GUID_CASA_NEOS_LOUNGE || 'f1f95f8b-80b9-42de-a8ba-47a5fb8aac70',
-  claudie: process.env.GUID_CLAUDIE,
-  mila: process.env.GUID_MILA,
-  ava_cg: process.env.GUID_AVA_CG,
-  ava_wp: process.env.GUID_AVA || process.env.GUID_AVA_CG2,
+  claudie: process.env.GUID_CLAUDIE || '380f8195-ef88-495e-b144-6e3202ccc569',
+  mila: process.env.GUID_MILA || '38e76bee-b844-427c-b078-260aa025f556',
+  // Hardcode correct AVA GUIDs — .env historically swapped GUID_AVA_CG / GUID_AVA_CG2
+  ava_coconut_grove: '1c653447-0a27-4f29-8e7c-d9141a8dc66c',
+  ava_winter_park: '0a365c66-d2b9-42ab-8f45-94ea26d50716',
 };
 
 function isoWeekDates(weekLabel) {
@@ -30,7 +35,6 @@ function isoWeekDates(weekLabel) {
   if (!m) throw new Error(`Bad week label: ${weekLabel}`);
   const year = +m[1];
   const week = +m[2];
-  // ISO week: Monday of week 1 contains Jan 4
   const jan4 = new Date(Date.UTC(year, 0, 4));
   const day = jan4.getUTCDay() || 7;
   const monday = new Date(jan4);
@@ -76,16 +80,14 @@ async function toastGet(token, venueGuid, apiPath) {
   return res.data;
 }
 
-async function main() {
-  const venue = process.argv[2] || 'casa_neos';
-  const weekLabel = process.argv[3] || '2026-W30';
+async function fetchVenue(venueRaw, weekLabel, token) {
+  const venue = resolveVenueSlug(venueRaw) || venueRaw;
   const venueGuid = VENUE_GUIDS[venue];
-  if (!venueGuid) throw new Error(`No GUID for venue ${venue}`);
+  if (!venueGuid) throw new Error(`No GUID for venue ${venueRaw}`);
 
   const dates = isoWeekDates(weekLabel);
   console.log(`Fetching labor for ${venue} ${weekLabel} (${dates[0]} → ${dates[6]})`);
 
-  const token = await getToken();
   const [employees, jobs] = await Promise.all([
     toastGet(token, venueGuid, '/labor/v1/employees'),
     toastGet(token, venueGuid, '/labor/v1/jobs'),
@@ -145,21 +147,34 @@ async function main() {
     console.log(`  ${date} (${dayName(date)}): ${list.length} raw → ${kept} kept`);
   }
 
-  const weekDir = path.join(ROOT, 'data', weekLabel);
-  fs.mkdirSync(weekDir, { recursive: true });
-  const outPath = path.join(weekDir, `labor-${venue}.json`);
+  const outDir = path.join(ROOT, 'data', weekLabel);
+  fs.mkdirSync(outDir, { recursive: true });
+  const outPath = path.join(outDir, `labor-${venue}.json`);
   const payload = {
     venue,
     weekLabel,
-    startDate: dates[0],
-    endDate: dates[6],
     fetchedAt: new Date().toISOString(),
-    employeeCount: empByGuid.size,
-    jobCount: jobByGuid.size,
+    venueGuid,
+    entryCount: entries.length,
     entries,
   };
   fs.writeFileSync(outPath, JSON.stringify(payload, null, 2));
-  console.log(`Wrote ${outPath} (${entries.length} shifts)`);
+  console.log(`Wrote ${outPath} (${entries.length} entries)`);
+  return outPath;
+}
+
+async function main() {
+  const arg1 = process.argv[2] || 'casa_neos';
+  const weekLabel = process.argv[3] || '2026-W30';
+  const token = await getToken();
+
+  if (arg1 === '--all') {
+    for (const v of STAFFING_VENUES) {
+      await fetchVenue(v, weekLabel, token);
+    }
+    return;
+  }
+  await fetchVenue(arg1, weekLabel, token);
 }
 
 main().catch((e) => {

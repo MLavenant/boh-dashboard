@@ -1,5 +1,5 @@
 /**
- * Ingest ADP/FTE workbook → weekly roster JSON.
+ * Ingest ADP/FTE workbook → weekly roster JSON (food-production families only).
  *
  * Usage:
  *   node ingest-fte-roster.cjs [path-to.xlsx] [weekLabel]
@@ -12,19 +12,10 @@
 const fs = require('fs');
 const path = require('path');
 const XLSX = require('xlsx');
+const { CODE_TO_VENUE, normalizeFoodFamily } = require('./boh-staffing-shared.cjs');
 
 const ROOT = process.env.BOH_ROOT || __dirname;
 const FTE_DIR = path.join(ROOT, 'data', 'fte');
-
-/** Payroll company code → BOH venue key (Casa Neos first). */
-const CODE_TO_VENUE = {
-  XPQ: 'casa_neos',
-  // Future:
-  // XPM: 'mila',
-  // XYD: 'ava_wp',
-  // '0TJ': 'ava_cg',
-  // '3AS': 'claudie',
-};
 
 function inferWeekFromFilename(filePath) {
   const base = path.basename(filePath);
@@ -33,14 +24,6 @@ function inferWeekFromFilename(filePath) {
   const weekNum = String(m[1]).padStart(2, '0');
   const year = new Date().getFullYear();
   return `${year}-W${weekNum}`;
-}
-
-function normalizeMatrix(raw) {
-  const s = String(raw || '').trim();
-  if (!s) return '';
-  if (s.toLowerCase() === 'raw') return 'Raw';
-  if (/^saute+e?$/i.test(s)) return 'Saute';
-  return s;
 }
 
 function main() {
@@ -75,6 +58,7 @@ function main() {
   const rows = XLSX.utils.sheet_to_json(wb.Sheets['Data - Overall'], { defval: '' });
   const venues = {};
   let skipped = 0;
+  let skippedNonFood = 0;
 
   for (const r of rows) {
     const code = String(r['Payroll Company Code'] || '').trim();
@@ -88,9 +72,10 @@ function main() {
     }
 
     const name = String(r['Payroll Name'] || '').trim();
-    const matrix = normalizeMatrix(r.Matrix);
+    const matrix = normalizeFoodFamily(r.Matrix);
     if (!name || !matrix) {
-      skipped++;
+      if (name && String(r.Matrix || '').trim()) skippedNonFood++;
+      else skipped++;
       continue;
     }
 
@@ -100,6 +85,7 @@ function main() {
       position: String(r.Position || r['Job Function Description'] || '').trim(),
       jobTitle: String(r['Job Title Description'] || '').trim(),
       matrix,
+      matrixRaw: String(r.Matrix || '').trim(),
       fileNumber: String(r['File Number'] || '').trim(),
       companyCode: code,
     });
@@ -116,16 +102,19 @@ function main() {
     sourceFile: path.basename(xlsxPath),
     ingestedAt: new Date().toISOString(),
     companyCodes: CODE_TO_VENUE,
+    foodOnly: true,
     skipped,
+    skippedNonFood,
     venues,
   };
   fs.writeFileSync(outPath, JSON.stringify(payload, null, 2));
 
   console.log(`Wrote ${outPath}`);
+  console.log(`Skipped non-food Matrix rows: ${skippedNonFood}`);
   for (const [v, list] of Object.entries(venues)) {
     const byMatrix = {};
     for (const e of list) byMatrix[e.matrix] = (byMatrix[e.matrix] || 0) + 1;
-    console.log(`  ${v}: ${list.length} active roster rows`);
+    console.log(`  ${v}: ${list.length} active food roster rows`);
     console.log('   ', Object.entries(byMatrix).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k}=${n}`).join(', '));
   }
 }
