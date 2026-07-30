@@ -17,6 +17,18 @@ try {
 } catch(e) {
   // fallback
 }
+// Clean CI/Pages worktrees do not include data/rolling.json. Discover immutable
+// week payloads from tracked venue files instead of silently falling back to W27.
+if (!rollingWeeks.length) {
+  const foundWeeks = new Set();
+  for (const file of fs.readdirSync(__dirname)) {
+    const m = file.match(/-data-(\d{4}-W\d{2})\.json$/);
+    if (m) foundWeeks.add(m[1]);
+  }
+  rollingWeeks = [...foundWeeks]
+    .sort()
+    .map((key) => ({ label: 'W' + key.slice(-2), key }));
+}
 if (!rollingWeeks.length) rollingWeeks = [{ label: 'W27', key: '2026-W27' }];
 
 const DIR = __dirname;
