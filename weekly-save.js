@@ -161,9 +161,18 @@ async function refreshToastWebToken() {
     }
   });
   await page.goto("https://www.toasttab.com/restaurants/admin/reports/home", {
-    waitUntil: "domcontentloaded", timeout: 60000,
+    waitUntil: "domcontentloaded", timeout: 90000,
   }).catch(() => {});
-  await page.waitForTimeout(12000);
+
+  // Cloudflare bot challenge on cloud IPs can take a while; poll for admin URL + token.
+  const deadline = Date.now() + 90000;
+  while (Date.now() < deadline && !capturedToken) {
+    const url = page.url();
+    if (url.includes("/restaurants/admin")) break;
+    await page.waitForTimeout(3000);
+  }
+  if (!capturedToken) await page.waitForTimeout(8000);
+
   const finalUrl = page.url();
   await context.storageState({ path: SESSION_FILE });
   if (!capturedToken) {
@@ -185,6 +194,25 @@ async function getToastWebToken() {
     if (ageMins < 50 && s.token) return s.token;
   }
   return refreshToastWebToken();
+}
+
+/** Cookie-only probe: kitchen report export accepts session cookies without a browser. */
+async function probeToastCookies() {
+  const cookies = getSessionCookies();
+  const headers = {
+    Cookie: cookies,
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    Accept: "*/*",
+    "X-Requested-With": "XMLHttpRequest",
+    Referer: "https://www.toasttab.com/restaurants/admin/reports/home",
+  };
+  const groupId = KITCHEN_GROUP_IDS.claudie;
+  const qs = `excel=true&reportDateRange=lastWeek&numberOfRestaurants=1&reportGroupIds=${groupId}`;
+  const res = await axios.get(
+    `${TOAST_ADMIN}/restaurantkitchenreports/kitchendetailstable?${qs}`,
+    { headers, validateStatus: () => true, maxRedirects: 0 }
+  );
+  return { status: res.status, hasLocation: Boolean(res.headers["location"]) };
 }
 
 /** Build the required headers for Toast's report-generator API */
@@ -546,17 +574,26 @@ async function main() {
   };
 
   // Warm Toast Web Admin cookies + OAuth before cookie-only report exports.
-  // On GitHub Actions the restored session secret is often stale until a browser pass.
+  // GitHub-hosted runners often hit Cloudflare on browser navigation; fall back
+  // to cookie-only exports when OAuth capture fails but cookies still work.
   console.log("─── Toast Web Admin session refresh ───");
+  let toastBrowserOk = false;
   try {
     await refreshToastWebToken();
+    toastBrowserOk = true;
     console.log("  [toast] Web Admin OAuth token + cookies refreshed");
   } catch (err) {
-    console.error("  [toast] Session refresh failed:", err.message);
-    throw new Error(
-      "Toast Web Admin session refresh failed. Re-run prepare-boh-cloud-session.ps1 and update TOAST_SESSION_GZIP_B64. " +
-      err.message
-    );
+    console.error("  [toast] Browser refresh failed:", err.message);
+    const probe = await probeToastCookies().catch(e => ({ status: 0, hasLocation: false, error: e.message }));
+    console.log(`  [toast] Cookie probe: status=${probe.status} hasLocation=${probe.hasLocation}`);
+    if (!probe.hasLocation) {
+      throw new Error(
+        "Toast Web Admin session unusable from this runner (Cloudflare and/or expired cookies). " +
+        "Re-run prepare-boh-cloud-session.ps1 after a local login, or use a non-datacenter runner. " +
+        err.message
+      );
+    }
+    console.log("  [toast] Continuing with cookie-only kitchen/item-details exports (fulfillment may skip)");
   }
 
   // ── Toast kitchen timing ──────────────────────────────────────────────────
@@ -591,6 +628,9 @@ async function main() {
   console.log("\n─── Item Fulfillment Custom Reports ───");
   for (const [venue, uuid] of Object.entries(CUSTOM_REPORT_IDS)) {
     try {
+      if (!toastBrowserOk && !fs.existsSync(TOAST_WEB_TOKEN_FILE)) {
+        throw new Error("Skipped: no OAuth token available (Cloudflare blocked browser refresh)");
+      }
       const items = await fetchItemFulfillment(venue, uuid, startDate, endDate);
       const outPath = path.join(weekDir, `item-fulfillment-${venue}.json`);
       saveJSON(outPath, { weekLabel, startDate, endDate, venue, items });
