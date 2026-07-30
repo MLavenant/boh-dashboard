@@ -140,14 +140,18 @@ function getMsGuid() {
   return m[1];
 }
 
-async function refreshToastWebToken() {
-  const { chromium } = await import("playwright");
+function playwrightLaunchOptions() {
   // GitHub-hosted runners install Playwright Chromium. Local Windows keeps
   // using Edge so existing laptop behavior remains unchanged.
-  const launchOptions = process.env.GITHUB_ACTIONS
-    ? { headless: true }
-    : { channel: "msedge", headless: true };
-  const browser = await chromium.launch(launchOptions);
+  if (process.env.GITHUB_ACTIONS) {
+    return { headless: true };
+  }
+  return { channel: "msedge", headless: true };
+}
+
+async function refreshToastWebToken() {
+  const { chromium } = await import("playwright");
+  const browser = await chromium.launch(playwrightLaunchOptions());
   const context = await browser.newContext({ storageState: SESSION_FILE });
   const page = await context.newPage();
   let capturedToken = null;
@@ -417,7 +421,7 @@ async function _doRefreshOTSession() {
     `&response_type=code&scope=openid%20email%20profile%20ot4r%20offline_access` +
     `&access_type=offline&sessionToken=${sessionToken}`;
 
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch(playwrightLaunchOptions());
   const context = await browser.newContext();
   const page    = await context.newPage();
 
@@ -534,6 +538,20 @@ async function main() {
     endDate,
     venues: {},
   };
+
+  // Warm Toast Web Admin cookies + OAuth before cookie-only report exports.
+  // On GitHub Actions the restored session secret is often stale until a browser pass.
+  console.log("─── Toast Web Admin session refresh ───");
+  try {
+    await refreshToastWebToken();
+    console.log("  [toast] Web Admin OAuth token + cookies refreshed");
+  } catch (err) {
+    console.error("  [toast] Session refresh failed:", err.message);
+    throw new Error(
+      "Toast Web Admin session refresh failed. Re-run prepare-boh-cloud-session.ps1 and update TOAST_SESSION_GZIP_B64. " +
+      err.message
+    );
+  }
 
   // ── Toast kitchen timing ──────────────────────────────────────────────────
   console.log("─── Toast Kitchen Timing ───");

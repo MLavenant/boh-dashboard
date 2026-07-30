@@ -51,9 +51,24 @@ jobs:
 
       - name: Install deps
         shell: cmd
+        run: npm ci || npm install
+
+      - name: Install Playwright Chromium
+        shell: powershell
         run: |
-          npm ci || npm install
-          npx playwright install chromium
+          # Use the repo's Playwright binary (not a mismatched npx cache).
+          # Newer Playwright headless mode needs chromium-headless-shell;
+          # install chromium (includes shell) and fall back to full Chromium.
+          & .\node_modules\.bin\playwright.cmd install chromium
+          if ($LASTEXITCODE -ne 0) { throw "playwright install chromium failed ($LASTEXITCODE)" }
+          $dir = Join-Path $env:USERPROFILE "AppData\Local\ms-playwright"
+          if (-not (Test-Path $dir)) { throw "Playwright browser cache missing: $dir" }
+          Write-Host "Installed browsers:"
+          Get-ChildItem $dir | ForEach-Object { Write-Host " - $($_.Name)" }
+          $hasChromium = Get-ChildItem $dir -Directory | Where-Object { $_.Name -like "chromium-*" -and $_.Name -notlike "*headless*" }
+          if (-not $hasChromium) { throw "Chromium browser folder not found under $dir" }
+          # Prefer full Chromium if headless-shell path drifts across versions.
+          "PLAYWRIGHT_CHROMIUM_USE_HEADLESS_SHELL=0" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Fetch + process week (Toast + OpenTable)
         id: fetch
@@ -63,6 +78,7 @@ jobs:
           OT_USERNAME: ${{ secrets.OT_USERNAME }}
           OT_PASSWORD: ${{ secrets.OT_PASSWORD }}
           OT_CLIENT_ID: ${{ secrets.OT_CLIENT_ID }}
+          PLAYWRIGHT_CHROMIUM_USE_HEADLESS_SHELL: "0"
         run: node weekly-save-cloud.cjs
 
       - name: Pipeline health gate
