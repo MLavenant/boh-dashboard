@@ -141,12 +141,12 @@ function getMsGuid() {
 }
 
 function playwrightLaunchOptions() {
-  // GitHub-hosted runners install Playwright Chromium. Local Windows keeps
-  // using Edge so existing laptop behavior remains unchanged.
-  if (process.env.GITHUB_ACTIONS) {
-    return { headless: true };
+  // Toast Web Admin is picky about automated Chromium from cloud IPs.
+  // Windows (local + windows-latest Actions) uses system Edge instead.
+  if (process.platform === "win32") {
+    return { channel: "msedge", headless: true };
   }
-  return { channel: "msedge", headless: true };
+  return { headless: true };
 }
 
 async function refreshToastWebToken() {
@@ -161,12 +161,18 @@ async function refreshToastWebToken() {
     }
   });
   await page.goto("https://www.toasttab.com/restaurants/admin/reports/home", {
-    waitUntil: "domcontentloaded", timeout: 30000,
+    waitUntil: "domcontentloaded", timeout: 60000,
   }).catch(() => {});
-  await page.waitForTimeout(8000);
+  await page.waitForTimeout(12000);
+  const finalUrl = page.url();
   await context.storageState({ path: SESSION_FILE });
+  if (!capturedToken) {
+    const shot = path.join(ROOT, "toast-session-refresh-fail.png");
+    await page.screenshot({ path: shot, fullPage: true }).catch(() => {});
+    await browser.close();
+    throw new Error(`No OAuth token captured during browser refresh (url=${finalUrl})`);
+  }
   await browser.close();
-  if (!capturedToken) throw new Error("No OAuth token captured during browser refresh");
   const record = { token: capturedToken, capturedAt: new Date().toISOString() };
   fs.writeFileSync(TOAST_WEB_TOKEN_FILE, JSON.stringify(record, null, 2));
   return capturedToken;
