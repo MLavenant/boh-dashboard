@@ -1,25 +1,18 @@
 name: BOH Weekly Refresh
 
-# Laptop OFF (self-hosted Windows runner with durable Toast session).
-# Primary: cron-job.org → workflow_dispatch Monday 8:25 AM ET
-# Backup: GitHub schedule (often late — do not rely on it alone)
+# Same cloud-first model as DJ:
+# GitHub-hosted runner → Toast/OT → Firebase + Pages. Laptop can be off.
 
 on:
   schedule:
-    # Late Monday morning ET backup (~11:30 AM EDT = 15:30 UTC / EST = 16:30 UTC)
-    - cron: "30 15 * * 1"
-    - cron: "0 17 * * 1"
+    # ~8:30 AM ET during daylight time; second run is the backup.
+    - cron: "30 12 * * 1"
+    - cron: "0 13 * * 1"
   workflow_dispatch:
-    inputs:
-      week:
-        description: "ISO week to fetch (use last for previous full week)"
-        required: true
-        default: last
-        type: string
 
 jobs:
   boh-weekly:
-    runs-on: [self-hosted, windows, boh]
+    runs-on: windows-latest
     timeout-minutes: 120
     permissions:
       contents: write
@@ -31,13 +24,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore durable Toast session
-        shell: cmd
+      - name: Restore encrypted Toast Web Admin session
+        shell: powershell
+        env:
+          TOAST_SESSION_GZIP_B64: ${{ secrets.TOAST_SESSION_GZIP_B64 }}
         run: |
-          if exist C:\boh-runner\secrets\toast-session.json copy /Y C:\boh-runner\secrets\toast-session.json toast-session.json
-          if exist C:\boh-runner\secrets\toast-web-token.json copy /Y C:\boh-runner\secrets\toast-web-token.json toast-web-token.json
-          if exist C:\boh-runner\secrets\ot-session.json copy /Y C:\boh-runner\secrets\ot-session.json ot-session.json
-          if exist C:\boh-runner\secrets\.env copy /Y C:\boh-runner\secrets\.env .env
+          if ([string]::IsNullOrWhiteSpace($env:TOAST_SESSION_GZIP_B64)) {
+            throw "Missing GitHub secret TOAST_SESSION_GZIP_B64"
+          }
+          $compressed = [Convert]::FromBase64String($env:TOAST_SESSION_GZIP_B64)
+          $input = [IO.MemoryStream]::new($compressed)
+          $gzip = [IO.Compression.GzipStream]::new($input, [IO.Compression.CompressionMode]::Decompress)
+          $output = [IO.File]::Create((Join-Path $env:GITHUB_WORKSPACE "toast-session.json"))
+          $gzip.CopyTo($output)
+          $output.Dispose(); $gzip.Dispose(); $input.Dispose()
+          $session = Get-Content toast-session.json -Raw | ConvertFrom-Json
+          if (-not $session.cookies -or $session.cookies.Count -eq 0) {
+            throw "Decoded Toast session contains no cookies"
+          }
+          Write-Host "Toast session restored ($($session.cookies.Count) cookies)"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -46,7 +51,9 @@ jobs:
 
       - name: Install deps
         shell: cmd
-        run: npm ci || npm install
+        run: |
+          npm ci || npm install
+          npx playwright install chromium
 
       - name: Fetch + process week (Toast + OpenTable)
         id: fetch
@@ -56,7 +63,7 @@ jobs:
           OT_USERNAME: ${{ secrets.OT_USERNAME }}
           OT_PASSWORD: ${{ secrets.OT_PASSWORD }}
           OT_CLIENT_ID: ${{ secrets.OT_CLIENT_ID }}
-        run: node weekly-save-cloud.cjs ${{ github.event.inputs.week || 'last' }}
+        run: node weekly-save-cloud.cjs
 
       - name: Pipeline health gate
         id: health
@@ -78,15 +85,6 @@ jobs:
           BOH_ROOT: ${{ github.workspace }}
         run: node build-unified-v2.cjs
 
-      - name: Persist refreshed sessions
-        if: always()
-        shell: cmd
-        run: |
-          if not exist C:\boh-runner\secrets mkdir C:\boh-runner\secrets
-          if exist toast-session.json copy /Y toast-session.json C:\boh-runner\secrets\toast-session.json
-          if exist toast-web-token.json copy /Y toast-web-token.json C:\boh-runner\secrets\toast-web-token.json
-          if exist ot-session.json copy /Y ot-session.json C:\boh-runner\secrets\ot-session.json
-
       - name: Commit + push GitHub Pages
         shell: powershell
         run: |
@@ -106,4 +104,4 @@ jobs:
       - name: Mark scrapeStatus failed
         if: failure()
         shell: cmd
-        run: node fb-scrape-status.cjs bohWeekly fail "BOH weekly GitHub Actions job failed" "{\"schedule\":\"Mon ~8:25 AM ET (cron-job.org → workflow_dispatch)\",\"what\":\"BOH weekly Toast+OT → Firebase + Pages\"}"
+        run: node fb-scrape-status.cjs bohWeekly fail "BOH weekly GitHub-hosted Actions job failed" "{\"schedule\":\"Mon ~8:30 AM ET (+ ~9:00 backup)\",\"what\":\"BOH weekly Toast+OT → Firebase + Pages\"}"

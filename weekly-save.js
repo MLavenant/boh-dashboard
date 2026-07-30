@@ -3,7 +3,7 @@
  * Fetches Toast kitchen timing + OpenTable covers for last week across all venues,
  * saves per-week JSON files, and maintains a rolling 3-week summary.
  *
- * Portable for local laptop + self-hosted Actions runner.
+ * Portable for local laptop + GitHub-hosted Actions runner.
  * Run: node weekly-save.js
  * Env: BOH_ROOT, TOAST_SESSION_FILE, OT_SESSION_FILE, DATA_DIR,
  *      OT_USERNAME, OT_PASSWORD, OT_CLIENT_ID, PLAYWRIGHT_BROWSERS_PATH
@@ -142,7 +142,12 @@ function getMsGuid() {
 
 async function refreshToastWebToken() {
   const { chromium } = await import("playwright");
-  const browser = await chromium.launch({ channel: "msedge", headless: true });
+  // GitHub-hosted runners install Playwright Chromium. Local Windows keeps
+  // using Edge so existing laptop behavior remains unchanged.
+  const launchOptions = process.env.GITHUB_ACTIONS
+    ? { headless: true }
+    : { channel: "msedge", headless: true };
+  const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext({ storageState: SESSION_FILE });
   const page = await context.newPage();
   let capturedToken = null;

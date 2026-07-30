@@ -407,9 +407,10 @@ async function loadBohFromFirebase() {
     const venues = meta.venues || ['claudie', 'casaneos', 'ava_cg', 'ava_wp', 'mila'];
     const weekKey = meta.latestWeek;
     ensureWeekInList(weekKey);
+    (meta.weeks || []).forEach(ensureWeekInList);
 
     // Also pull the prior 2 weeks if present under /rdg/boh/weeks
-    const weekKeys = new Set([weekKey]);
+    const weekKeys = new Set(meta.weeks || [weekKey]);
     WEEKS.forEach(w => weekKeys.add(w.key));
 
     for (const wk of weekKeys) {
@@ -2695,13 +2696,13 @@ function renderSettings() {
   html += '<div class="card" style="border-color:' + cloudColor + '40">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">';
   html += '<div><h2 style="margin:0">Cloud Automation (Firebase)</h2>';
-  html += '<p class="note" style="margin:6px 0 0">Primary: cron-job.org → GitHub Actions (self-hosted) Mon ~8:25 AM ET · laptop optional</p></div>';
+  html += '<p class="note" style="margin:6px 0 0">Primary: GitHub-hosted Actions Mon ~8:30 AM ET · backup ~9:00 AM · laptop can be off</p></div>';
   html += '<div style="font-size:18px;font-weight:800;color:' + cloudColor + '">' + cloudLabel + '</div>';
   html += '</div>';
   html += '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:12px">';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Last cloud run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.atLocal || fmtWhen(cloud.at)) + '</td></tr>';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Week published</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.weekLabel || (BOH_CLOUD_META && BOH_CLOUD_META.latestWeek) || '—') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.schedule || 'Mon ~8:25 AM ET') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.schedule || 'Mon ~8:30 AM ET · backup ~9:00 AM') + '</td></tr>';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">What</td><td style="padding:8px 0;text-align:right;color:#e8eaed;max-width:420px">' + (cloud.what || '—') + '</td></tr>';
   html += '<tr><td style="padding:8px 0;color:#9aa0aa">Message</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.message || '—') + '</td></tr>';
   html += '</table></div>';
@@ -2732,7 +2733,7 @@ function renderSettings() {
   // Schedule card
   html += '<div class="card">';
   html += '<h2>Automatic Update Schedule</h2>';
-  html += '<p class="note">Primary: cron-job.org → <code>boh-weekly.yml</code> Mon 8:25 AM ET on self-hosted runner. Laptop Task Scheduler is emergency-only.</p>';
+  html += '<p class="note">Primary: GitHub-hosted <code>boh-weekly.yml</code> Mon ~8:30 AM ET with a ~9:00 AM backup. Laptop Task Scheduler is emergency-only.</p>';
   html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Laptop task registered</td><td style="padding:8px 0;text-align:right;font-weight:600;color:' + (sched.exists?'#22c55e':'#ef4444') + '">' + (sched.exists?'Yes':'No') + '</td></tr>';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Laptop schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.days||'—') + ' ' + (sched.startTime||'') + '</td></tr>';

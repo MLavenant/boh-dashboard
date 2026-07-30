@@ -45,6 +45,27 @@ function fbPut(fbPath, payload) {
   });
 }
 
+function fbGet(fbPath) {
+  return new Promise((res, rej) => {
+    const req = https.request({
+      hostname: FB_DB,
+      path: fbPath + '.json',
+      method: 'GET',
+    }, r => {
+      let d = '';
+      r.on('data', c => d += c);
+      r.on('end', () => {
+        if (r.statusCode < 200 || r.statusCode >= 300) {
+          return rej(new Error(`Firebase GET ${fbPath} HTTP ${r.statusCode}`));
+        }
+        try { res(d ? JSON.parse(d) : null); } catch (e) { rej(e); }
+      });
+    });
+    req.on('error', rej);
+    req.end();
+  });
+}
+
 function loadHealth() {
   const p = path.join(ROOT, 'pipeline-health.json');
   if (!fs.existsSync(p)) return null;
@@ -86,11 +107,18 @@ async function main() {
   }
 
   const now = new Date();
+  let previousMeta = null;
+  try { previousMeta = await fbGet('/rdg/boh/meta'); } catch (_) {}
+  const weeks = Array.from(new Set([
+    weekLabel,
+    ...((previousMeta && Array.isArray(previousMeta.weeks)) ? previousMeta.weeks : []),
+  ])).sort().reverse().slice(0, 3);
   const meta = {
     latestWeek: weekLabel,
+    weeks,
     updatedAt: now.toISOString(),
     venues: PROCESS_VENUES.map(v => v.key),
-    source: 'boh_weekly_cloud'
+    source: 'github_actions_hosted'
   };
   const metaRes = await fbPut('/rdg/boh/meta', meta);
   log(`PUT /rdg/boh/meta HTTP ${metaRes.code}`);
@@ -101,7 +129,7 @@ async function main() {
     at: now.toISOString(),
     atLocal: now.toLocaleString('en-US', { timeZone: 'America/New_York' }),
     weekLabel,
-    schedule: 'Mon ~8:25 AM ET (cron-job.org → workflow_dispatch · self-hosted runner)',
+    schedule: 'Mon ~8:30 AM ET (GitHub-hosted Actions · backup ~9:00 AM)',
     what: 'BOH weekly Toast+OT → processed venue JSON → Firebase + Pages',
     message: ok
       ? `Published ${weekLabel} for ${published.length} venues`

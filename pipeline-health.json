@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-29T18:24:58.153Z",
+  "generatedAt": "2026-07-30T17:18:37.266Z",
   "latestWeek": "2026-W30",
   "availableWeeks": [
     "2026-W30",
@@ -75,8 +75,8 @@
   "files": {
     "dashboardHtml": {
       "path": "C:\\Cursor\\toast-mcp-server\\dashboard.html",
-      "mtime": "2026-07-29T17:36:52.889Z",
-      "size": 2916565,
+      "mtime": "2026-07-30T17:13:44.069Z",
+      "size": 2922227,
       "rows": null
     },
     "rolling": {
@@ -93,8 +93,8 @@
     },
     "sessionOT": {
       "path": "C:\\Cursor\\toast-mcp-server\\ot-session.json",
-      "mtime": "2026-07-29T18:24:04.683Z",
-      "size": 5748,
+      "mtime": "2026-07-29T19:19:15.493Z",
+      "size": 8547,
       "rows": 3
     },
     "itemStationMap": {
@@ -501,19 +501,19 @@
     {
       "step": 1,
       "name": "Dispatch (primary)",
-      "how": "cron-job.org → workflow_dispatch boh-weekly.yml",
-      "when": "Monday 8:25 AM ET"
+      "how": "GitHub schedule → boh-weekly.yml",
+      "when": "Monday ~8:30 AM ET (+ ~9:00 backup)"
     },
     {
       "step": 2,
-      "name": "Refresh Toast session",
-      "how": "durable toast-session.json on self-hosted runner (intercept.js if expired)",
+      "name": "Restore Toast session",
+      "how": "TOAST_SESSION_GZIP_B64 GitHub secret → toast-session.json",
       "when": "Monday cloud job"
     },
     {
       "step": 3,
       "name": "Fetch Toast Kitchen Timing",
-      "how": "weekly-save-cloud.cjs → kitchen-timing-{venue}.json",
+      "how": "GitHub-hosted weekly-save-cloud.cjs → kitchen-timing-{venue}.json",
       "when": "Monday cloud job"
     },
     {

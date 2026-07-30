@@ -1,5 +1,5 @@
 /**
- * Cloud / self-hosted entrypoint for BOH weekly fetch.
+ * GitHub-hosted Actions entrypoint for BOH weekly fetch.
  * Portable paths, session checks, then weekly-save.js (ESM).
  *
  * Usage:
@@ -50,7 +50,7 @@ async function markFail(message) {
     ok: false,
     at: now.toISOString(),
     atLocal: now.toLocaleString('en-US', { timeZone: 'America/New_York' }),
-    schedule: 'Mon ~8:25 AM ET (cron-job.org → workflow_dispatch)',
+    schedule: 'Mon ~8:30 AM ET (GitHub Actions; backup ~9:00 AM)',
     what: 'BOH weekly Toast+OT → processed venue JSON → Firebase + Pages',
     message,
     source: 'bohWeekly'
@@ -66,7 +66,7 @@ async function main() {
   log(`BOH weekly cloud start · ROOT=${ROOT}`);
 
   if (!fs.existsSync(SESSION_FILE)) {
-    const msg = `Missing Toast session at ${SESSION_FILE}. On the runner run: node intercept.js`;
+    const msg = `Missing Toast session at ${SESSION_FILE}. Refresh GitHub secret TOAST_SESSION_GZIP_B64`;
     log(msg);
     await markFail(msg);
     process.exit(1);
@@ -79,7 +79,7 @@ async function main() {
     } catch (_) {}
   }
   if (!process.env.OT_USERNAME || !process.env.OT_PASSWORD) {
-    const msg = 'OT_USERNAME / OT_PASSWORD not set (GitHub secrets or runner .env)';
+    const msg = 'OT_USERNAME / OT_PASSWORD not set in GitHub Actions secrets';
     log(msg);
     await markFail(msg);
     process.exit(1);

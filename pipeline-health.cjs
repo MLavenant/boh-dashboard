@@ -185,9 +185,9 @@ const totals = venueResults.reduce((a, v) => {
 }, { pass: 0, warn: 0, fail: 0 });
 
 const pipelineSteps = [
-  { step: 1, name: 'Dispatch (primary)', how: 'cron-job.org → workflow_dispatch boh-weekly.yml', when: 'Monday 8:25 AM ET' },
-  { step: 2, name: 'Refresh Toast session', how: 'durable toast-session.json on self-hosted runner (intercept.js if expired)', when: 'Monday cloud job' },
-  { step: 3, name: 'Fetch Toast Kitchen Timing', how: 'weekly-save-cloud.cjs → kitchen-timing-{venue}.json', when: 'Monday cloud job' },
+  { step: 1, name: 'Dispatch (primary)', how: 'GitHub schedule → boh-weekly.yml', when: 'Monday ~8:30 AM ET (+ ~9:00 backup)' },
+  { step: 2, name: 'Restore Toast session', how: 'TOAST_SESSION_GZIP_B64 GitHub secret → toast-session.json', when: 'Monday cloud job' },
+  { step: 3, name: 'Fetch Toast Kitchen Timing', how: 'GitHub-hosted weekly-save-cloud.cjs → kitchen-timing-{venue}.json', when: 'Monday cloud job' },
   { step: 4, name: 'Fetch Toast Item Details', how: 'weekly-save-cloud.cjs → item-details-{venue}.json', when: 'Monday cloud job' },
   { step: 5, name: 'Fetch Toast Item Fulfillment', how: 'weekly-save-cloud.cjs → item-fulfillment-{venue}.json', when: 'Monday cloud job' },
   { step: 6, name: 'Fetch OpenTable Covers', how: 'weekly-save-cloud.cjs → covers-{venue}.json', when: 'Monday cloud job' },

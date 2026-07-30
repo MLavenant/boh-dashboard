@@ -8,9 +8,13 @@
 
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
-const ROLLING_FILE      = "C:\\Cursor\\toast-mcp-server\\data\\rolling.json";
-const OUTPUT_FILE       = "C:\\Cursor\\toast-mcp-server\\claudie-dashboard-data.json";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT = process.env.BOH_ROOT || __dirname;
+const ROLLING_FILE      = path.join(process.env.DATA_DIR || path.join(ROOT, "data"), "rolling.json");
+const OUTPUT_FILE       = path.join(ROOT, "claudie-dashboard-data.json");
 const TARGET_VENUE      = "claudie";
 const TARGET_MINS       = 15;
 const TARGET_SECS       = TARGET_MINS * 60;
