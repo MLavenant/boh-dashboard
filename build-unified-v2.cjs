@@ -129,7 +129,7 @@ let html = htmlPart
 
 // Add Station KPI bar before station pills
 html = html.replace(
-  '<div class="section-title">Station Selector</div>\n<div class="station-pills" id="stationPills"></div>',
+  /<div class="section-title">Station Selector<\/div>\r?\n<div class="station-pills" id="stationPills"><\/div>/,
   `<div id="stationKpiBar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
   <div class="card" style="margin:0;text-align:center">
     <div style="font-size:11px;color:#9aa0aa;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">Overall Avg Fulfillment</div>
@@ -148,7 +148,13 @@ html = html.replace(
   </div>
 </div>
 <div class="section-title">Station Selector</div>
-<div class="station-pills" id="stationPills"></div>`
+<div class="station-pills" id="stationPills"></div>
+<div class="card" id="staffingCard" style="margin-top:18px;display:none">
+  <h2 style="margin:0 0 4px">Staffing by Station Family</h2>
+  <p class="note" id="staffingNote" style="margin-top:0">FTE Matrix assignment × Toast clock-ins × kitchen item volume. Heads = people who worked that day on that family.</p>
+  <div id="staffingGrid" style="overflow-x:auto"></div>
+  <p id="staffingMatchNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
+</div>`
 );
 
 // Add Assignment + Group + Settings tabs to nav
@@ -419,6 +425,9 @@ async function loadBohFromFirebase() {
           const data = await fbGetJson('/rdg/boh/weeks/' + encodeURIComponent(wk) + '/' + encodeURIComponent(venueKey));
           if (!data || typeof data !== 'object') continue;
           if (!ALL_DATA[venueKey]) ALL_DATA[venueKey] = {};
+          // Keep locally embedded staffing if cloud week payload predates staffing join
+          const prev = ALL_DATA[venueKey][wk];
+          if (prev && prev.staffing && !data.staffing) data.staffing = prev.staffing;
           ALL_DATA[venueKey][wk] = data;
           ensureWeekInList(wk);
         } catch (e) { /* week/venue may not exist yet */ }
@@ -1603,7 +1612,65 @@ function renderStationBreaking() {
 // ============================================================
 // TAB 2: Station Selector & Detail
 // ============================================================
+function renderStaffingGrid() {
+  const card = document.getElementById('staffingCard');
+  const grid = document.getElementById('staffingGrid');
+  const matchNote = document.getElementById('staffingMatchNote');
+  if (!card || !grid) return;
+  const staffing = getD().staffing;
+  if (!staffing || !staffing.byFamily) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = '';
+  const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const FOOD_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
+  const families = FOOD_FAMILIES.filter(f => staffing.byFamily[f]);
+  // Also include any other families that had worked heads
+  Object.keys(staffing.byFamily).forEach(f => {
+    if (families.includes(f)) return;
+    const any = DAYS.some(d => (staffing.byFamily[f].days[d]||{}).heads > 0);
+    if (any) families.push(f);
+  });
+  if (!families.length) {
+    grid.innerHTML = '<p style="color:#9aa0aa;font-size:13px">No BOH station-family staffing for this week.</p>';
+    return;
+  }
+  function headColor(h) {
+    if (!h) return '#13161c';
+    if (h <= 2) return '#3f1d1d';
+    if (h <= 4) return '#1e3a2f';
+    if (h <= 7) return '#1e3a5f';
+    return '#3b2f1a';
+  }
+  let html = '<table style="border-collapse:collapse;font-size:12px;min-width:720px;width:100%">';
+  html += '<thead><tr><th style="text-align:left;padding:6px 8px;color:#9aa0aa;background:#1e2533">Family</th>';
+  DAYS.forEach(d => { html += '<th style="padding:6px 8px;color:#9aa0aa;background:#1e2533;text-align:center">'+d.slice(0,3)+'</th>'; });
+  html += '<th style="padding:6px 8px;color:#9aa0aa;background:#1e2533;text-align:center">Week items/head-day</th></tr></thead><tbody>';
+  families.forEach(f => {
+    const fam = staffing.byFamily[f];
+    html += '<tr><td style="padding:6px 8px;color:#e8eaed;font-weight:600;white-space:nowrap">'+f+
+      '<div style="font-size:10px;color:#9aa0aa;font-weight:400">roster '+fam.rosterCount+' · worked '+fam.weekHeadsUnique+'</div></td>';
+    DAYS.forEach(day => {
+      const c = fam.days[day] || {};
+      const tip = (c.heads||0)+' staff · '+(c.hours||0)+' labor hours';
+      const iph = c.itemsPerHead != null ? c.itemsPerHead+' items/head' : '—';
+      html += '<td title="'+tip.replace(/"/g,'&quot;')+' · '+iph+'" style="padding:6px 8px;text-align:center;background:'+headColor(c.heads||0)+';color:#e8eaed;cursor:default">'+
+        '<div style="font-weight:700;font-size:14px">'+(c.heads||0)+'</div>'+
+        '<div style="font-size:10px;color:#9aa0aa">'+(c.itemsPerHead!=null?c.itemsPerHead+'/hd':'—')+'</div></td>';
+    });
+    html += '<td style="padding:6px 8px;text-align:center;color:#d9a441;font-weight:600">'+(fam.weekItemsPerHeadDay!=null?fam.weekItemsPerHeadDay:'—')+'</td></tr>';
+  });
+  html += '</tbody></table>';
+  grid.innerHTML = html;
+  if (matchNote && staffing.matchStats) {
+    const ms = staffing.matchStats;
+    matchNote.textContent = 'Matched '+ms.laborShiftsMatched+' labor days · unmatched '+ms.laborShiftsUnmatched+' · unused roster '+ms.rosterUnused+'/'+ms.rosterTotal;
+  }
+}
+
 function renderStations() {
+  renderStaffingGrid();
   const STATIONS = getD().stations;
   const STATION_ITEMS = getD().stationItemsArr;
   const STATION_DETAILS = getD().stationDetails;
@@ -1889,6 +1956,35 @@ function renderStations() {
       : '<span style="color:#9aa0aa;font-size:12px">'+statusText+'</span>';
     const ratioColor = ratio ? (ratio>1.15?'#ef4444':ratio>1?'#f59e0b':'#22c55e') : '#9aa0aa';
     const ratioDisp = ratio ? (ratio*100).toFixed(0)+'%' : '—';
+
+    // Staffing strip for this Toast station's FTE family (Casa Neos+)
+    let staffingHtml = '';
+    const staffing = getD().staffing;
+    const famName = staffing && staffing.toastStationFamily ? staffing.toastStationFamily[s.station] : null;
+    if (famName && staffing.byFamily && staffing.byFamily[famName]) {
+      const fam = staffing.byFamily[famName];
+      const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+      staffingHtml = '<div style="margin-bottom:16px;padding:12px;background:#13161c;border:1px solid #262a33;border-radius:10px">'+
+        '<div style="font-size:13px;font-weight:600;color:#d9a441;margin-bottom:6px">Staffing · '+famName+' family</div>'+
+        '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px">'+
+          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+fam.weekHeadsUnique+'</div><div class="l">Unique cooks worked</div></div>'+
+          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+fam.rosterCount+'</div><div class="l">On FTE roster</div></div>'+
+          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px;color:#d9a441">'+(fam.weekItemsPerHeadDay!=null?fam.weekItemsPerHeadDay:'—')+'</div><div class="l">Items / head-day</div></div>'+
+        '</div>'+
+        '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">'+
+        DAYS.map(day => {
+          const c = fam.days[day] || {};
+          const tip = (c.heads||0)+' staff · '+(c.hours||0)+' labor hours';
+          return '<div title="'+tip.replace(/"/g,'&quot;')+'" style="background:#181b22;border-radius:6px;padding:6px 4px;text-align:center">'+
+            '<div style="font-size:10px;color:#9aa0aa">'+day.slice(0,3)+'</div>'+
+            '<div style="font-size:15px;font-weight:700;color:#e8eaed">'+(c.heads||0)+'</div>'+
+            '<div style="font-size:10px;color:#9aa0aa">'+(c.itemsPerHead!=null?c.itemsPerHead+'/hd':'—')+'</div></div>';
+        }).join('')+
+        '</div></div>';
+    } else if (staffing) {
+      staffingHtml = '<div style="margin-bottom:12px;font-size:12px;color:#9aa0aa">No FTE staffing map for this Toast station.</div>';
+    }
+
     document.getElementById('stationDetail').innerHTML =
       '<div class="station-header">'+
         '<h2>'+s.station+'</h2>'+statusSpan+
@@ -1900,6 +1996,7 @@ function renderStations() {
           (s.bp_tickets != null ? '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px;color:#e2706a">'+s.bp_tickets+'</div><div class="l">Station BP</div></div>' : '')+
         '</div>'+
       '</div>'+
+      staffingHtml+
       '<div style="margin-bottom:16px">'+
         '<div style="font-size:13px;font-weight:600;color:#d9a441;margin-bottom:4px">⚡ Breaking Point</div>'+
         '<div style="font-size:12px;color:#9aa0aa">'+brkText+'</div>'+

@@ -1,0 +1,37 @@
+{
+  "venue": "casa_neos",
+  "description": "Maps Toast prep-station names → FTE Matrix station families for staffing join.",
+  "families": {
+    "Saute": {
+      "match": ["saute", "paella", "pasta", "hot line"]
+    },
+    "Fry": {
+      "match": ["fry"]
+    },
+    "Garde Manger": {
+      "match": ["garde manger"]
+    },
+    "Raw": {
+      "match": ["raw", "crudo", "fish", "meat"]
+    },
+    "Sushi": {
+      "match": ["maki", "sushi", "nico"]
+    },
+    "Robata": {
+      "match": ["robata", "grill"]
+    },
+    "Pastry": {
+      "match": ["pastry"]
+    },
+    "Expo": {
+      "match": ["expo", "hot expo", "cold expo"]
+    },
+    "Pizza": {
+      "match": ["pizza"]
+    },
+    "Prep": {
+      "match": ["prep", "condiments", "butcher"]
+    }
+  },
+  "ignore": ["no print", "event", "ico", "dock"]
+}
