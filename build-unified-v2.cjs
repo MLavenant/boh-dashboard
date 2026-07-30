@@ -107,7 +107,11 @@ const VENUE_LABELS = {
 };
 
 // ── Read template ────────────────────────────────────────────────────────────
-const template = fs.readFileSync(path.join(DIR, 'dashboard-claudie.html'), 'utf8');
+// Normalize Windows template line endings so structural replacements are
+// deterministic in local, clean worktree, and GitHub Pages builds.
+const template = fs
+  .readFileSync(path.join(DIR, 'dashboard-claudie.html'), 'utf8')
+  .replace(/\r\n/g, '\n');
 const buildStamp = new Date().toISOString();
 const latestWeekKey = rollingWeeks.length ? rollingWeeks[rollingWeeks.length - 1].key : 'unknown';
 

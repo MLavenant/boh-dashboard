@@ -123,14 +123,26 @@ table.menu-tbl tr:hover td{background:#1e2533}
 <body>
 <div class="wrap">
 <header>
-  <h1>Claudie · BOH Dashboard</h1>
-  <span class="badge">Week of Jun 29 – Jul 5, 2026 · Updated Jul 6, 2026</span>
+  <h1 id="dashTitle">BOH Dashboard</h1>
+  <span class="badge" id="dashBadge">Latest 2026-W30 · Built 2026-07-30 20:46 UTC</span>
 </header>
+<div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
+<div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
+  <span style="color:#9aa0aa">Week:</span>
+  <button id="weekPrev" onclick="changeWeek(-1)" style="background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">&#8249;</button>
+  <select id="weekDropdown" onchange="selectWeek(this.value)" style="background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">
+    <option value="0">W27</option><option value="1">W28</option><option value="2">W29</option><option value="3" selected>W30</option>
+  </select>
+  <button id="weekNext" onclick="changeWeek(1)" style="background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">&#8250;</button>
+</div>
 
 <nav class="tab-nav">
   <button class="tab-btn active" onclick="switchTab('overview',this)">Overview</button>
   <button class="tab-btn" onclick="switchTab('stations',this)">Stations</button>
   <button class="tab-btn" onclick="switchTab('menu',this)">Menu Items</button>
+  <button class="tab-btn" onclick="switchTab('assignment',this)">📋 Assignment</button>
+  <button class="tab-btn" onclick="switchTab('group',this)">🏢 Group</button>
+  <button class="tab-btn" onclick="switchTab('settings',this)">⚙️ Settings</button>
 </nav>
 
 <!-- ========== TAB 1: OVERVIEW ========== -->
@@ -144,6 +156,7 @@ table.menu-tbl tr:hover td{background:#1e2533}
   <div class="kpi"><div class="v" id="kPeakAvg">39.4</div><div class="l" id="kPeakAvgLabel">Peak avg conc.</div></div>
   <div class="kpi"><div class="v" id="kThreshold">15 min</div><div class="l">Fulfillment target</div></div>
 </div>
+<p id="pageSummary" style="color:#9aa0aa;font-size:13px;margin:12px 0 0;line-height:1.6;max-width:780px"></p>
 
 <!-- Visual 1 -->
 <div class="card">
@@ -203,6 +216,35 @@ table.menu-tbl tr:hover td{background:#1e2533}
     </div>
     <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
   </div>
+</div>
+
+<!-- Station Breaking Lines -->
+<div class="card">
+  <h2>Station Fulfillment vs Load — Where Stations Break</h2>
+  <p class="note">Each line = one food station. X-axis = estimated concurrent ticket load (derived from hourly data). Y-axis = avg fulfillment time (min). Red dashed = 15 min threshold. Click legend to isolate a station.</p>
+  <p id="stationBreakingSubtitle" style="font-size:12px;color:#9aa0aa;margin:-4px 0 8px">▼ = first moment station breaks 15 min threshold</p>
+  <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+    <button id="sbToggleAll" onclick="sbToggleAllLines()" style="padding:4px 12px;background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">Toggle All</button>
+    <span style="color:#9aa0aa;font-size:12px;line-height:28px">Click legend labels to isolate stations</span>
+  </div>
+  <canvas id="cStationBreaking" style="max-height:420px"></canvas>
+  <p id="stationBreakingNote" style="font-size:12px;color:#9aa0aa;margin:8px 0 0"></p>
+</div>
+
+<!-- Stations Recap (between Visual 3 and Visual 4) -->
+<div class="card" id="stationsRecapCard">
+  <h2>Stations Recap — This Week</h2>
+  <p class="note">All food stations ranked worst → best vs target. Click a row to open Stations tab.</p>
+  <div id="stationsRecap" style="overflow-x:auto"></div>
+</div>
+
+<!-- Visual 4: Station WoW -->
+<div class="card">
+  <h2>Visual 4 — Station Fulfillment — Week over Week</h2>
+  <p class="note">Avg fulfillment time per food station. Gold = current week. Reference line at 15 min target. Sorted worst → best.</p>
+  <p id="wowSubtitle" style="font-size:12px;color:#9aa0aa;margin:0 0 8px"></p>
+  <canvas id="cStationWoW" style="max-height:480px"></canvas>
+  <div><span class="trend-badge" id="wowTrendBadge">📊 Week-over-week trend: available from Week 2</span></div>
 </div>
 
 <!-- Visual 5: 3D -->
@@ -309,6 +351,12 @@ table.menu-tbl tr:hover td{background:#1e2533}
 <section id="tab-menu" class="tab-section">
 
 <div class="section-title">Menu Item Performance</div>
+<div id="menuWorstOffenders" style="display:none;background:#2d1212;border:1px solid #7f1d1d;border-radius:10px;padding:14px 18px;margin-bottom:14px"></div>
+<div class="card" id="menuBubbleCard" style="margin-bottom:12px">
+  <h2>Volume × Fulfillment Time</h2>
+  <p class="note">Bubble size = order count. Color: green ≤10 min, yellow 10–15 min, red &gt;15 min. Hover for details.</p>
+  <canvas id="cMenuBubble" style="max-height:340px"></canvas>
+</div>
 <div class="card">
   <div class="menu-stats" id="menuStats"></div>
   <input class="search-bar" id="menuSearch" placeholder="🔍 Search menu items…" oninput="applyMenuFilters()">
