@@ -48,6 +48,81 @@ function fbPut(fbPath, payload) {
   });
 }
 
+function fbGet(fbPath) {
+  return new Promise((res, rej) => {
+    const req = https.request({
+      hostname: FB_DB,
+      path: fbPath + '.json',
+      method: 'GET'
+    }, r => {
+      let d = '';
+      r.on('data', c => d += c);
+      r.on('end', () => {
+        if (r.statusCode < 200 || r.statusCode >= 300) {
+          return rej(new Error(`Firebase GET ${fbPath} returned HTTP ${r.statusCode}`));
+        }
+        try {
+          res(d ? JSON.parse(d) : null);
+        } catch (e) {
+          rej(new Error(`Firebase GET ${fbPath} returned invalid JSON: ${e.message}`));
+        }
+      });
+    });
+    req.on('error', rej);
+    req.end();
+  });
+}
+
+async function writePacingSnapshots(forecastRows) {
+  const snapshotDay = miamiToday();
+  const events = new Map();
+
+  for (const r of forecastRows || []) {
+    if (!r.date || !r.venue) continue;
+    const key = (r.venue + '_' + r.date).replace(/[^a-zA-Z0-9_-]/g, '_');
+    const revenue = Math.round(Number(r.totalRevenue) || 0);
+    const existing = events.get(key);
+    if (!existing || revenue > existing.revenue) {
+      events.set(key, {
+        key,
+        venue: r.venue,
+        date: r.date,
+        revenue,
+        tables: Number(r.bookings) || 0
+      });
+    }
+  }
+
+  let created = 0;
+  let preserved = 0;
+  await Promise.all(Array.from(events.values()).map(async event => {
+    const fbPath = `/rdg/pacing/${event.key}/${snapshotDay}`;
+    const existing = await fbGet(fbPath);
+
+    // The first accurate API read of each Miami day is the immutable
+    // beginning-of-day baseline. A later backup run must not move it.
+    if (existing && existing.source === 'integrations_api'
+        && Number.isFinite(Number(existing.revenue))
+        && Number.isFinite(Number(existing.tables))) {
+      preserved++;
+      return;
+    }
+
+    const status = await fbPut(fbPath, {
+      tables: event.tables,
+      revenue: event.revenue,
+      source: 'integrations_api',
+      capturedAt: new Date().toISOString()
+    });
+    if (status < 200 || status >= 300) {
+      throw new Error(`Firebase PUT ${fbPath} returned HTTP ${status}`);
+    }
+    created++;
+  }));
+
+  return { day: snapshotDay, events: events.size, created, preserved };
+}
+
 function buildLivePayload(forecastRows, period) {
   const today = miamiToday();
   const livePayload = {
@@ -139,6 +214,9 @@ function buildLivePayload(forecastRows, period) {
     throw new Error('All venue API pulls failed');
   }
 
+  const pacing = await writePacingSnapshots(pulled.forecastRows);
+  log(`Firebase pacing ${pacing.day}: ${pacing.created} created · ${pacing.preserved} preserved · ${pacing.events} events`);
+
   const code = await fbPut('/rdg/forecastLive', livePayload);
   log(`Firebase forecastLive HTTP ${code} · ${eventCount} events · $${Math.round(revenueSum).toLocaleString()}`);
 
@@ -148,6 +226,7 @@ function buildLivePayload(forecastRows, period) {
     miamiDay: miamiToday(),
     eventCount,
     revenueSum: Math.round(revenueSum),
+    pacing,
     period: pulled.period,
     errors: pulled.errors || [],
     schedule: 'Punctual dispatch ~8:25 ET · GitHub schedule = late backup',
