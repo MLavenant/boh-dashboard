@@ -167,7 +167,7 @@ html = html.replace(
 <div class="station-pills" id="stationPills"></div>
 <div class="card" id="staffingCard" style="margin-top:18px;display:none">
   <h2 style="margin:0 0 4px">Staffing by Station Family</h2>
-  <p class="note" id="staffingNote" style="margin-top:0">Food-production families only (no FOH). Volume = <strong>item quantity</strong> sent to that family (Toast item-details × station assignment). Main KPIs: <strong>items / person</strong> (volume ÷ staff count) and <strong>fulfillment</strong>.</p>
+  <p class="note" id="staffingNote" style="margin-top:0">Food-production families only (no FOH). Volume = <strong>item quantity</strong>. Read <strong style="color:#d9a441">items / person</strong> and <strong>fulfillment</strong> — no over/understaff labels.</p>
   <div id="staffingGrid" style="overflow-x:auto"></div>
   <p id="staffingMatchNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
 </div>`
@@ -179,23 +179,10 @@ html = html.replace(
   '<button class="tab-btn" onclick="switchTab(\'menu\',this)">Menu Items</button>\n  <button class="tab-btn" onclick="switchTab(\'assignment\',this)">📋 Assignment</button>\n  <button class="tab-btn" onclick="switchTab(\'group\',this)">🏢 Group</button>\n  <button class="tab-btn" onclick="switchTab(\'settings\',this)">⚙️ Settings</button>\n</nav>'
 );
 
-// Add Visual 4 (WoW) + Station Breaking Lines before Visual 5 (3D)
+// Add Visual 4 (WoW) + Stations Recap before Visual 5 (3D)
 html = html.replace(
   '</div>\n\n<!-- Visual 5: 3D -->',
   `</div>
-
-<!-- Station Breaking Lines -->
-<div class="card">
-  <h2>Station Fulfillment vs Load — Where Stations Break</h2>
-  <p class="note">Each line = one food station. X-axis = estimated concurrent ticket load (derived from hourly data). Y-axis = avg fulfillment time (min). Red dashed = 15 min threshold. Click legend to isolate a station.</p>
-  <p id="stationBreakingSubtitle" style="font-size:12px;color:#9aa0aa;margin:-4px 0 8px">▼ = first moment station breaks 15 min threshold</p>
-  <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-    <button id="sbToggleAll" onclick="sbToggleAllLines()" style="padding:4px 12px;background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">Toggle All</button>
-    <span style="color:#9aa0aa;font-size:12px;line-height:28px">Click legend labels to isolate stations</span>
-  </div>
-  <canvas id="cStationBreaking" style="max-height:420px"></canvas>
-  <p id="stationBreakingNote" style="font-size:12px;color:#9aa0aa;margin:8px 0 0"></p>
-</div>
 
 <!-- Stations Recap (between Visual 3 and Visual 4) -->
 <div class="card" id="stationsRecapCard">
@@ -335,18 +322,12 @@ html = html.replace(
 // Insert Visual TEST (hour-of-day profile) right after Visual 1 card
 html = html.replace(
   '<!-- Visual 2+3 -->',
-  `<!-- Service Break Timeline (1-min) -->
-<div class="card" id="serviceBreakCard">
-  <h2>Visual 1B — Service Break Timeline (1-min)</h2>
-  <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent tickets open</strong> in the kitchen. Gold line = <strong>avg fulfillment of those open tickets</strong>. Red band / markers = minutes where open-ticket avg &gt; 15 min. This is the live pressure view — different from Breaking Point (which is a capacity curve, not a clock).</p>
-  <div id="serviceBreakDayPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
-  <canvas id="cServiceBreak" style="max-height:420px"></canvas>
-  <div class="legend">
-    <span><span class="sw" style="background:#5aa9e6"></span>Concurrent tickets open</span>
-    <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment of open tickets (min)</span>
-    <span><span class="sw" style="background:#e2706a"></span>Over 15 min (break)</span>
-  </div>
-  <div class="annotation-box" id="serviceBreakNote">Select a day to see minute-by-minute kitchen pressure.</div>
+  `<!-- Overview: Staffing Performance (per location) — primary staffing view -->
+<div class="card" id="overviewStaffingCard" style="display:none;margin-bottom:14px">
+  <h2>Staffing Performance by Station Family</h2>
+  <p class="note">Per location. Volume = food item quantity. Main readouts: <strong style="color:#d9a441">items / person</strong> and <strong>fulfillment</strong>.</p>
+  <div id="overviewStaffingGrid" style="overflow-x:auto"></div>
+  <p id="overviewStaffingNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
 </div>
 
 <!-- Visual 2+3 -->`
@@ -1876,72 +1857,84 @@ function fmtFulMin(sec) {
   if (sec == null || !isFinite(sec)) return '—';
   return (sec / 60).toFixed(1) + 'm';
 }
-function renderStaffingGrid() {
-  const card = document.getElementById('staffingCard');
-  const grid = document.getElementById('staffingGrid');
-  const matchNote = document.getElementById('staffingMatchNote');
-  if (!card || !grid) return;
-  if (currentVenue === 'rdg_portfolio') { card.style.display = 'none'; return; }
-  const staffing = getD().staffing;
-  if (!staffing || !staffing.byFamily) {
-    card.style.display = 'none';
-    return;
-  }
-  card.style.display = '';
+function buildStaffingTableHtml(staffing, guests) {
   const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
   const FOOD_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
   const families = FOOD_FAMILIES.filter(f => staffing.byFamily[f]);
   if (!families.length) {
-    grid.innerHTML = '<p style="color:#9aa0aa;font-size:13px">No BOH station-family staffing for this week.</p>';
-    return;
+    return { html: '<p style="color:#9aa0aa;font-size:13px">No BOH station-family staffing for this week.</p>', note: '' };
   }
-  function headColor(h) {
-    if (!h) return '#13161c';
-    if (h <= 2) return '#3f1d1d';
-    if (h <= 4) return '#1e3a2f';
-    if (h <= 7) return '#1e3a5f';
-    return '#3b2f1a';
-  }
-  const guests = staffing.guestsSeated || getD().guestsSeated;
   let html = '';
   if (guests && guests.total != null) {
-    html += '<div style="font-size:12px;color:#9aa0aa;margin-bottom:8px">Guests seated this week: <strong style="color:#e8eaed">'+(guests.total||0).toLocaleString()+'</strong></div>';
+    html += '<div style="font-size:12px;color:#9aa0aa;margin-bottom:10px">Guests seated this week: <strong style="color:#e8eaed">'+(guests.total||0).toLocaleString()+'</strong></div>';
   }
-  html += '<table style="border-collapse:collapse;font-size:12px;min-width:780px;width:100%">';
-  html += '<thead><tr><th style="text-align:left;padding:6px 8px;color:#9aa0aa;background:#1e2533">Family</th>';
-  DAYS.forEach(d => { html += '<th style="padding:6px 8px;color:#9aa0aa;background:#1e2533;text-align:center">'+d.slice(0,3)+'</th>'; });
-  html += '<th style="padding:6px 8px;color:#9aa0aa;background:#1e2533;text-align:center">Week items/person</th></tr></thead><tbody>';
+  html += '<table style="border-collapse:collapse;font-size:12px;min-width:920px;width:100%">';
+  html += '<thead><tr>'+
+    '<th style="text-align:left;padding:8px;color:#9aa0aa;background:#1e2533">Family</th>'+
+    '<th style="padding:8px;color:#9aa0aa;background:#1e2533;text-align:center">Week ful</th>'+
+    '<th style="padding:8px;color:#d9a441;background:#1e2533;text-align:center">Week items/person</th>';
+  DAYS.forEach(d => { html += '<th style="padding:8px;color:#9aa0aa;background:#1e2533;text-align:center">'+d.slice(0,3)+'</th>'; });
+  html += '</tr></thead><tbody>';
   families.forEach(f => {
     const fam = staffing.byFamily[f];
-    html += '<tr><td style="padding:6px 8px;color:#e8eaed;font-weight:600;white-space:nowrap">'+f+
-      '<div style="font-size:10px;color:#9aa0aa;font-weight:400">roster '+fam.rosterCount+' · worked '+fam.weekHeadsUnique+
-      (fam.weekAvgFulSec!=null?' · avg '+fmtFulMin(fam.weekAvgFulSec):'')+'</div></td>';
+    html += '<tr style="border-top:1px solid #262a33"><td style="padding:10px 8px;color:#e8eaed;font-weight:700;white-space:nowrap;vertical-align:top">'+f+
+      '<div style="font-size:10px;color:#9aa0aa;font-weight:400;margin-top:2px">'+fam.weekHeadsUnique+' worked · roster '+fam.rosterCount+'</div></td>';
+    html += '<td style="padding:10px 8px;text-align:center;vertical-align:top;font-size:16px;font-weight:700;color:#e8eaed">'+(fam.weekAvgFulSec!=null?fmtFulMin(fam.weekAvgFulSec):'—')+'</td>';
+    html += '<td style="padding:10px 8px;text-align:center;vertical-align:top;font-size:18px;font-weight:700;color:#d9a441">'+(fam.weekItemsPerHeadDay!=null?fam.weekItemsPerHeadDay:'—')+'</td>';
     DAYS.forEach(day => {
       const c = fam.days[day] || {};
-      const sig = c.signal || {};
       const tip = [
         (c.heads||0)+' staff',
         (c.hours||0)+' labor hours',
         'volume '+(c.volume!=null?c.volume:(c.itemCount||0))+' items'+(c.volumeSource==='ticketCount'?' (ticket fallback)':''),
         'items/person '+(c.itemsPerHead!=null?c.itemsPerHead:'—'),
-        'ful '+fmtFulMin(c.avgFulSec),
-        sig.label || ''
-      ].filter(Boolean).join(' · ');
-      html += '<td title="'+tip.replace(/"/g,'&quot;')+'" style="padding:6px 8px;text-align:center;background:'+headColor(c.heads||0)+';color:#e8eaed;cursor:default">'+
-        '<div style="font-weight:700;font-size:14px">'+(c.heads||0)+'</div>'+
-        '<div style="font-size:10px;color:#d9a441">'+(c.itemsPerHead!=null?c.itemsPerHead+'/person':'—')+'</div>'+
-        (sig.label && sig.code && sig.code !== 'closed_or_empty' && sig.code !== 'insufficient_data'
-          ? '<div style="font-size:9px;color:'+signalColor(sig.code)+';margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72px">'+(sig.label.split(' ').pop())+'</div>'
-          : '')+
+        'ful '+fmtFulMin(c.avgFulSec)
+      ].join(' · ');
+      html += '<td title="'+tip.replace(/"/g,'&quot;')+'" style="padding:8px 6px;text-align:center;vertical-align:top;background:#13161c">'+
+        '<div style="font-size:11px;color:#9aa0aa">'+(c.heads||0)+' staff</div>'+
+        '<div style="font-size:15px;font-weight:700;color:#d9a441;line-height:1.3;margin:2px 0">'+(c.itemsPerHead!=null?c.itemsPerHead:'—')+'<span style="font-size:10px;font-weight:500">/p</span></div>'+
+        '<div style="font-size:12px;font-weight:600;color:#e8eaed">'+fmtFulMin(c.avgFulSec)+'</div>'+
         '</td>';
     });
-    html += '<td style="padding:6px 8px;text-align:center;color:#d9a441;font-weight:600">'+(fam.weekItemsPerHeadDay!=null?fam.weekItemsPerHeadDay:'—')+'</td></tr>';
+    html += '</tr>';
   });
   html += '</tbody></table>';
-  grid.innerHTML = html;
-  if (matchNote && staffing.matchStats) {
-    const ms = staffing.matchStats;
-    matchNote.textContent = 'Food families only · matched '+ms.laborShiftsMatched+' labor days · unmatched '+ms.laborShiftsUnmatched+' · unused roster '+ms.rosterUnused+'/'+ms.rosterTotal;
+  const ms = staffing.matchStats;
+  const note = ms
+    ? 'Food families only · closed food tickets · matched '+ms.laborShiftsMatched+' labor days · unmatched '+ms.laborShiftsUnmatched
+    : 'Food families only · closed food tickets';
+  return { html, note };
+}
+function renderStaffingGrid() {
+  const card = document.getElementById('staffingCard');
+  const grid = document.getElementById('staffingGrid');
+  const matchNote = document.getElementById('staffingMatchNote');
+  const ovCard = document.getElementById('overviewStaffingCard');
+  const ovGrid = document.getElementById('overviewStaffingGrid');
+  const ovNote = document.getElementById('overviewStaffingNote');
+
+  if (currentVenue === 'rdg_portfolio') {
+    if (card) card.style.display = 'none';
+    if (ovCard) ovCard.style.display = 'none';
+    return;
+  }
+  const staffing = getD().staffing;
+  if (!staffing || !staffing.byFamily) {
+    if (card) card.style.display = 'none';
+    if (ovCard) ovCard.style.display = 'none';
+    return;
+  }
+  const guests = staffing.guestsSeated || getD().guestsSeated;
+  const built = buildStaffingTableHtml(staffing, guests);
+  if (card && grid) {
+    card.style.display = '';
+    grid.innerHTML = built.html;
+    if (matchNote) matchNote.textContent = built.note;
+  }
+  if (ovCard && ovGrid) {
+    ovCard.style.display = '';
+    ovGrid.innerHTML = built.html;
+    if (ovNote) ovNote.textContent = built.note;
   }
 }
 
@@ -2263,19 +2256,17 @@ function renderStations() {
         (tueFriNote ? '<div style="font-size:12px;color:#9aa0aa;margin-bottom:10px">'+tueFriNote+'</div>' : '')+
         '<div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:11px;width:100%;min-width:640px">'+
         '<thead><tr style="color:#9aa0aa;text-align:center">'+
-        '<th style="text-align:left;padding:4px 6px">Day</th><th style="padding:4px 6px">Staff</th><th style="padding:4px 6px">Labor h</th><th style="padding:4px 6px">Items</th><th style="padding:4px 6px">Items/person</th><th style="padding:4px 6px">Ful</th><th style="padding:4px 6px">Signal</th></tr></thead><tbody>'+
+        '<th style="text-align:left;padding:4px 6px">Day</th><th style="padding:4px 6px">Staff</th><th style="padding:4px 6px">Labor h</th><th style="padding:4px 6px">Items</th><th style="padding:4px 6px">Items/person</th><th style="padding:4px 6px">Ful</th></tr></thead><tbody>'+
         DAYS.map(day => {
           const c = fam.days[day] || {};
-          const sig = c.signal || {};
           const highlight = (day === 'Tuesday' || day === 'Friday') ? 'background:#1a2030;' : '';
           return '<tr style="'+highlight+'border-top:1px solid #262a33">'+
             '<td style="padding:5px 6px;color:#e8eaed;font-weight:600;text-align:left">'+day.slice(0,3)+'</td>'+
             '<td style="padding:5px 6px;text-align:center;color:#e8eaed">'+(c.heads||0)+'</td>'+
             '<td style="padding:5px 6px;text-align:center;color:#9aa0aa">'+(c.hours||0)+'</td>'+
             '<td style="padding:5px 6px;text-align:center;color:#9aa0aa">'+(c.volume!=null?c.volume:(c.itemCount||0))+'</td>'+
-            '<td style="padding:5px 6px;text-align:center;color:#d9a441;font-weight:600">'+(c.itemsPerHead!=null?c.itemsPerHead:'—')+'</td>'+
-            '<td style="padding:5px 6px;text-align:center;color:#9aa0aa">'+fmtFulMin(c.avgFulSec)+'</td>'+
-            '<td style="padding:5px 6px;text-align:center;color:'+signalColor(sig.code)+'" title="'+(sig.note||'').replace(/"/g,'&quot;')+'">'+(sig.label||'—')+'</td></tr>';
+            '<td style="padding:5px 6px;text-align:center;color:#d9a441;font-weight:700;font-size:13px">'+(c.itemsPerHead!=null?c.itemsPerHead:'—')+'</td>'+
+            '<td style="padding:5px 6px;text-align:center;color:#e8eaed;font-weight:600">'+fmtFulMin(c.avgFulSec)+'</td></tr>';
         }).join('')+
         '</tbody></table></div></div>';
     } else if (staffing) {
@@ -3376,12 +3367,11 @@ function renderAll() {
   renderKPIs();
   renderStationsRecap();
   renderPressure();
-  renderServiceBreakTimeline();
+  renderStaffingGrid();
   renderBreaking();
   renderLoadPerf();
   render3D();
   renderHeatmaps();
-  renderStationBreaking();
   renderStationWoW();
   renderStations();
   renderMenuItems();

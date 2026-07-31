@@ -53,7 +53,11 @@ if (fs.existsSync(itemDetailsPath)) {
 }
 
 // ---- Station filter ----
-const EXCLUDE_WORDS = ['bar','champagne','wine','btg','pos','barista','somm','water','service','beach','drink'];
+const EXCLUDE_WORDS = [
+  'bar', 'champagne', 'wine', 'btg', 'pos', 'barista', 'somm', 'water', 'service', 'beach', 'drink',
+  'no print', 'noprint', 'all in', 'package', 'deposit', 'beo', 'gift card', 'gratuity',
+  'host', 'runner', 'server', 'captain', 'busser', 'bartender', 'sommelier',
+];
 function isFood(name) {
   if (!name) return false;
   const low = name.toLowerCase();
@@ -82,15 +86,31 @@ function parseDate(str) {
 
 const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-// ---- Filter food tickets ----
-const foodTickets = tickets.filter(t => isFood(t['Station'])).map(t => {
+// Max realistic BOH cook time — longer rows are usually unclosed / orphaned noise
+const MAX_FUL_SEC = 90 * 60;
+
+// ---- Filter food tickets (closed + food stations only) ----
+let skippedOpen = 0;
+let skippedLong = 0;
+let skippedNonFood = 0;
+const foodTickets = tickets.filter(t => {
+  if (!isFood(t['Station'])) { skippedNonFood++; return false; }
+  const fired = parseDate(t['Fired Date']);
+  const fulSec = parseFulTime(t['Fulfillment Time']);
+  const fulfilledAt = parseDate(t['Fulfilled Date']);
+  // Must be closed: need fulfillment duration and a fulfilled timestamp
+  if (!fired || fulSec == null || fulSec <= 0) { skippedOpen++; return false; }
+  if (!fulfilledAt && !t['Fulfilled Date']) { skippedOpen++; return false; }
+  if (fulSec > MAX_FUL_SEC) { skippedLong++; return false; }
+  return true;
+}).map(t => {
   const fired = parseDate(t['Fired Date']);
   const fulSec = parseFulTime(t['Fulfillment Time']);
   const fulfilled = fired && fulSec != null ? new Date(fired.getTime() + fulSec * 1000) : null;
   return { ...t, _fired: fired, _fulfilled: fulfilled, _fulSec: fulSec };
-}).filter(t => t._fired && t._fulSec != null);
+}).filter(t => t._fired && t._fulSec != null && t._fulfilled);
 
-console.log(`Food tickets for ${venueArg}: ${foodTickets.length}`);
+console.log(`Food tickets for ${venueArg}: ${foodTickets.length} (skipped non-food=${skippedNonFood}, open/unclosed=${skippedOpen}, >90min=${skippedLong})`);
 
 // ---- workloadDayHourly ----
 // For each ticket, assign to day+hour of the fired date
