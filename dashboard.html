@@ -124,7 +124,7 @@ table.menu-tbl tr:hover td{background:#1e2533}
 <div class="wrap">
 <header>
   <h1 id="dashTitle">BOH Dashboard</h1>
-  <span class="badge" id="dashBadge">Latest 2026-W30 · Built 2026-07-31 18:53 UTC</span>
+  <span class="badge" id="dashBadge">Latest 2026-W30 · Built 2026-07-31 19:00 UTC</span>
 </header>
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
 <div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
@@ -182,22 +182,10 @@ table.menu-tbl tr:hover td{background:#1e2533}
   <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
 </div>
 
-<!-- Visual TEST -->
-<div class="card">
-  <h2>Visual TEST — Time-of-Day Profile (10am → 4am)</h2>
-  <p class="note">X-axis = hour of day across the week (service window). Left Y = average ticket occurrences at that hour. Right Y = average fulfillment time (gold). <strong>Hourly averages smooth spikes</strong> — a calm 8pm average can still hide minutes where concurrent load pushed over 15 min (see Break Timeline below).</p>
-  <canvas id="cHourProfile" style="max-height:400px"></canvas>
-  <div class="legend">
-    <span><span class="sw" style="background:#5aa9e6"></span>Avg occurrences / day</span>
-    <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
-  </div>
-  <div class="annotation-box" id="hourProfileNote">Peak hour computed from weekly kitchen timing.</div>
-</div>
-
 <!-- Service Break Timeline (1-min) -->
 <div class="card" id="serviceBreakCard">
   <h2>Visual 1B — Service Break Timeline (1-min)</h2>
-  <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent tickets open</strong> in the kitchen. Gold line = <strong>avg fulfillment of those open tickets</strong>. Red band / markers = minutes where open-ticket avg &gt; 15 min. This is the live pressure view — different from the hourly average chart above and from Breaking Point (which is a capacity curve, not a clock).</p>
+  <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent tickets open</strong> in the kitchen. Gold line = <strong>avg fulfillment of those open tickets</strong>. Red band / markers = minutes where open-ticket avg &gt; 15 min. This is the live pressure view — different from Breaking Point (which is a capacity curve, not a clock).</p>
   <div id="serviceBreakDayPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
   <canvas id="cServiceBreak" style="max-height:420px"></canvas>
   <div class="legend">
@@ -3461,7 +3449,6 @@ function renderAll() {
   renderKPIs();
   renderStationsRecap();
   renderPressure();
-  renderHourProfile();
   renderServiceBreakTimeline();
   renderBreaking();
   renderLoadPerf();

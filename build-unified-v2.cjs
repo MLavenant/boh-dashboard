@@ -335,22 +335,10 @@ html = html.replace(
 // Insert Visual TEST (hour-of-day profile) right after Visual 1 card
 html = html.replace(
   '<!-- Visual 2+3 -->',
-  `<!-- Visual TEST -->
-<div class="card">
-  <h2>Visual TEST — Time-of-Day Profile (10am → 4am)</h2>
-  <p class="note">X-axis = hour of day across the week (service window). Left Y = average ticket occurrences at that hour. Right Y = average fulfillment time (gold). <strong>Hourly averages smooth spikes</strong> — a calm 8pm average can still hide minutes where concurrent load pushed over 15 min (see Break Timeline below).</p>
-  <canvas id="cHourProfile" style="max-height:400px"></canvas>
-  <div class="legend">
-    <span><span class="sw" style="background:#5aa9e6"></span>Avg occurrences / day</span>
-    <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
-  </div>
-  <div class="annotation-box" id="hourProfileNote">Peak hour computed from weekly kitchen timing.</div>
-</div>
-
-<!-- Service Break Timeline (1-min) -->
+  `<!-- Service Break Timeline (1-min) -->
 <div class="card" id="serviceBreakCard">
   <h2>Visual 1B — Service Break Timeline (1-min)</h2>
-  <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent tickets open</strong> in the kitchen. Gold line = <strong>avg fulfillment of those open tickets</strong>. Red band / markers = minutes where open-ticket avg &gt; 15 min. This is the live pressure view — different from the hourly average chart above and from Breaking Point (which is a capacity curve, not a clock).</p>
+  <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent tickets open</strong> in the kitchen. Gold line = <strong>avg fulfillment of those open tickets</strong>. Red band / markers = minutes where open-ticket avg &gt; 15 min. This is the live pressure view — different from Breaking Point (which is a capacity curve, not a clock).</p>
   <div id="serviceBreakDayPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
   <canvas id="cServiceBreak" style="max-height:420px"></canvas>
   <div class="legend">
@@ -3386,7 +3374,6 @@ function renderAll() {
   renderKPIs();
   renderStationsRecap();
   renderPressure();
-  renderHourProfile();
   renderServiceBreakTimeline();
   renderBreaking();
   renderLoadPerf();
