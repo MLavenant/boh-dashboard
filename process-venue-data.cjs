@@ -583,6 +583,13 @@ function isBeverageItem(name) {
   const n = (name || '').toLowerCase();
   return BEVERAGE_KEYWORDS.some(kw => n.includes(kw));
 }
+/** Venue-specific menu noise — MILA MB-* market/banquet lines are out of BOH scope */
+function isExcludedMenuItem(name) {
+  if (!name) return true;
+  if (isBeverageItem(name)) return true;
+  if (venueArg === 'mila' && /^MB[\s_-]/i.test(String(name).trim())) return true;
+  return false;
+}
 
 // ---- stationItemsArr: per-station item volume + avg fulfillment ----
 const stationItemsMap = {}; // { station: { itemName: { qty, totalFulSec, count } } }
@@ -593,7 +600,7 @@ const itemFirstStation = {};
 
 itemDetails.forEach(item => {
   if (!item.menuItem) return;
-  if (isBeverageItem(item.menuItem)) return;
+  if (isExcludedMenuItem(item.menuItem)) return;
   const datePfx = (item.sentDate || '').slice(0, 6);
   const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
   const matches = ticketByKey[key] || [];
@@ -651,7 +658,7 @@ if (fs.existsSync(itemFulPath)) {
 }
 
 const assignmentData = itemFulfillmentItems
-  .filter(it => it.menuItem && !isBeverageItem(it.menuItem))
+  .filter(it => it.menuItem && !isExcludedMenuItem(it.menuItem))
   .map(it => {
     const station = itemToStation[it.menuItem] || null;
     const targetSec = station ? (derivedStationTargets[station] || null) : null;
@@ -671,7 +678,7 @@ console.log(`Assignment data for ${venueArg}: ${assignmentData.length} items acr
 // ---- menuItems: overall item volume + avg fulfillment across all stations ----
 const menuItemsMap = {}; // { menuItem: { qty, totalFulSec, count } }
 itemDetails.forEach(item => {
-  if (!item.menuItem) return;
+  if (!item.menuItem || isExcludedMenuItem(item.menuItem)) return;
   const datePfx = (item.sentDate || '').slice(0, 6);
   const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
   const matches = ticketByKey[key] || [];
@@ -687,7 +694,8 @@ itemDetails.forEach(item => {
 // (not ticket-level kitchen-timing join — that understates item cook time).
 const fulAvgByItem = {};
 itemFulfillmentItems.forEach(it => {
-  if (it.menuItem && it.avgSeconds != null && Number(it.avgSeconds) > 0) {
+  if (!it.menuItem || isExcludedMenuItem(it.menuItem)) return;
+  if (it.avgSeconds != null && Number(it.avgSeconds) > 0) {
     fulAvgByItem[it.menuItem] = +Number(it.avgSeconds).toFixed(1);
   }
 });
@@ -786,7 +794,7 @@ let qtyAssigned = 0;
 let qtyFallback = 0;
 let qtySkipped = 0;
 itemDetails.forEach(item => {
-  if (!item.menuItem || isBeverageItem(item.menuItem)) return;
+  if (!item.menuItem || isExcludedMenuItem(item.menuItem)) return;
   const fired = parseDate(item.sentDate);
   if (!fired) return;
   const day = DAYS[fired.getDay()];

@@ -2365,6 +2365,10 @@ function renderMenuItems() {
       exp_sec: d.exp_sec || d.targetSec || 0,
     })).filter(d => d.item);
   }
+  // MILA: exclude MB-* market/banquet lines from menu analytics
+  if (currentVenue === 'mila') {
+    SUMMARY = SUMMARY.filter(d => !/^MB[\s_-]/i.test(String(d.item || '').trim()));
+  }
 
   const THR_SEC = 900;
   let currentSort = 'time';
