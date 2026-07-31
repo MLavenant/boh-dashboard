@@ -15955,7 +15955,7 @@
   "staffing": {
     "venue": "ava_coconut_grove",
     "weekLabel": "2026-W30",
-    "builtAt": "2026-07-31T01:02:48.982Z",
+    "builtAt": "2026-07-31T16:15:42.929Z",
     "matchStats": {
       "laborShiftsMatched": 99,
       "laborShiftsUnmatched": 274,
@@ -16813,12 +16813,12 @@
         "rosterCount": 2,
         "weekHeadsUnique": 2,
         "weekHours": 74.32,
-        "weekItemCount": 957.745,
+        "weekItemCount": 1001,
         "weekTicketCount": 1001,
-        "weekItemsPerHeadDay": 95.8,
-        "weekItemsPerStaffHour": 12.89,
+        "weekItemsPerHeadDay": 100.1,
+        "weekItemsPerStaffHour": 13.47,
         "weekServiceHours": 53,
-        "weekItemsPerServiceHour": 18.07,
+        "weekItemsPerServiceHour": 18.89,
         "weekAvgFulSec": 694.5,
         "days": {
           "Monday": {
@@ -16826,13 +16826,13 @@
             "hours": 6.36,
             "ticketCount": 75,
             "itemQty": 37.53,
-            "volume": 37.53,
-            "volumeSource": "itemQty",
-            "itemCount": 37.53,
-            "itemsPerHead": 37.5,
+            "volume": 75,
+            "volumeSource": "ticketCount",
+            "itemCount": 75,
+            "itemsPerHead": 75,
             "serviceHours": 5,
-            "itemsPerServiceHour": 7.51,
-            "itemsPerStaffHour": 5.9,
+            "itemsPerServiceHour": 15,
+            "itemsPerStaffHour": 11.79,
             "avgFulSec": 718.9,
             "qc": {
               "eligible": true,
@@ -16853,13 +16853,13 @@
             "hours": 7.1,
             "ticketCount": 52,
             "itemQty": 47.505,
-            "volume": 47.505,
-            "volumeSource": "itemQty",
-            "itemCount": 47.505,
-            "itemsPerHead": 47.5,
+            "volume": 52,
+            "volumeSource": "ticketCount",
+            "itemCount": 52,
+            "itemsPerHead": 52,
             "serviceHours": 5,
-            "itemsPerServiceHour": 9.5,
-            "itemsPerStaffHour": 6.69,
+            "itemsPerServiceHour": 10.4,
+            "itemsPerStaffHour": 7.32,
             "avgFulSec": 561.7,
             "qc": {
               "eligible": true,
@@ -16880,13 +16880,13 @@
             "hours": 7.3,
             "ticketCount": 100,
             "itemQty": 98.71000000000001,
-            "volume": 98.71000000000001,
-            "volumeSource": "itemQty",
-            "itemCount": 98.71000000000001,
-            "itemsPerHead": 98.7,
+            "volume": 100,
+            "volumeSource": "ticketCount",
+            "itemCount": 100,
+            "itemsPerHead": 100,
             "serviceHours": 6,
-            "itemsPerServiceHour": 16.45,
-            "itemsPerStaffHour": 13.52,
+            "itemsPerServiceHour": 16.67,
+            "itemsPerStaffHour": 13.7,
             "avgFulSec": 898.7,
             "qc": {
               "eligible": true,
@@ -17103,7 +17103,7 @@
               "nPeer": 3,
               "nHist": 0,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.41
+              "staffingRatio": 0.51
             }
           },
           "Thursday": {
@@ -17130,7 +17130,7 @@
               "nPeer": 3,
               "nHist": 0,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 1.17
+              "staffingRatio": 1.08
             }
           },
           "Friday": {
@@ -17307,7 +17307,7 @@
               "nPeer": 3,
               "nHist": 0,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.55
+              "staffingRatio": 0.56
             }
           },
           "Thursday": {
@@ -17334,7 +17334,7 @@
               "nPeer": 3,
               "nHist": 0,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.74
+              "staffingRatio": 0.67
             }
           },
           "Friday": {
@@ -17388,7 +17388,7 @@
               "nPeer": 3,
               "nHist": 0,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 1.02
+              "staffingRatio": 0.99
             }
           },
           "Sunday": {
@@ -17425,12 +17425,12 @@
         "rosterCount": 0,
         "weekHeadsUnique": 0,
         "weekHours": 0,
-        "weekItemCount": 3050.9410000000003,
+        "weekItemCount": 2438,
         "weekTicketCount": 2438,
         "weekItemsPerHeadDay": null,
         "weekItemsPerStaffHour": null,
         "weekServiceHours": 59,
-        "weekItemsPerServiceHour": 51.71,
+        "weekItemsPerServiceHour": 41.32,
         "weekAvgFulSec": 507.1,
         "days": {
           "Monday": {
@@ -17438,12 +17438,12 @@
             "hours": 0,
             "ticketCount": 170,
             "itemQty": 136.92000000000002,
-            "volume": 136.92000000000002,
-            "volumeSource": "itemQty",
-            "itemCount": 136.92000000000002,
+            "volume": 170,
+            "volumeSource": "ticketCount",
+            "itemCount": 170,
             "itemsPerHead": null,
             "serviceHours": 6,
-            "itemsPerServiceHour": 22.82,
+            "itemsPerServiceHour": 28.33,
             "itemsPerStaffHour": null,
             "avgFulSec": 573,
             "qc": {
@@ -17465,12 +17465,12 @@
             "hours": 0,
             "ticketCount": 140,
             "itemQty": 131.435,
-            "volume": 131.435,
-            "volumeSource": "itemQty",
-            "itemCount": 131.435,
+            "volume": 140,
+            "volumeSource": "ticketCount",
+            "itemCount": 140,
             "itemsPerHead": null,
             "serviceHours": 6,
-            "itemsPerServiceHour": 21.91,
+            "itemsPerServiceHour": 23.33,
             "itemsPerStaffHour": null,
             "avgFulSec": 425.4,
             "qc": {
@@ -17492,12 +17492,12 @@
             "hours": 0,
             "ticketCount": 250,
             "itemQty": 280.671,
-            "volume": 280.671,
-            "volumeSource": "itemQty",
-            "itemCount": 280.671,
+            "volume": 250,
+            "volumeSource": "ticketCount",
+            "itemCount": 250,
             "itemsPerHead": null,
             "serviceHours": 7,
-            "itemsPerServiceHour": 40.1,
+            "itemsPerServiceHour": 35.71,
             "itemsPerStaffHour": null,
             "avgFulSec": 635.1,
             "qc": {
@@ -17519,12 +17519,12 @@
             "hours": 0,
             "ticketCount": 233,
             "itemQty": 272.53,
-            "volume": 272.53,
-            "volumeSource": "itemQty",
-            "itemCount": 272.53,
+            "volume": 233,
+            "volumeSource": "ticketCount",
+            "itemCount": 233,
             "itemsPerHead": null,
             "serviceHours": 7,
-            "itemsPerServiceHour": 38.93,
+            "itemsPerServiceHour": 33.29,
             "itemsPerStaffHour": null,
             "avgFulSec": 543.9,
             "qc": {
@@ -17546,12 +17546,12 @@
             "hours": 0,
             "ticketCount": 438,
             "itemQty": 443.61,
-            "volume": 443.61,
-            "volumeSource": "itemQty",
-            "itemCount": 443.61,
+            "volume": 438,
+            "volumeSource": "ticketCount",
+            "itemCount": 438,
             "itemsPerHead": null,
             "serviceHours": 7,
-            "itemsPerServiceHour": 63.37,
+            "itemsPerServiceHour": 62.57,
             "itemsPerStaffHour": null,
             "avgFulSec": 490.1,
             "qc": {
@@ -17573,12 +17573,12 @@
             "hours": 0,
             "ticketCount": 708,
             "itemQty": 904.8650000000001,
-            "volume": 904.8650000000001,
-            "volumeSource": "itemQty",
-            "itemCount": 904.8650000000001,
+            "volume": 708,
+            "volumeSource": "ticketCount",
+            "itemCount": 708,
             "itemsPerHead": null,
             "serviceHours": 13,
-            "itemsPerServiceHour": 69.61,
+            "itemsPerServiceHour": 54.46,
             "itemsPerStaffHour": null,
             "avgFulSec": 482.9,
             "qc": {
@@ -17600,12 +17600,12 @@
             "hours": 0,
             "ticketCount": 499,
             "itemQty": 880.91,
-            "volume": 880.91,
-            "volumeSource": "itemQty",
-            "itemCount": 880.91,
+            "volume": 499,
+            "volumeSource": "ticketCount",
+            "itemCount": 499,
             "itemsPerHead": null,
             "serviceHours": 13,
-            "itemsPerServiceHour": 67.76,
+            "itemsPerServiceHour": 38.38,
             "itemsPerStaffHour": null,
             "avgFulSec": 475.6,
             "qc": {

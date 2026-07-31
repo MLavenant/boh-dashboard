@@ -171,13 +171,12 @@ function dayVolumeByFamily(venueData, familyMap) {
       const c = fam[day];
       if (!c) continue;
       c.avgFulSec = c.fulWeight > 0 ? +(c.fulSecSum / c.fulWeight).toFixed(1) : null;
-      // Prefer item qty only when the join covers ≥50% of ticket fires; sparse joins
-      // understate volume and break IPSH (e.g. Saute Fri with 6 mapped items vs 191 fires).
+      // Station volume = KDS ticket fires at mapped Toast stations.
+      // Item-details qty joins are often sparse (Saute) or inflated by first-station
+      // locking (Fry), so they are kept as diagnostics only — not the KPI numerator.
       const tickets = c.ticketCount || 0;
-      const items = c.itemQty || 0;
-      const useItems = items > 0 && items >= Math.max(1, tickets * 0.5);
-      c.volume = useItems ? items : tickets;
-      c.volumeSource = useItems ? 'itemQty' : 'ticketCount';
+      c.volume = tickets;
+      c.volumeSource = 'ticketCount';
       c.serviceHours = c.serviceHourKeys.size;
       c.itemsPerServiceHour = c.serviceHours > 0
         ? +(c.volume / c.serviceHours).toFixed(2)
