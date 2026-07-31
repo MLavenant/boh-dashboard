@@ -338,13 +338,27 @@ html = html.replace(
   `<!-- Visual TEST -->
 <div class="card">
   <h2>Visual TEST — Time-of-Day Profile (10am → 4am)</h2>
-  <p class="note">X-axis = hour of day across the week (service window). Left Y = average ticket occurrences at that hour. Right Y = average fulfillment time (gold). Same dual-axis layout as Visual 1.</p>
+  <p class="note">X-axis = hour of day across the week (service window). Left Y = average ticket occurrences at that hour. Right Y = average fulfillment time (gold). <strong>Hourly averages smooth spikes</strong> — a calm 8pm average can still hide minutes where concurrent load pushed over 15 min (see Break Timeline below).</p>
   <canvas id="cHourProfile" style="max-height:400px"></canvas>
   <div class="legend">
     <span><span class="sw" style="background:#5aa9e6"></span>Avg occurrences / day</span>
     <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
   </div>
   <div class="annotation-box" id="hourProfileNote">Peak hour computed from weekly kitchen timing.</div>
+</div>
+
+<!-- Service Break Timeline (1-min) -->
+<div class="card" id="serviceBreakCard">
+  <h2>Service Break Timeline — When Did We Go Over 15 min?</h2>
+  <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent tickets open</strong> in the kitchen. Gold line = <strong>avg fulfillment of those open tickets</strong>. Red band / markers = minutes where open-ticket avg &gt; 15 min. This is the live pressure view — different from the hourly average chart above and from Breaking Point (which is a capacity curve, not a clock).</p>
+  <div id="serviceBreakDayPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
+  <canvas id="cServiceBreak" style="max-height:420px"></canvas>
+  <div class="legend">
+    <span><span class="sw" style="background:#5aa9e6"></span>Concurrent tickets open</span>
+    <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment of open tickets (min)</span>
+    <span><span class="sw" style="background:#e2706a"></span>Over 15 min (break)</span>
+  </div>
+  <div class="annotation-box" id="serviceBreakNote">Select a day to see minute-by-minute kitchen pressure.</div>
 </div>
 
 <!-- Visual 2+3 -->`
@@ -974,6 +988,187 @@ function renderHourProfile() {
     const fulTxt = peak.avgFulMin != null ? peak.avgFulMin.toFixed(1) + ' min avg fulfillment' : 'no fulfillment data';
     note.innerHTML = '⚡ Peak volume at <strong>' + (peak.label || peak.hour) + '</strong> — ' +
       peak.avgOcc + ' tickets/day on average · ' + fulTxt + '.';
+  }
+}
+
+// ============================================================
+// Service Break Timeline (1-min concurrent open tickets + avg ful)
+// ============================================================
+let _serviceBreakDay = null;
+function renderServiceBreakTimeline() {
+  const card = document.getElementById('serviceBreakCard');
+  const canvas = document.getElementById('cServiceBreak');
+  const pillsEl = document.getElementById('serviceBreakDayPills');
+  const note = document.getElementById('serviceBreakNote');
+  const existing = Chart.getChart('cServiceBreak');
+  if (existing) existing.destroy();
+  if (!card || !canvas) return;
+
+  if (currentVenue === 'rdg_portfolio') {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = '';
+
+  const timeline = getD().serviceBreakTimeline;
+  const byDay = timeline && timeline.byDay ? timeline.byDay : null;
+  const DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const days = DAY_ORDER.filter(d => byDay && byDay[d] && byDay[d].labels && byDay[d].labels.length);
+
+  if (!days.length) {
+    if (pillsEl) pillsEl.innerHTML = '';
+    if (note) note.textContent = 'No 1-min break timeline yet — reprocess this venue week to enable.';
+    return;
+  }
+
+  // Default = day with most broken minutes (fallback Friday / first)
+  if (!_serviceBreakDay || !days.includes(_serviceBreakDay)) {
+    let best = days[0];
+    let bestBroken = -1;
+    days.forEach(d => {
+      const b = byDay[d].brokenMinutes || 0;
+      if (b > bestBroken) { bestBroken = b; best = d; }
+    });
+    if (bestBroken <= 0 && days.includes('Friday')) best = 'Friday';
+    _serviceBreakDay = best;
+  }
+
+  if (pillsEl) {
+    pillsEl.innerHTML = days.map(d => {
+      const broken = byDay[d].brokenMinutes || 0;
+      const active = d === _serviceBreakDay;
+      return '<button type="button" data-day="'+d+'" style="padding:5px 12px;border-radius:16px;cursor:pointer;font-size:12px;font-family:inherit;border:1px solid '+(active?'#d9a441':'#2d3448')+';background:'+(active?'#262a33':'#1e2533')+';color:'+(active?'#e8eaed':'#9aa0aa')+'">'+d.slice(0,3)+(broken?' · '+broken+'m':'')+'</button>';
+    }).join('');
+    pillsEl.querySelectorAll('button').forEach(btn => {
+      btn.onclick = () => { _serviceBreakDay = btn.dataset.day; renderServiceBreakTimeline(); };
+    });
+  }
+
+  const series = byDay[_serviceBreakDay];
+  const thr = (timeline && timeline.thresholdMin) || getThreshold();
+  const labels = series.labels;
+  const conc = series.conc;
+  const ful = series.ful;
+  const brokenFlags = ful.map(v => v != null && v > thr);
+
+  // Tick every ~30–60 minutes for readability
+  const step = labels.length > 600 ? 60 : 30;
+  const thrPlugin = {
+    id: 'svcBreakThr',
+    beforeDraw(chart) {
+      const { ctx, chartArea: a, scales } = chart;
+      if (!a || !scales.y1 || !scales.x) return;
+      // Shade broken minutes
+      ctx.save();
+      for (let i = 0; i < brokenFlags.length; i++) {
+        if (!brokenFlags[i]) continue;
+        const x0 = scales.x.getPixelForValue(i);
+        const x1 = scales.x.getPixelForValue(Math.min(i + 1, labels.length - 1));
+        ctx.fillStyle = 'rgba(226,112,106,0.18)';
+        ctx.fillRect(x0, a.top, Math.max(1, x1 - x0), a.bottom - a.top);
+      }
+      ctx.restore();
+      const yThr = scales.y1.getPixelForValue(thr);
+      if (yThr >= a.top && yThr <= a.bottom) {
+        ctx.save();
+        ctx.strokeStyle = '#e2706a';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        ctx.moveTo(a.left, yThr);
+        ctx.lineTo(a.right, yThr);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#e2706a';
+        ctx.font = '11px sans-serif';
+        ctx.fillText(thr + ' min', a.left + 4, yThr - 4);
+        ctx.restore();
+      }
+    }
+  };
+
+  new Chart(canvas, {
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Concurrent tickets open',
+          data: conc,
+          backgroundColor: brokenFlags.map(b => b ? 'rgba(226,112,106,0.55)' : 'rgba(74,159,255,0.45)'),
+          borderWidth: 0,
+          yAxisID: 'y',
+          order: 2,
+          barPercentage: 1,
+          categoryPercentage: 1,
+        },
+        {
+          type: 'line',
+          label: 'Avg fulfillment of open tickets (min)',
+          data: ful,
+          borderColor: '#d9a441',
+          backgroundColor: 'rgba(217,164,65,0)',
+          tension: 0.15,
+          pointRadius: 0,
+          pointHoverRadius: 3,
+          borderWidth: 2,
+          yAxisID: 'y1',
+          order: 1,
+          spanGaps: true,
+        },
+      ],
+    },
+    options: {
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: {
+          title: { display: true, text: 'Time of day (1-min)' },
+          grid: { color: gc },
+          ticks: {
+            maxRotation: 0,
+            autoSkip: false,
+            callback(val, idx) {
+              if (idx % step !== 0) return '';
+              return labels[idx];
+            },
+          },
+        },
+        y: { position: 'left', title: { display: true, text: 'Concurrent tickets open' }, grid: { color: gc }, min: 0 },
+        y1: { position: 'right', title: { display: true, text: 'Avg fulfillment (min)' }, grid: { display: false }, min: 0, suggestedMax: Math.max(22, thr + 4) },
+      },
+      plugins: {
+        legend: { position: 'top', labels: { boxWidth: 12 } },
+        tooltip: {
+          callbacks: {
+            title(items) {
+              const i = items[0] && items[0].dataIndex;
+              return _serviceBreakDay + ' · ' + (labels[i] || '');
+            },
+            afterBody(items) {
+              const i = items[0] && items[0].dataIndex;
+              if (i == null) return '';
+              return brokenFlags[i] ? '⚠ OVER 15 min — kitchen broken' : 'Under 15 min';
+            },
+          },
+        },
+      },
+    },
+    plugins: [thrPlugin],
+  });
+
+  if (note) {
+    const bm = series.brokenMinutes || 0;
+    const first = series.firstBreak || null;
+    const peak = series.peakConcWhileBroken || 0;
+    if (bm > 0) {
+      note.innerHTML = '<strong>'+_serviceBreakDay+'</strong>: broke for <strong style="color:#ef4444">'+bm+' minutes</strong>' +
+        (first ? ' · first break at <strong>'+first+'</strong>' : '') +
+        (peak ? ' · peak concurrent while broken: <strong>'+peak+'</strong> tickets' : '') +
+        '. Breaking Point capacity curve is separate (Visual 2).';
+    } else {
+      note.innerHTML = '<strong>'+_serviceBreakDay+'</strong>: open-ticket avg stayed ≤ '+thr+' min all service · '+
+        (series.ticketCount||0)+' tickets. Hourly averages above can still look calm even on days with brief spikes — this chart shows the spikes.';
+    }
   }
 }
 
@@ -2565,6 +2760,31 @@ function renderAssignment() {
     if (st) st.textContent = 'Exported — replace chef-target-overrides.json in repo';
   };
 
+  async function pingAssignmentHelper() {
+    try {
+      const resp = await fetch('http://127.0.0.1:3855/health', { cache: 'no-store' });
+      if (!resp.ok) return false;
+      const body = await resp.json().catch(() => ({}));
+      return !!body.ok;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  window.checkAssignmentHelper = async function() {
+    const st = document.getElementById('assignSaveStatus');
+    if (!st) return;
+    const online = await pingAssignmentHelper();
+    if (online) {
+      st.style.color = '#22c55e';
+      st.textContent = 'Refresh helper online';
+    } else {
+      st.style.color = '#ef4444';
+      st.textContent = 'Refresh helper offline — start: node assignment-refresh-server.cjs';
+    }
+    return online;
+  };
+
   window.refreshAssignmentFromToast = async function() {
     const st = document.getElementById('assignSaveStatus');
     const btn = document.getElementById('assignRefreshBtn');
@@ -2573,6 +2793,10 @@ function renderAssignment() {
     if (btn) { btn.disabled = true; btn.textContent = 'Refreshing…'; }
     if (st) { st.style.color = '#f59e0b'; st.textContent = 'Calling local Toast refresh helper…'; }
     try {
+      const online = await pingAssignmentHelper();
+      if (!online) {
+        throw new Error('HELPER_OFFLINE');
+      }
       const resp = await fetch('http://127.0.0.1:3855/refresh-assignment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2585,21 +2809,37 @@ function renderAssignment() {
         location.reload();
       }
     } catch (e) {
+      const msg = e && e.message ? e.message : String(e);
+      const offline = msg === 'HELPER_OFFLINE' || /Failed to fetch|NetworkError|Load failed/i.test(msg);
       if (st) {
         st.style.color = '#ef4444';
-        st.textContent = 'Refresh helper offline — start: node assignment-refresh-server.cjs';
+        st.textContent = offline
+          ? 'Refresh helper offline — start: node assignment-refresh-server.cjs'
+          : ('Refresh failed: ' + msg);
       }
       alert(
-        'Could not reach the local Toast refresh helper.\\n\\n' +
-        '1) In a terminal, run:\\n   node assignment-refresh-server.cjs\\n' +
-        '2) Keep that window open\\n' +
-        '3) Click Refresh from Toast again\\n\\n' +
-        'Detail: ' + (e && e.message ? e.message : e)
+        offline
+          ? ('Could not reach the local Toast refresh helper.\\n\\n' +
+             '1) In a terminal at C:\\\\Cursor\\\\toast-mcp-server, run:\\n   node assignment-refresh-server.cjs\\n' +
+             '2) Keep that window open\\n' +
+             '3) Click Refresh from Toast again')
+          : ('Toast refresh failed:\\n\\n' + msg)
       );
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = '↻ Refresh from Toast'; }
     }
   };
+
+  // Surface helper status when Assignment tab opens
+  const _origSwitchTab = window.switchTab;
+  if (typeof _origSwitchTab === 'function' && !_origSwitchTab._assignHelperHook) {
+    window.switchTab = function(tab, el) {
+      const r = _origSwitchTab(tab, el);
+      if (tab === 'assignment') setTimeout(() => window.checkAssignmentHelper && window.checkAssignmentHelper(), 50);
+      return r;
+    };
+    window.switchTab._assignHelperHook = true;
+  }
 }
 
 // ============================================================
@@ -3144,6 +3384,7 @@ function renderAll() {
   renderStationsRecap();
   renderPressure();
   renderHourProfile();
+  renderServiceBreakTimeline();
   renderBreaking();
   renderLoadPerf();
   render3D();
@@ -3240,6 +3481,7 @@ function initVenuePills() {
     btn.dataset.venue = key;
     btn.onclick = () => {
       currentVenue = key;
+      _serviceBreakDay = null;
       document.querySelectorAll('.venue-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('dashTitle').textContent = label + ' · BOH Dashboard';
@@ -3259,6 +3501,7 @@ function initVenuePills() {
 // ============================================================
 function selectWeek(idx) {
   currentWeekIdx = parseInt(idx);
+  _serviceBreakDay = null;
   renderAll();
 }
 function changeWeek(dir) {

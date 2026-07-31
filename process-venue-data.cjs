@@ -308,6 +308,106 @@ const breakingPoint = breakingPointRow ? breakingPointRow.conc : null;
 const breakingPointGuests = breakingPointRow ? Math.round(breakingPointRow.guests) : null;
 console.log('Breaking point (intervals):', breakingPoint, '| guests:', breakingPointGuests);
 
+// ---- Service break timeline (1-min samples of concurrent open tickets + avg ful) ----
+// Answers: "When during this day's service did open-ticket avg ful exceed 15 min?"
+const BREAK_THRESHOLD_MIN = 15;
+const SERVICE_START_MIN = 10 * 60; // 10:00
+const SERVICE_END_MIN = 28 * 60;   // 04:00 next day (as minutes from midnight)
+
+function fmtClockMin(absMin) {
+  const m = ((absMin % (24 * 60)) + (24 * 60)) % (24 * 60);
+  const h = Math.floor(m / 60);
+  const mm = m % 60;
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  const ap = h < 12 ? 'a' : 'p';
+  return h12 + ':' + String(mm).padStart(2, '0') + ap;
+}
+
+function buildDayMinuteTimeline(dayTickets) {
+  if (!dayTickets.length) return null;
+
+  // Build open-set events, then sample at each minute of service window
+  const events = [];
+  dayTickets.forEach(t => {
+    if (!t._fulfilled) return;
+    events.push({ time: t._fired.getTime(), type: 1, ticket: t });
+    events.push({ time: t._fulfilled.getTime(), type: -1, ticket: t });
+  });
+  events.sort((a, b) => a.time !== b.time ? a.time - b.time : a.type - b.type);
+
+  // Anchor calendar day from first fired ticket (local)
+  const anchor = new Date(dayTickets[0]._fired.getTime());
+  anchor.setHours(0, 0, 0, 0);
+  const dayStartMs = anchor.getTime();
+
+  const open = new Set();
+  let ei = 0;
+  const labels = [];
+  const conc = [];
+  const ful = [];
+  let brokenMinutes = 0;
+  let firstBreak = null;
+  let peakConcWhileBroken = 0;
+  let firstActive = -1;
+  let lastActive = -1;
+
+  for (let absMin = SERVICE_START_MIN; absMin < SERVICE_END_MIN; absMin++) {
+    const sampleMs = dayStartMs + absMin * 60 * 1000;
+    // Advance events up to sample instant (closes before opens on ties already sorted)
+    while (ei < events.length && events[ei].time <= sampleMs) {
+      const ev = events[ei++];
+      if (ev.type === 1) open.add(ev.ticket);
+      else open.delete(ev.ticket);
+    }
+    const n = open.size;
+    let fulMin = null;
+    if (n > 0) {
+      let sum = 0;
+      open.forEach(t => { sum += t._fulSec; });
+      fulMin = +(sum / n / 60).toFixed(2);
+      if (firstActive < 0) firstActive = labels.length;
+      lastActive = labels.length;
+    }
+    const broken = fulMin != null && fulMin > BREAK_THRESHOLD_MIN;
+    if (broken) {
+      brokenMinutes++;
+      if (!firstBreak) firstBreak = fmtClockMin(absMin);
+      if (n > peakConcWhileBroken) peakConcWhileBroken = n;
+    }
+    labels.push(fmtClockMin(absMin));
+    conc.push(n);
+    ful.push(fulMin);
+  }
+
+  // Trim leading/trailing empty concurrency to keep payload smaller
+  if (firstActive < 0) return null;
+  const pad = 5;
+  const lo = Math.max(0, firstActive - pad);
+  const hi = Math.min(labels.length - 1, lastActive + pad) + 1;
+  return {
+    startMin: SERVICE_START_MIN + lo,
+    labels: labels.slice(lo, hi),
+    conc: conc.slice(lo, hi),
+    ful: ful.slice(lo, hi),
+    brokenMinutes,
+    firstBreak,
+    peakConcWhileBroken,
+    ticketCount: dayTickets.length,
+  };
+}
+
+const serviceBreakTimeline = { thresholdMin: BREAK_THRESHOLD_MIN, byDay: {} };
+DAY_ORDER.forEach(day => {
+  const dayTickets = uniqueTickets.filter(t => DAYS[t._fired.getDay()] === day && t._fulfilled);
+  const series = buildDayMinuteTimeline(dayTickets);
+  if (series) serviceBreakTimeline.byDay[day] = series;
+});
+const breakDaySummary = DAY_ORDER
+  .filter(d => serviceBreakTimeline.byDay[d])
+  .map(d => d + ':' + serviceBreakTimeline.byDay[d].brokenMinutes + 'm')
+  .join(', ');
+console.log('Service break timeline (broken mins):', breakDaySummary || 'none');
+
 // ---- Stations ----
 // A station target is the item-volume-weighted average of all targeted items
 // assigned to that station for the selected week.
@@ -613,17 +713,13 @@ Object.keys(stationDetailsOut).forEach(st => {
   Object.keys(byDayHour).forEach(day => {
     let ticketCount = 0;
     let fulSecSum = 0;
-    const activeHourKeys = [];
-    Object.entries(byDayHour[day] || {}).forEach(([hourKey, cell]) => {
+    Object.values(byDayHour[day] || {}).forEach(cell => {
       ticketCount += cell.count || 0;
       fulSecSum += (cell.avg_sec || 0) * (cell.count || 0);
-      if ((cell.count || 0) > 0) activeHourKeys.push(hourKey);
     });
     stationDayVolume[st][day] = {
       ticketCount,
       itemQty: 0,
-      activeHourKeys,
-      serviceHours: activeHourKeys.length,
       avgFulSec: ticketCount > 0 ? +(fulSecSum / ticketCount).toFixed(1) : null,
     };
   });
@@ -648,13 +744,7 @@ itemDetails.forEach(item => {
   if (!station || !isFood(station)) return;
   if (!stationDayVolume[station]) stationDayVolume[station] = {};
   if (!stationDayVolume[station][day]) {
-    stationDayVolume[station][day] = {
-      ticketCount: 0,
-      itemQty: 0,
-      activeHourKeys: [],
-      serviceHours: 0,
-      avgFulSec: null,
-    };
+    stationDayVolume[station][day] = { ticketCount: 0, itemQty: 0, avgFulSec: null };
   }
   stationDayVolume[station][day].itemQty += (item.qty || 1);
 });
@@ -672,6 +762,7 @@ const output = {
   tbk,
   breakingPoint,
   breakingPointGuests,
+  serviceBreakTimeline,
   stationItemsArr,
   stationDetails: stationDetailsOut,
   stationDayVolume,
