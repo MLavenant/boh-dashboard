@@ -725,29 +725,78 @@ Object.keys(stationDetailsOut).forEach(st => {
   });
 });
 
-// Roll food item qty onto canonical station + day when item-details join exists
+function stripName(s) {
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+function resolveAssignedStation(menuItem) {
+  let info = ITEM_ASSIGNMENTS[menuItem];
+  if (!info) {
+    const want = stripName(menuItem);
+    const hit = Object.keys(ITEM_ASSIGNMENTS).find(k => stripName(k) === want);
+    if (hit) info = ITEM_ASSIGNMENTS[hit];
+  }
+  if (!info || !Array.isArray(info.stations)) return null;
+  // Prefer first food production station (skip expo/no-print when a cook station exists)
+  const ranked = info.stations.filter(st => st && isFood(st) && !/no\s*print/i.test(st));
+  const cookFirst = ranked.find(st => !/expo|pass/i.test(st));
+  return cookFirst || ranked[0] || null;
+}
+// Match assignment station name onto a kitchen station that actually fired this week
+function resolveKitchenStation(assignedName) {
+  if (!assignedName) return null;
+  if (stationDayVolume[assignedName]) return assignedName;
+  const want = stripName(assignedName);
+  const keys = Object.keys(stationDayVolume);
+  let best = null;
+  let bestLen = 0;
+  for (const k of keys) {
+    const kn = stripName(k);
+    if (kn === want) return k;
+    if ((kn.includes(want) || want.includes(kn)) && Math.min(kn.length, want.length) > bestLen) {
+      best = k;
+      bestLen = Math.min(kn.length, want.length);
+    }
+  }
+  return best;
+}
+
+// Roll food item qty onto station+day using chef/Toast assignment (item quantity),
+// falling back to first kitchen-ticket station only when unmapped.
+let qtyAssigned = 0;
+let qtyFallback = 0;
+let qtySkipped = 0;
 itemDetails.forEach(item => {
   if (!item.menuItem || isBeverageItem(item.menuItem)) return;
   const fired = parseDate(item.sentDate);
   if (!fired) return;
   const day = DAYS[fired.getDay()];
-  const datePfx = (item.sentDate || '').slice(0, 6);
-  const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
-  const matches = ticketByKey[key] || [];
-  let station = itemFirstStation[item.menuItem] || null;
-  if (!station && matches.length) {
-    station = matches[0]['Station'];
+  const qty = item.qty || 1;
+
+  let station = resolveKitchenStation(resolveAssignedStation(item.menuItem));
+  let via = 'assignment';
+  if (!station) {
+    const datePfx = (item.sentDate || '').slice(0, 6);
+    const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
+    const matches = ticketByKey[key] || [];
+    station = itemFirstStation[item.menuItem] || (matches[0] && matches[0]['Station']) || null;
     if (station && isFood(station) && !itemFirstStation[item.menuItem]) {
       itemFirstStation[item.menuItem] = station;
     }
+    via = 'ticket';
   }
-  if (!station || !isFood(station)) return;
+  if (!station || !isFood(station) || /no\s*print/i.test(station)) {
+    qtySkipped += qty;
+    return;
+  }
   if (!stationDayVolume[station]) stationDayVolume[station] = {};
   if (!stationDayVolume[station][day]) {
     stationDayVolume[station][day] = { ticketCount: 0, itemQty: 0, avgFulSec: null };
   }
-  stationDayVolume[station][day].itemQty += (item.qty || 1);
+  stationDayVolume[station][day].itemQty += qty;
+  if (via === 'assignment') qtyAssigned += qty;
+  else qtyFallback += qty;
 });
+console.log(`Item qty→station: assigned=${qtyAssigned}, ticket-fallback=${qtyFallback}, skipped=${qtySkipped}`);
 
 // ---- Output ----
 const output = {

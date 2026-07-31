@@ -171,12 +171,17 @@ function dayVolumeByFamily(venueData, familyMap) {
       const c = fam[day];
       if (!c) continue;
       c.avgFulSec = c.fulWeight > 0 ? +(c.fulSecSum / c.fulWeight).toFixed(1) : null;
-      // Station volume = KDS ticket fires at mapped Toast stations.
-      // Item-details qty joins are often sparse (Saute) or inflated by first-station
-      // locking (Fry), so they are kept as diagnostics only — not the KPI numerator.
+      // Prefer actual item quantity (Toast item-details × station assignment).
+      // Fall back to KDS ticket fires when qty attribution is empty for that day.
+      const qty = c.itemQty || 0;
       const tickets = c.ticketCount || 0;
-      c.volume = tickets;
-      c.volumeSource = 'ticketCount';
+      if (qty > 0) {
+        c.volume = qty;
+        c.volumeSource = 'itemQty';
+      } else {
+        c.volume = tickets;
+        c.volumeSource = 'ticketCount';
+      }
       c.serviceHours = c.serviceHourKeys.size;
       c.itemsPerServiceHour = c.serviceHours > 0
         ? +(c.volume / c.serviceHours).toFixed(2)
@@ -231,6 +236,7 @@ function writePanelRows(weekLabel, venue, byFamily) {
         itemQty: c.itemQty,
         serviceHours: c.serviceHours,
         itemsPerServiceHour: c.itemsPerServiceHour,
+        itemsPerHead: c.itemsPerHead,
         itemsPerStaffHour: c.itemsPerStaffHour,
         avgFulSec: c.avgFulSec,
         eligible: !!(c.qc && c.qc.eligible),
@@ -266,7 +272,7 @@ function classifySignal(cell, family, venue, day, weekLabel, panel) {
     r.day === day &&
     r.eligible &&
     r.weekLabel !== weekLabel &&
-    r.itemsPerStaffHour != null &&
+    (r.itemsPerHead != null || (r.volume != null && r.heads > 0)) &&
     r.avgFulSec != null
   );
   const peers = panel.filter((r) =>
@@ -275,7 +281,7 @@ function classifySignal(cell, family, venue, day, weekLabel, panel) {
     r.family === family &&
     r.day === day &&
     r.eligible &&
-    r.itemsPerStaffHour != null &&
+    (r.itemsPerHead != null || (r.volume != null && r.heads > 0)) &&
     r.avgFulSec != null
   );
 
@@ -297,13 +303,16 @@ function classifySignal(cell, family, venue, day, weekLabel, panel) {
     };
   }
 
-  const ipshArr = ref.map((r) => r.itemsPerStaffHour);
+  const perHead = (r) => (r.itemsPerHead != null
+    ? r.itemsPerHead
+    : (r.heads > 0 ? +(r.volume / r.heads).toFixed(1) : null));
+  const iphArr = ref.map(perHead).filter((x) => x != null);
   const fulArr = ref.map((r) => r.avgFulSec);
-  const pI = pctRank(cell.itemsPerStaffHour, ipshArr);
+  const pI = pctRank(cell.itemsPerHead, iphArr);
   const pF = pctRank(cell.avgFulSec, fulArr);
-  const medIpsh = median(ipshArr);
-  const expectedHours = medIpsh > 0 ? +(cell.volume / medIpsh).toFixed(2) : null;
-  const staffingRatio = expectedHours > 0 ? +(cell.hours / expectedHours).toFixed(2) : null;
+  const medIph = median(iphArr);
+  const expectedHeads = medIph > 0 ? +(cell.volume / medIph).toFixed(1) : null;
+  const staffingRatio = expectedHeads > 0 ? +(cell.heads / expectedHeads).toFixed(2) : null;
 
   let code = 'in_band';
   let label = 'Balanced';
@@ -327,9 +336,9 @@ function classifySignal(cell, family, venue, day, weekLabel, panel) {
     source,
     nPeer: peers.length,
     nHist: hist.length,
-    pIpsh: pI != null ? +pI.toFixed(2) : null,
+    pItemsPerHead: pI != null ? +pI.toFixed(2) : null,
     pFul: pF != null ? +pF.toFixed(2) : null,
-    expectedHours,
+    expectedHeads,
     staffingRatio,
     note: source === 'peer' ? 'vs RDG peer same-DOW' : 'vs own same-DOW history',
   };
