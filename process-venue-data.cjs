@@ -613,13 +613,17 @@ Object.keys(stationDetailsOut).forEach(st => {
   Object.keys(byDayHour).forEach(day => {
     let ticketCount = 0;
     let fulSecSum = 0;
-    Object.values(byDayHour[day] || {}).forEach(cell => {
+    const activeHourKeys = [];
+    Object.entries(byDayHour[day] || {}).forEach(([hourKey, cell]) => {
       ticketCount += cell.count || 0;
       fulSecSum += (cell.avg_sec || 0) * (cell.count || 0);
+      if ((cell.count || 0) > 0) activeHourKeys.push(hourKey);
     });
     stationDayVolume[st][day] = {
       ticketCount,
       itemQty: 0,
+      activeHourKeys,
+      serviceHours: activeHourKeys.length,
       avgFulSec: ticketCount > 0 ? +(fulSecSum / ticketCount).toFixed(1) : null,
     };
   });
@@ -644,7 +648,13 @@ itemDetails.forEach(item => {
   if (!station || !isFood(station)) return;
   if (!stationDayVolume[station]) stationDayVolume[station] = {};
   if (!stationDayVolume[station][day]) {
-    stationDayVolume[station][day] = { ticketCount: 0, itemQty: 0, avgFulSec: null };
+    stationDayVolume[station][day] = {
+      ticketCount: 0,
+      itemQty: 0,
+      activeHourKeys: [],
+      serviceHours: 0,
+      avgFulSec: null,
+    };
   }
   stationDayVolume[station][day].itemQty += (item.qty || 1);
 });

@@ -167,7 +167,7 @@ html = html.replace(
 <div class="station-pills" id="stationPills"></div>
 <div class="card" id="staffingCard" style="margin-top:18px;display:none">
   <h2 style="margin:0 0 4px">Staffing by Station Family</h2>
-  <p class="note" id="staffingNote" style="margin-top:0">Food-production families only (no FOH). Cell = heads · items/staff-hour. Hover for hours, volume, fulfillment, and staffing signal. Compare Tuesday vs Friday in station detail.</p>
+  <p class="note" id="staffingNote" style="margin-top:0">Food-production families only (no FOH). S/h = station volume per active service hour; L/h (IPSH) = volume per staff labor-hour. Hover for hours, volume, fulfillment, and staffing signal.</p>
   <div id="staffingGrid" style="overflow-x:auto"></div>
   <p id="staffingMatchNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
 </div>`
@@ -406,9 +406,48 @@ let currentWeekIdx = (() => {
   return WEEKS.length ? best : 0;
 })();
 let currentVenue = 'claudie';
+function ensureServiceThroughput(data) {
+  if (!data || !data.staffing || !data.staffing.byFamily) return data || {};
+  const staffing = data.staffing;
+  const familyHours = {};
+  Object.entries(staffing.toastStationFamily || {}).forEach(([station, family]) => {
+    const detail = data.stationDetails && data.stationDetails[station];
+    if (!detail || !detail.byDayHour) return;
+    if (!familyHours[family]) familyHours[family] = {};
+    Object.entries(detail.byDayHour).forEach(([day, hours]) => {
+      if (!familyHours[family][day]) familyHours[family][day] = new Set();
+      Object.entries(hours || {}).forEach(([hourKey, cell]) => {
+        if ((cell.count || 0) > 0) familyHours[family][day].add(hourKey);
+      });
+    });
+  });
+  Object.entries(staffing.byFamily).forEach(([family, fam]) => {
+    let weekVolume = 0;
+    let weekServiceHours = 0;
+    Object.entries(fam.days || {}).forEach(([day, cell]) => {
+      const derivedHours = familyHours[family] && familyHours[family][day]
+        ? familyHours[family][day].size
+        : 0;
+      if (!(cell.serviceHours > 0)) cell.serviceHours = derivedHours;
+      const volume = cell.volume != null ? cell.volume : (cell.itemCount || 0);
+      cell.itemsPerServiceHour = cell.serviceHours > 0
+        ? +(volume / cell.serviceHours).toFixed(2)
+        : null;
+      weekVolume += volume || 0;
+      weekServiceHours += cell.serviceHours || 0;
+    });
+    fam.weekServiceHours = weekServiceHours;
+    fam.weekItemsPerServiceHour = weekServiceHours > 0
+      ? +(weekVolume / weekServiceHours).toFixed(2)
+      : null;
+  });
+  return data;
+}
 function getD() {
   const weekKey = WEEKS[currentWeekIdx]?.key;
-  return ALL_DATA[currentVenue]?.[weekKey] || ALL_DATA[currentVenue]?.['latest'] || {};
+  return ensureServiceThroughput(
+    ALL_DATA[currentVenue]?.[weekKey] || ALL_DATA[currentVenue]?.['latest'] || {}
+  );
 }
 
 function weekShortLabel(weekKey) {
@@ -1685,7 +1724,7 @@ function renderStaffingGrid() {
   html += '<table style="border-collapse:collapse;font-size:12px;min-width:780px;width:100%">';
   html += '<thead><tr><th style="text-align:left;padding:6px 8px;color:#9aa0aa;background:#1e2533">Family</th>';
   DAYS.forEach(d => { html += '<th style="padding:6px 8px;color:#9aa0aa;background:#1e2533;text-align:center">'+d.slice(0,3)+'</th>'; });
-  html += '<th style="padding:6px 8px;color:#9aa0aa;background:#1e2533;text-align:center">Week IPSH</th></tr></thead><tbody>';
+  html += '<th style="padding:6px 8px;color:#9aa0aa;background:#1e2533;text-align:center">Week S/h · L/h</th></tr></thead><tbody>';
   families.forEach(f => {
     const fam = staffing.byFamily[f];
     html += '<tr><td style="padding:6px 8px;color:#e8eaed;font-weight:600;white-space:nowrap">'+f+
@@ -1697,20 +1736,25 @@ function renderStaffingGrid() {
       const tip = [
         (c.heads||0)+' staff',
         (c.hours||0)+' labor hours',
+        (c.serviceHours||0)+' active service hours',
         'volume '+(c.volume!=null?c.volume:(c.itemCount||0)),
+        'station throughput '+(c.itemsPerServiceHour!=null?c.itemsPerServiceHour:'—')+'/service h',
         'IPSH '+(c.itemsPerStaffHour!=null?c.itemsPerStaffHour:'—'),
         'ful '+fmtFulMin(c.avgFulSec),
         sig.label || ''
       ].filter(Boolean).join(' · ');
       html += '<td title="'+tip.replace(/"/g,'&quot;')+'" style="padding:6px 8px;text-align:center;background:'+headColor(c.heads||0)+';color:#e8eaed;cursor:default">'+
         '<div style="font-weight:700;font-size:14px">'+(c.heads||0)+'</div>'+
-        '<div style="font-size:10px;color:#9aa0aa">'+(c.itemsPerStaffHour!=null?c.itemsPerStaffHour+'/h':'—')+'</div>'+
+        '<div style="font-size:10px;color:#d9a441">S '+(c.itemsPerServiceHour!=null?c.itemsPerServiceHour+'/h':'—')+'</div>'+
+        '<div style="font-size:10px;color:#9aa0aa">L '+(c.itemsPerStaffHour!=null?c.itemsPerStaffHour+'/h':'—')+'</div>'+
         (sig.label && sig.code && sig.code !== 'closed_or_empty' && sig.code !== 'insufficient_data'
           ? '<div style="font-size:9px;color:'+signalColor(sig.code)+';margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72px">'+(sig.label.split(' ').pop())+'</div>'
           : '')+
         '</td>';
     });
-    html += '<td style="padding:6px 8px;text-align:center;color:#d9a441;font-weight:600">'+(fam.weekItemsPerStaffHour!=null?fam.weekItemsPerStaffHour:(fam.weekItemsPerHeadDay!=null?fam.weekItemsPerHeadDay+'/hd':'—'))+'</td></tr>';
+    html += '<td style="padding:6px 8px;text-align:center;font-weight:600">'+
+      '<div style="color:#d9a441">S '+(fam.weekItemsPerServiceHour!=null?fam.weekItemsPerServiceHour+'/h':'—')+'</div>'+
+      '<div style="color:#9aa0aa;font-size:10px">L '+(fam.weekItemsPerStaffHour!=null?fam.weekItemsPerStaffHour+'/h':'—')+'</div></td></tr>';
   });
   html += '</tbody></table>';
   grid.innerHTML = html;
@@ -2026,19 +2070,25 @@ function renderStations() {
         tueFriNote = 'Tue vs Fri IPSH: <strong style="color:#e8eaed">'+tueIpsh+'</strong> → <strong style="color:#e8eaed">'+friIpsh+'</strong> ('+
           (faster ? 'Friday +' : 'Friday ')+((ratio-1)*100).toFixed(0)+'% vs Tuesday). ' +
           'Heads Tue/Fri: '+(tue.heads||0)+'/'+(fri.heads||0)+' · Ful '+fmtFulMin(tue.avgFulSec)+' / '+fmtFulMin(fri.avgFulSec)+'.';
+        if (tue.itemsPerServiceHour != null && fri.itemsPerServiceHour != null) {
+          tueFriNote += ' Station throughput Tue/Fri: <strong style="color:#d9a441">'+
+            tue.itemsPerServiceHour+'</strong> / <strong style="color:#d9a441">'+
+            fri.itemsPerServiceHour+'</strong> items/service-hour.';
+        }
       }
       staffingHtml = '<div style="margin-bottom:16px;padding:12px;background:#13161c;border:1px solid #262a33;border-radius:10px">'+
         '<div style="font-size:13px;font-weight:600;color:#d9a441;margin-bottom:6px">Staffing performance · '+famName+' family</div>'+
         '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px">'+
           '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+fam.weekHeadsUnique+'</div><div class="l">Unique cooks worked</div></div>'+
           '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+fam.rosterCount+'</div><div class="l">On FTE roster</div></div>'+
+          '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px;color:#d9a441">'+(fam.weekItemsPerServiceHour!=null?fam.weekItemsPerServiceHour:'—')+'</div><div class="l">Items / service-hour</div></div>'+
           '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px;color:#d9a441">'+(fam.weekItemsPerStaffHour!=null?fam.weekItemsPerStaffHour:(fam.weekItemsPerHeadDay??'—'))+'</div><div class="l">Items / staff-hour</div></div>'+
           '<div class="kpi" style="padding:8px 12px"><div class="v" style="font-size:16px">'+(fam.weekAvgFulSec!=null?fmtFulMin(fam.weekAvgFulSec):'—')+'</div><div class="l">Avg fulfillment</div></div>'+
         '</div>'+
         (tueFriNote ? '<div style="font-size:12px;color:#9aa0aa;margin-bottom:10px">'+tueFriNote+'</div>' : '')+
-        '<div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:11px;width:100%;min-width:640px">'+
+        '<div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:11px;width:100%;min-width:760px">'+
         '<thead><tr style="color:#9aa0aa;text-align:center">'+
-        '<th style="text-align:left;padding:4px 6px">Day</th><th style="padding:4px 6px">Staff</th><th style="padding:4px 6px">Hours</th><th style="padding:4px 6px">Volume</th><th style="padding:4px 6px">IPSH</th><th style="padding:4px 6px">Ful</th><th style="padding:4px 6px">Signal</th></tr></thead><tbody>'+
+        '<th style="text-align:left;padding:4px 6px">Day</th><th style="padding:4px 6px">Staff</th><th style="padding:4px 6px">Labor h</th><th style="padding:4px 6px">Service h</th><th style="padding:4px 6px">Volume</th><th style="padding:4px 6px">Items/service h</th><th style="padding:4px 6px">IPSH</th><th style="padding:4px 6px">Ful</th><th style="padding:4px 6px">Signal</th></tr></thead><tbody>'+
         DAYS.map(day => {
           const c = fam.days[day] || {};
           const sig = c.signal || {};
@@ -2047,7 +2097,9 @@ function renderStations() {
             '<td style="padding:5px 6px;color:#e8eaed;font-weight:600;text-align:left">'+day.slice(0,3)+'</td>'+
             '<td style="padding:5px 6px;text-align:center;color:#e8eaed">'+(c.heads||0)+'</td>'+
             '<td style="padding:5px 6px;text-align:center;color:#9aa0aa">'+(c.hours||0)+'</td>'+
+            '<td style="padding:5px 6px;text-align:center;color:#9aa0aa">'+(c.serviceHours||0)+'</td>'+
             '<td style="padding:5px 6px;text-align:center;color:#9aa0aa">'+(c.volume!=null?c.volume:(c.itemCount||0))+'</td>'+
+            '<td style="padding:5px 6px;text-align:center;color:#d9a441;font-weight:600">'+(c.itemsPerServiceHour!=null?c.itemsPerServiceHour:'—')+'</td>'+
             '<td style="padding:5px 6px;text-align:center;color:#d9a441;font-weight:600">'+(c.itemsPerStaffHour!=null?c.itemsPerStaffHour:'—')+'</td>'+
             '<td style="padding:5px 6px;text-align:center;color:#9aa0aa">'+fmtFulMin(c.avgFulSec)+'</td>'+
             '<td style="padding:5px 6px;text-align:center;color:'+signalColor(sig.code)+'" title="'+(sig.note||'').replace(/"/g,'&quot;')+'">'+(sig.label||'—')+'</td></tr>';

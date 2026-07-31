@@ -10710,36 +10710,115 @@
       "Monday": {
         "ticketCount": 160,
         "itemQty": 415,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 522.6
       },
       "Tuesday": {
         "ticketCount": 141,
         "itemQty": 580,
+        "activeHourKeys": [
+          "17-18",
+          "16-17",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 545.2
       },
       "Wednesday": {
         "ticketCount": 201,
         "itemQty": 603,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 620.1
       },
       "Thursday": {
         "ticketCount": 243,
         "itemQty": 817,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 719.6
       },
       "Friday": {
         "ticketCount": 264,
         "itemQty": 833.0000000000008,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 530.2
       },
       "Saturday": {
         "ticketCount": 365,
         "itemQty": 1262.9999999999995,
+        "activeHourKeys": [
+          "11-12",
+          "12-13",
+          "13-14",
+          "14-15",
+          "15-16",
+          "16-17",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 13,
         "avgFulSec": 624
       },
       "Sunday": {
         "ticketCount": 253,
         "itemQty": 942,
+        "activeHourKeys": [
+          "11-12",
+          "12-13",
+          "13-14",
+          "14-15",
+          "15-16",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 11,
         "avgFulSec": 672.6
       }
     },
@@ -10747,36 +10826,109 @@
       "Monday": {
         "ticketCount": 68,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 402.9
       },
       "Tuesday": {
         "ticketCount": 60,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 463
       },
       "Wednesday": {
         "ticketCount": 77,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 571
       },
       "Thursday": {
         "ticketCount": 84,
         "itemQty": 0,
+        "activeHourKeys": [
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 630.2
       },
       "Friday": {
         "ticketCount": 104,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 513.6
       },
       "Saturday": {
         "ticketCount": 151,
         "itemQty": 0,
+        "activeHourKeys": [
+          "11-12",
+          "12-13",
+          "13-14",
+          "14-15",
+          "15-16",
+          "16-17",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 13,
         "avgFulSec": 567.1
       },
       "Sunday": {
         "ticketCount": 98,
         "itemQty": 0,
+        "activeHourKeys": [
+          "11-12",
+          "12-13",
+          "13-14",
+          "14-15",
+          "15-16",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22"
+        ],
+        "serviceHours": 10,
         "avgFulSec": 565.5
       }
     },
@@ -10784,36 +10936,108 @@
       "Monday": {
         "ticketCount": 107,
         "itemQty": 53,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 848
       },
       "Tuesday": {
         "ticketCount": 108,
         "itemQty": 66,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 830.8
       },
       "Wednesday": {
         "ticketCount": 140,
         "itemQty": 78,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 958.4
       },
       "Thursday": {
         "ticketCount": 170,
         "itemQty": 75,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 1206
       },
       "Friday": {
         "ticketCount": 231,
         "itemQty": 152,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 937.4
       },
       "Saturday": {
         "ticketCount": 291,
         "itemQty": 215,
+        "activeHourKeys": [
+          "11-12",
+          "12-13",
+          "13-14",
+          "14-15",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 11,
         "avgFulSec": 956.8
       },
       "Sunday": {
         "ticketCount": 178,
         "itemQty": 146,
+        "activeHourKeys": [
+          "11-12",
+          "12-13",
+          "13-14",
+          "14-15",
+          "15-16",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 11,
         "avgFulSec": 910.3
       }
     },
@@ -10821,36 +11045,108 @@
       "Monday": {
         "ticketCount": 93,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 847.9
       },
       "Tuesday": {
         "ticketCount": 93,
         "itemQty": 3,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 868.1
       },
       "Wednesday": {
         "ticketCount": 118,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 1003
       },
       "Thursday": {
         "ticketCount": 143,
         "itemQty": 2,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 1141.7
       },
       "Friday": {
         "ticketCount": 189,
         "itemQty": 2,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 946.7
       },
       "Saturday": {
         "ticketCount": 251,
         "itemQty": 14,
+        "activeHourKeys": [
+          "11-12",
+          "12-13",
+          "13-14",
+          "14-15",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 11,
         "avgFulSec": 932.3
       },
       "Sunday": {
         "ticketCount": 173,
         "itemQty": 20,
+        "activeHourKeys": [
+          "11-12",
+          "12-13",
+          "13-14",
+          "14-15",
+          "15-16",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 11,
         "avgFulSec": 873.1
       }
     },
@@ -10858,36 +11154,105 @@
       "Monday": {
         "ticketCount": 46,
         "itemQty": 16,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 895.8
       },
       "Tuesday": {
         "ticketCount": 50,
         "itemQty": 11,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 845.6
       },
       "Wednesday": {
         "ticketCount": 55,
         "itemQty": 16,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 980.2
       },
       "Thursday": {
         "ticketCount": 75,
         "itemQty": 22,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 1264.5
       },
       "Friday": {
         "ticketCount": 92,
         "itemQty": 25,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 1033.3
       },
       "Saturday": {
         "ticketCount": 121,
         "itemQty": 46,
+        "activeHourKeys": [
+          "11-12",
+          "12-13",
+          "13-14",
+          "14-15",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 11,
         "avgFulSec": 1073.1
       },
       "Sunday": {
         "ticketCount": 50,
         "itemQty": 17,
+        "activeHourKeys": [
+          "12-13",
+          "13-14",
+          "14-15",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 8,
         "avgFulSec": 975.9
       }
     },
@@ -10895,36 +11260,96 @@
       "Monday": {
         "ticketCount": 10,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21"
+        ],
+        "serviceHours": 4,
         "avgFulSec": 315.3
       },
       "Tuesday": {
         "ticketCount": 12,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 249.8
       },
       "Wednesday": {
         "ticketCount": 12,
         "itemQty": 0,
+        "activeHourKeys": [
+          "19-20",
+          "18-19",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 266.7
       },
       "Thursday": {
         "ticketCount": 13,
         "itemQty": 0,
+        "activeHourKeys": [
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 393.2
       },
       "Friday": {
         "ticketCount": 15,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 348
       },
       "Saturday": {
         "ticketCount": 21,
         "itemQty": 0,
+        "activeHourKeys": [
+          "11-12",
+          "13-14",
+          "14-15",
+          "15-16",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 10,
         "avgFulSec": 344.4
       },
       "Sunday": {
         "ticketCount": 11,
         "itemQty": 0,
+        "activeHourKeys": [
+          "13-14",
+          "18-19",
+          "19-20",
+          "20-21"
+        ],
+        "serviceHours": 4,
         "avgFulSec": 306.7
       }
     },
@@ -10932,36 +11357,109 @@
       "Monday": {
         "ticketCount": 91,
         "itemQty": 14,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 843.2
       },
       "Tuesday": {
         "ticketCount": 83,
         "itemQty": 16,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 886.8
       },
       "Wednesday": {
         "ticketCount": 126,
         "itemQty": 35,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 973.5
       },
       "Thursday": {
         "ticketCount": 165,
         "itemQty": 51,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 1204
       },
       "Friday": {
         "ticketCount": 200,
         "itemQty": 37,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 1025.1
       },
       "Saturday": {
         "ticketCount": 241,
         "itemQty": 20,
+        "activeHourKeys": [
+          "12-13",
+          "13-14",
+          "14-15",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 10,
         "avgFulSec": 1013.2
       },
       "Sunday": {
         "ticketCount": 154,
         "itemQty": 24,
+        "activeHourKeys": [
+          "11-12",
+          "12-13",
+          "13-14",
+          "14-15",
+          "15-16",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 11,
         "avgFulSec": 885.7
       }
     },
@@ -10969,36 +11467,107 @@
       "Monday": {
         "ticketCount": 94,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 897.7
       },
       "Tuesday": {
         "ticketCount": 99,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 873.7
       },
       "Wednesday": {
         "ticketCount": 136,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 972.6
       },
       "Thursday": {
         "ticketCount": 172,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 1195.8
       },
       "Friday": {
         "ticketCount": 223,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 991.2
       },
       "Saturday": {
         "ticketCount": 287,
         "itemQty": 0,
+        "activeHourKeys": [
+          "12-13",
+          "13-14",
+          "14-15",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 10,
         "avgFulSec": 951.9
       },
       "Sunday": {
         "ticketCount": 159,
         "itemQty": 0,
+        "activeHourKeys": [
+          "11-12",
+          "12-13",
+          "13-14",
+          "14-15",
+          "15-16",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 11,
         "avgFulSec": 896.8
       }
     },
@@ -11006,36 +11575,110 @@
       "Monday": {
         "ticketCount": 31,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 6,
         "avgFulSec": 541.6
       },
       "Tuesday": {
         "ticketCount": 28,
         "itemQty": 0,
+        "activeHourKeys": [
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 5,
         "avgFulSec": 517.9
       },
       "Wednesday": {
         "ticketCount": 41,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 477.7
       },
       "Thursday": {
         "ticketCount": 61,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 544.8
       },
       "Friday": {
         "ticketCount": 53,
         "itemQty": 0,
+        "activeHourKeys": [
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 7,
         "avgFulSec": 351.3
       },
       "Saturday": {
         "ticketCount": 98,
         "itemQty": 0,
+        "activeHourKeys": [
+          "12-13",
+          "13-14",
+          "14-15",
+          "15-16",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23",
+          "23-24"
+        ],
+        "serviceHours": 10,
         "avgFulSec": 599.1
       },
       "Sunday": {
         "ticketCount": 84,
         "itemQty": 0,
+        "activeHourKeys": [
+          "11-12",
+          "12-13",
+          "13-14",
+          "14-15",
+          "15-16",
+          "17-18",
+          "18-19",
+          "19-20",
+          "20-21",
+          "21-22",
+          "22-23"
+        ],
+        "serviceHours": 11,
         "avgFulSec": 735.8
       }
     }
@@ -11997,7 +12640,7 @@
   "staffing": {
     "venue": "ava_winter_park",
     "weekLabel": "2026-W30",
-    "builtAt": "2026-07-30T21:26:25.423Z",
+    "builtAt": "2026-07-31T01:02:49.008Z",
     "matchStats": {
       "laborShiftsMatched": 133,
       "laborShiftsUnmatched": 299,
@@ -12038,6 +12681,8 @@
         "weekTicketCount": 642,
         "weekItemsPerHeadDay": 30.6,
         "weekItemsPerStaffHour": 4.12,
+        "weekServiceHours": 52,
+        "weekItemsPerServiceHour": 12.35,
         "weekAvgFulSec": 539.8,
         "days": {
           "Monday": {
@@ -12049,6 +12694,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 68,
             "itemsPerHead": 34,
+            "serviceHours": 5,
+            "itemsPerServiceHour": 13.6,
             "itemsPerStaffHour": 5.04,
             "avgFulSec": 402.9,
             "qc": {
@@ -12074,6 +12721,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 60,
             "itemsPerHead": 30,
+            "serviceHours": 6,
+            "itemsPerServiceHour": 10,
             "itemsPerStaffHour": 4.17,
             "avgFulSec": 463,
             "qc": {
@@ -12099,6 +12748,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 77,
             "itemsPerHead": 25.7,
+            "serviceHours": 6,
+            "itemsPerServiceHour": 12.83,
             "itemsPerStaffHour": 3.59,
             "avgFulSec": 571,
             "qc": {
@@ -12124,6 +12775,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 84,
             "itemsPerHead": 28,
+            "serviceHours": 5,
+            "itemsPerServiceHour": 16.8,
             "itemsPerStaffHour": 3.45,
             "avgFulSec": 630.2,
             "qc": {
@@ -12149,6 +12802,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 104,
             "itemsPerHead": 52,
+            "serviceHours": 7,
+            "itemsPerServiceHour": 14.86,
             "itemsPerStaffHour": 5.84,
             "avgFulSec": 513.6,
             "qc": {
@@ -12174,6 +12829,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 151,
             "itemsPerHead": 37.8,
+            "serviceHours": 13,
+            "itemsPerServiceHour": 11.62,
             "itemsPerStaffHour": 4.83,
             "avgFulSec": 567.1,
             "qc": {
@@ -12199,6 +12856,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 98,
             "itemsPerHead": 19.6,
+            "serviceHours": 10,
+            "itemsPerServiceHour": 9.8,
             "itemsPerStaffHour": 2.96,
             "avgFulSec": 565.5,
             "qc": {
@@ -12226,6 +12885,8 @@
         "weekTicketCount": 0,
         "weekItemsPerHeadDay": 0,
         "weekItemsPerStaffHour": 0,
+        "weekServiceHours": 0,
+        "weekItemsPerServiceHour": null,
         "weekAvgFulSec": null,
         "days": {
           "Monday": {
@@ -12237,6 +12898,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": 0,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": 0,
             "avgFulSec": null,
             "qc": {
@@ -12262,6 +12925,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": 0,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": 0,
             "avgFulSec": null,
             "qc": {
@@ -12287,6 +12952,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": 0,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": 0,
             "avgFulSec": null,
             "qc": {
@@ -12312,6 +12979,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": 0,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": 0,
             "avgFulSec": null,
             "qc": {
@@ -12337,6 +13006,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": 0,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": 0,
             "avgFulSec": null,
             "qc": {
@@ -12362,6 +13033,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": 0,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": 0,
             "avgFulSec": null,
             "qc": {
@@ -12387,6 +13060,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": 0,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": 0,
             "avgFulSec": null,
             "qc": {
@@ -12414,6 +13089,8 @@
         "weekTicketCount": 396,
         "weekItemsPerHeadDay": 14.1,
         "weekItemsPerStaffHour": 1.7,
+        "weekServiceHours": 53,
+        "weekItemsPerServiceHour": 7.47,
         "weekAvgFulSec": 563.8,
         "days": {
           "Monday": {
@@ -12425,6 +13102,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 31,
             "itemsPerHead": 7.8,
+            "serviceHours": 6,
+            "itemsPerServiceHour": 5.17,
             "itemsPerStaffHour": 1,
             "avgFulSec": 541.6,
             "qc": {
@@ -12450,6 +13129,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 28,
             "itemsPerHead": 7,
+            "serviceHours": 5,
+            "itemsPerServiceHour": 5.6,
             "itemsPerStaffHour": 0.89,
             "avgFulSec": 517.9,
             "qc": {
@@ -12475,6 +13156,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 41,
             "itemsPerHead": 20.5,
+            "serviceHours": 7,
+            "itemsPerServiceHour": 5.86,
             "itemsPerStaffHour": 2.55,
             "avgFulSec": 477.7,
             "qc": {
@@ -12500,6 +13183,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 61,
             "itemsPerHead": 30.5,
+            "serviceHours": 7,
+            "itemsPerServiceHour": 8.71,
             "itemsPerStaffHour": 3.88,
             "avgFulSec": 544.8,
             "qc": {
@@ -12525,6 +13210,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 53,
             "itemsPerHead": 10.6,
+            "serviceHours": 7,
+            "itemsPerServiceHour": 7.57,
             "itemsPerStaffHour": 1.32,
             "avgFulSec": 351.3,
             "qc": {
@@ -12550,6 +13237,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 98,
             "itemsPerHead": 16.3,
+            "serviceHours": 10,
+            "itemsPerServiceHour": 9.8,
             "itemsPerStaffHour": 1.68,
             "avgFulSec": 599.1,
             "qc": {
@@ -12575,6 +13264,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 84,
             "itemsPerHead": 16.8,
+            "serviceHours": 11,
+            "itemsPerServiceHour": 7.64,
             "itemsPerStaffHour": 2.14,
             "avgFulSec": 735.8,
             "qc": {
@@ -12602,6 +13293,8 @@
         "weekTicketCount": 1060,
         "weekItemsPerHeadDay": 55.8,
         "weekItemsPerStaffHour": 7.5,
+        "weekServiceHours": 51,
+        "weekItemsPerServiceHour": 20.78,
         "weekAvgFulSec": 948.3,
         "days": {
           "Monday": {
@@ -12613,6 +13306,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 93,
             "itemsPerHead": 46.5,
+            "serviceHours": 5,
+            "itemsPerServiceHour": 18.6,
             "itemsPerStaffHour": 7.02,
             "avgFulSec": 847.9,
             "qc": {
@@ -12638,6 +13333,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 93,
             "itemsPerHead": null,
+            "serviceHours": 5,
+            "itemsPerServiceHour": 18.6,
             "itemsPerStaffHour": null,
             "avgFulSec": 868.1,
             "qc": {
@@ -12663,6 +13360,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 118,
             "itemsPerHead": 59,
+            "serviceHours": 6,
+            "itemsPerServiceHour": 19.67,
             "itemsPerStaffHour": 8.73,
             "avgFulSec": 1003,
             "qc": {
@@ -12688,6 +13387,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 143,
             "itemsPerHead": 35.8,
+            "serviceHours": 6,
+            "itemsPerServiceHour": 23.83,
             "itemsPerStaffHour": 4.5,
             "avgFulSec": 1141.7,
             "qc": {
@@ -12713,6 +13414,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 189,
             "itemsPerHead": 63,
+            "serviceHours": 7,
+            "itemsPerServiceHour": 27,
             "itemsPerStaffHour": 8.45,
             "avgFulSec": 946.7,
             "qc": {
@@ -12738,6 +13441,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 251,
             "itemsPerHead": 62.8,
+            "serviceHours": 11,
+            "itemsPerServiceHour": 22.82,
             "itemsPerStaffHour": 7.91,
             "avgFulSec": 932.3,
             "qc": {
@@ -12763,6 +13468,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 173,
             "itemsPerHead": 43.3,
+            "serviceHours": 11,
+            "itemsPerServiceHour": 15.73,
             "itemsPerStaffHour": 6.04,
             "avgFulSec": 873.1,
             "qc": {
@@ -12790,6 +13497,8 @@
         "weekTicketCount": 2884,
         "weekItemsPerHeadDay": 90.1,
         "weekItemsPerStaffHour": 12.03,
+        "weekServiceHours": 51,
+        "weekItemsPerServiceHour": 56.55,
         "weekAvgFulSec": 980.7,
         "days": {
           "Monday": {
@@ -12801,6 +13510,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 247,
             "itemsPerHead": 61.8,
+            "serviceHours": 5,
+            "itemsPerServiceHour": 49.4,
             "itemsPerStaffHour": 10.16,
             "avgFulSec": 875.8,
             "qc": {
@@ -12826,6 +13537,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 257,
             "itemsPerHead": 51.4,
+            "serviceHours": 5,
+            "itemsPerServiceHour": 51.4,
             "itemsPerStaffHour": 7.61,
             "avgFulSec": 850.2,
             "qc": {
@@ -12851,6 +13564,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 331,
             "itemsPerHead": 82.8,
+            "serviceHours": 6,
+            "itemsPerServiceHour": 55.17,
             "itemsPerStaffHour": 11.11,
             "avgFulSec": 967.9,
             "qc": {
@@ -12876,6 +13591,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 417,
             "itemsPerHead": 139,
+            "serviceHours": 6,
+            "itemsPerServiceHour": 69.5,
             "itemsPerStaffHour": 17.42,
             "avgFulSec": 1212.3,
             "qc": {
@@ -12901,6 +13618,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 546,
             "itemsPerHead": 109.2,
+            "serviceHours": 7,
+            "itemsPerServiceHour": 78,
             "itemsPerStaffHour": 12.69,
             "avgFulSec": 975.5,
             "qc": {
@@ -12926,6 +13645,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 699,
             "itemsPerHead": 99.9,
+            "serviceHours": 11,
+            "itemsPerServiceHour": 63.55,
             "itemsPerStaffHour": 12.18,
             "avgFulSec": 974.9,
             "qc": {
@@ -12951,6 +13672,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 387,
             "itemsPerHead": 96.8,
+            "serviceHours": 11,
+            "itemsPerServiceHour": 35.18,
             "itemsPerStaffHour": 14.08,
             "avgFulSec": 913.2,
             "qc": {
@@ -12978,6 +13701,8 @@
         "weekTicketCount": 0,
         "weekItemsPerHeadDay": null,
         "weekItemsPerStaffHour": null,
+        "weekServiceHours": 0,
+        "weekItemsPerServiceHour": null,
         "weekAvgFulSec": null,
         "days": {
           "Monday": {
@@ -12989,6 +13714,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": null,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": null,
             "avgFulSec": null,
             "qc": {
@@ -13014,6 +13741,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": null,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": null,
             "avgFulSec": null,
             "qc": {
@@ -13039,6 +13768,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": null,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": null,
             "avgFulSec": null,
             "qc": {
@@ -13064,6 +13795,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": null,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": null,
             "avgFulSec": null,
             "qc": {
@@ -13089,6 +13822,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": null,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": null,
             "avgFulSec": null,
             "qc": {
@@ -13114,6 +13849,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": null,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": null,
             "avgFulSec": null,
             "qc": {
@@ -13139,6 +13876,8 @@
             "volumeSource": "ticketCount",
             "itemCount": 0,
             "itemsPerHead": null,
+            "serviceHours": 0,
+            "itemsPerServiceHour": null,
             "itemsPerStaffHour": null,
             "avgFulSec": null,
             "qc": {
@@ -13166,6 +13905,8 @@
         "weekTicketCount": 2687,
         "weekItemsPerHeadDay": null,
         "weekItemsPerStaffHour": null,
+        "weekServiceHours": 58,
+        "weekItemsPerServiceHour": 97.41,
         "weekAvgFulSec": 764.8,
         "days": {
           "Monday": {
@@ -13177,6 +13918,8 @@
             "volumeSource": "itemQty",
             "itemCount": 429,
             "itemsPerHead": null,
+            "serviceHours": 6,
+            "itemsPerServiceHour": 71.5,
             "itemsPerStaffHour": null,
             "avgFulSec": 638.8,
             "qc": {
@@ -13202,6 +13945,8 @@
             "volumeSource": "itemQty",
             "itemCount": 596,
             "itemsPerHead": null,
+            "serviceHours": 7,
+            "itemsPerServiceHour": 85.14,
             "itemsPerStaffHour": null,
             "avgFulSec": 671.8,
             "qc": {
@@ -13227,6 +13972,8 @@
             "volumeSource": "itemQty",
             "itemCount": 638,
             "itemsPerHead": null,
+            "serviceHours": 7,
+            "itemsPerServiceHour": 91.14,
             "itemsPerStaffHour": null,
             "avgFulSec": 756.3,
             "qc": {
@@ -13252,6 +13999,8 @@
             "volumeSource": "itemQty",
             "itemCount": 868,
             "itemsPerHead": null,
+            "serviceHours": 7,
+            "itemsPerServiceHour": 124,
             "itemsPerStaffHour": null,
             "avgFulSec": 915.5,
             "qc": {
@@ -13277,6 +14026,8 @@
             "volumeSource": "itemQty",
             "itemCount": 870.0000000000008,
             "itemsPerHead": null,
+            "serviceHours": 7,
+            "itemsPerServiceHour": 124.29,
             "itemsPerStaffHour": null,
             "avgFulSec": 743.5,
             "qc": {
@@ -13302,6 +14053,8 @@
             "volumeSource": "itemQty",
             "itemCount": 1282.9999999999995,
             "itemsPerHead": null,
+            "serviceHours": 13,
+            "itemsPerServiceHour": 98.69,
             "itemsPerStaffHour": null,
             "avgFulSec": 778.8,
             "qc": {
@@ -13327,6 +14080,8 @@
             "volumeSource": "itemQty",
             "itemCount": 966,
             "itemsPerHead": null,
+            "serviceHours": 11,
+            "itemsPerServiceHour": 87.82,
             "itemsPerStaffHour": null,
             "avgFulSec": 753.2,
             "qc": {

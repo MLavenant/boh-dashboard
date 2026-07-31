@@ -104,9 +104,16 @@ function stationToFamily(stationName, familyMap) {
 }
 
 function dayVolumeByFamily(venueData, familyMap) {
-  /** family -> day -> { ticketCount, itemQty, avgFulSec } */
+  /** family -> day -> volume, fulfillment, and union of active service hours */
   const out = {};
   const sdv = venueData.stationDayVolume || null;
+  const makeRow = () => ({
+    ticketCount: 0,
+    itemQty: 0,
+    fulSecSum: 0,
+    fulWeight: 0,
+    serviceHourKeys: new Set(),
+  });
 
   if (sdv && Object.keys(sdv).length) {
     for (const [stName, byDay] of Object.entries(sdv)) {
@@ -116,10 +123,18 @@ function dayVolumeByFamily(venueData, familyMap) {
       for (const day of DAYS) {
         const cell = byDay[day];
         if (!cell) continue;
-        if (!out[family][day]) out[family][day] = { ticketCount: 0, itemQty: 0, fulSecSum: 0, fulWeight: 0 };
+        if (!out[family][day]) out[family][day] = makeRow();
         const row = out[family][day];
         row.ticketCount += cell.ticketCount || 0;
         row.itemQty += cell.itemQty || 0;
+        const fallbackHours = Object.entries(
+          venueData.stationDetails?.[stName]?.byDayHour?.[day] || {}
+        )
+          .filter(([, hourCell]) => (hourCell.count || 0) > 0)
+          .map(([hourKey]) => hourKey);
+        for (const hourKey of cell.activeHourKeys || fallbackHours) {
+          row.serviceHourKeys.add(hourKey);
+        }
         if (cell.avgFulSec != null && (cell.ticketCount || 0) > 0) {
           row.fulSecSum += cell.avgFulSec * cell.ticketCount;
           row.fulWeight += cell.ticketCount;
@@ -140,10 +155,13 @@ function dayVolumeByFamily(venueData, familyMap) {
           ticketCount += cell.count || 0;
           fulSecSum += (cell.avg_sec || 0) * (cell.count || 0);
         }
-        if (!out[family][day]) out[family][day] = { ticketCount: 0, itemQty: 0, fulSecSum: 0, fulWeight: 0 };
+        if (!out[family][day]) out[family][day] = makeRow();
         out[family][day].ticketCount += ticketCount;
         out[family][day].fulSecSum += fulSecSum;
         out[family][day].fulWeight += ticketCount;
+        for (const [hourKey, cell] of Object.entries(hrs)) {
+          if ((cell.count || 0) > 0) out[family][day].serviceHourKeys.add(hourKey);
+        }
       }
     }
   }
@@ -160,6 +178,10 @@ function dayVolumeByFamily(venueData, familyMap) {
       const useItems = items > 0 && items >= Math.max(1, tickets * 0.5);
       c.volume = useItems ? items : tickets;
       c.volumeSource = useItems ? 'itemQty' : 'ticketCount';
+      c.serviceHours = c.serviceHourKeys.size;
+      c.itemsPerServiceHour = c.serviceHours > 0
+        ? +(c.volume / c.serviceHours).toFixed(2)
+        : null;
     }
   }
   return out;
@@ -208,6 +230,8 @@ function writePanelRows(weekLabel, venue, byFamily) {
         volume: c.volume,
         ticketCount: c.ticketCount,
         itemQty: c.itemQty,
+        serviceHours: c.serviceHours,
+        itemsPerServiceHour: c.itemsPerServiceHour,
         itemsPerStaffHour: c.itemsPerStaffHour,
         avgFulSec: c.avgFulSec,
         eligible: !!(c.qc && c.qc.eligible),
@@ -423,6 +447,8 @@ function buildVenue(venueRaw, weekLabel) {
           volumeSource: vol.volumeSource || 'ticketCount',
           itemCount: vol.volume || 0, // backward-compat alias
           itemsPerHead: null,
+          serviceHours: vol.serviceHours || 0,
+          itemsPerServiceHour: vol.itemsPerServiceHour ?? null,
           itemsPerStaffHour: null,
           avgFulSec: vol.avgFulSec != null ? vol.avgFulSec : null,
           qc: { eligible: false, denyReason: null },
@@ -467,6 +493,8 @@ function buildVenue(venueRaw, weekLabel) {
       cell.volume = vol.volume || 0;
       cell.volumeSource = vol.volumeSource || 'ticketCount';
       cell.itemCount = cell.volume;
+      cell.serviceHours = vol.serviceHours || 0;
+      cell.itemsPerServiceHour = vol.itemsPerServiceHour ?? null;
       cell.avgFulSec = vol.avgFulSec != null ? vol.avgFulSec : null;
       cell.itemsPerHead = cell.heads > 0 ? +(cell.volume / cell.heads).toFixed(1) : null;
       cell.itemsPerStaffHour = cell.hours > 0 ? +(cell.volume / cell.hours).toFixed(2) : null;
@@ -490,6 +518,13 @@ function buildVenue(venueRaw, weekLabel) {
     })();
     fam.weekItemsPerStaffHour = fam.weekHours > 0
       ? +(fam.weekItemCount / fam.weekHours).toFixed(2)
+      : null;
+    fam.weekServiceHours = DAYS.reduce(
+      (sum, day) => sum + (fam.days[day].serviceHours || 0),
+      0
+    );
+    fam.weekItemsPerServiceHour = fam.weekServiceHours > 0
+      ? +(fam.weekItemCount / fam.weekServiceHours).toFixed(2)
       : null;
     const fulW = DAYS.reduce((acc, d) => {
       const c = fam.days[d];
@@ -560,6 +595,8 @@ function buildVenue(venueRaw, weekLabel) {
       weekTicketCount: data.weekTicketCount,
       weekItemsPerHeadDay: data.weekItemsPerHeadDay,
       weekItemsPerStaffHour: data.weekItemsPerStaffHour,
+      weekServiceHours: data.weekServiceHours,
+      weekItemsPerServiceHour: data.weekItemsPerServiceHour,
       weekAvgFulSec: data.weekAvgFulSec,
       days: {},
     };
@@ -574,6 +611,8 @@ function buildVenue(venueRaw, weekLabel) {
         volumeSource: cell.volumeSource,
         itemCount: cell.volume,
         itemsPerHead: cell.itemsPerHead,
+        serviceHours: cell.serviceHours,
+        itemsPerServiceHour: cell.itemsPerServiceHour,
         itemsPerStaffHour: cell.itemsPerStaffHour,
         avgFulSec: cell.avgFulSec,
         qc: { eligible: !!(cell.qc && cell.qc.eligible), denyReason: cell.qc?.denyReason || null },
