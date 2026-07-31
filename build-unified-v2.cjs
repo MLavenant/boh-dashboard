@@ -349,7 +349,7 @@ html = html.replace(
 
 <!-- Service Break Timeline (1-min) -->
 <div class="card" id="serviceBreakCard">
-  <h2>Service Break Timeline — When Did We Go Over 15 min?</h2>
+  <h2>Visual 1B — Service Break Timeline (1-min)</h2>
   <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent tickets open</strong> in the kitchen. Gold line = <strong>avg fulfillment of those open tickets</strong>. Red band / markers = minutes where open-ticket avg &gt; 15 min. This is the live pressure view — different from the hourly average chart above and from Breaking Point (which is a capacity curve, not a clock).</p>
   <div id="serviceBreakDayPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
   <canvas id="cServiceBreak" style="max-height:420px"></canvas>
@@ -505,9 +505,12 @@ async function loadBohFromFirebase() {
           const data = await fbGetJson('/rdg/boh/weeks/' + encodeURIComponent(wk) + '/' + encodeURIComponent(venueKey));
           if (!data || typeof data !== 'object') continue;
           if (!ALL_DATA[venueKey]) ALL_DATA[venueKey] = {};
-          // Keep locally embedded staffing if cloud week payload predates staffing join
+          // Keep locally embedded fields if cloud week payload predates them
           const prev = ALL_DATA[venueKey][wk];
           if (prev && prev.staffing && !data.staffing) data.staffing = prev.staffing;
+          if (prev && prev.serviceBreakTimeline && !data.serviceBreakTimeline) {
+            data.serviceBreakTimeline = prev.serviceBreakTimeline;
+          }
           ALL_DATA[venueKey][wk] = data;
           ensureWeekInList(wk);
         } catch (e) { /* week/venue may not exist yet */ }
