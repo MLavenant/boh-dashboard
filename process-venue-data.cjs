@@ -86,6 +86,13 @@ function parseDate(str) {
 
 const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
+// Calibration: Toast fulfillment times run ~5s high vs observed service — subtract from all actuals
+const FULFILLMENT_ADJUST_SEC = 5;
+function adjustFulSec(sec) {
+  if (sec == null || !Number.isFinite(Number(sec))) return sec;
+  return Math.max(0, Number(sec) - FULFILLMENT_ADJUST_SEC);
+}
+
 // Max realistic BOH cook time — longer rows are usually unclosed / orphaned noise
 const MAX_FUL_SEC = 90 * 60;
 
@@ -96,21 +103,22 @@ let skippedNonFood = 0;
 const foodTickets = tickets.filter(t => {
   if (!isFood(t['Station'])) { skippedNonFood++; return false; }
   const fired = parseDate(t['Fired Date']);
-  const fulSec = parseFulTime(t['Fulfillment Time']);
+  const fulSecRaw = parseFulTime(t['Fulfillment Time']);
+  const fulSec = adjustFulSec(fulSecRaw);
   const fulfilledAt = parseDate(t['Fulfilled Date']);
   // Must be closed: need fulfillment duration and a fulfilled timestamp
-  if (!fired || fulSec == null || fulSec <= 0) { skippedOpen++; return false; }
+  if (!fired || fulSecRaw == null || fulSecRaw <= 0) { skippedOpen++; return false; }
   if (!fulfilledAt && !t['Fulfilled Date']) { skippedOpen++; return false; }
-  if (fulSec > MAX_FUL_SEC) { skippedLong++; return false; }
+  if (fulSecRaw > MAX_FUL_SEC) { skippedLong++; return false; }
   return true;
 }).map(t => {
   const fired = parseDate(t['Fired Date']);
-  const fulSec = parseFulTime(t['Fulfillment Time']);
+  const fulSec = adjustFulSec(parseFulTime(t['Fulfillment Time']));
   const fulfilled = fired && fulSec != null ? new Date(fired.getTime() + fulSec * 1000) : null;
   return { ...t, _fired: fired, _fulfilled: fulfilled, _fulSec: fulSec };
 }).filter(t => t._fired && t._fulSec != null && t._fulfilled);
 
-console.log(`Food tickets for ${venueArg}: ${foodTickets.length} (skipped non-food=${skippedNonFood}, open/unclosed=${skippedOpen}, >90min=${skippedLong})`);
+console.log(`Food tickets for ${venueArg}: ${foodTickets.length} (skipped non-food=${skippedNonFood}, open/unclosed=${skippedOpen}, >90min=${skippedLong}; ful −${FULFILLMENT_ADJUST_SEC}s)`);
 
 // ---- workloadDayHourly ----
 // For each ticket, assign to day+hour of the fired date
@@ -666,7 +674,7 @@ const assignmentData = itemFulfillmentItems
       menuItem: it.menuItem,
       station,
       targetSec,
-      avgFulSec: it.avgSeconds || null,
+      avgFulSec: it.avgSeconds != null ? adjustFulSec(it.avgSeconds) : null,
       count: it.count || 0,
     };
   })
@@ -696,7 +704,7 @@ const fulAvgByItem = {};
 itemFulfillmentItems.forEach(it => {
   if (!it.menuItem || isExcludedMenuItem(it.menuItem)) return;
   if (it.avgSeconds != null && Number(it.avgSeconds) > 0) {
-    fulAvgByItem[it.menuItem] = +Number(it.avgSeconds).toFixed(1);
+    fulAvgByItem[it.menuItem] = +adjustFulSec(Number(it.avgSeconds)).toFixed(1);
   }
 });
 
