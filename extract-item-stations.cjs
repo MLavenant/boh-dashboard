@@ -24,10 +24,22 @@ function isFoodStationName(name) {
   return !['bar', 'champagne', 'wine', 'btg', 'pos', 'barista', 'somm', 'water', 'service', 'beach', 'btl', 'drink'].some(p => n.includes(p));
 }
 
+function firstExisting(paths) {
+  for (const p of paths) {
+    if (p && fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
 /** Read Claudie ref + TARGET sheets */
 function readClaudie() {
-  const filePath = 'C:/Dell/data extraction125 claudie.xlsx';
-  if (!fs.existsSync(filePath)) { console.warn('Claudie file missing'); return {}; }
+  const filePath = firstExisting([
+    process.env.BOH_CLAUDIE_REF_XLSX,
+    path.join(__dirname, 'data', 'ref', 'claudie-ref.xlsx'),
+    path.join(__dirname, 'data', 'extraction125 claudie.xlsx'),
+    'C:/Dell/data extraction125 claudie.xlsx',
+  ]);
+  if (!filePath) { console.warn('Claudie REF xlsx missing — keep prior map entries if any'); return {}; }
   const wb = xlsx.readFile(filePath);
 
   // Prep times from TARGET
@@ -79,8 +91,13 @@ function readClaudie() {
 
 /** Read Casa Neos ref sheet (stations 1–9, Target in col 10). */
 function readCasaNeos() {
-  const filePath = 'C:/Dell/data extraction100 casa neos.xlsx';
-  if (!fs.existsSync(filePath)) { console.warn('Casa Neos file missing'); return {}; }
+  const filePath = firstExisting([
+    process.env.BOH_CASANEOS_REF_XLSX,
+    path.join(__dirname, 'data', 'ref', 'casa-neos-ref.xlsx'),
+    path.join(__dirname, 'data', 'extraction100 casa neos.xlsx'),
+    'C:/Dell/data extraction100 casa neos.xlsx',
+  ]);
+  if (!filePath) { console.warn('Casa Neos REF xlsx missing — keep prior map entries if any'); return {}; }
   const wb = xlsx.readFile(filePath);
   const ws = wb.Sheets['ref'] || wb.Sheets['REF'];
   if (!ws) { console.warn('Casa Neos: ref sheet missing'); return {}; }
@@ -167,13 +184,19 @@ function readTargetItemsSheet(filePath, sheetName, venueName) {
 }
 
 const TARGET_ITEMS_XLSX = path.join(__dirname, 'data', 'Target items.xlsx');
+const existingMap = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, 'utf8')) : {};
+
+function keepIfEmpty(next, prev) {
+  return next && Object.keys(next).length ? next : (prev || {});
+}
 
 const map = {
-  claudie: readClaudie(),
-  casa_neos: readCasaNeos(),
-  ava_cg: readTargetItemsSheet(TARGET_ITEMS_XLSX, 'AVA CG', 'AVA CG'),
-  ava_wp: readTargetItemsSheet(TARGET_ITEMS_XLSX, 'AVA WP', 'AVA WP'),
-  mila: {}, // MILA REF not ready yet — do not use old BOH dashboard copy
+  claudie: keepIfEmpty(readClaudie(), existingMap.claudie),
+  casa_neos: keepIfEmpty(readCasaNeos(), existingMap.casa_neos),
+  ava_cg: keepIfEmpty(readTargetItemsSheet(TARGET_ITEMS_XLSX, 'AVA CG', 'AVA CG'), existingMap.ava_cg),
+  ava_wp: keepIfEmpty(readTargetItemsSheet(TARGET_ITEMS_XLSX, 'AVA WP', 'AVA WP'), existingMap.ava_wp),
+  // MILA has no REF xlsx yet — preserve prior / fill from Toast prep scrape below
+  mila: existingMap.mila || {},
 };
 
 fs.writeFileSync(OUT, JSON.stringify(map, null, 2));
@@ -216,9 +239,50 @@ function mergeToastPrep(venueKey, minItems = 5) {
   console.log(`${venueKey} Toast prep: +${added} new, ${updated} routes (REF targets preserved)`);
 }
 
-for (const v of ['claudie', 'ava_cg', 'ava_wp', 'casa_neos']) {
-  mergeToastPrep(v, v === 'casa_neos' ? 1 : 5);
+for (const v of ['claudie', 'ava_cg', 'ava_wp', 'casa_neos', 'mila']) {
+  mergeToastPrep(v, v === 'casa_neos' || v === 'mila' ? 1 : 5);
 }
+
+/** If MILA map still empty, seed stations from latest week assignmentData. */
+function seedMilaFromAssignmentData() {
+  if (map.mila && Object.keys(map.mila).length) return;
+  const files = [];
+  const dataRoot = path.join(__dirname, 'data');
+  if (fs.existsSync(dataRoot)) {
+    fs.readdirSync(dataRoot)
+      .filter(d => /^\d{4}-W\d{2}$/.test(d))
+      .sort()
+      .reverse()
+      .forEach(w => files.push(path.join(__dirname, `mila-data-${w}.json`)));
+  }
+  files.push(path.join(__dirname, 'mila-data.json'));
+  let src = null;
+  for (const f of files) {
+    if (!fs.existsSync(f)) continue;
+    try {
+      const d = JSON.parse(fs.readFileSync(f, 'utf8'));
+      if (Array.isArray(d.assignmentData) && d.assignmentData.length) { src = d.assignmentData; break; }
+    } catch (_) { /* skip */ }
+  }
+  if (!src) {
+    console.log('MILA: no assignmentData seed available');
+    return;
+  }
+  map.mila = {};
+  let n = 0;
+  for (const row of src) {
+    if (!row.menuItem || !row.station) continue;
+    if (map.mila[row.menuItem]) continue;
+    map.mila[row.menuItem] = {
+      stations: [row.station],
+      targetSec: row.targetSec || 0,
+      source: 'assignmentData-seed',
+    };
+    n++;
+  }
+  console.log(`MILA seeded from assignmentData: ${n} items`);
+}
+seedMilaFromAssignmentData();
 
 /** Chef-edited fulfillment targets (minutes→sec). Applied after REF; scrape never touches these. */
 function applyChefTargetOverrides() {

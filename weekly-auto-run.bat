@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableExtensions
-cd /d C:\Cursor\toast-mcp-server
+cd /d "%~dp0"
 set ERR=0
 
 echo [%date% %time%] Starting weekly auto-run >> auto-run.log 2>&1

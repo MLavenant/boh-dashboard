@@ -81,6 +81,14 @@ jobs:
           BOH_ROOT: ${{ github.workspace }}
         run: node pipeline-health.cjs
 
+      # Same staffing join as local weekly-auto-run.bat (FTE optional — exits 0 if missing)
+      - name: Food staffing join (FTE × labor)
+        shell: cmd
+        env:
+          BOH_ROOT: ${{ github.workspace }}
+        run: node weekly-staffing.cjs
+        continue-on-error: true
+
       - name: Publish processed weeks to Firebase
         id: firebase
         shell: cmd

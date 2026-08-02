@@ -23,7 +23,8 @@ const ROOT = process.env.BOH_ROOT || __dirname;
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const MIN_HOURS = 0.25;
 const FOOD_SET = new Set(FOOD_FAMILIES);
-const WEAK_ATTR_FAMILIES = new Set(['Expo', 'Prep']);
+// Expo/Prep/Fry qty↔labor joins are often imperfect — label caution, do not invent volumes
+const WEAK_ATTR_FAMILIES = new Set(['Expo', 'Prep', 'Fry']);
 
 const GUARDS = {
   minHours: 4,

@@ -564,6 +564,7 @@ const BEVERAGE_KEYWORDS = [
   // Waters & soft drinks
   'evian', 'pellegrino', 'perrier', 'water', 'coke', 'coca', 'diet',
   'sprite', 'soda', 'juice', 'lemonade', 'iced tea', 'ginger ale',
+  'still', 'sparkling', // bottled water labels without "water" in the name
   // Beer
   'beer', 'kronenbourg', 'heineken', 'stella', 'bud', 'corona', 'draft',
   // Wine & champagne
@@ -579,6 +580,7 @@ const BEVERAGE_KEYWORDS = [
   'beluga', 'grey goose', 'ketel', 'absolut', 'tanqueray', 'bombay',
   'bacardi', 'patron', 'don julio', 'casamigos', 'centinela',
   'martini', 'negroni', 'cocktail', 'spritz', 'aperol', 'campari',
+  'margarita', 'mimosa', 'bloody mary',
   'cognac', 'armagnac', 'calvados', 'brandy', 'port', 'sherry', 'vermouth',
   // Coffee & tea
   'espresso', 'coffee', 'latte', 'cappuccino', 'tea', 'barista', 'americano',

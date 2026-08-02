@@ -453,7 +453,61 @@ async function fbGetJson(path) {
   return res.json();
 }
 
-/** Prefer Firebase live weeks over embedded Pages payload (DJ-style). */
+/** Prefer Firebase live weeks, but never clobber richer embedded Pages data. */
+function weekPayloadRichness(d) {
+  if (!d || typeof d !== 'object') return 0;
+  let score = 0;
+  if (d.staffing && d.staffing.byFamily) score += 200 + Object.keys(d.staffing.byFamily).length * 10;
+  if (d.serviceBreakTimeline && d.serviceBreakTimeline.byDay) score += 40;
+  if (Array.isArray(d.stations) && d.stations.length) score += Math.min(d.stations.length, 40);
+  if (Array.isArray(d.summary) && d.summary.length) score += Math.min(d.summary.length, 40);
+  if (d.stationDayVolume && typeof d.stationDayVolume === 'object') score += 25;
+  if (Array.isArray(d.assignmentData) && d.assignmentData.length) score += 15;
+  if (d.guestsSeated && d.guestsSeated.total != null) score += 10;
+  if (Array.isArray(d.hourProfile) && d.hourProfile.length) score += 5;
+  if (Array.isArray(d.curve) && d.curve.length) score += 5;
+  return score;
+}
+function weekPayloadBuiltAtMs(d) {
+  const t = d && (d.staffing && d.staffing.builtAt || d.builtAt || d.generatedAt || d.processedAt);
+  if (!t) return 0;
+  const ms = Date.parse(t);
+  return isFinite(ms) ? ms : 0;
+}
+function mergeBohWeekPayload(local, cloud) {
+  if (!cloud || typeof cloud !== 'object') return local || cloud;
+  if (!local || typeof local !== 'object') return cloud;
+  const localScore = weekPayloadRichness(local);
+  const cloudScore = weekPayloadRichness(cloud);
+  const localTs = weekPayloadBuiltAtMs(local);
+  const cloudTs = weekPayloadBuiltAtMs(cloud);
+  // Embedded Pages payload is richer, or equally rich but fresher → keep local
+  // (prevents stale Firebase wiping staffing / −5s metrics / day volumes)
+  if (localScore > cloudScore || (localScore === cloudScore && localTs > cloudTs)) {
+    return Object.assign({}, cloud, local);
+  }
+  const out = Object.assign({}, local, cloud);
+  // Field-level: never drop local staffing / timeline when cloud is thinner or older
+  const localFam = local.staffing && local.staffing.byFamily ? Object.keys(local.staffing.byFamily).length : 0;
+  const cloudFam = cloud.staffing && cloud.staffing.byFamily ? Object.keys(cloud.staffing.byFamily).length : 0;
+  const localStaffTs = weekPayloadBuiltAtMs({ staffing: local.staffing }) || localTs;
+  const cloudStaffTs = weekPayloadBuiltAtMs({ staffing: cloud.staffing }) || cloudTs;
+  if (local.staffing && (!cloud.staffing || localFam > cloudFam || (localFam === cloudFam && localStaffTs > cloudStaffTs))) {
+    out.staffing = local.staffing;
+  }
+  if (local.serviceBreakTimeline && !cloud.serviceBreakTimeline) {
+    out.serviceBreakTimeline = local.serviceBreakTimeline;
+  }
+  // Keep non-empty local analytics when cloud omitted them (partial Firebase writes)
+  ['stations','summary','stationDetails','stationDayVolume','assignmentData','curve','curveByDay','hourProfile','guestsSeated','hmFul','hmGuests','tbk','breakingPoint','breakingPointGuests'].forEach(function(k) {
+    const lv = local[k];
+    const cv = cloud[k];
+    const localOk = lv != null && !(Array.isArray(lv) && lv.length === 0) && !(typeof lv === 'object' && !Array.isArray(lv) && !Object.keys(lv).length);
+    const cloudEmpty = cv == null || (Array.isArray(cv) && cv.length === 0) || (typeof cv === 'object' && !Array.isArray(cv) && !Object.keys(cv).length);
+    if (localOk && cloudEmpty) out[k] = lv;
+  });
+  return out;
+}
 async function loadBohFromFirebase() {
   try {
     const meta = await fbGetJson('/rdg/boh/meta');
@@ -464,7 +518,6 @@ async function loadBohFromFirebase() {
     ensureWeekInList(weekKey);
     (meta.weeks || []).forEach(ensureWeekInList);
 
-    // Also pull the prior 2 weeks if present under /rdg/boh/weeks
     const weekKeys = new Set(meta.weeks || [weekKey]);
     WEEKS.forEach(w => weekKeys.add(w.key));
 
@@ -474,19 +527,13 @@ async function loadBohFromFirebase() {
           const data = await fbGetJson('/rdg/boh/weeks/' + encodeURIComponent(wk) + '/' + encodeURIComponent(venueKey));
           if (!data || typeof data !== 'object') continue;
           if (!ALL_DATA[venueKey]) ALL_DATA[venueKey] = {};
-          // Keep locally embedded fields if cloud week payload predates them
           const prev = ALL_DATA[venueKey][wk];
-          if (prev && prev.staffing && !data.staffing) data.staffing = prev.staffing;
-          if (prev && prev.serviceBreakTimeline && !data.serviceBreakTimeline) {
-            data.serviceBreakTimeline = prev.serviceBreakTimeline;
-          }
-          ALL_DATA[venueKey][wk] = data;
+          ALL_DATA[venueKey][wk] = mergeBohWeekPayload(prev, data);
           ensureWeekInList(wk);
         } catch (e) { /* week/venue may not exist yet */ }
       }
     }
 
-    // Select latest week from meta
     let best = 0;
     for (let i = 1; i < WEEKS.length; i++) {
       if (String(WEEKS[i].key) > String(WEEKS[best].key)) best = i;
@@ -539,7 +586,24 @@ function getEffectiveTargetSec(menuItem, refSec) {
   return refSec || 0;
 }
 function getStaticItemMap() {
-  const base = ITEM_STATION_MAP_DATA[venueSlugForMap()] || {};
+  let base = ITEM_STATION_MAP_DATA[venueSlugForMap()] || {};
+  // MILA (and any venue with empty REF map): fall back to live assignmentData so Assignment tab works
+  if (!Object.keys(base).length) {
+    const live = {};
+    (getD().assignmentData || []).forEach(d => {
+      if (!d.menuItem || !d.station) return;
+      if (!live[d.menuItem]) {
+        live[d.menuItem] = {
+          stations: [d.station],
+          targetSec: d.targetSec || 0,
+          source: 'assignmentData',
+        };
+      } else if (d.station && !live[d.menuItem].stations.includes(d.station)) {
+        live[d.menuItem].stations.push(d.station);
+      }
+    });
+    base = live;
+  }
   const out = {};
   for (const [k, v] of Object.entries(base)) {
     out[k] = { ...v, targetSec: getEffectiveTargetSec(k, v.targetSec || 0) };
@@ -964,185 +1028,12 @@ function renderHourProfile() {
 }
 
 // ============================================================
-// Service Break Timeline (1-min concurrent open tickets + avg ful)
+// Service Break Timeline — removed from UI (kept data in week JSON)
 // ============================================================
 let _serviceBreakDay = null;
-function renderServiceBreakTimeline() {
-  const card = document.getElementById('serviceBreakCard');
-  const canvas = document.getElementById('cServiceBreak');
-  const pillsEl = document.getElementById('serviceBreakDayPills');
-  const note = document.getElementById('serviceBreakNote');
-  const existing = Chart.getChart('cServiceBreak');
-  if (existing) existing.destroy();
-  if (!card || !canvas) return;
+function renderServiceBreakTimeline() { /* no-op: card removed */ }
 
-  if (currentVenue === 'rdg_portfolio') {
-    card.style.display = 'none';
-    return;
-  }
-  card.style.display = '';
 
-  const timeline = getD().serviceBreakTimeline;
-  const byDay = timeline && timeline.byDay ? timeline.byDay : null;
-  const DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  const days = DAY_ORDER.filter(d => byDay && byDay[d] && byDay[d].labels && byDay[d].labels.length);
-
-  if (!days.length) {
-    if (pillsEl) pillsEl.innerHTML = '';
-    if (note) note.textContent = 'No 1-min break timeline yet — reprocess this venue week to enable.';
-    return;
-  }
-
-  // Default = day with most broken minutes (fallback Friday / first)
-  if (!_serviceBreakDay || !days.includes(_serviceBreakDay)) {
-    let best = days[0];
-    let bestBroken = -1;
-    days.forEach(d => {
-      const b = byDay[d].brokenMinutes || 0;
-      if (b > bestBroken) { bestBroken = b; best = d; }
-    });
-    if (bestBroken <= 0 && days.includes('Friday')) best = 'Friday';
-    _serviceBreakDay = best;
-  }
-
-  if (pillsEl) {
-    pillsEl.innerHTML = days.map(d => {
-      const broken = byDay[d].brokenMinutes || 0;
-      const active = d === _serviceBreakDay;
-      return '<button type="button" data-day="'+d+'" style="padding:5px 12px;border-radius:16px;cursor:pointer;font-size:12px;font-family:inherit;border:1px solid '+(active?'#d9a441':'#2d3448')+';background:'+(active?'#262a33':'#1e2533')+';color:'+(active?'#e8eaed':'#9aa0aa')+'">'+d.slice(0,3)+(broken?' · '+broken+'m':'')+'</button>';
-    }).join('');
-    pillsEl.querySelectorAll('button').forEach(btn => {
-      btn.onclick = () => { _serviceBreakDay = btn.dataset.day; renderServiceBreakTimeline(); };
-    });
-  }
-
-  const series = byDay[_serviceBreakDay];
-  const thr = (timeline && timeline.thresholdMin) || getThreshold();
-  const labels = series.labels;
-  const conc = series.conc;
-  const ful = series.ful;
-  const brokenFlags = ful.map(v => v != null && v > thr);
-
-  // Tick every ~30–60 minutes for readability
-  const step = labels.length > 600 ? 60 : 30;
-  const thrPlugin = {
-    id: 'svcBreakThr',
-    beforeDraw(chart) {
-      const { ctx, chartArea: a, scales } = chart;
-      if (!a || !scales.y1 || !scales.x) return;
-      // Shade broken minutes
-      ctx.save();
-      for (let i = 0; i < brokenFlags.length; i++) {
-        if (!brokenFlags[i]) continue;
-        const x0 = scales.x.getPixelForValue(i);
-        const x1 = scales.x.getPixelForValue(Math.min(i + 1, labels.length - 1));
-        ctx.fillStyle = 'rgba(226,112,106,0.18)';
-        ctx.fillRect(x0, a.top, Math.max(1, x1 - x0), a.bottom - a.top);
-      }
-      ctx.restore();
-      const yThr = scales.y1.getPixelForValue(thr);
-      if (yThr >= a.top && yThr <= a.bottom) {
-        ctx.save();
-        ctx.strokeStyle = '#e2706a';
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([6, 4]);
-        ctx.beginPath();
-        ctx.moveTo(a.left, yThr);
-        ctx.lineTo(a.right, yThr);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = '#e2706a';
-        ctx.font = '11px sans-serif';
-        ctx.fillText(thr + ' min', a.left + 4, yThr - 4);
-        ctx.restore();
-      }
-    }
-  };
-
-  new Chart(canvas, {
-    data: {
-      labels,
-      datasets: [
-        {
-          type: 'bar',
-          label: 'Concurrent tickets open',
-          data: conc,
-          backgroundColor: brokenFlags.map(b => b ? 'rgba(226,112,106,0.55)' : 'rgba(74,159,255,0.45)'),
-          borderWidth: 0,
-          yAxisID: 'y',
-          order: 2,
-          barPercentage: 1,
-          categoryPercentage: 1,
-        },
-        {
-          type: 'line',
-          label: 'Avg fulfillment of open tickets (min)',
-          data: ful,
-          borderColor: '#d9a441',
-          backgroundColor: 'rgba(217,164,65,0)',
-          tension: 0.15,
-          pointRadius: 0,
-          pointHoverRadius: 3,
-          borderWidth: 2,
-          yAxisID: 'y1',
-          order: 1,
-          spanGaps: true,
-        },
-      ],
-    },
-    options: {
-      interaction: { mode: 'index', intersect: false },
-      scales: {
-        x: {
-          title: { display: true, text: 'Time of day (1-min)' },
-          grid: { color: gc },
-          ticks: {
-            maxRotation: 0,
-            autoSkip: false,
-            callback(val, idx) {
-              if (idx % step !== 0) return '';
-              return labels[idx];
-            },
-          },
-        },
-        y: { position: 'left', title: { display: true, text: 'Concurrent tickets open' }, grid: { color: gc }, min: 0 },
-        y1: { position: 'right', title: { display: true, text: 'Avg fulfillment (min)' }, grid: { display: false }, min: 0, suggestedMax: Math.max(22, thr + 4) },
-      },
-      plugins: {
-        legend: { position: 'top', labels: { boxWidth: 12 } },
-        tooltip: {
-          callbacks: {
-            title(items) {
-              const i = items[0] && items[0].dataIndex;
-              return _serviceBreakDay + ' · ' + (labels[i] || '');
-            },
-            afterBody(items) {
-              const i = items[0] && items[0].dataIndex;
-              if (i == null) return '';
-              return brokenFlags[i] ? '⚠ OVER 15 min — kitchen broken' : 'Under 15 min';
-            },
-          },
-        },
-      },
-    },
-    plugins: [thrPlugin],
-  });
-
-  if (note) {
-    const bm = series.brokenMinutes || 0;
-    const first = series.firstBreak || null;
-    const peak = series.peakConcWhileBroken || 0;
-    if (bm > 0) {
-      note.innerHTML = '<strong>'+_serviceBreakDay+'</strong>: broke for <strong style="color:#ef4444">'+bm+' minutes</strong>' +
-        (first ? ' · first break at <strong>'+first+'</strong>' : '') +
-        (peak ? ' · peak concurrent while broken: <strong>'+peak+'</strong> tickets' : '') +
-        '. Breaking Point capacity curve is separate (Visual 2).';
-    } else {
-      note.innerHTML = '<strong>'+_serviceBreakDay+'</strong>: open-ticket avg stayed ≤ '+thr+' min all service · '+
-        (series.ticketCount||0)+' tickets. Hourly averages above can still look calm even on days with brief spikes — this chart shows the spikes.';
-    }
-  }
-}
 
 // ============================================================
 // VISUAL 2: Breaking Point
@@ -1593,254 +1484,12 @@ function renderStationWoW() {
 }
 
 // ============================================================
-// Station Breaking Lines (Overview)
+// Station Breaking Lines — removed from UI
 // ============================================================
-let _sbAllVisible = true;
-function sbToggleAllLines() {
-  const chart = Chart.getChart('cStationBreaking');
-  if (!chart) return;
-  _sbAllVisible = !_sbAllVisible;
-  chart.data.datasets.forEach((ds, i) => {
-    chart.getDatasetMeta(i).hidden = !_sbAllVisible;
-  });
-  chart.update();
-}
+function sbToggleAllLines() { /* no-op */ }
+function renderStationBreaking() { /* no-op: canvas removed */ }
 
-function renderStationBreaking() {
-  const STATIONS = getD().stations.filter(s => isFoodStation(s.station));
-  const STATION_DETAILS = getD().stationDetails;
-  const CURVE = getD().curve;
-  const HM_FUL_DATA = getD().hmFul;
 
-  // Build hour → avg overall fulfillment map (avg across days)
-  const hourFulMap = {};
-  Object.values(HM_FUL_DATA).forEach(dayData => {
-    Object.entries(dayData).forEach(([hr, val]) => {
-      if (!hourFulMap[hr]) hourFulMap[hr] = { sum: 0, cnt: 0 };
-      hourFulMap[hr].sum += val;
-      hourFulMap[hr].cnt += 1;
-    });
-  });
-  const hourAvgFul = {};
-  Object.entries(hourFulMap).forEach(([hr, d]) => { hourAvgFul[hr] = d.sum / d.cnt; });
-
-  // Build inverse lookup: given overall avg_ful → approx concurrent
-  // For each hour, find curve point closest to hourAvgFul[hr]
-  function estConc(avgFulMin) {
-    if (!avgFulMin || !CURVE.length) return null;
-    let best = CURVE[0], bestDiff = Math.abs(CURVE[0].ful - avgFulMin);
-    CURVE.forEach(c => {
-      const diff = Math.abs(c.ful - avgFulMin);
-      if (diff < bestDiff) { bestDiff = diff; best = c; }
-    });
-    return best.conc;
-  }
-
-  // Palette for stations
-  const PALETTE = ['#d9a441','#5aa9e6','#74d39a','#e2706a','#a78bfa','#fb923c','#f472b6','#38bdf8','#a3e635','#fbbf24','#34d399','#f87171'];
-
-  // For each food station, collect (concEstimate, avg_sec/60) pairs per hour
-  const datasets = [];
-  STATIONS.forEach((stn, idx) => {
-    const det = STATION_DETAILS[stn.station];
-    if (!det || !det.hourly) return;
-    const pairs = [];
-    Object.entries(det.hourly).forEach(([hr, hd]) => {
-      if (!hd.avg_sec) return;
-      const overallFul = hourAvgFul[hr];
-      if (overallFul == null) return;
-      const conc = estConc(overallFul);
-      if (conc == null) return;
-      pairs.push({ x: conc, y: +(hd.avg_sec / 60).toFixed(2) });
-    });
-    if (!pairs.length) return;
-    // Sort by concurrent ascending
-    pairs.sort((a, b) => a.x - b.x);
-    // Simple rolling average (window 3)
-    const smoothed = pairs.map((p, i) => {
-      const win = pairs.slice(Math.max(0, i - 1), i + 2);
-      const avgY = win.reduce((s, w) => s + w.y, 0) / win.length;
-      return { x: p.x, y: +avgY.toFixed(2) };
-    });
-    // Deduplicate by x (avg y for same conc)
-    const byConc = {};
-    smoothed.forEach(p => {
-      if (!byConc[p.x]) byConc[p.x] = { sum: 0, cnt: 0 };
-      byConc[p.x].sum += p.y;
-      byConc[p.x].cnt += 1;
-    });
-    const finalPts = Object.entries(byConc)
-      .map(([x, d]) => ({ x: +x, y: +(d.sum / d.cnt).toFixed(2) }))
-      .sort((a, b) => a.x - b.x);
-
-    // Fix 3: Apply BP rule — skip first 10 data points, require at least 2 consecutive above threshold
-    const postSkip = finalPts.slice(10);
-    let hasConsecutive = false;
-    for (let i = 0; i < postSkip.length - 1; i++) {
-      if (postSkip[i].y >= 15 && postSkip[i + 1].y >= 15) { hasConsecutive = true; break; }
-    }
-    if (!hasConsecutive) return;
-
-    const color = PALETTE[idx % PALETTE.length];
-    datasets.push({
-      label: stn.station,
-      data: finalPts,
-      borderColor: color,
-      backgroundColor: color + '22',
-      borderWidth: 2,
-      pointRadius: 3,
-      pointHoverRadius: 6,
-      tension: 0.3,
-      fill: false
-    });
-  });
-
-  // Count hidden stations
-  const totalStations = getD().stations.filter(s => isFoodStation(s.station)).length;
-  const hiddenCount = totalStations - datasets.length;
-  const noteEl = document.getElementById('stationBreakingNote');
-  if (noteEl) {
-    noteEl.textContent = hiddenCount > 0
-      ? 'Only stations that break 15 min threshold are shown. ' + hiddenCount + ' other' + (hiddenCount === 1 ? '' : 's') + ' stayed under target.'
-      : 'All stations shown — each exceeds the 15 min threshold at some load level.';
-  }
-
-  const thrLine = {
-    id: 'sbThr15',
-    beforeDraw(chart) {
-      const { ctx, chartArea: a, scales } = chart;
-      if (!a || !scales.y) return;
-      const y15 = scales.y.getPixelForValue(15);
-      const y20 = scales.y.getPixelForValue(20);
-      if (y15 >= a.top && y15 <= a.bottom) {
-        // Danger zone band
-        ctx.save();
-        ctx.fillStyle = 'rgba(192,57,43,0.08)';
-        ctx.fillRect(a.left, y20, a.right - a.left, y15 - y20);
-        ctx.restore();
-      }
-    },
-    afterDraw(chart) {
-      const { ctx, chartArea: a, scales } = chart;
-      if (!a || !scales.y) return;
-      const y15 = scales.y.getPixelForValue(15);
-      if (y15 < a.top || y15 > a.bottom) return;
-      ctx.save();
-      ctx.strokeStyle = '#e74c3c';
-      ctx.lineWidth = 3;
-      ctx.setLineDash([6, 4]);
-      ctx.beginPath(); ctx.moveTo(a.left, y15); ctx.lineTo(a.right, y15); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = '#e74c3c';
-      ctx.font = 'bold 11px sans-serif';
-      ctx.fillText('15 min threshold', a.left + 6, y15 - 4);
-      // BREAKING ZONE label on right side
-      const y175 = scales.y.getPixelForValue(17.5);
-      ctx.fillStyle = '#e74c3c';
-      ctx.font = '11px sans-serif';
-      ctx.textAlign = 'right';
-      ctx.fillText('🔴 BREAKING ZONE', a.right - 4, y175 + 4);
-      ctx.restore();
-    }
-  };
-
-  // Plugin: draw red downward triangle at first point where station crosses 15 min
-  const breakingMarkerPlugin = {
-    id: 'breakingMarkers',
-    afterDatasetsDraw(chart) {
-      const { ctx, scales } = chart;
-      if (!scales.x || !scales.y) return;
-      chart.data.datasets.forEach((ds, di) => {
-        const meta = chart.getDatasetMeta(di);
-        if (meta.hidden) return;
-        const pts = ds.data;
-        let crossPt = null;
-        for (let i = 0; i < pts.length - 1; i++) {
-          if (pts[i].y < 15 && pts[i+1].y >= 15) { crossPt = pts[i+1]; break; }
-          if (pts[i].y >= 15 && i === 0) { crossPt = pts[i]; break; }
-        }
-        if (!crossPt) return;
-        const px = scales.x.getPixelForValue(crossPt.x);
-        const py = scales.y.getPixelForValue(crossPt.y);
-        const s = 8;
-        ctx.save();
-        ctx.fillStyle = '#ef4444';
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(px, py + s);
-        ctx.lineTo(px - s, py - s/2);
-        ctx.lineTo(px + s, py - s/2);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-        ctx.restore();
-      });
-    }
-  };
-
-  const existing = Chart.getChart('cStationBreaking');
-  if (existing) existing.destroy();
-
-  if (!datasets.length) return;
-
-  // Add subtitle element
-  const sbSubEl = document.getElementById('stationBreakingSubtitle');
-  if (sbSubEl) sbSubEl.textContent = '▼ = first moment station breaks ' + getThreshold() + ' min threshold';
-
-  const chart = new Chart(document.getElementById('cStationBreaking'), {
-    type: 'line',
-    data: { datasets },
-    options: {
-      clip: false,
-      parsing: false,
-      interaction: { mode: 'nearest', intersect: false },
-      scales: {
-        x: {
-          type: 'linear',
-          title: { display: true, text: 'Estimated concurrent tickets open' },
-          grid: { color: gc },
-          min: 0
-        },
-        y: {
-          title: { display: true, text: 'Avg fulfillment time (min)' },
-          grid: { color: gc },
-          min: 0,
-          max: 20
-        }
-      },
-      plugins: {
-        legend: {
-          position: 'top',
-          labels: { boxWidth: 12, padding: 10 },
-          onClick(e, legendItem, legend) {
-            const idx = legendItem.datasetIndex;
-            const meta = legend.chart.getDatasetMeta(idx);
-            meta.hidden = !meta.hidden;
-            // Fade others when one is selected
-            const anyVisible = legend.chart.data.datasets.some((_, i) => !legend.chart.getDatasetMeta(i).hidden);
-            legend.chart.data.datasets.forEach((ds, i) => {
-              if (!legend.chart.getDatasetMeta(i).hidden) {
-                legend.chart.data.datasets[i].borderColor = ds._origColor || ds.borderColor;
-                legend.chart.data.datasets[i].borderWidth = 2;
-              }
-            });
-            legend.chart.update();
-          }
-        },
-        tooltip: {
-          callbacks: {
-            title(items) { return items[0] ? items[0].dataset.label : ''; },
-            label(ctx) {
-              return ['Concurrent: ' + ctx.parsed.x, 'Avg time: ' + ctx.parsed.y.toFixed(1) + ' min'];
-            }
-          }
-        }
-      }
-    },
-    plugins: [thrLine, breakingMarkerPlugin]
-  });
-}
 
 // ============================================================
 // TAB 2: Station Selector & Detail
@@ -2366,8 +2015,9 @@ function renderMenuItems() {
     })).filter(d => d.item);
   }
   // MILA: exclude MB-* market/banquet lines from menu analytics
+  // Use [ \\t_-] (not \\s) so template-literal emit cannot collapse whitespace class
   if (currentVenue === 'mila') {
-    SUMMARY = SUMMARY.filter(d => !/^MB[\s_-]/i.test(String(d.item || '').trim()));
+    SUMMARY = SUMMARY.filter(d => !/^MB[ \\t_-]/i.test(String(d.item || '').trim()));
   }
 
   const THR_SEC = 900;
@@ -2429,7 +2079,7 @@ function renderMenuItems() {
     '<div class="menu-stat"><div class="v" style="color:#22c55e">'+under10+'</div><div class="l">Under 10 min</div></div>';
 
   // ── Worst Offenders callout (same noise filters as bubble) ──
-  const NOISE_NAME_RE_WORST = /deposit|all\\s*in|beo|package|gift\\s*card|gratuity|service\\s*charge|comp\\b|void|water|soda|coke|wine|beer|cocktail|vodka|gin|rum|tequila|whiskey|champagne|prosecco|latte|espresso|coffee/i;
+  const NOISE_NAME_RE_WORST = /deposit|all\\s*in|beo|package|gift\\s*card|gratuity|service\\s*charge|comp\\b|void|water|soda|coke|wine|beer|cocktail|vodka|gin|rum|tequila|whiskey|champagne|prosecco|latte|espresso|coffee|\\bstill\\b|sparkling|margarita|mimosa|aperol|campari/i;
   const top5worst = [...SUMMARY]
     .filter(d => (d.count||0) >= 3 && d.avg_sec > 0 && d.avg_sec <= 45*60 && d.item && !NOISE_NAME_RE_WORST.test(d.item))
     .sort((a,b)=>b.avg_sec-a.avg_sec)
@@ -2446,7 +2096,7 @@ function renderMenuItems() {
     const existing = Chart.getChart('cMenuBubble');
     if (existing) existing.destroy();
 
-    const NOISE_NAME_RE = /deposit|all\\s*in|beo|package|gift\\s*card|gratuity|service\\s*charge|comp\\b|void|water|soda|coke|wine|beer|cocktail|vodka|gin|rum|tequila|whiskey|champagne|prosecco|latte|espresso|coffee/i;
+    const NOISE_NAME_RE = /deposit|all\\s*in|beo|package|gift\\s*card|gratuity|service\\s*charge|comp\\b|void|water|soda|coke|wine|beer|cocktail|vodka|gin|rum|tequila|whiskey|champagne|prosecco|latte|espresso|coffee|\\bstill\\b|sparkling|margarita|mimosa|aperol|campari/i;
     const food = SUMMARY.filter(d => {
       const st = itemStationMap[d.item];
       if (st && !isFoodStation(st)) return false;
