@@ -269,22 +269,21 @@ html = html.replace(
 <!-- ========== TAB 4: GROUP / RDG PORTFOLIO ========== -->
 <section id="tab-group" class="tab-section">
 <div class="section-title" id="groupTitle">RDG Portfolio — ${rollingWeeks[rollingWeeks.length-1].label} Performance</div>
-<p class="note" id="groupSubtitle" style="margin-top:-8px">Two main KPIs across RDG food venues (Claudie excluded): <strong>avg fulfillment</strong> and <strong>items / staff-hour</strong> (station volume ÷ labor hours).</p>
+<p class="note" id="groupSubtitle" style="margin-top:-8px">All RDG food venues including Claudie. Main KPIs: <strong>avg fulfillment</strong> and <strong>items / person</strong>. Claudie staffing cells stay empty until FTE×labor join is available.</p>
 <div class="card" style="margin-bottom:16px">
   <h2>Portfolio Scoreboard</h2>
-  <p class="note">Location vs location — fulfillment speed and items handled per staff-hour.</p>
+  <p class="note">Location vs location — fulfillment speed and items handled per person.</p>
   <div id="groupPortfolioTable" style="overflow-x:auto"></div>
-</div>
-<div class="row three" id="groupCards" style="margin-bottom:18px"></div>
-<div class="card">
-  <h2>Venue Comparison — Avg Fulfillment Time</h2>
-  <p class="note">Horizontal bars per venue. Reference line at 15 min target. Color: green ≤10 min, yellow 10–15 min, red &gt;15 min.</p>
-  <canvas id="cGroupBar" style="max-height:280px"></canvas>
 </div>
 <div class="card" style="margin-top:16px">
   <h2>Stations Comparison across RDG</h2>
-  <p class="note">Same station family: avg fulfillment vs items / staff-hour. This is how we assess performance location vs location.</p>
+  <p class="note">Same station family: avg fulfillment vs items / person. This is how we assess performance location vs location.</p>
   <div id="groupFamilyTable" style="overflow-x:auto"></div>
+</div>
+<div class="card" style="margin-top:16px">
+  <h2>Items Top 10 Variance across RDG</h2>
+  <p class="note">Menu items that appear in 2+ venues this week, ranked by the largest fulfillment spread (slowest venue − fastest venue). Dashes = item not seen / no time at that location.</p>
+  <div id="groupItemVarianceTable" style="overflow-x:auto"></div>
 </div>
 <div class="coming-note" id="groupWowNote">📅 Week-over-week comparison: available from Week 2 (Jul 14)</div>
 </section>
@@ -2667,7 +2666,7 @@ function renderAssignment() {
 // ============================================================
 // TAB 4: Group / RDG Portfolio Summary (client-side aggregator)
 // ============================================================
-const PORTFOLIO_VENUE_KEYS = ['casaneos','ava_cg','ava_wp','mila'];
+const PORTFOLIO_VENUE_KEYS = ['claudie','casaneos','ava_cg','ava_wp','mila'];
 function buildVenueWeekScorecard(key, label, weekKey) {
   const d = ALL_DATA[key]?.[weekKey] || ALL_DATA[key]?.['latest'] || {};
   const stations = (d.stations || []).filter(s => isFoodStation(s.station));
@@ -2705,7 +2704,26 @@ function buildVenueWeekScorecard(key, label, weekKey) {
   }
   const bohIph = bohHeadDays > 0 ? +(bohVolume / bohHeadDays).toFixed(1) : null;
   const top3 = [...stations].sort((a,b)=>b.avg_sec-a.avg_sec).slice(0,3);
-  return { key, label, avgFulMin, avgFulSec, totalTickets, bp, bpGuests, guestsSeated, top3, sauteIph, sauteFul, bohIph, familyStats, hasStaffing: !!staffing };
+  // Item map for cross-venue variance (summary preferred; fall back to assignmentData)
+  const itemMap = {};
+  (d.summary || []).forEach(row => {
+    const name = String(row.menuItem || row.item || '').trim();
+    if (!name) return;
+    const avg = row.avg_sec != null ? row.avg_sec : (row.avgFulSec != null ? row.avgFulSec : null);
+    const qty = row.qty != null ? row.qty : (row.count != null ? row.count : 0);
+    if (avg == null || !(avg > 0)) return;
+    itemMap[name.toLowerCase()] = { name, avgSec: avg, qty };
+  });
+  if (!Object.keys(itemMap).length) {
+    (d.assignmentData || []).forEach(row => {
+      const name = String(row.menuItem || '').trim();
+      if (!name || itemMap[name.toLowerCase()]) return;
+      const avg = row.avgFulSec != null ? row.avgFulSec : null;
+      if (avg == null || !(avg > 0)) return;
+      itemMap[name.toLowerCase()] = { name, avgSec: avg, qty: row.qty || 0 };
+    });
+  }
+  return { key, label, avgFulMin, avgFulSec, totalTickets, bp, bpGuests, guestsSeated, top3, sauteIph, sauteFul, bohIph, familyStats, hasStaffing: !!staffing, itemMap };
 }
 function renderGroup() {
   const VENUE_LABELS_LOCAL = ${JSON.stringify(VENUE_LABELS)};
@@ -2720,6 +2738,10 @@ function renderGroup() {
     ? PORTFOLIO_VENUE_KEYS.map(k => [k, VENUE_LABELS_LOCAL[k]]).filter(([,l]) => l)
     : Object.entries(VENUE_LABELS_LOCAL);
   const venueData = entries.map(([key, label]) => buildVenueWeekScorecard(key, label, weekKey));
+
+  // Destroy legacy group bar if an older HTML shell still has the canvas
+  const legacyBar = Chart.getChart('cGroupBar');
+  if (legacyBar) legacyBar.destroy();
 
   // ── Scoreboard first (fulfillment + items/person) ──
   const scoreEl = document.getElementById('groupPortfolioTable');
@@ -2745,27 +2767,9 @@ function renderGroup() {
     scoreEl.innerHTML = th + '</tbody></table>';
   }
 
-  // ── Venue scorecards ──
+  // Legacy card row (removed from portfolio shell) — clear if present
   const cardsEl = document.getElementById('groupCards');
-  if (cardsEl) {
-    cardsEl.innerHTML = venueData.map(v => {
-      const avgColor = v.avgFulMin != null ? avgFulColorByMin(v.avgFulMin) : '#9aa0aa';
-      const avgDisp = v.avgFulMin != null ? v.avgFulMin.toFixed(1)+' min' : '—';
-      return '<div class="group-card" style="cursor:pointer" onclick="selectVenueFromPortfolio(\\''+v.key+'\\')">'+
-        '<div class="venue-name">'+v.label+'</div>'+
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0">'+
-          '<div style="text-align:center"><div class="big-num" style="color:'+avgColor+';font-size:22px">'+avgDisp+'</div><div class="sub">Avg fulfillment</div></div>'+
-          '<div style="text-align:center"><div class="big-num" style="color:#d9a441;font-size:22px">'+(v.bohIph!=null?v.bohIph:'—')+'</div><div class="sub">Items / person</div></div>'+
-        '</div>'+
-        '<div class="row4">'+
-          '<div class="mini-kpi"><div class="v">'+v.totalTickets.toLocaleString()+'</div><div class="l">Food tickets</div></div>'+
-          '<div class="mini-kpi"><div class="v">'+(v.bp||'—')+'</div><div class="l">Breaking point</div></div>'+
-          '<div class="mini-kpi"><div class="v">'+(v.guestsSeated!=null?v.guestsSeated.toLocaleString():'—')+'</div><div class="l">Guests seated</div></div>'+
-          '<div class="mini-kpi"><div class="v" style="color:#d9a441">'+(v.sauteIph!=null?v.sauteIph:'—')+'</div><div class="l">Saute items/person</div></div>'+
-        '</div>'+
-      '</div>';
-    }).join('');
-  }
+  if (cardsEl) cardsEl.innerHTML = '';
 
   // ── Station family comparison: fulfillment + items/person ──
   const famEl = document.getElementById('groupFamilyTable');
@@ -2783,6 +2787,8 @@ function renderGroup() {
     fh += '</tr></thead><tbody>';
     FOOD_FAMILIES.forEach(f => {
       const any = venueData.some(v => v.familyStats[f] && (v.familyStats[f].iph != null || v.familyStats[f].fulMin != null));
+      // Always show family rows in portfolio so Claudie empty cells are visible when others have data
+      if (!any && !portfolioMode) return;
       if (!any) return;
       fh += '<tr style="border-top:1px solid #262a33"><td style="padding:8px;color:#e8eaed;font-weight:600">'+f+'</td>';
       venueData.forEach(v => {
@@ -2796,64 +2802,60 @@ function renderGroup() {
     fh += '</tbody></table>';
     if (!venueData.some(v => v.hasStaffing)) {
       fh = '<p style="color:#9aa0aa;font-size:13px">Staffing efficiency appears after FTE × labor join for each venue.</p>' + fh;
+    } else if (portfolioMode && venueData.some(v => !v.hasStaffing)) {
+      fh = '<p style="color:#9aa0aa;font-size:13px;margin:0 0 8px">Claudie (and any venue without staffing join) shows — for family items/person until FTE×labor is available.</p>' + fh;
     }
     famEl.innerHTML = fh;
   }
 
-  // ── Group comparison bar chart ──
-  const thrLine = {id:'groupThr',afterDraw(chart){
-    const{ctx,chartArea:a,scales}=chart;if(!a||!scales.x)return;
-    const x15=scales.x.getPixelForValue(15);
-    if(x15<a.left||x15>a.right)return;
-    ctx.save();ctx.strokeStyle='#e2706a';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
-    ctx.beginPath();ctx.moveTo(x15,a.top);ctx.lineTo(x15,a.bottom);ctx.stroke();
-    ctx.setLineDash([]);ctx.fillStyle='#e2706a';ctx.font='11px sans-serif';ctx.textAlign='center';
-    ctx.fillText('15 min',x15,a.top-4);ctx.restore();
-  }};
-
-  const existing = Chart.getChart('cGroupBar');
-  if (existing) existing.destroy();
-
-  const groupCanvas = document.getElementById('cGroupBar');
-  if (groupCanvas) {
-    new Chart(groupCanvas, {
-      type: 'bar',
-      data: {
-        labels: venueData.map(v => v.label),
-        datasets: [{
-          label: 'Avg fulfillment (min)',
-          data: venueData.map(v => v.avgFulMin != null ? +v.avgFulMin.toFixed(2) : null),
-          backgroundColor: venueData.map(v => {
-            if (v.avgFulMin == null) return '#6b7280';
-            return avgFulColorByMin(v.avgFulMin) + 'cc';
-          }),
-          borderColor: venueData.map(v => {
-            if (v.avgFulMin == null) return '#6b7280';
-            return avgFulColorByMin(v.avgFulMin);
-          }),
-          borderWidth: 1,
-          borderRadius: 4
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        plugins: { legend: { display: false }, tooltip: { callbacks: {
-          label(ctx) {
-            const v = venueData[ctx.dataIndex];
-            return [
-              ctx.parsed.x.toFixed(1)+' min avg fulfillment',
-              v.bohIph != null ? v.bohIph+' items/person' : 'no staffing join',
-              v.totalTickets.toLocaleString()+' tickets'
-            ];
-          }
-        }}},
-        scales: {
-          x: { title:{display:true,text:'Avg fulfillment (min)'}, grid:{color:gc}, min:0 },
-          y: { grid:{display:false} }
-        }
-      },
-      plugins: [thrLine]
+  // ── Items top 10 variance across RDG ──
+  const varEl = document.getElementById('groupItemVarianceTable');
+  if (varEl) {
+    const byItem = {};
+    venueData.forEach(v => {
+      Object.entries(v.itemMap || {}).forEach(([norm, info]) => {
+        if (!byItem[norm]) byItem[norm] = { name: info.name, byVenue: {} };
+        byItem[norm].byVenue[v.key] = info;
+        // Prefer the longest display name
+        if ((info.name || '').length > (byItem[norm].name || '').length) byItem[norm].name = info.name;
+      });
     });
+    const ranked = Object.values(byItem).map(row => {
+      const vals = venueData.map(v => {
+        const hit = row.byVenue[v.key];
+        return hit ? hit.avgSec / 60 : null;
+      }).filter(x => x != null && isFinite(x));
+      if (vals.length < 2) return null;
+      const mn = Math.min(...vals);
+      const mx = Math.max(...vals);
+      return { name: row.name, byVenue: row.byVenue, spread: mx - mn, n: vals.length };
+    }).filter(Boolean).sort((a, b) => b.spread - a.spread).slice(0, 10);
+
+    if (!ranked.length) {
+      varEl.innerHTML = '<p style="color:#9aa0aa;font-size:13px">No shared menu items with fulfillment times across 2+ venues this week.</p>';
+    } else {
+      let vh = '<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:780px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
+        '<th style="text-align:left;padding:8px">#</th>'+
+        '<th style="text-align:left;padding:8px">Menu item</th>';
+      venueData.forEach(v => { vh += '<th style="padding:8px;text-align:right">'+v.label+'</th>'; });
+      vh += '<th style="padding:8px;text-align:right;color:#d9a441">Spread</th></tr></thead><tbody>';
+      ranked.forEach((row, i) => {
+        vh += '<tr style="border-top:1px solid #262a33"><td style="padding:8px;color:#6b7280">'+(i+1)+'</td>'+
+          '<td style="padding:8px;color:#e8eaed;font-weight:600">'+row.name+'</td>';
+        venueData.forEach(v => {
+          const hit = row.byVenue[v.key];
+          if (!hit) {
+            vh += '<td style="padding:8px;text-align:right;color:#6b7280">—</td>';
+            return;
+          }
+          const min = hit.avgSec / 60;
+          vh += '<td style="padding:8px;text-align:right;color:'+avgFulColorByMin(min)+'">'+min.toFixed(1)+'m</td>';
+        });
+        vh += '<td style="padding:8px;text-align:right;font-weight:700;color:#d9a441">'+row.spread.toFixed(1)+'m</td></tr>';
+      });
+      vh += '</tbody></table>';
+      varEl.innerHTML = vh;
+    }
   }
 }
 function selectVenueFromPortfolio(key) {
@@ -3193,7 +3195,7 @@ function renderAll() {
     renderGroup();
     renderSettings();
     const pageSum = document.getElementById('pageSummary');
-    if (pageSum) pageSum.innerHTML = 'RDG Portfolio compares Casa Neos, AVA Coconut Grove, AVA Winter Park, and MILA for the selected week. Pick a location pill to drill into station detail.';
+    if (pageSum) pageSum.innerHTML = 'RDG Portfolio compares Claudie, Casa Neos, AVA Coconut Grove, AVA Winter Park, and MILA for the selected week. Pick a location pill to drill into station detail.';
     const sbc = document.getElementById('serviceBreakCard');
     if (sbc) sbc.style.display = 'none';
     const ov = document.getElementById('overviewStaffingCard');
