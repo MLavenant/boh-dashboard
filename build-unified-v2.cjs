@@ -281,13 +281,13 @@ html = html.replace(
   <div id="groupFamilyTable" style="overflow-x:auto"></div>
 </div>
 <div class="card" style="margin-top:16px">
-  <h2>Items Top 10 Variance — with Target</h2>
-  <p class="note">Highest fulfillment spread for items that have a <strong>target</strong> (REF / chef). Matches exact names and like-to-like prefixes (CL-… / C-… / ACG-…).</p>
+  <h2>Items Top 10 Variance — with Target (food)</h2>
+  <p class="note">Food items only (beverages / bar excluded). Highest fulfillment spread where a <strong>target</strong> exists. Matches exact names and like-to-like prefixes (CL-… / C-… / ACG-…).</p>
   <div id="groupItemVarianceTargetTable" style="overflow-x:auto"></div>
 </div>
 <div class="card" style="margin-top:16px">
-  <h2>Items Top 10 Variance — like-to-like</h2>
-  <p class="note">Cross-venue matches after stripping location prefixes (e.g. <strong>CL-Tenderloin</strong> ↔ <strong>C-Tenderloin</strong> ↔ <strong>M-Tenderloin</strong>). Ranked by fulfillment spread.</p>
+  <h2>Items Top 10 Variance — like-to-like (food)</h2>
+  <p class="note">Food items only. Cross-venue matches after stripping location prefixes (e.g. <strong>CL-Tenderloin</strong> ↔ <strong>C-Tenderloin</strong> ↔ <strong>M-Tenderloin</strong>). Ranked by fulfillment spread.</p>
   <div id="groupItemVarianceAlikeTable" style="overflow-x:auto"></div>
 </div>
 <div class="coming-note" id="groupWowNote">📅 Week-over-week comparison: available from Week 2 (Jul 14)</div>
@@ -583,6 +583,37 @@ const FOOD_EXCL_PATTERNS = ['bar','champagne','wine','btg','pos','barista','somm
 function isFoodStation(name) {
   const n = name.toLowerCase();
   return !FOOD_EXCL_PATTERNS.some(p => n.includes(p));
+}
+/** Portfolio / menu: drop beverages, bar noise, and absurd cook times */
+const PORTFOLIO_BEV_KEYWORDS = [
+  'evian','pellegrino','perrier','water','coke','coca','diet','sprite','soda','juice','lemonade','iced tea','ginger ale','still','sparkling',
+  'beer','kronenbourg','heineken','stella','bud','corona','draft',
+  'wine','champagne','prosecco','sancerre','pinot','chardonnay','bordeaux','burgundy','rosé','rose','chablis','malbec','cabernet','merlot','syrah','shiraz','riesling','sauvignon',
+  'vodka','gin','rum','tequila','whiskey','whisky','bourbon','scotch','mezcal','cognac','armagnac','brandy','port','sherry','vermouth','liqueur','aperitif',
+  'reposado','anejo','blanco','vsop','xo',
+  'martini','negroni','cocktail','spritz','aperol','campari','margarita','mimosa','bloody mary','daiquiri','hemingway','old fashioned','moscow mule','french 75','pisco','pornstar','paper plane',
+  'laphroaig','oban','remy','hennessy','macallan','glenlivet','glenfiddich','balvenie','jameson','johnnie','walker','beefeater','tanqueray','bombay','hendrick',
+  'grey goose','ketel','absolut','belvedere','tito','patron','don julio','casamigos','bacardi','havana','plantaray','maestro dobel','santa teresa','st germain','st. germain','chartreuse','frangelico','sambuca','limoncello','amaretto',
+  'maker','woodford','basil hayden','buffalo trace','hibiki','monkey 47','sipsmith',"angel's",'envy','envye',
+  'espresso','coffee','latte','cappuccino','cappuc','macchiato','cortadito','carajillo','tea','barista','americano','earl grey',
+  'paloma','tonic','gl ','benoit','chauveau','et fill','paris for you','by day','by night',
+  'deposit','beo','package','gift card','gratuity','comp ','void','all in ',
+];
+function isPortfolioBeverageName(name) {
+  const n = String(name || '').toLowerCase();
+  if (!n) return true;
+  if (PORTFOLIO_BEV_KEYWORDS.some(kw => n.includes(kw))) return true;
+  // Spirit age tags: "10yr", "14 yr", "12-year"
+  if (/\\b\\d{1,2}\\s*-?\\s*(yr|year)s?\\b/i.test(n)) return true;
+  return false;
+}
+function isPortfolioFoodItem(name, stations, avgSec) {
+  if (isPortfolioBeverageName(name)) return false;
+  if (avgSec != null && (avgSec <= 0 || avgSec > 90 * 60)) return false; // drop absurd / unclosed times
+  const foodSt = (stations || []).filter(isFoodStation);
+  // Prefer mapped food stations; if no station info, still allow non-beverage names
+  if (stations && stations.length && !foodSt.length) return false;
+  return true;
 }
 
 // Static REF assignment helpers (authoritative item → stations + target)
@@ -2718,6 +2749,11 @@ function buildVenueWeekScorecard(key, label, weekKey) {
     if (ref && ref.targetSec > 0) return ref.targetSec;
     return 0;
   }
+  function stationsFor(name, assignStation) {
+    const fromMap = ((venueMap[name] && venueMap[name].stations) || []).slice();
+    if (assignStation) fromMap.push(assignStation);
+    return [...new Set(fromMap.filter(Boolean))];
+  }
   // Item map for cross-venue variance (summary preferred; fall back to assignmentData)
   const itemMap = {};
   (d.summary || []).forEach(row => {
@@ -2726,20 +2762,28 @@ function buildVenueWeekScorecard(key, label, weekKey) {
     const avg = row.avg_sec != null ? row.avg_sec : (row.avgFulSec != null ? row.avgFulSec : null);
     const qty = row.qty != null ? row.qty : (row.count != null ? row.count : 0);
     if (avg == null || !(avg > 0)) return;
-    itemMap[name.toLowerCase()] = { name, avgSec: avg, qty, targetSec: targetFor(name) };
+    const stations = stationsFor(name, null);
+    if (!isPortfolioFoodItem(name, stations, avg)) return;
+    itemMap[name.toLowerCase()] = { name, avgSec: avg, qty, targetSec: targetFor(name), stations };
   });
   (d.assignmentData || []).forEach(row => {
     const name = String(row.menuItem || '').trim();
     if (!name) return;
     const avg = row.avgFulSec != null ? row.avgFulSec : null;
     const tAssign = row.targetSec > 0 ? row.targetSec : 0;
+    const stations = stationsFor(name, row.station || null);
+    if (avg != null && avg > 0 && !isPortfolioFoodItem(name, stations, avg)) return;
     if (!itemMap[name.toLowerCase()]) {
       if (avg == null || !(avg > 0)) return;
-      itemMap[name.toLowerCase()] = { name, avgSec: avg, qty: row.qty || row.count || 0, targetSec: tAssign || targetFor(name) };
-    } else if (!itemMap[name.toLowerCase()].targetSec && tAssign) {
-      itemMap[name.toLowerCase()].targetSec = tAssign;
-    } else if (!itemMap[name.toLowerCase()].targetSec) {
-      itemMap[name.toLowerCase()].targetSec = targetFor(name);
+      if (!isPortfolioFoodItem(name, stations, avg)) return;
+      itemMap[name.toLowerCase()] = { name, avgSec: avg, qty: row.qty || row.count || 0, targetSec: tAssign || targetFor(name), stations };
+    } else {
+      const cur = itemMap[name.toLowerCase()];
+      if (!cur.targetSec && tAssign) cur.targetSec = tAssign;
+      else if (!cur.targetSec) cur.targetSec = targetFor(name);
+      if (row.station && isFoodStation(row.station) && !(cur.stations || []).includes(row.station)) {
+        cur.stations = [...(cur.stations || []), row.station];
+      }
     }
   });
   return { key, label, avgFulMin, avgFulSec, totalTickets, bp, bpGuests, guestsSeated, top3, sauteIph, sauteFul, bohIph, familyStats, hasStaffing: !!staffing, itemMap };
@@ -2827,8 +2871,7 @@ function renderGroup() {
     famEl.innerHTML = fh;
   }
 
-  // ── Items top 10 variance (with target + like-to-like) ──
-  const PORTFOLIO_ITEM_NOISE = /deposit|beo|package|gift\\s*card|gratuity|comp\\b|void|water|soda|coke|wine|beer|cocktail|vodka|gin|rum|tequila|whiskey|champagne|prosecco|latte|espresso|coffee|cappuc|macchiato|cortadito|carajillo|paloma|margarita|mimosa|negroni|spritz|aperol|campari|old fashioned|moscow mule|french 75|pisco|beefeater|maker|woodford|basil hayden|buffalo|hibiki|monkey 47|sipsmith|limoncello|sambuca|frangelico|havana|plantaray|chartreuse|amaretto|angel.s envy|earl grey|tonic\\b|pornstar|paper plane|maestro dobel|santa teresa/i;
+  // ── Items top 10 variance (food only: with target + like-to-like) ──
   const VENUE_ITEM_PREFIX_RE = /^(AVACGPFMS|AVACGPF|AVACG|ACG|CLPFL|CLIN|CLEV|CLEL|CLPF|CLR|CLK|CLE|CLL|CL|CNSM|CMS|CSM|CIN|CE|CN|C|AVAWP|AWP|AOB|AEV|AMO|AM0|A|MEV|MG|MP|MILA|MM|M)[-_\\s]+/i;
   function rdgItemBaseName(name) {
     return String(name || '').trim().replace(VENUE_ITEM_PREFIX_RE, '').replace(/\\s+/g, ' ').trim().toLowerCase();
@@ -2892,7 +2935,8 @@ function renderGroup() {
   const byBase = {};
   venueData.forEach(v => {
     Object.values(v.itemMap || {}).forEach(info => {
-      if (PORTFOLIO_ITEM_NOISE.test(info.name)) return;
+      // itemMap is already food-filtered at build time; keep a soft re-check
+      if (!isPortfolioFoodItem(info.name, info.stations, info.avgSec)) return;
       const norm = info.name.toLowerCase();
       if (!byExact[norm]) byExact[norm] = { name: info.name, byVenue: {}, aliases: new Set() };
       byExact[norm].byVenue[v.key] = info;
