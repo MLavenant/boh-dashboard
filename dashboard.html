@@ -118,13 +118,27 @@ table.menu-tbl tr:hover td{background:#1e2533}
 .group-card .mini-kpi{background:#13161c;border-radius:8px;padding:8px 10px;text-align:center}
 .group-card .mini-kpi .v{font-size:16px;font-weight:700}
 .group-card .mini-kpi .l{color:#9aa0aa;font-size:10px;margin-top:1px}
+/* Print / PDF export — RDG Portfolio */
+@media print {
+  @page { size: landscape; margin: 12mm; }
+  body { background:#fff !important; color:#111 !important; }
+  nav, .venue-pills, .tab-btn, footer, #portfolioPdfBtn, #weekWelcomePopup,
+  #assignmentHelperBanner, .coming-note { display:none !important; }
+  .tab-section { display:none !important; }
+  #tab-group.tab-section, #tab-group.tab-section.active { display:block !important; }
+  #tab-group .card { break-inside:avoid; border:1px solid #ccc !important; background:#fff !important; color:#111 !important; box-shadow:none !important; }
+  #tab-group h2, #tab-group .section-title, #tab-group strong { color:#111 !important; }
+  #tab-group .note, #tab-group td, #tab-group th { color:#333 !important; }
+  #tab-group table { width:100% !important; font-size:10px !important; }
+  #dashTitle, #dashBadge { color:#111 !important; }
+}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
   <h1 id="dashTitle">BOH Dashboard</h1>
-  <span class="badge" id="dashBadge">Latest 2026-W31 · Built 2026-08-04 16:51 UTC</span>
+  <span class="badge" id="dashBadge">Latest 2026-W31 · Built 2026-08-04 17:17 UTC</span>
 </header>
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
 <div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
@@ -425,8 +439,13 @@ table.menu-tbl tr:hover td{background:#1e2533}
 
 <!-- ========== TAB 4: GROUP / RDG PORTFOLIO ========== -->
 <section id="tab-group" class="tab-section">
-<div class="section-title" id="groupTitle">RDG Portfolio — W31 Performance</div>
-<p class="note" id="groupSubtitle" style="margin-top:-8px">All RDG food venues including Claudie. Main KPIs: <strong>avg fulfillment</strong> and <strong>items / person</strong>. Claudie staffing cells stay empty until FTE×labor join is available.</p>
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:4px">
+  <div>
+    <div class="section-title" id="groupTitle" style="margin:0">RDG Portfolio — W31 Performance</div>
+    <p class="note" id="groupSubtitle" style="margin:6px 0 0">All RDG food venues including Claudie. Main KPIs: <strong>avg fulfillment</strong> and <strong>items / person</strong>. Claudie staffing cells stay empty until FTE×labor join is available.</p>
+  </div>
+  <button type="button" id="portfolioPdfBtn" onclick="exportPortfolioPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Export PDF</button>
+</div>
 <div class="card" style="margin-bottom:16px">
   <h2>Portfolio Scoreboard</h2>
   <p class="note">Location vs location — fulfillment speed and items handled per person.</p>
@@ -438,14 +457,14 @@ table.menu-tbl tr:hover td{background:#1e2533}
   <div id="groupFamilyTable" style="overflow-x:auto"></div>
 </div>
 <div class="card" style="margin-top:16px">
-  <h2>Items Top 10 Variance — with Target (food only)</h2>
-  <p class="note">Food dishes only — spirits, wine, cocktails, and coffee/tea are excluded. Highest fulfillment spread where a <strong>target</strong> exists. Matches exact names and like-to-like prefixes (CL-… / C-… / ACG-…).</p>
-  <div id="groupItemVarianceTargetTable" style="overflow-x:auto"></div>
-</div>
-<div class="card" style="margin-top:16px">
   <h2>Items Top 10 Variance — like-to-like (food only)</h2>
   <p class="note">Food dishes only. Cross-venue matches after stripping location prefixes (e.g. <strong>CL-Tenderloin</strong> ↔ <strong>C-Tenderloin</strong>). Ranked by fulfillment spread.</p>
   <div id="groupItemVarianceAlikeTable" style="overflow-x:auto"></div>
+</div>
+<div class="card" style="margin-top:16px">
+  <h2>Items Top 10 Variance — with Target (food only)</h2>
+  <p class="note">Food dishes only — spirits, wine, cocktails, and coffee/tea are excluded. Highest fulfillment spread where a <strong>target</strong> exists. Matches exact names and like-to-like prefixes (CL-… / C-… / ACG-…).</p>
+  <div id="groupItemVarianceTargetTable" style="overflow-x:auto"></div>
 </div>
 <div class="coming-note" id="groupWowNote">📅 Week-over-week comparison: available from Week 2 (Jul 14)</div>
 </section>
@@ -2888,8 +2907,6 @@ function renderGroup() {
       '<th style="text-align:left;padding:10px 8px">Venue</th>'+
       '<th style="padding:10px 8px;text-align:right">Avg fulfillment</th>'+
       '<th style="padding:10px 8px;text-align:right">Items / person</th>'+
-      '<th style="padding:10px 8px;text-align:right">Saute ful</th>'+
-      '<th style="padding:10px 8px;text-align:right">Saute items/person</th>'+
       '<th style="padding:10px 8px;text-align:right">Guests seated</th>'+
       '<th style="padding:10px 8px;text-align:right">Breaking point</th></tr></thead><tbody>';
     venueData.forEach(v => {
@@ -2897,8 +2914,6 @@ function renderGroup() {
         '<td style="padding:10px 8px;color:#e8eaed;font-weight:700">'+v.label+'</td>'+
         '<td style="padding:10px 8px;text-align:right;font-weight:700;color:'+(v.avgFulMin!=null?avgFulColorByMin(v.avgFulMin):'#9aa0aa')+'">'+(v.avgFulMin!=null?v.avgFulMin.toFixed(1)+' min':'—')+'</td>'+
         '<td style="padding:10px 8px;text-align:right;font-weight:700;color:#d9a441">'+(v.bohIph!=null?v.bohIph:'—')+'</td>'+
-        '<td style="padding:10px 8px;text-align:right;color:#9aa0aa">'+(v.sauteFul!=null?v.sauteFul.toFixed(1)+'m':'—')+'</td>'+
-        '<td style="padding:10px 8px;text-align:right;color:#d9a441">'+(v.sauteIph!=null?v.sauteIph:'—')+'</td>'+
         '<td style="padding:10px 8px;text-align:right">'+(v.guestsSeated!=null?v.guestsSeated.toLocaleString():'—')+'</td>'+
         '<td style="padding:10px 8px;text-align:right">'+(v.bp||'—')+(v.bpGuests!=null?' / '+v.bpGuests+'g':'')+'</td></tr>';
     });
@@ -3084,6 +3099,21 @@ function selectVenueFromPortfolio(key) {
   const groupBtn = document.querySelector('.tab-btn[onclick*="group"]');
   // Stay on Group if coming from scorecard click while browsing portfolio; otherwise re-render venue tabs
   renderAll();
+}
+function exportPortfolioPdf() {
+  // Ensure Portfolio tab is visible, then open the browser print dialog (Save as PDF)
+  const groupBtn = document.querySelector('.tab-btn[onclick*="group"]');
+  if (groupBtn) switchTab('group', groupBtn);
+  if (currentVenue !== 'rdg_portfolio') {
+    currentVenue = 'rdg_portfolio';
+    document.querySelectorAll('.venue-pill').forEach(b => {
+      b.classList.toggle('active', b.dataset.venue === 'rdg_portfolio');
+    });
+    const title = document.getElementById('dashTitle');
+    if (title) title.textContent = 'RDG Portfolio · BOH Dashboard';
+    renderAll();
+  }
+  setTimeout(() => window.print(), 150);
 }
 
 // ============================================================
