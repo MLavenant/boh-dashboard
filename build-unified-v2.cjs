@@ -281,13 +281,13 @@ html = html.replace(
   <div id="groupFamilyTable" style="overflow-x:auto"></div>
 </div>
 <div class="card" style="margin-top:16px">
-  <h2>Items Top 10 Variance — with Target (food)</h2>
-  <p class="note">Food items only (beverages / bar excluded). Highest fulfillment spread where a <strong>target</strong> exists. Matches exact names and like-to-like prefixes (CL-… / C-… / ACG-…).</p>
+  <h2>Items Top 10 Variance — with Target (food only)</h2>
+  <p class="note">Food dishes only — spirits, wine, cocktails, and coffee/tea are excluded. Highest fulfillment spread where a <strong>target</strong> exists. Matches exact names and like-to-like prefixes (CL-… / C-… / ACG-…).</p>
   <div id="groupItemVarianceTargetTable" style="overflow-x:auto"></div>
 </div>
 <div class="card" style="margin-top:16px">
-  <h2>Items Top 10 Variance — like-to-like (food)</h2>
-  <p class="note">Food items only. Cross-venue matches after stripping location prefixes (e.g. <strong>CL-Tenderloin</strong> ↔ <strong>C-Tenderloin</strong> ↔ <strong>M-Tenderloin</strong>). Ranked by fulfillment spread.</p>
+  <h2>Items Top 10 Variance — like-to-like (food only)</h2>
+  <p class="note">Food dishes only. Cross-venue matches after stripping location prefixes (e.g. <strong>CL-Tenderloin</strong> ↔ <strong>C-Tenderloin</strong>). Ranked by fulfillment spread.</p>
   <div id="groupItemVarianceAlikeTable" style="overflow-x:auto"></div>
 </div>
 <div class="coming-note" id="groupWowNote">📅 Week-over-week comparison: available from Week 2 (Jul 14)</div>
