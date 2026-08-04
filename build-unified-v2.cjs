@@ -3226,7 +3226,6 @@ function exportPortfolioPdf() {
     const card = document.getElementById(id);
     if (!card) return;
     const tbl = card.querySelector('[id$="Table"]');
-    const empty = !tbl || !tbl.querySelector('tbody tr') || /No |empty|—<\/td><\/tr><\/tbody><\/table>$/i.test(tbl.textContent || '');
     const hasRows = tbl && tbl.querySelectorAll('tbody tr').length > 0;
     card.classList.toggle('portfolio-print-empty', !hasRows);
   });

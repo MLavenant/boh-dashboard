@@ -190,7 +190,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <div class="wrap">
 <header>
   <h1 id="dashTitle">BOH Dashboard</h1>
-  <span class="badge" id="dashBadge">Latest 2026-W31 · Built 2026-08-04 17:53 UTC</span>
+  <span class="badge" id="dashBadge">Latest 2026-W31 · Built 2026-08-04 18:47 UTC</span>
 </header>
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
 <div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
@@ -3269,7 +3269,6 @@ function exportPortfolioPdf() {
     const card = document.getElementById(id);
     if (!card) return;
     const tbl = card.querySelector('[id$="Table"]');
-    const empty = !tbl || !tbl.querySelector('tbody tr') || /No |empty|—</td></tr></tbody></table>$/i.test(tbl.textContent || '');
     const hasRows = tbl && tbl.querySelectorAll('tbody tr').length > 0;
     card.classList.toggle('portfolio-print-empty', !hasRows);
   });
