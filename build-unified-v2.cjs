@@ -281,9 +281,14 @@ html = html.replace(
   <div id="groupFamilyTable" style="overflow-x:auto"></div>
 </div>
 <div class="card" style="margin-top:16px">
-  <h2>Items Top 10 Variance across RDG</h2>
-  <p class="note">Menu items that appear in 2+ venues this week, ranked by the largest fulfillment spread (slowest venue − fastest venue). Dashes = item not seen / no time at that location.</p>
-  <div id="groupItemVarianceTable" style="overflow-x:auto"></div>
+  <h2>Items Top 10 Variance — with Target</h2>
+  <p class="note">Highest fulfillment spread for items that have a <strong>target</strong> (REF / chef). Matches exact names and like-to-like prefixes (CL-… / C-… / ACG-…).</p>
+  <div id="groupItemVarianceTargetTable" style="overflow-x:auto"></div>
+</div>
+<div class="card" style="margin-top:16px">
+  <h2>Items Top 10 Variance — like-to-like</h2>
+  <p class="note">Cross-venue matches after stripping location prefixes (e.g. <strong>CL-Tenderloin</strong> ↔ <strong>C-Tenderloin</strong> ↔ <strong>M-Tenderloin</strong>). Ranked by fulfillment spread.</p>
+  <div id="groupItemVarianceAlikeTable" style="overflow-x:auto"></div>
 </div>
 <div class="coming-note" id="groupWowNote">📅 Week-over-week comparison: available from Week 2 (Jul 14)</div>
 </section>
@@ -2704,6 +2709,15 @@ function buildVenueWeekScorecard(key, label, weekKey) {
   }
   const bohIph = bohHeadDays > 0 ? +(bohVolume / bohHeadDays).toFixed(1) : null;
   const top3 = [...stations].sort((a,b)=>b.avg_sec-a.avg_sec).slice(0,3);
+  const mapSlug = ({ claudie:'claudie', casaneos:'casa_neos', ava_cg:'ava_cg', ava_wp:'ava_wp', mila:'mila' })[key] || key;
+  const venueMap = ITEM_STATION_MAP_DATA[mapSlug] || {};
+  const chefMap = CHEF_TARGET_OVERRIDES[mapSlug] || {};
+  function targetFor(name) {
+    if (chefMap[name] > 0) return chefMap[name];
+    const ref = venueMap[name];
+    if (ref && ref.targetSec > 0) return ref.targetSec;
+    return 0;
+  }
   // Item map for cross-venue variance (summary preferred; fall back to assignmentData)
   const itemMap = {};
   (d.summary || []).forEach(row => {
@@ -2712,17 +2726,22 @@ function buildVenueWeekScorecard(key, label, weekKey) {
     const avg = row.avg_sec != null ? row.avg_sec : (row.avgFulSec != null ? row.avgFulSec : null);
     const qty = row.qty != null ? row.qty : (row.count != null ? row.count : 0);
     if (avg == null || !(avg > 0)) return;
-    itemMap[name.toLowerCase()] = { name, avgSec: avg, qty };
+    itemMap[name.toLowerCase()] = { name, avgSec: avg, qty, targetSec: targetFor(name) };
   });
-  if (!Object.keys(itemMap).length) {
-    (d.assignmentData || []).forEach(row => {
-      const name = String(row.menuItem || '').trim();
-      if (!name || itemMap[name.toLowerCase()]) return;
-      const avg = row.avgFulSec != null ? row.avgFulSec : null;
+  (d.assignmentData || []).forEach(row => {
+    const name = String(row.menuItem || '').trim();
+    if (!name) return;
+    const avg = row.avgFulSec != null ? row.avgFulSec : null;
+    const tAssign = row.targetSec > 0 ? row.targetSec : 0;
+    if (!itemMap[name.toLowerCase()]) {
       if (avg == null || !(avg > 0)) return;
-      itemMap[name.toLowerCase()] = { name, avgSec: avg, qty: row.qty || 0 };
-    });
-  }
+      itemMap[name.toLowerCase()] = { name, avgSec: avg, qty: row.qty || row.count || 0, targetSec: tAssign || targetFor(name) };
+    } else if (!itemMap[name.toLowerCase()].targetSec && tAssign) {
+      itemMap[name.toLowerCase()].targetSec = tAssign;
+    } else if (!itemMap[name.toLowerCase()].targetSec) {
+      itemMap[name.toLowerCase()].targetSec = targetFor(name);
+    }
+  });
   return { key, label, avgFulMin, avgFulSec, totalTickets, bp, bpGuests, guestsSeated, top3, sauteIph, sauteFul, bohIph, familyStats, hasStaffing: !!staffing, itemMap };
 }
 function renderGroup() {
@@ -2808,55 +2827,133 @@ function renderGroup() {
     famEl.innerHTML = fh;
   }
 
-  // ── Items top 10 variance across RDG ──
-  const varEl = document.getElementById('groupItemVarianceTable');
-  if (varEl) {
-    const byItem = {};
-    venueData.forEach(v => {
-      Object.entries(v.itemMap || {}).forEach(([norm, info]) => {
-        if (!byItem[norm]) byItem[norm] = { name: info.name, byVenue: {} };
-        byItem[norm].byVenue[v.key] = info;
-        // Prefer the longest display name
-        if ((info.name || '').length > (byItem[norm].name || '').length) byItem[norm].name = info.name;
-      });
-    });
-    const ranked = Object.values(byItem).map(row => {
-      const vals = venueData.map(v => {
+  // ── Items top 10 variance (with target + like-to-like) ──
+  const PORTFOLIO_ITEM_NOISE = /deposit|beo|package|gift\\s*card|gratuity|comp\\b|void|water|soda|coke|wine|beer|cocktail|vodka|gin|rum|tequila|whiskey|champagne|prosecco|latte|espresso|coffee|cappuc|macchiato|cortadito|carajillo|paloma|margarita|mimosa|negroni|spritz|aperol|campari|old fashioned|moscow mule|french 75|pisco|beefeater|maker|woodford|basil hayden|buffalo|hibiki|monkey 47|sipsmith|limoncello|sambuca|frangelico|havana|plantaray|chartreuse|amaretto|angel.s envy|earl grey|tonic\\b|pornstar|paper plane|maestro dobel|santa teresa/i;
+  const VENUE_ITEM_PREFIX_RE = /^(AVACGPFMS|AVACGPF|AVACG|ACG|CLPFL|CLIN|CLEV|CLEL|CLPF|CLR|CLK|CLE|CLL|CL|CNSM|CMS|CSM|CIN|CE|CN|C|AVAWP|AWP|AOB|AEV|AMO|AM0|A|MEV|MG|MP|MILA|MM|M)[-_\\s]+/i;
+  function rdgItemBaseName(name) {
+    return String(name || '').trim().replace(VENUE_ITEM_PREFIX_RE, '').replace(/\\s+/g, ' ').trim().toLowerCase();
+  }
+  function rankVarianceRows(rows, venueDataLocal, limit) {
+    const ranked = rows.map(row => {
+      const vals = venueDataLocal.map(v => {
         const hit = row.byVenue[v.key];
         return hit ? hit.avgSec / 60 : null;
       }).filter(x => x != null && isFinite(x));
       if (vals.length < 2) return null;
       const mn = Math.min(...vals);
       const mx = Math.max(...vals);
-      return { name: row.name, byVenue: row.byVenue, spread: mx - mn, n: vals.length };
-    }).filter(Boolean).sort((a, b) => b.spread - a.spread).slice(0, 10);
-
-    if (!ranked.length) {
-      varEl.innerHTML = '<p style="color:#9aa0aa;font-size:13px">No shared menu items with fulfillment times across 2+ venues this week.</p>';
-    } else {
-      let vh = '<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:780px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
-        '<th style="text-align:left;padding:8px">#</th>'+
-        '<th style="text-align:left;padding:8px">Menu item</th>';
-      venueData.forEach(v => { vh += '<th style="padding:8px;text-align:right">'+v.label+'</th>'; });
-      vh += '<th style="padding:8px;text-align:right;color:#d9a441">Spread</th></tr></thead><tbody>';
-      ranked.forEach((row, i) => {
-        vh += '<tr style="border-top:1px solid #262a33"><td style="padding:8px;color:#6b7280">'+(i+1)+'</td>'+
-          '<td style="padding:8px;color:#e8eaed;font-weight:600">'+row.name+'</td>';
-        venueData.forEach(v => {
-          const hit = row.byVenue[v.key];
-          if (!hit) {
-            vh += '<td style="padding:8px;text-align:right;color:#6b7280">—</td>';
-            return;
-          }
-          const min = hit.avgSec / 60;
-          vh += '<td style="padding:8px;text-align:right;color:'+avgFulColorByMin(min)+'">'+min.toFixed(1)+'m</td>';
-        });
-        vh += '<td style="padding:8px;text-align:right;font-weight:700;color:#d9a441">'+row.spread.toFixed(1)+'m</td></tr>';
+      let targetSec = 0;
+      venueDataLocal.forEach(v => {
+        const hit = row.byVenue[v.key];
+        if (hit && hit.targetSec > targetSec) targetSec = hit.targetSec;
       });
-      vh += '</tbody></table>';
-      varEl.innerHTML = vh;
-    }
+      return { ...row, spread: mx - mn, n: vals.length, targetSec };
+    }).filter(Boolean).sort((a, b) => b.spread - a.spread);
+    return limit ? ranked.slice(0, limit) : ranked;
   }
+  function renderVarianceTable(el, ranked, venueDataLocal, opts) {
+    if (!el) return;
+    if (!ranked.length) {
+      el.innerHTML = '<p style="color:#9aa0aa;font-size:13px">'+(opts.empty || 'No matching items this week.')+'</p>';
+      return;
+    }
+    let vh = '<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:780px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
+      '<th style="text-align:left;padding:8px">#</th>'+
+      '<th style="text-align:left;padding:8px">Menu item</th>';
+    if (opts.showTarget) vh += '<th style="padding:8px;text-align:right">Target</th>';
+    venueDataLocal.forEach(v => { vh += '<th style="padding:8px;text-align:right">'+v.label+'</th>'; });
+    vh += '<th style="padding:8px;text-align:right;color:#d9a441">Spread</th></tr></thead><tbody>';
+    ranked.forEach((row, i) => {
+      const sub = row.aliases && row.aliases.length
+        ? '<div style="font-size:10px;color:#6b7280;font-weight:400;margin-top:2px">'+row.aliases.join(' · ')+'</div>'
+        : '';
+      vh += '<tr style="border-top:1px solid #262a33"><td style="padding:8px;color:#6b7280">'+(i+1)+'</td>'+
+        '<td style="padding:8px;color:#e8eaed;font-weight:600">'+row.name+sub+'</td>';
+      if (opts.showTarget) {
+        vh += '<td style="padding:8px;text-align:right;color:#9aa0aa">'+(row.targetSec>0?(row.targetSec/60).toFixed(1)+'m':'—')+'</td>';
+      }
+      venueDataLocal.forEach(v => {
+        const hit = row.byVenue[v.key];
+        if (!hit) {
+          vh += '<td style="padding:8px;text-align:right;color:#6b7280">—</td>';
+          return;
+        }
+        const min = hit.avgSec / 60;
+        vh += '<td style="padding:8px;text-align:right;color:'+avgFulColorByMin(min)+'">'+min.toFixed(1)+'m</td>';
+      });
+      vh += '<td style="padding:8px;text-align:right;font-weight:700;color:#d9a441">'+row.spread.toFixed(1)+'m</td></tr>';
+    });
+    vh += '</tbody></table>';
+    el.innerHTML = vh;
+  }
+
+  // Exact-name + like-to-like base groups (shared builder)
+  const byExact = {};
+  const byBase = {};
+  venueData.forEach(v => {
+    Object.values(v.itemMap || {}).forEach(info => {
+      if (PORTFOLIO_ITEM_NOISE.test(info.name)) return;
+      const norm = info.name.toLowerCase();
+      if (!byExact[norm]) byExact[norm] = { name: info.name, byVenue: {}, aliases: new Set() };
+      byExact[norm].byVenue[v.key] = info;
+      byExact[norm].aliases.add(info.name);
+
+      const base = rdgItemBaseName(info.name);
+      if (!base || base.length < 3) return;
+      if (!byBase[base]) byBase[base] = { name: info.name.replace(VENUE_ITEM_PREFIX_RE, '').trim() || info.name, byVenue: {}, aliases: new Set() };
+      const prev = byBase[base].byVenue[v.key];
+      if (!prev || (info.qty || 0) >= (prev.qty || 0)) byBase[base].byVenue[v.key] = info;
+      byBase[base].aliases.add(info.name);
+      const display = info.name.replace(VENUE_ITEM_PREFIX_RE, '').trim();
+      if (display && (!byBase[base].name || display.length <= byBase[base].name.length)) byBase[base].name = display;
+    });
+  });
+
+  function toRankable(groups, { requireTarget, requireDistinctNames }) {
+    return Object.values(groups).map(row => {
+      const aliases = [...(row.aliases || [])];
+      const distinct = new Set(aliases.map(a => a.toLowerCase()));
+      if (Object.keys(row.byVenue).length < 2) return null;
+      if (requireDistinctNames && distinct.size < 2) return null;
+      const hasTarget = Object.values(row.byVenue).some(x => x.targetSec > 0);
+      if (requireTarget && !hasTarget) return null;
+      return {
+        name: row.name,
+        byVenue: row.byVenue,
+        aliases: requireDistinctNames ? aliases.sort() : (distinct.size > 1 ? aliases.sort() : null),
+      };
+    }).filter(Boolean);
+  }
+
+  // Table 1: highest variance among items that have a Target (matched exact OR like-to-like)
+  const withTargetRows = [
+    ...toRankable(byExact, { requireTarget: true, requireDistinctNames: false }),
+    ...toRankable(byBase, { requireTarget: true, requireDistinctNames: true }),
+  ];
+  // Dedupe by base-ish key preferring larger spread later via rank
+  const seenTarget = new Set();
+  const withTargetDedup = [];
+  rankVarianceRows(withTargetRows, venueData).forEach(row => {
+    const key = rdgItemBaseName(row.name) || row.name.toLowerCase();
+    if (seenTarget.has(key)) return;
+    seenTarget.add(key);
+    withTargetDedup.push(row);
+  });
+  renderVarianceTable(
+    document.getElementById('groupItemVarianceTargetTable'),
+    withTargetDedup.slice(0, 10),
+    venueData,
+    { showTarget: true, empty: 'No shared items with a target and 2+ venue times this week.' }
+  );
+
+  // Table 2: like-to-like only (CL-X vs C-X / ACG-X …), target not required
+  const alikeRows = toRankable(byBase, { requireTarget: false, requireDistinctNames: true });
+  renderVarianceTable(
+    document.getElementById('groupItemVarianceAlikeTable'),
+    rankVarianceRows(alikeRows, venueData, 10),
+    venueData,
+    { showTarget: false, empty: 'No like-to-like prefixed matches (e.g. CL-… vs C-…) across 2+ venues this week.' }
+  );
 }
 function selectVenueFromPortfolio(key) {
   currentVenue = key;
