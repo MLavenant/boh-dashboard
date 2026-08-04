@@ -276,22 +276,22 @@ html = html.replace(
   <button type="button" id="portfolioPdfBtn" onclick="exportPortfolioPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Export PDF</button>
 </div>
 <div id="portfolioPrintRoot">
-<div class="card" style="margin-bottom:16px">
+<div class="card portfolio-print-card" id="portfolioCardScoreboard" style="margin-bottom:16px">
   <h2>Portfolio Scoreboard</h2>
   <p class="note">Location vs location — fulfillment speed and items handled per person.</p>
   <div id="groupPortfolioTable" style="overflow-x:auto"></div>
 </div>
-<div class="card" style="margin-top:16px">
+<div class="card portfolio-print-card" id="portfolioCardStations" style="margin-top:16px">
   <h2>Stations Comparison across RDG</h2>
   <p class="note">Same station family: avg fulfillment vs items / person. This is how we assess performance location vs location.</p>
   <div id="groupFamilyTable" style="overflow-x:auto"></div>
 </div>
-<div class="card" style="margin-top:16px">
+<div class="card portfolio-print-card" id="portfolioCardAlike" style="margin-top:16px">
   <h2>Items Top 10 Variance — like-to-like (food only)</h2>
   <p class="note">Food dishes only. Cross-venue matches after stripping location prefixes (e.g. <strong>CL-Tenderloin</strong> ↔ <strong>C-Tenderloin</strong>). Ranked by fulfillment spread.</p>
   <div id="groupItemVarianceAlikeTable" style="overflow-x:auto"></div>
 </div>
-<div class="card" style="margin-top:16px">
+<div class="card portfolio-print-card" id="portfolioCardTarget" style="margin-top:16px">
   <h2>Items Top 10 Variance — with Target (food only)</h2>
   <p class="note">Food dishes only — spirits, wine, cocktails, and coffee/tea are excluded. Highest fulfillment spread where a <strong>target</strong> exists. Matches exact names and like-to-like prefixes (CL-… / C-… / ACG-…).</p>
   <div id="groupItemVarianceTargetTable" style="overflow-x:auto"></div>
@@ -384,67 +384,63 @@ html = html.replace('</style>', `
 .group-card .mini-kpi{background:#13161c;border-radius:8px;padding:8px 10px;text-align:center}
 .group-card .mini-kpi .v{font-size:16px;font-weight:700}
 .group-card .mini-kpi .l{color:#9aa0aa;font-size:10px;margin-top:1px}
-/* Print / PDF export — RDG Portfolio (screen-matched, one landscape page) */
+/* Portfolio PDF prep (also used while measuring before print) + print output */
+body.printing-portfolio header,
+body.printing-portfolio .tab-nav,
+body.printing-portfolio #venuePills,
+body.printing-portfolio #weekSelector,
+body.printing-portfolio #portfolioTopChrome,
+body.printing-portfolio footer,
+body.printing-portfolio #weekWelcomePopup,
+body.printing-portfolio #assignmentHelperBanner,
+body.printing-portfolio .coming-note,
+body.printing-portfolio #portfolioPdfBtn {
+  display:none !important;
+}
+body.printing-portfolio .wrap { max-width:1080px !important; padding:8px !important; margin:0 auto !important; }
+body.printing-portfolio .tab-section { display:none !important; }
+body.printing-portfolio #tab-group.tab-section,
+body.printing-portfolio #tab-group.tab-section.active { display:block !important; margin:0 !important; }
+body.printing-portfolio #portfolioPrintRoot {
+  display:grid !important;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  width:100% !important;
+  max-width:1080px !important;
+  margin:0 auto !important;
+  transform:scale(var(--print-scale, 1));
+  transform-origin:top center;
+}
+body.printing-portfolio #portfolioCardScoreboard,
+body.printing-portfolio #portfolioCardStations { grid-column:1 / -1; }
+body.printing-portfolio #portfolioPrintRoot .card {
+  background:#181b22 !important;
+  border:1px solid #262a33 !important;
+  border-radius:8px !important;
+  padding:6px 8px !important;
+  margin:0 !important;
+  box-shadow:none !important;
+}
+body.printing-portfolio #portfolioPrintRoot .card h2 { font-size:11px !important; margin:0 0 3px !important; color:#e8eaed !important; }
+body.printing-portfolio #portfolioPrintRoot .card p.note,
+body.printing-portfolio #portfolioPrintRoot .card > p { display:none !important; }
+body.printing-portfolio #portfolioPrintRoot table { width:100% !important; font-size:7.5px !important; border-collapse:collapse !important; }
+body.printing-portfolio #portfolioPrintRoot th,
+body.printing-portfolio #portfolioPrintRoot td { padding:2px 4px !important; line-height:1.25 !important; }
+body.printing-portfolio #portfolioPrintRoot [style*="overflow"] { overflow:visible !important; }
+
 @media print {
-  @page { size: landscape; margin: 6mm; }
+  @page { size: landscape; margin: 5mm; }
   html, body {
     background:#0d1117 !important;
     color:#e8eaed !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-  }
-  body.printing-portfolio header,
-  body.printing-portfolio .tab-nav,
-  body.printing-portfolio #venuePills,
-  body.printing-portfolio #weekSelector,
-  body.printing-portfolio #portfolioTopChrome,
-  body.printing-portfolio footer,
-  body.printing-portfolio #weekWelcomePopup,
-  body.printing-portfolio #assignmentHelperBanner,
-  body.printing-portfolio .coming-note,
-  body.printing-portfolio #portfolioPdfBtn {
-    display:none !important;
-  }
-  body.printing-portfolio .wrap { max-width:none !important; padding:0 !important; margin:0 !important; }
-  body.printing-portfolio .tab-section { display:none !important; }
-  body.printing-portfolio #tab-group.tab-section,
-  body.printing-portfolio #tab-group.tab-section.active {
-    display:block !important;
-    margin:0 !important;
-  }
-  body.printing-portfolio #portfolioPrintRoot {
-    transform: scale(var(--print-scale, 0.72));
-    transform-origin: top left;
-    width: calc(100% / var(--print-scale, 0.72));
+    overflow: hidden !important;
   }
   body.printing-portfolio #portfolioPrintRoot .card {
     break-inside: avoid;
     page-break-inside: avoid;
-    background:#181b22 !important;
-    border:1px solid #262a33 !important;
-    color:#e8eaed !important;
-    border-radius:8px !important;
-    padding:8px 10px !important;
-    margin:0 0 8px !important;
-    box-shadow:none !important;
-  }
-  body.printing-portfolio #portfolioPrintRoot .card h2 {
-    color:#e8eaed !important;
-    font-size:12px !important;
-    margin:0 0 4px !important;
-  }
-  body.printing-portfolio #portfolioPrintRoot .card p.note { display:none !important; }
-  body.printing-portfolio #portfolioPrintRoot table {
-    width:100% !important;
-    font-size:8.5px !important;
-    border-collapse:collapse !important;
-  }
-  body.printing-portfolio #portfolioPrintRoot th,
-  body.printing-portfolio #portfolioPrintRoot td {
-    padding:3px 5px !important;
-  }
-  body.printing-portfolio #portfolioPrintRoot [style*="overflow"] {
-    overflow:visible !important;
   }
 }
 </style>`);
@@ -3098,22 +3094,23 @@ function exportPortfolioPdf() {
   };
   window.addEventListener('afterprint', cleanup);
 
-  // Match on-screen look, hide chrome, scale content to one landscape page
   document.body.classList.add('printing-portfolio');
   if (root) root.style.setProperty('--print-scale', '1');
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       if (root) {
-        // Approx printable area for landscape Letter/A4 with small margins (CSS px)
-        const maxW = 1040;
-        const maxH = 680;
+        // Landscape printable area (~Letter/A4). Uniform scale only — keeps proportions.
+        const maxW = 1020;
+        const maxH = 650;
         const w = Math.max(root.scrollWidth, root.offsetWidth, 1);
         const h = Math.max(root.scrollHeight, root.offsetHeight, 1);
-        const scale = Math.min(1, maxW / w, maxH / h);
-        root.style.setProperty('--print-scale', String(Math.max(0.35, scale * 0.98)));
+        let scale = Math.min(1, maxW / w, maxH / h);
+        // Prefer staying readable; never stretch axes independently
+        scale = Math.min(0.98, Math.max(0.55, scale));
+        root.style.setProperty('--print-scale', String(scale));
       }
-      setTimeout(() => window.print(), 80);
+      setTimeout(() => window.print(), 100);
     });
   });
 }
