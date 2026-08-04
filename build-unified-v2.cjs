@@ -432,15 +432,26 @@ body.printing-portfolio .coming-note,
 body.printing-portfolio #portfolioPdfBtn {
   display:none !important;
 }
+body.printing-portfolio,
+body.printing-portfolio html {
+  background:#0d1117 !important;
+}
 body.printing-portfolio .wrap { max-width:none !important; padding:0 !important; margin:0 !important; width:100% !important; }
 body.printing-portfolio .tab-section { display:none !important; }
 body.printing-portfolio #tab-group.tab-section,
-body.printing-portfolio #tab-group.tab-section.active { display:block !important; margin:0 !important; padding:0 !important; }
+body.printing-portfolio #tab-group.tab-section.active {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  margin:0 !important;
+  padding:0 !important;
+  min-height:100vh !important;
+}
 /* zoom (not transform) so print layout height shrinks — avoids empty black page */
 body.printing-portfolio #portfolioPrintRoot {
   display:grid !important;
   grid-template-columns:1fr 1fr;
-  gap:6px;
+  gap:5px;
   width:max-content !important;
   max-width:none !important;
   margin:0 auto !important;
@@ -452,22 +463,22 @@ body.printing-portfolio #portfolioPrintRoot .card {
   background:#181b22 !important;
   border:1px solid #262a33 !important;
   border-radius:6px !important;
-  padding:5px 7px !important;
+  padding:4px 6px !important;
   margin:0 !important;
   box-shadow:none !important;
 }
-body.printing-portfolio #portfolioPrintRoot .card h2 { font-size:11px !important; margin:0 0 3px !important; color:#e8eaed !important; }
+body.printing-portfolio #portfolioPrintRoot .card h2 { font-size:10px !important; margin:0 0 2px !important; color:#e8eaed !important; }
 body.printing-portfolio #portfolioPrintRoot .card p.note,
 body.printing-portfolio #portfolioPrintRoot .card > p { display:none !important; }
-body.printing-portfolio #portfolioPrintRoot table { width:100% !important; font-size:8px !important; border-collapse:collapse !important; }
+body.printing-portfolio #portfolioPrintRoot table { width:100% !important; font-size:7.5px !important; border-collapse:collapse !important; }
 body.printing-portfolio #portfolioPrintRoot th,
-body.printing-portfolio #portfolioPrintRoot td { padding:2px 4px !important; line-height:1.2 !important; }
+body.printing-portfolio #portfolioPrintRoot td { padding:1px 3px !important; line-height:1.15 !important; }
 body.printing-portfolio #portfolioPrintRoot td div { display:none !important; } /* hide alias sub-lines */
 body.printing-portfolio #portfolioPrintRoot [style*="overflow"] { overflow:visible !important; }
 body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:none !important; }
 
 @media print {
-  @page { size: landscape; margin: 6mm; }
+  @page { size: landscape; margin: 5mm; }
   html, body {
     background:#0d1117 !important;
     color:#e8eaed !important;
@@ -478,6 +489,11 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
     margin:0 !important;
     padding:0 !important;
     overflow:hidden !important;
+  }
+  body.printing-portfolio #tab-group.tab-section,
+  body.printing-portfolio #tab-group.tab-section.active {
+    min-height:0 !important;
+    height:100% !important;
   }
   body.printing-portfolio #portfolioPrintRoot .card {
     break-inside: avoid;
@@ -3255,17 +3271,19 @@ function exportPortfolioPdf() {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       if (root) {
-        // Letter landscape printable ~ 10.5" × 7.5" at 96dpi ≈ 1008 × 720
-        const maxW = 1008;
-        const maxH = 720;
+        // Letter landscape printable ~ 10.6" × 7.6" at 96dpi after 5mm margins
+        const maxW = 1020;
+        const maxH = 730;
+        // Measure at zoom=1
+        root.style.setProperty('--print-zoom', '1');
         const w = Math.max(root.scrollWidth, root.offsetWidth, 1);
         const h = Math.max(root.scrollHeight, root.offsetHeight, 1);
-        // Uniform zoom only (keeps proportions). Prefer filling the page without overflow.
+        // Uniform zoom only — fill page as much as possible without overflow or axis stretch
         let zoom = Math.min(maxW / w, maxH / h);
-        zoom = Math.min(1.35, Math.max(0.5, zoom));
-        root.style.setProperty('--print-zoom', String(zoom));
+        zoom = Math.min(1.45, Math.max(0.55, zoom));
+        root.style.setProperty('--print-zoom', String(Number(zoom.toFixed(3))));
       }
-      setTimeout(() => window.print(), 150);
+      setTimeout(() => window.print(), 180);
     });
   });
 }
