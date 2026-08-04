@@ -131,46 +131,53 @@ body.printing-portfolio .coming-note,
 body.printing-portfolio #portfolioPdfBtn {
   display:none !important;
 }
-body.printing-portfolio .wrap { max-width:1080px !important; padding:8px !important; margin:0 auto !important; }
+body.printing-portfolio .wrap { max-width:none !important; padding:0 !important; margin:0 !important; width:100% !important; }
 body.printing-portfolio .tab-section { display:none !important; }
 body.printing-portfolio #tab-group.tab-section,
-body.printing-portfolio #tab-group.tab-section.active { display:block !important; margin:0 !important; }
+body.printing-portfolio #tab-group.tab-section.active { display:block !important; margin:0 !important; padding:0 !important; }
 body.printing-portfolio #portfolioPrintRoot {
-  display:grid !important;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  width:100% !important;
-  max-width:1080px !important;
+  display:flex !important;
+  flex-direction:column;
+  gap:6px;
+  width:fit-content !important;
+  max-width:100% !important;
   margin:0 auto !important;
   transform:scale(var(--print-scale, 1));
   transform-origin:top center;
 }
 body.printing-portfolio #portfolioCardScoreboard,
-body.printing-portfolio #portfolioCardStations { grid-column:1 / -1; }
+body.printing-portfolio #portfolioCardStations,
+body.printing-portfolio #portfolioCardAlike,
+body.printing-portfolio #portfolioCardTarget { width:100%; }
 body.printing-portfolio #portfolioPrintRoot .card {
   background:#181b22 !important;
   border:1px solid #262a33 !important;
-  border-radius:8px !important;
-  padding:6px 8px !important;
+  border-radius:6px !important;
+  padding:5px 7px !important;
   margin:0 !important;
   box-shadow:none !important;
 }
-body.printing-portfolio #portfolioPrintRoot .card h2 { font-size:11px !important; margin:0 0 3px !important; color:#e8eaed !important; }
+body.printing-portfolio #portfolioPrintRoot .card h2 { font-size:10px !important; margin:0 0 2px !important; color:#e8eaed !important; }
 body.printing-portfolio #portfolioPrintRoot .card p.note,
 body.printing-portfolio #portfolioPrintRoot .card > p { display:none !important; }
-body.printing-portfolio #portfolioPrintRoot table { width:100% !important; font-size:7.5px !important; border-collapse:collapse !important; }
+body.printing-portfolio #portfolioPrintRoot table { width:100% !important; font-size:7px !important; border-collapse:collapse !important; }
 body.printing-portfolio #portfolioPrintRoot th,
-body.printing-portfolio #portfolioPrintRoot td { padding:2px 4px !important; line-height:1.25 !important; }
+body.printing-portfolio #portfolioPrintRoot td { padding:1px 3px !important; line-height:1.2 !important; }
+body.printing-portfolio #portfolioPrintRoot td div { display:none !important; } /* hide alias sub-lines */
 body.printing-portfolio #portfolioPrintRoot [style*="overflow"] { overflow:visible !important; }
+body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:none !important; }
 
 @media print {
-  @page { size: landscape; margin: 5mm; }
+  @page { size: landscape; margin: 4mm; }
   html, body {
     background:#0d1117 !important;
     color:#e8eaed !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    overflow: hidden !important;
+    width:100% !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:0 !important;
   }
   body.printing-portfolio #portfolioPrintRoot .card {
     break-inside: avoid;
@@ -183,7 +190,7 @@ body.printing-portfolio #portfolioPrintRoot [style*="overflow"] { overflow:visib
 <div class="wrap">
 <header>
   <h1 id="dashTitle">BOH Dashboard</h1>
-  <span class="badge" id="dashBadge">Latest 2026-W31 · Built 2026-08-04 17:29 UTC</span>
+  <span class="badge" id="dashBadge">Latest 2026-W31 · Built 2026-08-04 17:53 UTC</span>
 </header>
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
 <div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
@@ -399,7 +406,11 @@ body.printing-portfolio #portfolioPrintRoot [style*="overflow"] { overflow:visib
     <span><span class="sw" style="background:#5aa9e6"></span>No target</span>
   </div>
 </div>
-<div class="coming-note">📊 3-week trend comparison — coming when Week 2 data is available</div>
+<div class="card" id="stationWowCard" style="margin-top:18px">
+  <h2>Station Fulfillment — Week over Week</h2>
+  <p class="note">This location only. Avg fulfillment (minutes) for every food station across stored weeks. Green ≤10 · amber 10–15 · red &gt;15. Blank = station not present that week. Values come from each weekly save — no extra scrape needed.</p>
+  <div id="stationWowTable" style="overflow-x:auto"></div>
+</div>
 
 </section>
 
@@ -513,7 +524,6 @@ body.printing-portfolio #portfolioPrintRoot [style*="overflow"] { overflow:visib
   <div id="groupItemVarianceTargetTable" style="overflow-x:auto"></div>
 </div>
 </div>
-<div class="coming-note" id="groupWowNote">📅 Week-over-week comparison: available from Week 2 (Jul 14)</div>
 </section>
 
 <!-- ========== TAB: SETTINGS / SANITY ========== -->
@@ -1759,12 +1769,12 @@ function renderHeatmaps() {
 // ============================================================
 function renderStationWoW() {
   const STATIONS = getD().stations.filter(s => isFoodStation(s.station));
-  const numWeeks = WEEKS.length;
+  const weeks = WEEKS.slice().sort((a, b) => String(a.key).localeCompare(String(b.key)));
+  const numWeeks = weeks.length;
 
   // Sort worst -> best by current week avg_sec desc
   const sorted = [...STATIONS].sort((a,b) => b.avg_sec - a.avg_sec);
   const labels = sorted.map(s => s.station);
-  const currentData = sorted.map(s => +(s.avg_sec / 60).toFixed(2));
 
   const refLine = {
     id: 'refLine15',
@@ -1793,15 +1803,22 @@ function renderStationWoW() {
   const existing = Chart.getChart('cStationWoW');
   if (existing) existing.destroy();
 
-  const wowBarColors = currentData.map(v => v >= 15 ? '#ef4444' : v >= 12 ? '#f59e0b' : '#22c55e');
-  const datasets = [{
-    label: WEEKS[currentWeekIdx] ? WEEKS[currentWeekIdx].label : 'Week 1',
-    data: currentData,
-    backgroundColor: wowBarColors,
-    borderColor: wowBarColors.map(c => c),
-    borderWidth: 1,
-    borderRadius: 4
-  }];
+  const palette = ['#22c55e','#5aa9e6','#d9a441','#a78bfa','#f472b6','#38bdf8'];
+  const datasets = weeks.map((w, wi) => {
+    const data = sorted.map(s => {
+      const st = (ALL_DATA[currentVenue]?.[w.key]?.stations || []).find(x => x.station === s.station);
+      return st && st.avg_sec > 0 ? +(st.avg_sec / 60).toFixed(2) : null;
+    });
+    const isCurrent = wi === weeks.findIndex(x => x.key === WEEKS[currentWeekIdx]?.key);
+    return {
+      label: w.label,
+      data,
+      backgroundColor: isCurrent ? data.map(v => v == null ? '#2d3448' : (v >= 15 ? '#ef4444' : v >= 10 ? '#f59e0b' : '#22c55e')) : (palette[wi % palette.length] + '99'),
+      borderColor: isCurrent ? data.map(v => v == null ? '#2d3448' : (v >= 15 ? '#ef4444' : v >= 10 ? '#f59e0b' : '#22c55e')) : palette[wi % palette.length],
+      borderWidth: isCurrent ? 1.5 : 1,
+      borderRadius: 3
+    };
+  });
 
   new Chart(document.getElementById('cStationWoW'), {
     type: 'bar',
@@ -1824,10 +1841,8 @@ function renderStationWoW() {
         legend: { display: numWeeks > 1, position: 'top', labels: { boxWidth: 12 } },
         tooltip: { callbacks: {
           label(ctx) {
-            const s = sorted[ctx.dataIndex];
-            const lines = [ctx.dataset.label+': '+ctx.parsed.x.toFixed(1)+' min ('+fmtSec(s.avg_sec)+')'];
-            if (s.exp_sec) lines.push('Target: '+fmtSec(s.exp_sec));
-            return lines;
+            if (ctx.parsed.x == null) return ctx.dataset.label + ': —';
+            return ctx.dataset.label + ': ' + ctx.parsed.x.toFixed(1) + ' min';
           }
         }}
       }
@@ -1842,7 +1857,7 @@ function renderStationWoW() {
       : '📊 Week-over-week trend: available from Week 2';
   }
   const wowSubEl = document.getElementById('wowSubtitle');
-  if (wowSubEl) wowSubEl.textContent = 'Sorted by current week — worst stations left. 🔴 >15min  🟡 12–15min  🟢 <12min';
+  if (wowSubEl) wowSubEl.textContent = 'Grouped bars = weeks. Current week colored by ful band. Sorted by current week — worst at top.';
 }
 
 // ============================================================
@@ -2000,26 +2015,54 @@ function renderStations() {
     return 'red';
   }
 
-  // ── Sparkline SVG (single dot for 1 week, line for 2+) ──
+  // ── Sparkline SVG from multi-week station avg ──
   function makeSparkline(stationName) {
-    // For now only 1 week of data
-    const numW = WEEKS.length;
-    const W = 36, H = 16;
-    if (numW <= 1) {
-      // Single dot
+    const weeks = WEEKS.slice().sort((a, b) => String(a.key).localeCompare(String(b.key)));
+    const vals = weeks.map(w => {
+      const st = (ALL_DATA[currentVenue]?.[w.key]?.stations || []).find(s => s.station === stationName);
+      return st && st.avg_sec > 0 ? st.avg_sec / 60 : null;
+    });
+    const W = 48, H = 16;
+    const present = vals.filter(v => v != null);
+    if (!present.length) {
+      return '<svg class="sparkline-svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'"></svg>';
+    }
+    if (present.length === 1) {
+      const v = present[0];
+      const col = avgFulColorByMin(v);
       return '<svg class="sparkline-svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'
-        + '<circle cx="'+(W/2)+'" cy="'+(H/2)+'" r="3" fill="#f59e0b"/>'
+        + '<circle cx="'+(W/2)+'" cy="'+(H/2)+'" r="3" fill="'+col+'"/>'
         + '</svg>';
     }
-    // Multi-week sparkline (placeholder structure for future)
-    return '<svg class="sparkline-svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'"></svg>';
+    const minV = Math.min(...present), maxV = Math.max(...present);
+    const span = Math.max(0.5, maxV - minV);
+    const pts = [];
+    vals.forEach((v, i) => {
+      if (v == null) return;
+      const x = 3 + (i / Math.max(1, vals.length - 1)) * (W - 6);
+      const y = H - 3 - ((v - minV) / span) * (H - 6);
+      pts.push({ x, y, v });
+    });
+    const path = pts.map((p, i) => (i ? 'L' : 'M') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+    const last = pts[pts.length - 1];
+    return '<svg class="sparkline-svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'
+      + '<path d="'+path+'" fill="none" stroke="#5aa9e6" stroke-width="1.5"/>'
+      + '<circle cx="'+last.x.toFixed(1)+'" cy="'+last.y.toFixed(1)+'" r="2.5" fill="'+avgFulColorByMin(last.v)+'"/>'
+      + '</svg>';
   }
 
-  // ── Trend arrow (→ for single week) ──
+  // ── Trend arrow from last two weeks ──
   function trendArrow(stationName) {
-    if (WEEKS.length <= 1) return '<span style="color:#9aa0aa;font-size:11px">→</span>';
-    // Future: compute from multiple weeks
-    return '<span style="color:#9aa0aa;font-size:11px">→</span>';
+    const weeks = WEEKS.slice().sort((a, b) => String(a.key).localeCompare(String(b.key)));
+    if (weeks.length < 2) return '<span style="color:#9aa0aa;font-size:11px">→</span>';
+    const a = weeks[weeks.length - 2], b = weeks[weeks.length - 1];
+    const sa = (ALL_DATA[currentVenue]?.[a.key]?.stations || []).find(s => s.station === stationName);
+    const sb = (ALL_DATA[currentVenue]?.[b.key]?.stations || []).find(s => s.station === stationName);
+    if (!sa || !sb || !(sa.avg_sec > 0) || !(sb.avg_sec > 0)) return '<span style="color:#9aa0aa;font-size:11px">→</span>';
+    const dMin = (sb.avg_sec - sa.avg_sec) / 60;
+    if (Math.abs(dMin) < 0.3) return '<span style="color:#9aa0aa;font-size:11px" title="flat vs prior week">→</span>';
+    if (dMin < 0) return '<span style="color:#22c55e;font-size:11px" title="faster vs prior week">↓ '+Math.abs(dMin).toFixed(1)+'m</span>';
+    return '<span style="color:#ef4444;font-size:11px" title="slower vs prior week">↑ '+dMin.toFixed(1)+'m</span>';
   }
 
   // ── Station KPI bar ──
@@ -2346,6 +2389,65 @@ function renderStations() {
     options:{interaction:{mode:'index',intersect:false},scales:{x:{grid:{display:false},ticks:{maxRotation:45,minRotation:30}},y:{title:{display:true,text:'Avg fulfillment time (min)'},grid:{color:gc},min:0}},plugins:{legend:{display:false},tooltip:{callbacks:{label(ctx){const s=stSorted[ctx.dataIndex];const lines=['Avg: '+fmtSec(s.avg_sec)+' ('+ctx.parsed.y.toFixed(1)+' min)','Count: '+s.count];if(s.exp_sec){lines.push('Target: '+fmtSec(s.exp_sec));lines.push('Ratio: '+(s.avg_sec/s.exp_sec*100).toFixed(1)+'%');}else lines.push('No target');return lines;}}}}},
     plugins:[thrPlugin]
   });
+
+  renderStationWowTable();
+}
+
+/** Stations tab: per-restaurant table of all food stations × weeks (avg ful min). */
+function renderStationWowTable() {
+  const el = document.getElementById('stationWowTable');
+  if (!el) return;
+  if (currentVenue === 'rdg_portfolio') {
+    el.innerHTML = '<p style="color:#9aa0aa;font-size:13px;margin:0">Pick a restaurant pill to see that location’s station week-over-week table.</p>';
+    return;
+  }
+  const weeks = WEEKS.slice().sort((a, b) => String(a.key).localeCompare(String(b.key)));
+  const stationNames = new Set();
+  weeks.forEach(w => {
+    ((ALL_DATA[currentVenue] && ALL_DATA[currentVenue][w.key] && ALL_DATA[currentVenue][w.key].stations) || [])
+      .filter(s => isFoodStation(s.station))
+      .forEach(s => stationNames.add(s.station));
+  });
+  const latestKey = weeks.length ? weeks[weeks.length - 1].key : null;
+  const stations = [...stationNames].sort((a, b) => {
+    const sa = ((ALL_DATA[currentVenue] && ALL_DATA[currentVenue][latestKey] && ALL_DATA[currentVenue][latestKey].stations) || []).find(s => s.station === a);
+    const sb = ((ALL_DATA[currentVenue] && ALL_DATA[currentVenue][latestKey] && ALL_DATA[currentVenue][latestKey].stations) || []).find(s => s.station === b);
+    return ((sb && sb.avg_sec) || 0) - ((sa && sa.avg_sec) || 0);
+  });
+  if (!stations.length) {
+    el.innerHTML = '<p style="color:#9aa0aa;font-size:13px;margin:0">No food station data for this location yet.</p>';
+    return;
+  }
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:520px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'
+    + '<th style="text-align:left;padding:8px 10px">Station</th>'
+    + weeks.map(w => '<th style="text-align:right;padding:8px 8px;white-space:nowrap">' + w.label + '</th>').join('')
+    + '<th style="text-align:right;padding:8px 8px;white-space:nowrap">Δ vs prior</th>'
+    + '</tr></thead><tbody>';
+  stations.forEach(name => {
+    const mins = weeks.map(w => {
+      const st = ((ALL_DATA[currentVenue] && ALL_DATA[currentVenue][w.key] && ALL_DATA[currentVenue][w.key].stations) || []).find(s => s.station === name);
+      return st && st.avg_sec > 0 ? st.avg_sec / 60 : null;
+    });
+    const last = mins[mins.length - 1];
+    const prev = mins.length >= 2 ? mins[mins.length - 2] : null;
+    let deltaCell = '<td style="padding:8px;text-align:right;color:#9aa0aa">—</td>';
+    if (last != null && prev != null) {
+      const d = last - prev;
+      if (Math.abs(d) < 0.05) deltaCell = '<td style="padding:8px;text-align:right;color:#9aa0aa">0.0</td>';
+      else if (d < 0) deltaCell = '<td style="padding:8px;text-align:right;color:#22c55e;font-weight:600">' + d.toFixed(1) + '</td>';
+      else deltaCell = '<td style="padding:8px;text-align:right;color:#ef4444;font-weight:600">+' + d.toFixed(1) + '</td>';
+    }
+    html += '<tr style="border-top:1px solid #262a33">'
+      + '<td style="padding:8px 10px;color:#e8eaed;font-weight:600">' + name + '</td>'
+      + mins.map(m => m == null
+        ? '<td style="padding:8px;text-align:right;color:#4b5563">—</td>'
+        : '<td style="padding:8px;text-align:right;font-weight:700;color:' + avgFulColorByMin(m) + '">' + m.toFixed(1) + '</td>'
+      ).join('')
+      + deltaCell
+      + '</tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
 }
 
 // ============================================================
@@ -3162,11 +3264,25 @@ function exportPortfolioPdf() {
   }
 
   const root = document.getElementById('portfolioPrintRoot') || document.getElementById('tab-group');
+  // Hide empty variance cards so print doesn't leave blank blocks
+  ['portfolioCardAlike', 'portfolioCardTarget'].forEach(id => {
+    const card = document.getElementById(id);
+    if (!card) return;
+    const tbl = card.querySelector('[id$="Table"]');
+    const empty = !tbl || !tbl.querySelector('tbody tr') || /No |empty|—</td></tr></tbody></table>$/i.test(tbl.textContent || '');
+    const hasRows = tbl && tbl.querySelectorAll('tbody tr').length > 0;
+    card.classList.toggle('portfolio-print-empty', !hasRows);
+  });
+
   const cleanup = () => {
     document.body.classList.remove('printing-portfolio');
-    if (root) root.style.removeProperty('--print-scale');
+    if (root) {
+      root.style.removeProperty('--print-scale');
+      root.style.removeProperty('width');
+    }
     window.removeEventListener('afterprint', cleanup);
   };
+  window.removeEventListener('afterprint', cleanup);
   window.addEventListener('afterprint', cleanup);
 
   document.body.classList.add('printing-portfolio');
@@ -3175,17 +3291,17 @@ function exportPortfolioPdf() {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       if (root) {
-        // Landscape printable area (~Letter/A4). Uniform scale only — keeps proportions.
-        const maxW = 1020;
-        const maxH = 650;
+        // Landscape printable area (~Letter). Uniform scale only — never stretch axes.
+        const maxW = 1000;
+        const maxH = 700;
         const w = Math.max(root.scrollWidth, root.offsetWidth, 1);
         const h = Math.max(root.scrollHeight, root.offsetHeight, 1);
-        let scale = Math.min(1, maxW / w, maxH / h);
-        // Prefer staying readable; never stretch axes independently
-        scale = Math.min(0.98, Math.max(0.55, scale));
+        // Fit entirely on one page; allow mild upscale so short content isn't a postage stamp
+        let scale = Math.min(maxW / w, maxH / h);
+        scale = Math.min(1.25, Math.max(0.42, scale));
         root.style.setProperty('--print-scale', String(scale));
       }
-      setTimeout(() => window.print(), 100);
+      setTimeout(() => window.print(), 120);
     });
   });
 }
