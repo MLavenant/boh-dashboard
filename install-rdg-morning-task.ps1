@@ -33,7 +33,7 @@ $morningTr  = "cmd.exe /c `"$MorningBat`""
 
 function Ensure-DailyTask {
   param([string]$Name, [string]$Time, [string]$Tr)
-  schtasks /Delete /TN $Name /F 2>$null | Out-Null
+  cmd /c "schtasks /Delete /TN `"$Name`" /F >nul 2>&1" | Out-Null
   schtasks /Create /TN $Name /TR $Tr /SC DAILY /ST $Time /RL LIMITED /F
   if ($LASTEXITCODE -ne 0) { throw "Failed to create task: $Name (exit $LASTEXITCODE)" }
 
