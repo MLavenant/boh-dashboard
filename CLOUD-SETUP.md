@@ -11,7 +11,8 @@ GitHub Actions **`schedule:` crons are often hours late**. Do not rely on them f
 |----------|---------|------|--------|
 | **1 – Primary** | External cron → `workflow_dispatch` | **8:25 AM America/New_York** | Laptop off; runners start in ~1–2 min |
 | **2 – Secondary** | Windows Task on this PC | **8:25** dispatch + **8:30** local refresh | Punctual when PC is on/awake |
-| **3 – Backup** | GitHub `schedule:` in `rdg-daily.yml` | Late morning / afternoon | Catch-up only |
+| **3 – Retry** | Same dispatch again | **9:00** and **9:30 AM ET** | If morning failed, retry; success clears Sanity RED. If still failing after 9:30, Sanity stays RED. |
+| **4 – Backup** | GitHub `schedule:` in `rdg-daily.yml` | Late morning / afternoon | Catch-up only |
 
 ## Punctual primary: cron-job.org → workflow_dispatch
 
@@ -38,7 +39,11 @@ One-time setup (free tier is enough):
      {"ref":"main","inputs":{"job":"both"}}
      ```
 4. Save. Expected response: **HTTP 204** (empty body).
-5. Optional test from this PC (uses your logged-in `gh`):
+5. Duplicate the same job twice more for retries:
+   - **Title:** `RDG Daily Dispatch 900 ET` — schedule **09:00** America/New_York — same URL/headers/body
+   - **Title:** `RDG Daily Dispatch 930 ET` — schedule **09:30** America/New_York — same URL/headers/body  
+   Re-running after a success is harmless; after a failure it clears Sanity RED when the retry succeeds. If still failing after 9:30, Sanity stays **RED**.
+6. Optional test from this PC (uses your logged-in `gh`):
    ```powershell
    powershell -ExecutionPolicy Bypass -File C:\Users\MatthiasLavenant\Documents\boh-dashboard\trigger-rdg-daily-dispatch.ps1
    ```

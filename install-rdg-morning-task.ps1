@@ -53,10 +53,16 @@ Ensure-DailyTask -Name 'RDG-Toast-BS-Daily' -Time '08:25' -Tr $dispatchTr
 # Secondary local refresh → Firebase immediately
 Ensure-DailyTask -Name 'RDG DJ FourVenues Daily 830' -Time '08:30' -Tr $morningTr
 
+# Retries if 8:25/8:30 failed — same cloud dispatch; success clears Sanity RED
+Ensure-DailyTask -Name 'RDG-Toast-BS-Retry-900' -Time '09:00' -Tr $dispatchTr
+Ensure-DailyTask -Name 'RDG-Toast-BS-Retry-930' -Time '09:30' -Tr $dispatchTr
+
 # Preferred names (optional — often Access Denied on locked-down PCs)
 foreach ($pair in @(
   @{ Name = 'RDG Daily Cloud Dispatch 825'; Time = '08:25'; Tr = $dispatchTr },
-  @{ Name = 'RDG Morning Refresh 830'; Time = '08:30'; Tr = $morningTr }
+  @{ Name = 'RDG Morning Refresh 830'; Time = '08:30'; Tr = $morningTr },
+  @{ Name = 'RDG Daily Cloud Retry 900'; Time = '09:00'; Tr = $dispatchTr },
+  @{ Name = 'RDG Daily Cloud Retry 930'; Time = '09:30'; Tr = $dispatchTr }
 )) {
   schtasks /Create /TN $pair.Name /TR $pair.Tr /SC DAILY /ST $pair.Time /RL LIMITED /F 2>$null | Out-Null
   if ($LASTEXITCODE -eq 0) {
@@ -70,12 +76,16 @@ foreach ($pair in @(
 
 Write-Host ''
 Write-Host 'Verify:' -ForegroundColor Cyan
-foreach ($Name in @('RDG-Toast-BS-Daily', 'RDG DJ FourVenues Daily 830')) {
-  $t = Get-ScheduledTask -TaskName $Name
-  $info = $t | Get-ScheduledTaskInfo
-  $s = $t.Settings
-  Write-Host ("{0} | Next={1} | Wake={2} | DisallowBattery={3} | StopOnBattery={4}" -f `
-    $Name, $info.NextRunTime, $s.WakeToRun, $s.DisallowStartIfOnBatteries, $s.StopIfGoingOnBatteries)
+foreach ($Name in @('RDG-Toast-BS-Daily', 'RDG DJ FourVenues Daily 830', 'RDG-Toast-BS-Retry-900', 'RDG-Toast-BS-Retry-930')) {
+  try {
+    $t = Get-ScheduledTask -TaskName $Name -ErrorAction Stop
+    $info = $t | Get-ScheduledTaskInfo
+    $s = $t.Settings
+    Write-Host ("{0} | Next={1} | Wake={2} | DisallowBattery={3} | StopOnBattery={4}" -f `
+      $Name, $info.NextRunTime, $s.WakeToRun, $s.DisallowStartIfOnBatteries, $s.StopIfGoingOnBatteries)
+  } catch {
+    Write-Host ("MISSING {0} - re-run this installer or add cron-job.org at that time" -f $Name) -ForegroundColor Yellow
+  }
 }
 
 Write-Host ''
