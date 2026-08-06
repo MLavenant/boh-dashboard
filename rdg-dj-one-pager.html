@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>RDG DJ Dashboard — Architecture One-Pager</title>
+<style>
+  @page { size: letter landscape; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 11in;
+    height: 8.5in;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: #141820;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    width: 11in;
+    height: 8.5in;
+    padding: 0.42in 0.48in 0.36in;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+
+  /* Header */
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2.5px solid #141820;
+    padding-bottom: 10px;
+  }
+  .top h1 {
+    font-size: 26px;
+    font-weight: 750;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+  .top .sub {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #5a6270;
+  }
+  .badge {
+    border: 1.5px solid #141820;
+    padding: 6px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .badge em {
+    display: block;
+    font-style: normal;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin-top: 2px;
+    color: #5a6270;
+  }
+
+  /* Overview band */
+  .overview {
+    background: #141820;
+    color: #f3f4f6;
+    border-radius: 6px;
+    padding: 10px 14px;
+  }
+  .overview .label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #d9a441;
+    margin-bottom: 4px;
+  }
+  .overview .label span {
+    color: #9aa3b2;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    margin-left: 8px;
+  }
+  .overview p {
+    font-size: 12px;
+    line-height: 1.45;
+    color: #e8eaed;
+  }
+
+  /* WHY HOW WHERE */
+  .tri {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .card {
+    border: 1.5px solid #d5dae3;
+    border-radius: 6px;
+    padding: 10px 12px 11px;
+    background: #fafbfc;
+  }
+  .card .num {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #d9a441;
+    margin-bottom: 2px;
+  }
+  .card h2 {
+    font-size: 13px;
+    font-weight: 750;
+    margin-bottom: 6px;
+  }
+  .card h2 small {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-top: 1px;
+  }
+  .card p {
+    font-size: 11.5px;
+    line-height: 1.42;
+    color: #2a303c;
+  }
+
+  /* Architecture */
+  .arch {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .arch-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .arch-head h2 {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #141820;
+  }
+  .arch-head h2 span {
+    color: #6b7280;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    margin-left: 8px;
+  }
+  .lanes {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6b7280;
+  }
+  .lanes .l1 { flex: 0 0 38%; }
+  .lanes .l2 { flex: 1; }
+
+  .flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    flex: 1;
+  }
+  .step {
+    flex: 1;
+    border: 1.5px solid #c9d0dc;
+    border-radius: 6px;
+    padding: 8px 7px 9px;
+    background: #fff;
+    min-width: 0;
+  }
+  .step.build {
+    background: #fffaf0;
+    border-color: #d9a441;
+  }
+  .step.host {
+    background: #f3f7fb;
+    border-color: #5aa9e6;
+  }
+  .step.data {
+    background: #f3faf6;
+    border-color: #2d6a4f;
+  }
+  .step .n {
+    font-size: 10px;
+    font-weight: 800;
+    color: #d9a441;
+    margin-bottom: 3px;
+  }
+  .step h3 {
+    font-size: 11px;
+    font-weight: 750;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .step p {
+    font-size: 9.5px;
+    line-height: 1.35;
+    color: #3d4554;
+  }
+  .arrow {
+    width: 14px;
+    flex: 0 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #9aa3b2;
+  }
+  .arrow.down {
+    flex-direction: column;
+    font-size: 9px;
+    letter-spacing: 0;
+    color: #6b7280;
+    width: 18px;
+    flex: 0 0 18px;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  .footnote-band {
+    margin-top: 7px;
+    background: #f0f2f5;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 10px;
+    color: #3d4554;
+    line-height: 1.35;
+  }
+  .footnote-band strong { color: #141820; }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #d5dae3;
+    padding-top: 7px;
+    font-size: 10px;
+    color: #6b7280;
+  }
+  footer .live {
+    color: #141820;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="top">
+      <div>
+        <h1>RDG DJ Dashboard</h1>
+        <div class="sub">Executive briefing | Overview, purpose, delivery, and architecture</div>
+      </div>
+      <div class="badge">Confidential<em>Internal use only</em></div>
+    </div>
+
+    <div class="overview">
+      <div class="label">Overview <span>Host · server · data layer</span></div>
+      <p>The application is a static front end hosted on GitHub Pages (no dedicated app server); the browser is the client, and Firebase Realtime Database is the live data / sync layer, with Firebase Storage for files and GitHub Actions supplying scheduled integrations (FourVenues, Toast).</p>
+    </div>
+
+    <div class="tri">
+      <div class="card">
+        <div class="num">01</div>
+        <h2>Why<small>Business purpose</small></h2>
+        <p>One operating view for guest-DJ nights across Casa Neos Beach Club, MILA, and Casa Neos Lounge — fees, bottle-service vs target, ROI, schedule, and AP — so programming and finance share a single source of truth.</p>
+      </div>
+      <div class="card">
+        <div class="num">02</div>
+        <h2>How<small>Delivery approach</small></h2>
+        <p>Built in Cursor as a lightweight HTML/CSS/JS app (no build pipeline). Baseline schedule is in-repo; live edits sync via Firebase. Ship by push to GitHub <strong>main</strong>; Pages publishes continuously from the IDE workflow.</p>
+      </div>
+      <div class="card">
+        <div class="num">03</div>
+        <h2>Where<small>Environment &amp; testing</small></h2>
+        <p>Live test surface: <strong>mlavenant.github.io/rdg-dj</strong>. Source: <strong>MLavenant/rdg-dj</strong> (main). Data: Firebase project <strong>rdg-dj-dashboard</strong>. Integrations refresh on a morning GitHub Actions schedule.</p>
+      </div>
+    </div>
+
+    <div class="arch">
+      <div class="arch-head">
+        <h2>Architecture <span>End-to-end path from development to live operations</span></h2>
+      </div>
+      <div class="lanes">
+        <div class="l1">Build &amp; release</div>
+        <div class="l2">Runtime — client · host · data · feeds</div>
+      </div>
+
+      <div class="flow">
+        <div class="step build">
+          <div class="n">1</div>
+          <h3>Cursor</h3>
+          <p>Development workspace<br />Design · code · review<br /><em>author</em></p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step build">
+          <div class="n">2</div>
+          <h3>Source repo</h3>
+          <p>Local working copy<br />Static application assets<br /><em>commit / push</em></p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step build">
+          <div class="n">3</div>
+          <h3>GitHub</h3>
+          <p>Remote repository<br />Branch: <strong>main</strong><br /><em>publish</em></p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step host">
+          <div class="n">4</div>
+          <h3>Host — Pages</h3>
+          <p>Web host (no app server)<br /><strong>mlavenant.github.io</strong><br /><em>serve</em></p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step host">
+          <div class="n">5</div>
+          <h3>Client — Browser</h3>
+          <p>End-user application<br />Calendar · Accounting · ROI<br /><strong>Active test environment</strong></p>
+        </div>
+        <div class="arrow down">↕<br />sync</div>
+        <div class="step data">
+          <div class="n">6</div>
+          <h3>Data — Firebase</h3>
+          <p>Realtime Database (<strong>rdg/</strong>)<br />File storage<br /><strong>rdg-dj-dashboard</strong></p>
+        </div>
+        <div class="arrow down">←<br />ingest</div>
+        <div class="step data">
+          <div class="n">7</div>
+          <h3>Integration feeds</h3>
+          <p>FourVenues event feed<br />Toast bottle-service sales<br />GitHub Actions · scheduled</p>
+        </div>
+      </div>
+
+      <div class="footnote-band">
+        <strong>Host</strong> = GitHub Pages · <strong>Client</strong> = browser · <strong>Data server</strong> = Firebase · No dedicated application server
+      </div>
+    </div>
+
+    <footer>
+      <div>Riviera Dining Group · Guest DJ &amp; Bottle Service operations</div>
+      <div class="live">Live environment: https://mlavenant.github.io/rdg-dj/</div>
+      <div>Architecture one-pager</div>
+    </footer>
+  </div>
+</body>
+</html>
