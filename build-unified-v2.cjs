@@ -308,6 +308,31 @@ html = html.replace(
 <footer>`
 );
 
+// Cross-location item searcher at top of Menu Items tab
+html = html.replace(
+  `<!-- ========== TAB 3: MENU ITEMS ========== -->
+<section id="tab-menu" class="tab-section">
+
+<div class="section-title">Menu Item Performance</div>
+<div class="card">
+  <div class="menu-stats" id="menuStats"></div>
+  <input class="search-bar" id="menuSearch" placeholder="🔍 Search menu items…" oninput="applyMenuFilters()">`,
+  `<!-- ========== TAB 3: MENU ITEMS ========== -->
+<section id="tab-menu" class="tab-section">
+
+<div class="card" id="crossVenueItemSearchCard" style="margin-bottom:16px">
+  <h2>Search item across all locations</h2>
+  <p class="note">Type a dish (e.g. <strong>Tomahawk</strong>). Matches location prefixes (C- / CL- / ACG- / …) and light typos. Shows avg fulfillment for the <strong>selected week</strong> at every venue that sells it.</p>
+  <input class="search-bar" id="crossVenueItemSearch" placeholder="🔍 Search dish across Claudie, Casa Neos, AVA, MILA…" oninput="runCrossVenueItemSearch()" autocomplete="off" style="max-width:480px">
+  <div id="crossVenueItemResults" style="margin-top:12px"></div>
+</div>
+
+<div class="section-title">Menu Item Performance — this location</div>
+<div class="card">
+  <div class="menu-stats" id="menuStats"></div>
+  <input class="search-bar" id="menuSearch" placeholder="🔍 Filter this location’s menu…" oninput="applyMenuFilters()">`
+);
+
 // Inject IDs into the top KPI row elements
 html = html
   .replace('<div class="kpi"><div class="v">22,927</div><div class="l">Food tickets (week)</div></div>',
@@ -374,6 +399,21 @@ html = html.replace(
   <p class="note">Per location. Volume = food item quantity. Main readouts: <strong style="color:#d9a441">items / person</strong> and <strong>fulfillment</strong>.</p>
   <div id="overviewStaffingGrid" style="overflow-x:auto"></div>
   <p id="overviewStaffingNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
+</div>
+
+<div class="card" id="hourlyThroughputCard" style="display:none;margin-bottom:14px">
+  <h2>Items / hour / staff — by station family</h2>
+  <p class="note">Pick a <strong>station family</strong> (e.g. Pastry) and a <strong>day</strong> (or Total). Hours run <strong>10:00 → 02:00</strong>. Items come from Toast station timing for that family; staff = cooks clocked that day on the family (same headcount applied to each hour — labor is day-level).</p>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
+    <label style="font-size:12px;color:#9aa0aa">Family
+      <select id="hourlyFamilySelect" onchange="renderHourlyThroughput()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+    </label>
+    <label style="font-size:12px;color:#9aa0aa">Day
+      <select id="hourlyDaySelect" onchange="renderHourlyThroughput()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+    </label>
+  </div>
+  <div id="hourlyThroughputTable" style="overflow-x:auto"></div>
+  <p id="hourlyThroughputNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
 </div>
 
 <!-- Service Break Timeline (1-min) -->
@@ -706,6 +746,55 @@ const FOOD_EXCL_PATTERNS = ['bar','champagne','wine','btg','pos','barista','somm
 function isFoodStation(name) {
   const n = name.toLowerCase();
   return !FOOD_EXCL_PATTERNS.some(p => n.includes(p));
+}
+/** Strip venue menu prefixes so C-Tomahawk / CL-Tomahawk / ACG-Tomahawk share one base. */
+const VENUE_ITEM_PREFIX_RE = /^(AVACGPFMS|AVACGPF|AVACG|ACG|CLPFL|CLIN|CLEV|CLEL|CLPF|CLR|CLK|CLE|CLL|CL|CNSM|CMS|CSM|CIN|CE|CN|C|AVAWP|AWP|AOB|AEV|AMO|AM0|A|MEV|MG|MP|MILA|MM|M)[-_\\s]+/i;
+function rdgItemBaseName(name) {
+  return String(name || '').trim().replace(VENUE_ITEM_PREFIX_RE, '').replace(/\\s+/g, ' ').trim().toLowerCase();
+}
+function normalizeSearchToken(s) {
+  return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+function editDistance(a, b) {
+  if (a === b) return 0;
+  const m = a.length, n = b.length;
+  if (!m) return n;
+  if (!n) return m;
+  if (Math.abs(m - n) > 3) return 99;
+  const prev = new Array(n + 1);
+  const cur = new Array(n + 1);
+  for (let j = 0; j <= n; j++) prev[j] = j;
+  for (let i = 1; i <= m; i++) {
+    cur[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      cur[j] = Math.min(cur[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+    }
+    for (let j = 0; j <= n; j++) prev[j] = cur[j];
+  }
+  return prev[n];
+}
+function itemNameMatchesQuery(itemName, queryRaw) {
+  const q = String(queryRaw || '').trim().toLowerCase();
+  if (q.length < 2) return false;
+  const full = String(itemName || '').toLowerCase();
+  const base = rdgItemBaseName(itemName);
+  if (full.includes(q) || base.includes(q) || q.includes(base)) return true;
+  const qn = normalizeSearchToken(q);
+  const bn = normalizeSearchToken(base);
+  if (qn.length >= 2 && (bn.includes(qn) || (qn.length >= 4 && qn.includes(bn)))) return true;
+  const maxDist = qn.length <= 5 ? 1 : (qn.length <= 8 ? 2 : 3);
+  if (qn.length >= 4 && bn.length >= 4 && editDistance(bn, qn) <= maxDist) return true;
+  // Word-level fuzzy (e.g. "toma hawk" vs "tomahawk")
+  const qWords = q.split(/[^a-z0-9]+/).filter(w => w.length >= 3);
+  const bWords = base.split(/[^a-z0-9]+/).filter(w => w.length >= 3);
+  if (qWords.length && bWords.length) {
+    return qWords.every(qw => bWords.some(bw => {
+      const a = normalizeSearchToken(qw), b = normalizeSearchToken(bw);
+      return a === b || b.includes(a) || a.includes(b) || editDistance(a, b) <= (a.length <= 5 ? 1 : 2);
+    }));
+  }
+  return false;
 }
 /** Portfolio / menu: drop beverages, bar noise, and absurd cook times */
 const PORTFOLIO_BEV_KEYWORDS = [
@@ -1914,25 +2003,177 @@ function renderStaffingGrid() {
   if (currentVenue === 'rdg_portfolio') {
     if (card) card.style.display = 'none';
     if (ovCard) ovCard.style.display = 'none';
+    const ht = document.getElementById('hourlyThroughputCard');
+    if (ht) ht.style.display = 'none';
     return;
   }
   const staffing = getD().staffing;
   if (!staffing || !staffing.byFamily) {
     if (card) card.style.display = 'none';
     if (ovCard) ovCard.style.display = 'none';
+  } else {
+    const guests = staffing.guestsSeated || getD().guestsSeated;
+    const built = buildStaffingTableHtml(staffing, guests);
+    if (card && grid) {
+      card.style.display = '';
+      grid.innerHTML = built.html;
+      if (matchNote) matchNote.textContent = built.note;
+    }
+    if (ovCard && ovGrid) {
+      ovCard.style.display = '';
+      ovGrid.innerHTML = built.html;
+      if (ovNote) ovNote.textContent = built.note;
+    }
+  }
+  renderHourlyThroughput();
+}
+
+/** Hours 10:00 → 02:00 (next calendar day overnight). */
+const HOURLY_BAND = [
+  '10-11','11-12','12-13','13-14','14-15','15-16','16-17','17-18',
+  '18-19','19-20','20-21','21-22','22-23','23-24','0-1','1-2'
+];
+const HOURLY_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const HOURLY_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
+
+function stationsForFamily(family, staffing, stationDetails) {
+  const map = (staffing && staffing.toastStationFamily) || {};
+  const fromMap = Object.entries(map).filter(([, f]) => f === family).map(([st]) => st);
+  if (fromMap.length) return fromMap;
+  // Fallback: name contains family token
+  const token = family.toLowerCase().split(/\\s+/)[0];
+  return Object.keys(stationDetails || {}).filter(st => st.toLowerCase().includes(token));
+}
+
+function sumFamilyHourItems(family, day, hourKey, staffing, stationDetails) {
+  const stations = stationsForFamily(family, staffing, stationDetails);
+  let items = 0, tickets = 0, fulWeighted = 0, fulN = 0;
+  stations.forEach(st => {
+    const cell = stationDetails?.[st]?.byDayHour?.[day]?.[hourKey];
+    if (!cell) return;
+    const c = cell.count || 0;
+    tickets += c;
+    items += c; // stationDetails count is ticket/item events at station
+    if (cell.avg_sec > 0 && c > 0) {
+      fulWeighted += cell.avg_sec * c;
+      fulN += c;
+    }
+  });
+  // Prefer itemQty from stationDayVolume when hour-level qty unavailable — count is best hourly proxy
+  return {
+    items,
+    tickets,
+    avgFulSec: fulN > 0 ? fulWeighted / fulN : null,
+    stations,
+  };
+}
+
+function renderHourlyThroughput() {
+  const card = document.getElementById('hourlyThroughputCard');
+  const famSel = document.getElementById('hourlyFamilySelect');
+  const daySel = document.getElementById('hourlyDaySelect');
+  const tableEl = document.getElementById('hourlyThroughputTable');
+  const noteEl = document.getElementById('hourlyThroughputNote');
+  if (!card || !tableEl) return;
+
+  if (currentVenue === 'rdg_portfolio') {
+    card.style.display = 'none';
     return;
   }
-  const guests = staffing.guestsSeated || getD().guestsSeated;
-  const built = buildStaffingTableHtml(staffing, guests);
-  if (card && grid) {
-    card.style.display = '';
-    grid.innerHTML = built.html;
-    if (matchNote) matchNote.textContent = built.note;
+
+  const d = getD();
+  const staffing = d.staffing;
+  const stationDetails = d.stationDetails || {};
+  const hasDetails = Object.keys(stationDetails).length > 0;
+  if (!hasDetails) {
+    card.style.display = 'none';
+    return;
   }
-  if (ovCard && ovGrid) {
-    ovCard.style.display = '';
-    ovGrid.innerHTML = built.html;
-    if (ovNote) ovNote.textContent = built.note;
+  card.style.display = '';
+
+  // Populate selectors once / keep selection
+  const availableFamilies = HOURLY_FAMILIES.filter(f => {
+    if (staffing && staffing.byFamily && staffing.byFamily[f]) return true;
+    return stationsForFamily(f, staffing, stationDetails).some(st => stationDetails[st]);
+  });
+  const families = availableFamilies.length ? availableFamilies : HOURLY_FAMILIES;
+  if (famSel && (!famSel.options.length || famSel.dataset.venue !== currentVenue)) {
+    famSel.innerHTML = families.map(f => '<option value="'+f+'">'+f+'</option>').join('');
+    famSel.dataset.venue = currentVenue;
+    if (families.includes('Pastry')) famSel.value = 'Pastry';
+  }
+  if (daySel && daySel.options.length < 2) {
+    daySel.innerHTML = '<option value="Total">Total (week)</option>' +
+      HOURLY_DAYS.map(day => '<option value="'+day+'">'+day+'</option>').join('');
+  }
+
+  const family = (famSel && famSel.value) || families[0] || 'Pastry';
+  const dayMode = (daySel && daySel.value) || 'Total';
+  const famStaff = staffing && staffing.byFamily ? staffing.byFamily[family] : null;
+
+  const daysToSum = dayMode === 'Total' ? HOURLY_DAYS : [dayMode];
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:640px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
+    '<th style="text-align:left;padding:8px 10px">Hour</th>'+
+    '<th style="text-align:right;padding:8px 10px">Items</th>'+
+    '<th style="text-align:right;padding:8px 10px">Staff on</th>'+
+    '<th style="text-align:right;padding:8px 10px;color:#d9a441">Items / staff</th>'+
+    '<th style="text-align:right;padding:8px 10px">Avg ful</th>'+
+    '</tr></thead><tbody>';
+
+  let totalItems = 0, totalFulW = 0, totalFulN = 0;
+  const staffSamples = [];
+
+  HOURLY_BAND.forEach(hk => {
+    let items = 0, fulW = 0, fulN = 0;
+    let headsSum = 0, headsDays = 0;
+    daysToSum.forEach(day => {
+      const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails);
+      items += hit.items;
+      if (hit.avgFulSec != null && hit.items > 0) {
+        fulW += hit.avgFulSec * hit.items;
+        fulN += hit.items;
+      }
+      const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
+      if (cell && cell.heads > 0) {
+        headsSum += cell.heads;
+        headsDays += 1;
+      }
+    });
+    const heads = dayMode === 'Total'
+      ? (headsDays > 0 ? +(headsSum / headsDays).toFixed(1) : null)
+      : (famStaff && famStaff.days && famStaff.days[dayMode] ? famStaff.days[dayMode].heads || null : null);
+    if (heads != null && heads > 0) staffSamples.push(heads);
+    totalItems += items;
+    totalFulW += fulW;
+    totalFulN += fulN;
+    const ips = heads > 0 ? +(items / heads).toFixed(1) : null;
+    const fulMin = fulN > 0 ? fulW / fulN / 60 : null;
+    const label = hk.replace('-', ':00–') + ':00';
+    html += '<tr style="border-top:1px solid #262a33">' +
+      '<td style="padding:7px 10px;color:#e8eaed;font-weight:600;white-space:nowrap">'+label+'</td>' +
+      '<td style="padding:7px 10px;text-align:right;color:#e8eaed">'+(items || '—')+'</td>' +
+      '<td style="padding:7px 10px;text-align:right;color:#9aa0aa">'+(heads != null && heads > 0 ? heads : '—')+'</td>' +
+      '<td style="padding:7px 10px;text-align:right;font-weight:700;color:#d9a441">'+(ips != null ? ips : '—')+'</td>' +
+      '<td style="padding:7px 10px;text-align:right;color:'+(fulMin!=null?avgFulColorByMin(fulMin):'#9aa0aa')+'">'+(fulMin!=null?fulMin.toFixed(1)+'m':'—')+'</td>' +
+      '</tr>';
+  });
+
+  const avgHeads = staffSamples.length ? staffSamples.reduce((a,b)=>a+b,0)/staffSamples.length : null;
+  const totalIps = avgHeads > 0 ? +(totalItems / avgHeads).toFixed(1) : null;
+  const totalFul = totalFulN > 0 ? totalFulW / totalFulN / 60 : null;
+  html += '<tr style="border-top:2px solid #3d4458;background:#13161c">' +
+    '<td style="padding:8px 10px;color:#d9a441;font-weight:700">Total</td>' +
+    '<td style="padding:8px 10px;text-align:right;font-weight:700;color:#e8eaed">'+totalItems+'</td>' +
+    '<td style="padding:8px 10px;text-align:right;color:#9aa0aa">'+(avgHeads!=null?avgHeads.toFixed(1)+' avg':'—')+'</td>' +
+    '<td style="padding:8px 10px;text-align:right;font-weight:700;color:#d9a441">'+(totalIps!=null?totalIps:'—')+'</td>' +
+    '<td style="padding:8px 10px;text-align:right;color:'+(totalFul!=null?avgFulColorByMin(totalFul):'#9aa0aa')+'">'+(totalFul!=null?totalFul.toFixed(1)+'m':'—')+'</td>' +
+    '</tr></tbody></table>';
+
+  tableEl.innerHTML = html;
+  const stList = stationsForFamily(family, staffing, stationDetails);
+  if (noteEl) {
+    noteEl.textContent = (stList.length ? ('Stations in '+family+': '+stList.join(', ')+'. ') : '') +
+      (famStaff ? 'Staff from FTE×labor join for this family.' : 'No staffing join for this venue/family — items shown without staff divisor.');
   }
 }
 
@@ -2433,6 +2674,111 @@ function renderStationWowTable() {
 // ============================================================
 // TAB 3: Menu Items
 // ============================================================
+function runCrossVenueItemSearch() {
+  const input = document.getElementById('crossVenueItemSearch');
+  const out = document.getElementById('crossVenueItemResults');
+  if (!out) return;
+  const q = (input && input.value || '').trim();
+  if (q.length < 2) {
+    out.innerHTML = '<p style="color:#9aa0aa;font-size:13px;margin:0">Type at least 2 characters. Prefixes like <code>C-</code> / <code>CL-</code> are ignored for matching.</p>';
+    return;
+  }
+  const weekKey = WEEKS[currentWeekIdx]?.key;
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const venueKeys = ['claudie','casaneos','ava_cg','ava_wp','mila'];
+  // Group hits by base dish name
+  const groups = {};
+  venueKeys.forEach(vk => {
+    const d = ALL_DATA[vk]?.[weekKey] || ALL_DATA[vk]?.['latest'];
+    if (!d) return;
+    const rows = [];
+    (d.summary || []).forEach(r => {
+      const name = String(r.menuItem || r.item || '').trim();
+      if (!name) return;
+      const avg = r.avg_sec != null ? r.avg_sec : (r.avgFulSec != null ? r.avgFulSec : null);
+      const qty = r.qty != null ? r.qty : (r.count != null ? r.count : 0);
+      if (!(avg > 0)) return;
+      rows.push({ name, avgSec: avg, qty });
+    });
+    (d.assignmentData || []).forEach(r => {
+      const name = String(r.menuItem || '').trim();
+      if (!name) return;
+      const avg = r.avgFulSec != null ? r.avgFulSec : null;
+      if (!(avg > 0)) return;
+      if (rows.some(x => x.name.toLowerCase() === name.toLowerCase())) return;
+      rows.push({ name, avgSec: avg, qty: r.qty || r.count || 0 });
+    });
+    rows.forEach(row => {
+      if (!itemNameMatchesQuery(row.name, q)) return;
+      const base = rdgItemBaseName(row.name) || row.name.toLowerCase();
+      if (!groups[base]) {
+        groups[base] = {
+          base,
+          display: row.name.replace(VENUE_ITEM_PREFIX_RE, '').trim() || row.name,
+          aliases: new Set(),
+          byVenue: {},
+        };
+      }
+      groups[base].aliases.add(row.name);
+      const prev = groups[base].byVenue[vk];
+      if (!prev || (row.qty || 0) >= (prev.qty || 0)) {
+        groups[base].byVenue[vk] = row;
+      }
+      const disp = row.name.replace(VENUE_ITEM_PREFIX_RE, '').trim();
+      if (disp && disp.length <= groups[base].display.length) groups[base].display = disp;
+    });
+  });
+
+  const ranked = Object.values(groups).map(g => {
+    let wSum = 0, wQty = 0, n = 0;
+    Object.values(g.byVenue).forEach(v => {
+      wSum += v.avgSec * Math.max(v.qty || 1, 1);
+      wQty += Math.max(v.qty || 1, 1);
+      n++;
+    });
+    return { ...g, venueCount: n, portfolioMin: wQty > 0 ? wSum / wQty / 60 : null };
+  }).sort((a, b) => b.venueCount - a.venueCount || a.display.localeCompare(b.display));
+
+  if (!ranked.length) {
+    out.innerHTML = '<p style="color:#9aa0aa;font-size:13px;margin:0">No matches for “'+q.replace(/[<>&]/g,'')+'” this week.</p>';
+    return;
+  }
+
+  let html = '';
+  ranked.slice(0, 12).forEach(g => {
+    const aliases = [...g.aliases].sort();
+    html += '<div style="border:1px solid #262a33;border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#13161c">';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;margin-bottom:8px">';
+    html += '<div style="font-size:15px;font-weight:700;color:#e8eaed">'+g.display+'</div>';
+    html += '<div style="font-size:13px;font-weight:700;color:'+(g.portfolioMin!=null?avgFulColorByMin(g.portfolioMin):'#9aa0aa')+'">'+(g.portfolioMin!=null?('RDG avg '+g.portfolioMin.toFixed(1)+' min'):'—')+'</div>';
+    html += '</div>';
+    if (aliases.length) {
+      html += '<div style="font-size:11px;color:#6b7280;margin-bottom:8px">Matched: '+aliases.map(a=>'<code style="color:#9aa0aa">'+a+'</code>').join(' · ')+'</div>';
+    }
+    html += '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">';
+    html += '<th style="text-align:left;padding:6px 8px">Location</th><th style="text-align:right;padding:6px 8px">Avg ful</th><th style="text-align:right;padding:6px 8px">Qty</th><th style="text-align:left;padding:6px 8px">As sold</th></tr></thead><tbody>';
+    venueKeys.forEach(vk => {
+      const hit = g.byVenue[vk];
+      html += '<tr style="border-top:1px solid #1e2533">';
+      html += '<td style="padding:6px 8px;color:#e8eaed;font-weight:600">'+(labels[vk]||vk)+'</td>';
+      if (!hit) {
+        html += '<td style="padding:6px 8px;text-align:right;color:#4b5563">—</td><td style="padding:6px 8px;text-align:right;color:#4b5563">—</td><td style="padding:6px 8px;color:#4b5563">—</td>';
+      } else {
+        const min = hit.avgSec / 60;
+        html += '<td style="padding:6px 8px;text-align:right;font-weight:700;color:'+avgFulColorByMin(min)+'">'+min.toFixed(1)+' min</td>';
+        html += '<td style="padding:6px 8px;text-align:right;color:#9aa0aa">'+(hit.qty||0)+'</td>';
+        html += '<td style="padding:6px 8px;color:#9aa0aa;font-size:12px">'+hit.name+'</td>';
+      }
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  });
+  if (ranked.length > 12) {
+    html += '<p style="color:#9aa0aa;font-size:12px;margin:4px 0 0">Showing top 12 of '+ranked.length+' matches — refine your search.</p>';
+  }
+  out.innerHTML = html;
+}
+
 function renderMenuItems() {
   // ONLY items from static REF assignment; Avg Time from item-fulfillment
   const staticMap = getStaticItemMap();
@@ -3091,10 +3437,6 @@ function renderGroup() {
   }
 
   // ── Items top 10 variance (food only: with target + like-to-like) ──
-  const VENUE_ITEM_PREFIX_RE = /^(AVACGPFMS|AVACGPF|AVACG|ACG|CLPFL|CLIN|CLEV|CLEL|CLPF|CLR|CLK|CLE|CLL|CL|CNSM|CMS|CSM|CIN|CE|CN|C|AVAWP|AWP|AOB|AEV|AMO|AM0|A|MEV|MG|MP|MILA|MM|M)[-_\\s]+/i;
-  function rdgItemBaseName(name) {
-    return String(name || '').trim().replace(VENUE_ITEM_PREFIX_RE, '').replace(/\\s+/g, ' ').trim().toLowerCase();
-  }
   function rankVarianceRows(rows, venueDataLocal, limit) {
     const ranked = rows.map(row => {
       const vals = venueDataLocal.map(v => {
@@ -3618,6 +3960,8 @@ function renderAll() {
     if (sbc) sbc.style.display = 'none';
     const ov = document.getElementById('overviewStaffingCard');
     if (ov) ov.style.display = 'none';
+    const ht = document.getElementById('hourlyThroughputCard');
+    if (ht) ht.style.display = 'none';
     return;
   }
   applyDerivedStationTargets();
@@ -3644,6 +3988,7 @@ function renderAll() {
   renderGroup();
   renderSettings();
   renderPageSummary();
+  if (typeof runCrossVenueItemSearch === 'function') runCrossVenueItemSearch();
 }
 
 // ============================================================

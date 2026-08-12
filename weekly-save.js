@@ -664,9 +664,24 @@ async function main() {
 
   // Remove any existing entry for this week (idempotent re-run)
   rolling.weeks = rolling.weeks.filter(w => w.weekLabel !== weekLabel);
-  // Add new entry at front
-  rolling.weeks.unshift(weekEntry);
-  // Keep only last 3 weeks
+  // Slim entry — never embed raw ticket/item arrays (dashboard reads *-data-WEEK.json)
+  const slimEntry = {
+    weekLabel: weekEntry.weekLabel,
+    startDate: weekEntry.startDate,
+    endDate: weekEntry.endDate,
+    venues: Object.fromEntries(
+      Object.entries(weekEntry.venues || {}).map(([k, v]) => [
+        k,
+        {
+          ticketCount: Array.isArray(v.tickets) ? v.tickets.length : (v.ticketCount || 0),
+          itemCount: Array.isArray(v.items) ? v.items.length : (v.itemCount || 0),
+          coverCount: Array.isArray(v.covers) ? v.covers.length : (v.coverCount || 0),
+        },
+      ])
+    ),
+  };
+  rolling.weeks.unshift(slimEntry);
+  // Keep only last 3 week metadata rows (processed files keep full history)
   rolling.weeks = rolling.weeks.slice(0, 3);
 
   saveJSON(ROLLING_FILE, rolling);
