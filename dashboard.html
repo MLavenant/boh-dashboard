@@ -205,7 +205,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <div class="wrap">
 <header>
   <h1 id="dashTitle">BOH Dashboard</h1>
-  <span class="badge" id="dashBadge">Latest 2026-W32 · Built 2026-08-12 20:57 UTC</span>
+  <span class="badge" id="dashBadge">Latest 2026-W32 · Built 2026-08-12 21:23 UTC</span>
 </header>
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
 <div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
@@ -271,19 +271,8 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
   <p id="overviewStaffingNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
 </div>
 
-<div class="card" id="hourlyThroughputCard" style="display:none;margin-bottom:14px">
-  <h2>Items / hour / staff — by station family</h2>
-  <p class="note">Pick a <strong>station family</strong> (e.g. Pastry) and a <strong>day</strong> (or Total). Hours run <strong>10:00 → 02:00</strong>. Items come from Toast station timing for that family; staff = cooks clocked that day on the family (same headcount applied to each hour — labor is day-level).</p>
-  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
-    <label style="font-size:12px;color:#9aa0aa">Family
-      <select id="hourlyFamilySelect" onchange="renderHourlyThroughput()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
-    </label>
-    <label style="font-size:12px;color:#9aa0aa">Day
-      <select id="hourlyDaySelect" onchange="renderHourlyThroughput()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
-    </label>
-  </div>
-  <div id="hourlyThroughputTable" style="overflow-x:auto"></div>
-  <p id="hourlyThroughputNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
+<div class="card" id="overviewHourlyHint" style="display:none;margin-bottom:14px;padding:12px 14px">
+  <p class="note" style="margin:0"><strong>Items / hour / staff</strong> by station family or Toast station is on the <button type="button" onclick="switchTab('stations', document.querySelector('.tab-btn[onclick*=stations]'))" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;padding:0;text-decoration:underline">Stations</button> tab — pick Family, Station, and Day.</p>
 </div>
 
 <!-- Service Break Timeline (1-min) -->
@@ -411,6 +400,23 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
     <div id="skpiWorst" style="font-size:1.4rem;font-weight:700;line-height:1.2">—</div>
     <div style="font-size:11px;color:#9aa0aa;margin-top:2px" id="skpiWorstSub"></div>
   </div>
+</div>
+<div class="card" id="hourlyThroughputCard" style="margin:18px 0;display:block">
+  <h2 style="margin:0 0 4px">Items / hour / staff</h2>
+  <p class="note" style="margin-top:0">This location only. Pick a <strong>station family</strong> (e.g. Pastry) or a <strong>Toast station</strong>, then a <strong>day</strong> (or Total). Hours <strong>10:00 → 02:00</strong>. Staff = cooks on that family that day (day-level labor).</p>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
+    <label style="font-size:12px;color:#9aa0aa">Family
+      <select id="hourlyFamilySelect" onchange="onHourlyFamilyChange()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+    </label>
+    <label style="font-size:12px;color:#9aa0aa">Station
+      <select id="hourlyStationSelect" onchange="renderHourlyThroughput()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;min-width:160px"></select>
+    </label>
+    <label style="font-size:12px;color:#9aa0aa">Day
+      <select id="hourlyDaySelect" onchange="renderHourlyThroughput()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+    </label>
+  </div>
+  <div id="hourlyThroughputTable" style="overflow-x:auto"><p class="note" style="margin:0">Loading hourly table…</p></div>
+  <p id="hourlyThroughputNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
 </div>
 <div class="section-title">Station Selector</div>
 <div class="station-pills" id="stationPills"></div>
@@ -2068,8 +2074,10 @@ function stationsForFamily(family, staffing, stationDetails) {
   return Object.keys(stationDetails || {}).filter(st => st.toLowerCase().includes(token));
 }
 
-function sumFamilyHourItems(family, day, hourKey, staffing, stationDetails) {
-  const stations = stationsForFamily(family, staffing, stationDetails);
+function sumFamilyHourItems(family, day, hourKey, staffing, stationDetails, stationFilter) {
+  const stations = stationFilter
+    ? [stationFilter]
+    : stationsForFamily(family, staffing, stationDetails);
   let items = 0, tickets = 0, fulWeighted = 0, fulN = 0;
   stations.forEach(st => {
     const cell = stationDetails?.[st]?.byDayHour?.[day]?.[hourKey];
@@ -2082,7 +2090,6 @@ function sumFamilyHourItems(family, day, hourKey, staffing, stationDetails) {
       fulN += c;
     }
   });
-  // Prefer itemQty from stationDayVolume when hour-level qty unavailable — count is best hourly proxy
   return {
     items,
     tickets,
@@ -2091,9 +2098,32 @@ function sumFamilyHourItems(family, day, hourKey, staffing, stationDetails) {
   };
 }
 
+function populateHourlyStationSelect(family, staffing, stationDetails, keepValue) {
+  const stSel = document.getElementById('hourlyStationSelect');
+  if (!stSel) return;
+  const list = stationsForFamily(family, staffing, stationDetails)
+    .filter(st => stationDetails[st])
+    .sort((a, b) => a.localeCompare(b));
+  const prev = keepValue != null ? keepValue : stSel.value;
+  stSel.innerHTML = '<option value="">All in family</option>' +
+    list.map(st => '<option value="'+st.replace(/"/g,'&quot;')+'">'+st+'</option>').join('');
+  if (prev && [...stSel.options].some(o => o.value === prev)) stSel.value = prev;
+  else stSel.value = '';
+}
+
+function onHourlyFamilyChange() {
+  const famSel = document.getElementById('hourlyFamilySelect');
+  const d = getD();
+  const family = (famSel && famSel.value) || 'Pastry';
+  populateHourlyStationSelect(family, d.staffing, d.stationDetails || {}, '');
+  renderHourlyThroughput();
+}
+
 function renderHourlyThroughput() {
   const card = document.getElementById('hourlyThroughputCard');
+  const hint = document.getElementById('overviewHourlyHint');
   const famSel = document.getElementById('hourlyFamilySelect');
+  const stSel = document.getElementById('hourlyStationSelect');
   const daySel = document.getElementById('hourlyDaySelect');
   const tableEl = document.getElementById('hourlyThroughputTable');
   const noteEl = document.getElementById('hourlyThroughputNote');
@@ -2101,6 +2131,7 @@ function renderHourlyThroughput() {
 
   if (currentVenue === 'rdg_portfolio') {
     card.style.display = 'none';
+    if (hint) hint.style.display = 'none';
     return;
   }
 
@@ -2109,10 +2140,14 @@ function renderHourlyThroughput() {
   const stationDetails = d.stationDetails || {};
   const hasDetails = Object.keys(stationDetails).length > 0;
   if (!hasDetails) {
-    card.style.display = 'none';
+    card.style.display = '';
+    if (hint) hint.style.display = '';
+    tableEl.innerHTML = '<p class="note" style="margin:0">No hourly station timing for this venue/week yet.</p>';
+    if (noteEl) noteEl.textContent = '';
     return;
   }
   card.style.display = '';
+  if (hint) hint.style.display = '';
 
   // Populate selectors once / keep selection
   const availableFamilies = HOURLY_FAMILIES.filter(f => {
@@ -2124,6 +2159,7 @@ function renderHourlyThroughput() {
     famSel.innerHTML = families.map(f => '<option value="'+f+'">'+f+'</option>').join('');
     famSel.dataset.venue = currentVenue;
     if (families.includes('Pastry')) famSel.value = 'Pastry';
+    else if (families[0]) famSel.value = families[0];
   }
   if (daySel && daySel.options.length < 2) {
     daySel.innerHTML = '<option value="Total">Total (week)</option>' +
@@ -2131,6 +2167,15 @@ function renderHourlyThroughput() {
   }
 
   const family = (famSel && famSel.value) || families[0] || 'Pastry';
+  if (!stSel || stSel.dataset.family !== family || stSel.dataset.venue !== currentVenue) {
+    populateHourlyStationSelect(family, staffing, stationDetails, stSel && stSel.dataset.venue === currentVenue ? stSel.value : '');
+    if (stSel) {
+      stSel.dataset.family = family;
+      stSel.dataset.venue = currentVenue;
+    }
+  }
+
+  const stationFilter = (stSel && stSel.value) || '';
   const dayMode = (daySel && daySel.value) || 'Total';
   const famStaff = staffing && staffing.byFamily ? staffing.byFamily[family] : null;
 
@@ -2150,7 +2195,7 @@ function renderHourlyThroughput() {
     let items = 0, fulW = 0, fulN = 0;
     let headsSum = 0, headsDays = 0;
     daysToSum.forEach(day => {
-      const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails);
+      const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, stationFilter || null);
       items += hit.items;
       if (hit.avgFulSec != null && hit.items > 0) {
         fulW += hit.avgFulSec * hit.items;
@@ -2195,8 +2240,11 @@ function renderHourlyThroughput() {
   tableEl.innerHTML = html;
   const stList = stationsForFamily(family, staffing, stationDetails);
   if (noteEl) {
-    noteEl.textContent = (stList.length ? ('Stations in '+family+': '+stList.join(', ')+'. ') : '') +
-      (famStaff ? 'Staff from FTE×labor join for this family.' : 'No staffing join for this venue/family — items shown without staff divisor.');
+    const scope = stationFilter
+      ? ('Toast station: '+stationFilter+' (family '+family+'). ')
+      : (stList.length ? ('Stations in '+family+': '+stList.join(', ')+'. ') : '');
+    noteEl.textContent = scope +
+      (famStaff ? 'Staff = family headcount for that day (not split per Toast station).' : 'No staffing join for this venue/family — items shown without staff divisor.');
   }
 }
 
@@ -3985,6 +4033,8 @@ function renderAll() {
     if (ov) ov.style.display = 'none';
     const ht = document.getElementById('hourlyThroughputCard');
     if (ht) ht.style.display = 'none';
+    const oh = document.getElementById('overviewHourlyHint');
+    if (oh) oh.style.display = 'none';
     return;
   }
   applyDerivedStationTargets();
