@@ -22,47 +22,13 @@ const VENUES = {
   casa_neos_lounge: "f1f95f8b-80b9-42de-a8ba-47a5fb8aac70",
 };
 
-// Operating DJ nights (matches Venue ROI rules): only these days get BS Actual written
-const BS_CONFIG = {
-  casa_neos: {
-    label: "Casa Neos Beach Club",
-    days: [6, 0], // Saturday, Sunday
-    tables: new Set(["34","51","52","31","41","32","33","35","36","42","43","46","48","49",
-                     "53","54","55","56","45","44","47","24","25","26","27","28","19","20",
-                     "21","22","23","C1","C2","C3","C4","C5","C6","C7","C8","C9","C10",
-                     "C1A","C2A","C3A","C4A","C5A","C6A","C7A","C8A","C9A","C10A",
-                     "D1","D2","D3","D4","D5","D6","D7"]),
-    startFrac: 0.604167, endFrac: 0.833333, crossesMidnight: false,
-  },
-  mm_mila: {
-    label: "MILA Lounge",
-    days: [3, 4, 5, 6], // Wednesday–Saturday
-    tables: new Set(["402","304","303","302","301","308","410","401","403","404","305","306",
-                     "307","408","408bis","407","405","409","406","1","2","3","4","5","6","7",
-                     "8","9","10","11","12","1A","2A","3A","4A","5A","6A","7A","8A","9A",
-                     "10A","11A","12A","S1","S2","S3","S4","S5","S6","S7","S8","S9","S10",
-                     "S11","S12","S13","S14","S15","S16","S17","S18","S19","S20","S21",
-                     "S22","S23","S24","S25","S26","S27","S28","S29","S30","73"]),
-    startFrac: 0.979167, endFrac: 0.208333, crossesMidnight: true,
-  },
-  casa_neos_lounge: {
-    label: "Casa Neos Lounge",
-    days: [4, 5, 6, 0], // Thursday–Sunday
-    tables: new Set(["809","808","905","904","903","902","810","906","907","908","909","910",
-                     "911","912","901","807","806","805","804","803","L1","L2","L3","L4",
-                     "L5","L6","L7","L8","L9","L10","L11","L12","L1A","L2A","L3A","L4A",
-                     "L5A","L6A","L7A","L8A","L9A","L10A","L11A","L12A","44"]),
-    startFrac: 0.958333, endFrac: 0.208333, crossesMidnight: true,
-    includeNoTable: true, sundayStartFrac: 0.75,
-  },
-};
-
-function isOperatingDay(venueKey, dateStr) {
-  const cfg = BS_CONFIG[venueKey];
-  if (!cfg || !cfg.days) return true;
-  const dow = new Date(dateStr + "T12:00:00").getDay();
-  return cfg.days.includes(dow);
-}
+const {
+  BS_CONFIG,
+  getBsTables,
+  includeNoTable,
+  isOperatingDay,
+  isCnbcSummerRoof,
+} = require("./bs-config.cjs");
 
 function log(msg) {
   const ts = new Date().toLocaleTimeString("en-US", { hour12: false });
@@ -148,7 +114,14 @@ async function fetchBsSales(venueKey, dates) {
   const cfg  = BS_CONFIG[venueKey];
   const guid = VENUES[venueKey];
   const token = await getToken();
-  const bsGuids = await getTableGuids(token, guid, cfg.tables);
+  const guidCache = new Map();
+  async function guidsForDate(date) {
+    const key = (venueKey === "casa_neos" && isCnbcSummerRoof(date)) ? "roof" : "base";
+    if (!guidCache.has(key)) {
+      guidCache.set(key, await getTableGuids(token, guid, getBsTables(venueKey, date)));
+    }
+    return guidCache.get(key);
+  }
   const byDate = {};
 
   for (const date of dates) {
@@ -156,12 +129,13 @@ async function fetchBsSales(venueKey, dates) {
       byDate[date] = 0;
       continue;
     }
+    const bsGuids = await guidsForDate(date);
     const orders = await getAllOrders(token, guid, date);
     let total = 0;
     for (const order of orders) {
       const hasTable  = !!(order.table?.guid);
       const isBsTable = bsGuids.has(order.table?.guid ?? "");
-      if (!isBsTable && !(cfg.includeNoTable && !hasTable)) continue;
+      if (!isBsTable && !(includeNoTable(venueKey, date) && !hasTable)) continue;
 
       const openedUtc = order.openedDate;
       if (!openedUtc) continue;
@@ -205,7 +179,18 @@ function applyBsActual(entry, newBsA) {
 function updateSchedInHtml(html, salesByVenueDate) {
   // Extract the SCHED array
   const schedMatch = html.match(/var SCHED = (\[[\s\S]*?\]);/);
-  if (!schedMatch) { log("ERROR: SCHED array not found"); return { html, count: 0, changed: 0, zeros: [] }; }
+  if (!schedMatch) {
+    log("NOTE: SCHED not in index.html � Firebase toastActuals is the live source");
+    const updates = [];
+    Object.keys(salesByVenueDate || {}).forEach(vk => {
+      const label = (BS_CONFIG[vk] && BS_CONFIG[vk].label) || vk;
+      const byDate = salesByVenueDate[vk] || {};
+      Object.keys(byDate).forEach(date => {
+        updates.push({ venue: label, date, bs_a: byDate[date], dj: null });
+      });
+    });
+    return { html, count: 0, changed: 0, updates };
+  }
 
   let sched;
   try { sched = JSON.parse(schedMatch[1]); }
@@ -313,8 +298,8 @@ function updateSchedInHtml(html, salesByVenueDate) {
   const toastCode = await fbPut("/rdg/toastActuals", toastLivePayload);
   log(`Firebase toastActuals HTTP ${toastCode}`);
 
-  const positives = updates.filter(u => (u.bs_a || 0) > 0).length;
-  const zeros = updates.filter(u => (u.bs_a || 0) === 0).length;
+  const positives = (updates || []).filter(u => (u.bs_a || 0) > 0).length;
+  const zeros = (updates || []).filter(u => (u.bs_a || 0) === 0).length;
   const statusCode = await fbPut("/rdg/scrapeStatus/toast", {
     ok: true,
     at: new Date().toISOString(),
