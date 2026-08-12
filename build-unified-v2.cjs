@@ -165,7 +165,7 @@ html = html.replace(
 </div>
 <div class="card" id="hourlyThroughputCard" style="margin:18px 0;display:block">
   <h2 style="margin:0 0 4px">Items / hour / staff</h2>
-  <p class="note" style="margin-top:0">This location only. Pick a <strong>station family</strong> (e.g. Pastry) or a <strong>Toast station</strong>, then a <strong>day</strong> (or Total). Hours <strong>10:00 → 02:00</strong>. Staff = cooks on that family that day (day-level labor).</p>
+  <p class="note" style="margin-top:0">This location only. Pick a <strong>station family</strong> (e.g. Pastry) or a <strong>Toast station</strong>, then a <strong>day</strong> (or Total). Hours <strong>10:00 → 02:00</strong>. <strong>Items include dishes with no target.</strong> Click an item count for the full sold list (name + time). Staff = cooks on that family that day.</p>
   <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
     <label style="font-size:12px;color:#9aa0aa">Family
       <select id="hourlyFamilySelect" onchange="onHourlyFamilyChange()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
@@ -686,7 +686,7 @@ function mergeBohWeekPayload(local, cloud) {
     out.serviceBreakTimeline = local.serviceBreakTimeline;
   }
   // Keep non-empty local analytics when cloud omitted them (partial Firebase writes)
-  ['stations','summary','stationDetails','stationDayVolume','assignmentData','curve','curveByDay','hourProfile','guestsSeated','hmFul','hmGuests','tbk','breakingPoint','breakingPointGuests'].forEach(function(k) {
+  ['stations','summary','stationDetails','stationHourItems','stationDayVolume','assignmentData','curve','curveByDay','hourProfile','guestsSeated','hmFul','hmGuests','tbk','breakingPoint','breakingPointGuests'].forEach(function(k) {
     const lv = local[k];
     const cv = cloud[k];
     const localOk = lv != null && !(Array.isArray(lv) && lv.length === 0) && !(typeof lv === 'object' && !Array.isArray(lv) && !Object.keys(lv).length);
@@ -2056,20 +2056,29 @@ function stationsForFamily(family, staffing, stationDetails) {
   return Object.keys(stationDetails || {}).filter(st => st.toLowerCase().includes(token));
 }
 
-function sumFamilyHourItems(family, day, hourKey, staffing, stationDetails, stationFilter) {
+function sumFamilyHourItems(family, day, hourKey, staffing, stationDetails, stationFilter, stationHourItems) {
   const stations = stationFilter
     ? [stationFilter]
     : stationsForFamily(family, staffing, stationDetails);
   let items = 0, tickets = 0, fulWeighted = 0, fulN = 0;
+  const events = [];
   stations.forEach(st => {
     const cell = stationDetails?.[st]?.byDayHour?.[day]?.[hourKey];
-    if (!cell) return;
-    const c = cell.count || 0;
-    tickets += c;
-    items += c; // stationDetails count is ticket/item events at station
-    if (cell.avg_sec > 0 && c > 0) {
-      fulWeighted += cell.avg_sec * c;
-      fulN += c;
+    const hourEvents = stationHourItems?.[st]?.[day]?.[hourKey] || [];
+    if (hourEvents.length) {
+      hourEvents.forEach(e => {
+        events.push(Object.assign({ station: st, day }, e));
+        items += e.q || 1;
+      });
+    } else if (cell) {
+      // Prefer menu-item qty when present; else kitchen ticket fires
+      const c = (cell.itemQty != null ? cell.itemQty : cell.count) || 0;
+      tickets += cell.count || 0;
+      items += c;
+    }
+    if (cell && cell.avg_sec > 0 && (cell.count || 0) > 0) {
+      fulWeighted += cell.avg_sec * cell.count;
+      fulN += cell.count;
     }
   });
   return {
@@ -2077,6 +2086,7 @@ function sumFamilyHourItems(family, day, hourKey, staffing, stationDetails, stat
     tickets,
     avgFulSec: fulN > 0 ? fulWeighted / fulN : null,
     stations,
+    events,
   };
 }
 
@@ -2160,8 +2170,11 @@ function renderHourlyThroughput() {
   const stationFilter = (stSel && stSel.value) || '';
   const dayMode = (daySel && daySel.value) || 'Total';
   const famStaff = staffing && staffing.byFamily ? staffing.byFamily[family] : null;
+  const stationHourItems = d.stationHourItems || {};
+  const hasItemListings = Object.keys(stationHourItems).length > 0;
 
   const daysToSum = dayMode === 'Total' ? HOURLY_DAYS : [dayMode];
+  window._hourlyBucketEvents = {};
   let html = '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:640px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
     '<th style="text-align:left;padding:8px 10px">Hour</th>'+
     '<th style="text-align:right;padding:8px 10px">Items</th>'+
@@ -2172,16 +2185,20 @@ function renderHourlyThroughput() {
 
   let totalItems = 0, totalFulW = 0, totalFulN = 0;
   const staffSamples = [];
+  const allEvents = [];
 
   HOURLY_BAND.forEach(hk => {
     let items = 0, fulW = 0, fulN = 0;
     let headsSum = 0, headsDays = 0;
+    const bucketEvents = [];
     daysToSum.forEach(day => {
-      const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, stationFilter || null);
+      const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, stationFilter || null, stationHourItems);
       items += hit.items;
-      if (hit.avgFulSec != null && hit.items > 0) {
-        fulW += hit.avgFulSec * hit.items;
-        fulN += hit.items;
+      if (hit.events && hit.events.length) bucketEvents.push(...hit.events);
+      if (hit.avgFulSec != null && (hit.tickets || hit.items) > 0) {
+        const w = hit.tickets || hit.items;
+        fulW += hit.avgFulSec * w;
+        fulN += w;
       }
       const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
       if (cell && cell.heads > 0) {
@@ -2189,6 +2206,8 @@ function renderHourlyThroughput() {
         headsDays += 1;
       }
     });
+    window._hourlyBucketEvents[hk] = bucketEvents;
+    allEvents.push(...bucketEvents);
     const heads = dayMode === 'Total'
       ? (headsDays > 0 ? +(headsSum / headsDays).toFixed(1) : null)
       : (famStaff && famStaff.days && famStaff.days[dayMode] ? famStaff.days[dayMode].heads || null : null);
@@ -2199,21 +2218,28 @@ function renderHourlyThroughput() {
     const ips = heads > 0 ? +(items / heads).toFixed(1) : null;
     const fulMin = fulN > 0 ? fulW / fulN / 60 : null;
     const label = hk.replace('-', ':00–') + ':00';
+    const itemsCell = (items && hasItemListings)
+      ? '<button type="button" onclick="openHourlyItemList(\''+hk+'\')" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+items+'</button>'
+      : (items || '—');
     html += '<tr style="border-top:1px solid #262a33">' +
       '<td style="padding:7px 10px;color:#e8eaed;font-weight:600;white-space:nowrap">'+label+'</td>' +
-      '<td style="padding:7px 10px;text-align:right;color:#e8eaed">'+(items || '—')+'</td>' +
+      '<td style="padding:7px 10px;text-align:right;color:#e8eaed">'+itemsCell+'</td>' +
       '<td style="padding:7px 10px;text-align:right;color:#9aa0aa">'+(heads != null && heads > 0 ? heads : '—')+'</td>' +
       '<td style="padding:7px 10px;text-align:right;font-weight:700;color:#d9a441">'+(ips != null ? ips : '—')+'</td>' +
       '<td style="padding:7px 10px;text-align:right;color:'+(fulMin!=null?avgFulColorByMin(fulMin):'#9aa0aa')+'">'+(fulMin!=null?fulMin.toFixed(1)+'m':'—')+'</td>' +
       '</tr>';
   });
 
+  window._hourlyBucketEvents.__total = allEvents;
   const avgHeads = staffSamples.length ? staffSamples.reduce((a,b)=>a+b,0)/staffSamples.length : null;
   const totalIps = avgHeads > 0 ? +(totalItems / avgHeads).toFixed(1) : null;
   const totalFul = totalFulN > 0 ? totalFulW / totalFulN / 60 : null;
+  const totalItemsCell = (totalItems && hasItemListings)
+    ? '<button type="button" onclick="openHourlyItemList(\\'__total\\')" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+totalItems+'</button>'
+    : totalItems;
   html += '<tr style="border-top:2px solid #3d4458;background:#13161c">' +
     '<td style="padding:8px 10px;color:#d9a441;font-weight:700">Total</td>' +
-    '<td style="padding:8px 10px;text-align:right;font-weight:700;color:#e8eaed">'+totalItems+'</td>' +
+    '<td style="padding:8px 10px;text-align:right;font-weight:700;color:#e8eaed">'+totalItemsCell+'</td>' +
     '<td style="padding:8px 10px;text-align:right;color:#9aa0aa">'+(avgHeads!=null?avgHeads.toFixed(1)+' avg':'—')+'</td>' +
     '<td style="padding:8px 10px;text-align:right;font-weight:700;color:#d9a441">'+(totalIps!=null?totalIps:'—')+'</td>' +
     '<td style="padding:8px 10px;text-align:right;color:'+(totalFul!=null?avgFulColorByMin(totalFul):'#9aa0aa')+'">'+(totalFul!=null?totalFul.toFixed(1)+'m':'—')+'</td>' +
@@ -2226,8 +2252,68 @@ function renderHourlyThroughput() {
       ? ('Toast station: '+stationFilter+' (family '+family+'). ')
       : (stList.length ? ('Stations in '+family+': '+stList.join(', ')+'. ') : '');
     noteEl.textContent = scope +
+      (hasItemListings
+        ? 'Items = menu item qty (includes items with no target). Click a count for the full sold list. '
+        : 'Items = kitchen ticket fires (no item listing yet for this venue/week). ') +
       (famStaff ? 'Staff = family headcount for that day (not split per Toast station).' : 'No staffing join for this venue/family — items shown without staff divisor.');
   }
+}
+
+function closeHourlyItemList() {
+  const el = document.getElementById('hourlyItemModal');
+  if (el) el.remove();
+}
+
+function openHourlyItemList(hourKey) {
+  closeHourlyItemList();
+  const events = (window._hourlyBucketEvents && window._hourlyBucketEvents[hourKey]) || [];
+  const famSel = document.getElementById('hourlyFamilySelect');
+  const stSel = document.getElementById('hourlyStationSelect');
+  const daySel = document.getElementById('hourlyDaySelect');
+  const family = (famSel && famSel.value) || '';
+  const station = (stSel && stSel.value) || 'All in family';
+  const dayMode = (daySel && daySel.value) || 'Total';
+  const hourLabel = hourKey === '__total' ? 'All hours' : (hourKey.replace('-', ':00–') + ':00');
+  const qty = events.reduce((a, e) => a + (e.q || 1), 0);
+  const noTarget = events.reduce((a, e) => a + (e.tgt ? 0 : (e.q || 1)), 0);
+
+  let body = '';
+  if (!events.length) {
+    body = '<p class="note">No menu-item listing for this hour (ticket-only count).</p>';
+  } else {
+    body = '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
+      '<th style="text-align:left;padding:8px 6px">When</th>'+
+      '<th style="text-align:left;padding:8px 6px">Item</th>'+
+      '<th style="text-align:right;padding:8px 6px">Qty</th>'+
+      '<th style="text-align:left;padding:8px 6px">Station</th>'+
+      '<th style="text-align:left;padding:8px 6px">Table</th>'+
+      '<th style="text-align:left;padding:8px 6px">Target</th>'+
+      '</tr></thead><tbody>';
+    events.forEach(e => {
+      body += '<tr style="border-top:1px solid #262a33">' +
+        '<td style="padding:6px;white-space:nowrap;color:#9aa0aa">'+(e.t||'—')+'</td>' +
+        '<td style="padding:6px;color:#e8eaed">'+(e.n||'').replace(/</g,'&lt;')+'</td>' +
+        '<td style="padding:6px;text-align:right;font-weight:600">'+(e.q||1)+'</td>' +
+        '<td style="padding:6px;color:#9aa0aa">'+(e.station||'')+'</td>' +
+        '<td style="padding:6px;color:#9aa0aa">'+(e.table||'—')+'</td>' +
+        '<td style="padding:6px;color:'+(e.tgt?'#22c55e':'#f59e0b')+'">'+(e.tgt?'Yes':'No')+'</td>' +
+        '</tr>';
+    });
+    body += '</tbody></table>';
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'hourlyItemModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:24px';
+  modal.onclick = function(ev) { if (ev.target === modal) closeHourlyItemList(); };
+  modal.innerHTML = '<div style="background:#181b22;border:1px solid #2d3448;border-radius:12px;max-width:920px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.45)">'+
+    '<div style="padding:16px 18px;border-bottom:1px solid #262a33;display:flex;justify-content:space-between;gap:12px;align-items:flex-start">'+
+      '<div><div style="font-size:16px;font-weight:700;color:#e8eaed">Sold items — '+hourLabel+'</div>'+
+      '<div style="font-size:12px;color:#9aa0aa;margin-top:4px">'+family+(station && station !== 'All in family' ? ' · '+station : '')+' · '+dayMode+
+      ' · '+qty+' items'+(noTarget ? ' · '+noTarget+' without target' : '')+'</div></div>'+
+      '<button type="button" onclick="closeHourlyItemList()" style="background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;padding:6px 12px;cursor:pointer">Close</button>'+
+    '</div><div style="padding:8px 14px 18px;overflow:auto">'+body+'</div></div>';
+  document.body.appendChild(modal);
 }
 
 function renderStations() {
