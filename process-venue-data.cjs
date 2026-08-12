@@ -836,6 +836,55 @@ itemDetails.forEach(item => {
 });
 console.log(`Item qty→station: assigned=${qtyAssigned}, ticket-fallback=${qtyFallback}, skipped=${qtySkipped}`);
 
+// ---- stationHourItems: full sold listing by station / day / hour (menu item qty) ----
+const stationHourItems = {};
+itemDetails.forEach(item => {
+  if (!item.menuItem || isExcludedMenuItem(item.menuItem)) return;
+  const fired = parseDate(item.sentDate);
+  if (!fired) return;
+  let station = resolveKitchenStation(resolveAssignedStation(item.menuItem));
+  if (!station) {
+    const datePfx = (item.sentDate || '').slice(0, 6);
+    const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
+    const matches = ticketByKey[key] || [];
+    station = itemFirstStation[item.menuItem] || (matches[0] && matches[0]['Station']) || null;
+  }
+  if (!station || !isFood(station) || /no\s*print/i.test(station)) return;
+  const day = DAYS[fired.getDay()];
+  const hr = fired.getHours();
+  const hrKey = `${hr}-${hr + 1}`;
+  const qty = item.qty || 1;
+  const info = ITEM_ASSIGNMENTS[item.menuItem] || null;
+  const hasTarget = !!(info && info.targetSec > 0);
+  if (!stationHourItems[station]) stationHourItems[station] = {};
+  if (!stationHourItems[station][day]) stationHourItems[station][day] = {};
+  if (!stationHourItems[station][day][hrKey]) stationHourItems[station][day][hrKey] = [];
+  const hh = fired.getHours();
+  const mm = String(fired.getMinutes()).padStart(2, '0');
+  const ap = hh >= 12 ? 'p' : 'a';
+  let h12 = hh % 12; if (h12 === 0) h12 = 12;
+  stationHourItems[station][day][hrKey].push({
+    n: item.menuItem,
+    q: qty,
+    t: `${DAYS[fired.getDay()].slice(0, 3)} ${h12}:${mm}${ap}`,
+    tgt: hasTarget ? 1 : 0,
+    table: item.table || '',
+  });
+  if (stationDetailsOut[station] && stationDetailsOut[station].byDayHour) {
+    if (!stationDetailsOut[station].byDayHour[day]) stationDetailsOut[station].byDayHour[day] = {};
+    const cell = stationDetailsOut[station].byDayHour[day][hrKey] || { count: 0, avg_sec: 0, exp_sec: derivedStationTargets[station] || 0 };
+    cell.itemQty = (cell.itemQty || 0) + qty;
+    stationDetailsOut[station].byDayHour[day][hrKey] = cell;
+  }
+});
+Object.values(stationHourItems).forEach(days => {
+  Object.values(days).forEach(hours => {
+    Object.keys(hours).forEach(hk => {
+      hours[hk].sort((a, b) => String(a.t).localeCompare(String(b.t)));
+    });
+  });
+});
+
 // ---- Output ----
 const output = {
   stations,
@@ -852,6 +901,7 @@ const output = {
   serviceBreakTimeline,
   stationItemsArr,
   stationDetails: stationDetailsOut,
+  stationHourItems,
   stationDayVolume,
   assignmentData,
 };
