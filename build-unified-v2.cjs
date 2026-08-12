@@ -727,8 +727,13 @@ async function loadBohFromFirebase() {
       ).join('');
     }
     const badge = document.getElementById('dashBadge');
-    if (badge && meta.updatedAt) {
-      badge.textContent = 'Latest ' + weekKey + ' · Cloud ' + new Date(meta.updatedAt).toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+    if (badge) {
+      const latestKey = WEEKS[best]?.key || weekKey;
+      const cloudBit = meta.updatedAt
+        ? (' · Cloud ' + new Date(meta.updatedAt).toISOString().slice(0, 16).replace('T', ' ') + ' UTC')
+        : '';
+      // Prefer newest week present in the app (embedded + cloud), not only Firebase meta.latestWeek
+      badge.textContent = 'Latest ' + latestKey + cloudBit;
     }
     try { BOH_CLOUD_STATUS = await fbGetJson('/rdg/scrapeStatus/bohWeekly'); } catch (e) { BOH_CLOUD_STATUS = null; }
     return true;
