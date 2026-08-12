@@ -2219,7 +2219,7 @@ function renderHourlyThroughput() {
     const fulMin = fulN > 0 ? fulW / fulN / 60 : null;
     const label = hk.replace('-', ':00–') + ':00';
     const itemsCell = (items && hasItemListings)
-      ? '<button type="button" onclick="openHourlyItemList(\''+hk+'\')" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+items+'</button>'
+      ? '<button type="button" data-hour="'+hk+'" onclick="openHourlyItemList(this.dataset.hour)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+items+'</button>'
       : (items || '—');
     html += '<tr style="border-top:1px solid #262a33">' +
       '<td style="padding:7px 10px;color:#e8eaed;font-weight:600;white-space:nowrap">'+label+'</td>' +
@@ -2235,7 +2235,7 @@ function renderHourlyThroughput() {
   const totalIps = avgHeads > 0 ? +(totalItems / avgHeads).toFixed(1) : null;
   const totalFul = totalFulN > 0 ? totalFulW / totalFulN / 60 : null;
   const totalItemsCell = (totalItems && hasItemListings)
-    ? '<button type="button" onclick="openHourlyItemList(\\'__total\\')" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+totalItems+'</button>'
+    ? '<button type="button" data-hour="__total" onclick="openHourlyItemList(this.dataset.hour)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+totalItems+'</button>'
     : totalItems;
   html += '<tr style="border-top:2px solid #3d4458;background:#13161c">' +
     '<td style="padding:8px 10px;color:#d9a441;font-weight:700">Total</td>' +
