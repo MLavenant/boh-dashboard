@@ -1,7 +1,7 @@
 /**
  * Toast BS Actual Updater
- * Fetches bottle service sales from Toast API for last week + this week
- * and updates bs_a values in the SCHED array inside index.html
+ * Fetches bottle service sales from Toast API and writes Firebase toastActuals
+ * (calendar overlay). index.html SCHED is optional — dashboard uses sched-baked.js.
  */
 
 const axios  = require("axios");
@@ -35,6 +35,10 @@ function log(msg) {
   console.log(`[${ts}] ${msg}`);
 }
 
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
 function shift(dateStr, days) {
   const d = new Date(dateStr + "T12:00:00Z");
   d.setUTCDate(d.getUTCDate() + days);
@@ -47,7 +51,6 @@ function miamiToday() {
   }).format(new Date());
 }
 
-// Returns last 14 days of dates (catches any recent shows)
 function getRelevantDates() {
   const todayStr = miamiToday();
   const dates = [];
@@ -73,6 +76,28 @@ function fbPut(fbPath, payload) {
   });
 }
 
+function fbGet(fbPath) {
+  return new Promise((resolve) => {
+    const req = https.request({
+      hostname: FB_DB,
+      path: fbPath + ".json",
+      method: "GET"
+    }, (r) => {
+      let d = "";
+      r.on("data", c => d += c);
+      r.on("end", () => {
+        try {
+          resolve(r.statusCode >= 200 && r.statusCode < 300 ? JSON.parse(d || "null") : null);
+        } catch (e) {
+          resolve(null);
+        }
+      });
+    });
+    req.on("error", () => resolve(null));
+    req.end();
+  });
+}
+
 async function getToken() {
   const res = await axios.post(`${TOAST_BASE}/authentication/v1/authentication/login`, {
     clientId: CLIENT_ID, clientSecret: API_SECRET, userAccessType: "TOAST_MACHINE_CLIENT",
@@ -80,9 +105,27 @@ async function getToken() {
   return res.data.token.accessToken;
 }
 
+async function toastGetWithRetry(url, headers, tries = 6) {
+  let lastErr;
+  for (let i = 0; i < tries; i++) {
+    try {
+      return await axios.get(url, { headers, timeout: 60000 });
+    } catch (e) {
+      lastErr = e;
+      const code = e.response && e.response.status;
+      if (code !== 429 && code !== 503) throw e;
+      const wait = Math.min(45000, 2000 * Math.pow(2, i));
+      log(`  Toast HTTP ${code} — retry in ${Math.round(wait / 1000)}s`);
+      await sleep(wait);
+    }
+  }
+  throw lastErr;
+}
+
 async function getTableGuids(token, venueGuid, bsNames) {
-  const res = await axios.get(`${TOAST_BASE}/config/v2/tables`, {
-    headers: { Authorization: `Bearer ${token}`, "Toast-Restaurant-External-ID": venueGuid },
+  const res = await toastGetWithRetry(`${TOAST_BASE}/config/v2/tables`, {
+    Authorization: `Bearer ${token}`,
+    "Toast-Restaurant-External-ID": venueGuid,
   });
   const tables = Array.isArray(res.data) ? res.data : (res.data?.tables || []);
   const guids = new Set();
@@ -99,13 +142,14 @@ async function getAllOrders(token, venueGuid, date) {
   const headers = { Authorization: `Bearer ${token}`, "Toast-Restaurant-External-ID": venueGuid };
   const all = [];
   for (let page = 1; page <= 100; page++) {
-    const res = await axios.get(
+    const res = await toastGetWithRetry(
       `${TOAST_BASE}/orders/v2/ordersBulk?businessDate=${businessDate}&pageSize=100&page=${page}`,
-      { headers }
+      headers
     );
     const batch = Array.isArray(res.data) ? res.data : Object.values(res.data || {});
     all.push(...batch);
     if (batch.length < 100) break;
+    await sleep(250);
   }
   return all;
 }
@@ -157,6 +201,7 @@ async function fetchBsSales(venueKey, dates) {
     }
     byDate[date] = Math.round(total * 100) / 100;
     if (total > 0) log(`  ${cfg.label} | ${date} → $${byDate[date].toLocaleString()}`);
+    await sleep(200);
   }
   return byDate;
 }
@@ -175,26 +220,31 @@ function applyBsActual(entry, newBsA) {
   return prev !== newBsA;
 }
 
-// Parse SCHED array from HTML, update entries, re-inject (also fixes beat/_s/roi_a)
+function buildUpdatesFromResults(salesByVenueDate) {
+  const updates = [];
+  Object.keys(salesByVenueDate || {}).forEach(vk => {
+    const label = (BS_CONFIG[vk] && BS_CONFIG[vk].label) || vk;
+    const byDate = salesByVenueDate[vk] || {};
+    Object.keys(byDate).forEach(date => {
+      updates.push({ venue: label, date, bs_a: byDate[date], dj: null });
+    });
+  });
+  return updates;
+}
+
 function updateSchedInHtml(html, salesByVenueDate) {
-  // Extract the SCHED array
   const schedMatch = html.match(/var SCHED = (\[[\s\S]*?\]);/);
   if (!schedMatch) {
-    log("NOTE: SCHED not in index.html � Firebase toastActuals is the live source");
-    const updates = [];
-    Object.keys(salesByVenueDate || {}).forEach(vk => {
-      const label = (BS_CONFIG[vk] && BS_CONFIG[vk].label) || vk;
-      const byDate = salesByVenueDate[vk] || {};
-      Object.keys(byDate).forEach(date => {
-        updates.push({ venue: label, date, bs_a: byDate[date], dj: null });
-      });
-    });
-    return { html, count: 0, changed: 0, updates };
+    log("NOTE: SCHED not in index.html — Firebase toastActuals is the live source");
+    return { html, count: 0, changed: 0, updates: buildUpdatesFromResults(salesByVenueDate) };
   }
 
   let sched;
   try { sched = JSON.parse(schedMatch[1]); }
-  catch (e) { log("ERROR parsing SCHED: " + e.message); return { html, count: 0, changed: 0, updates: [] }; }
+  catch (e) {
+    log("ERROR parsing SCHED: " + e.message);
+    return { html, count: 0, changed: 0, updates: buildUpdatesFromResults(salesByVenueDate) };
+  }
 
   const today = miamiToday();
   let count = 0;
@@ -209,8 +259,6 @@ function updateSchedInHtml(html, salesByVenueDate) {
     if (!venueKey) return;
     const byDate = salesByVenueDate[venueKey];
     if (!byDate || byDate[date] === undefined) return;
-    // Write $0 for completed past nights so blanks don't look "not updated".
-    // Skip today (night may still be open).
     if (byDate[date] === 0 && date >= today) return;
 
     const newBsA = byDate[date];
@@ -221,7 +269,6 @@ function updateSchedInHtml(html, salesByVenueDate) {
     log(`  ✅ ${venue} | ${date} → $${newBsA.toLocaleString()} | ${e._s || "nd"} (min $${(e.bs_m||0).toLocaleString()})`);
   });
 
-  // Also update the BS array (same structure as SCHED)
   const bsMatch = html.match(/var BS\s*= (\[[\s\S]*?\]);/);
   let bs = [];
   if (bsMatch) {
@@ -240,12 +287,9 @@ function updateSchedInHtml(html, salesByVenueDate) {
     });
   }
 
-  // Re-inject both arrays
-  const newSchedJS = "var SCHED = " + JSON.stringify(sched) + ";";
-  html = html.replace(/var SCHED = \[[\s\S]*?\];/, newSchedJS);
+  html = html.replace(/var SCHED = \[[\s\S]*?\];/, "var SCHED = " + JSON.stringify(sched) + ";");
   if (bsMatch) {
-    const newBsJS = "var BS    = " + JSON.stringify(bs) + ";";
-    html = html.replace(/var BS\s*= \[[\s\S]*?\];/, newBsJS);
+    html = html.replace(/var BS\s*= \[[\s\S]*?\];/, "var BS    = " + JSON.stringify(bs) + ";");
   }
 
   return { html, count, changed, updates };
@@ -259,35 +303,50 @@ function updateSchedInHtml(html, salesByVenueDate) {
 
   const venueKeys = ["casa_neos", "mm_mila", "casa_neos_lounge"];
   const allResults = {};
+  const failedVenues = [];
+  const prevToast = await fbGet("/rdg/toastActuals");
+  const prevByVenue = (prevToast && prevToast.byVenueDate) || {};
 
-  for (const vk of venueKeys) {
+  for (let i = 0; i < venueKeys.length; i++) {
+    const vk = venueKeys[i];
+    if (i > 0) await sleep(1500);
     log(`\nFetching ${BS_CONFIG[vk].label}...`);
     try {
       allResults[vk] = await fetchBsSales(vk, dates);
     } catch (e) {
       log(`  ERROR: ${e.message}`);
-      allResults[vk] = {};
+      failedVenues.push(vk);
+      const label = BS_CONFIG[vk].label;
+      allResults[vk] = Object.assign({}, prevByVenue[label] || {});
+      log(`  Kept ${Object.keys(allResults[vk]).length} prior nights for ${label}`);
     }
   }
 
-  // Read dashboard HTML and update SCHED + BS arrays (UTF-8 — never latin1)
-  let html = fs.readFileSync(DASHBOARD_PATH, "utf8");
-  const { html: newHtml, count: updatedCount, changed, updates } = updateSchedInHtml(html, allResults);
-  html = newHtml;
-  fs.writeFileSync(DASHBOARD_PATH, html, "utf8");
+  let updatedCount = 0;
+  let changed = 0;
+  let updates = buildUpdatesFromResults(allResults);
 
-  if (updatedCount === 0) {
-    log("\nNo SCHED entries updated.");
+  if (fs.existsSync(DASHBOARD_PATH)) {
+    let html = fs.readFileSync(DASHBOARD_PATH, "utf8");
+    const result = updateSchedInHtml(html, allResults);
+    updatedCount = result.count;
+    changed = result.changed;
+    updates = result.updates && result.updates.length ? result.updates : updates;
+    if (result.count > 0) {
+      fs.writeFileSync(DASHBOARD_PATH, result.html, "utf8");
+      log(`\n✅ Matched ${updatedCount} shows (${changed} value changes) in index.html`);
+    } else {
+      log("\nNo SCHED entries updated (Firebase toastActuals is source of truth).");
+    }
   } else {
-    log(`\n✅ Matched ${updatedCount} shows (${changed} value changes) in index.html`);
+    log("\nDASHBOARD_PATH missing — Firebase toastActuals only.");
   }
 
-  // Live overlay for every browser (does not depend on git push succeeding)
-  const byVenueDate = {};
-  for (const vk of Object.keys(allResults)) {
-    const label = BS_CONFIG[vk].label;
-    byVenueDate[label] = allResults[vk];
+  const byVenueDate = Object.assign({}, prevByVenue);
+  for (const vk of venueKeys) {
+    byVenueDate[BS_CONFIG[vk].label] = allResults[vk];
   }
+
   const toastLivePayload = {
     updatedAt: new Date().toISOString(),
     miamiDay: miamiToday(),
@@ -300,35 +359,44 @@ function updateSchedInHtml(html, salesByVenueDate) {
 
   const positives = (updates || []).filter(u => (u.bs_a || 0) > 0).length;
   const zeros = (updates || []).filter(u => (u.bs_a || 0) === 0).length;
+  const toastOk = failedVenues.length === 0;
+  const failNote = failedVenues.length
+    ? (" · partial fail: " + failedVenues.map(v => BS_CONFIG[v].label).join(", "))
+    : "";
   const statusCode = await fbPut("/rdg/scrapeStatus/toast", {
-    ok: true,
+    ok: toastOk,
     at: new Date().toISOString(),
     atLocal: new Date().toLocaleString("en-US", { timeZone: "America/New_York" }),
     schedule: "Punctual dispatch ~8:25 ET · GitHub schedule = late backup",
-    what: "Toast bottle-service Actual → Firebase toastActuals + index.html SCHED/BS → GitHub Pages",
-    message: `Toast BS cloud OK · ${positives} with sales · ${zeros} zero nights · ${changed} changed in file`,
+    what: "Toast bottle-service Actual → Firebase toastActuals (+ optional index.html)",
+    message: (toastOk ? "Toast BS cloud OK" : "Toast BS cloud PARTIAL") +
+      ` · ${positives} with sales · ${zeros} zero nights · ${changed} changed in file` + failNote,
     matched: updatedCount,
     changed,
     positives,
-    zeros
+    zeros,
+    failedVenues
   });
   log(`Firebase scrapeStatus/toast HTTP ${statusCode}`);
 
-  // Git commit & push (skip on GitHub Actions — workflow pushes)
   if (process.env.GITHUB_ACTIONS) {
     log("GitHub Actions: skip local git push (workflow handles it)");
-  } else {
-  const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-  try {
-    execSync(
-      `cd "${DASHBOARD_PATH.replace("index.html","")}" && git add index.html && git commit -m "Auto-refresh: Toast BS Actual — ${today}" && git push origin main`,
-      { stdio: "inherit", shell: "cmd.exe" }
-    );
-    log("✅ Pushed to GitHub");
-  } catch (e) {
-    log("Git: " + e.message.split("\n")[0]);
-  }
+  } else if (updatedCount > 0) {
+    const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    try {
+      execSync(
+        `cd "${DASHBOARD_PATH.replace("index.html","")}" && git add index.html && git commit -m "Auto-refresh: Toast BS Actual — ${today}" && git push origin main`,
+        { stdio: "inherit", shell: "cmd.exe" }
+      );
+      log("✅ Pushed to GitHub");
+    } catch (e) {
+      log("Git: " + e.message.split("\n")[0]);
+    }
   }
 
   log("\n=== Toast BS Update Complete ===");
-})();
+  if (!toastOk) process.exitCode = 1;
+})().catch(e => {
+  console.error(e);
+  process.exit(1);
+});
