@@ -118,7 +118,7 @@ server.tool(
 
 server.tool(
   "get_events",
-  "List FourVenues events via Integrations API for a date range (default: last 7 days through +21 days).",
+  "List FourVenues events via Integrations API for a date range (default: last 7 days through +40 days).",
   {
     venue: venueEnum.default("all"),
     start: z.string().optional().describe("YYYY-MM-DD"),
