@@ -33,7 +33,7 @@ jobs:
   fourvenues-forecast:
     if: github.event_name == 'schedule' || github.event.inputs.job == 'both' || github.event.inputs.job == 'fourvenues'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
