@@ -34,10 +34,15 @@ const ktPath = path.join(DATA_DIR, `kitchen-timing-${venueArg}.json`);
 const coversPath = path.join(DATA_DIR, `covers-${venueArg}.json`);
 
 const ktRaw = JSON.parse(fs.readFileSync(ktPath, 'utf8'));
-const coversRaw = JSON.parse(fs.readFileSync(coversPath, 'utf8'));
+let coversRaw = { covers: [] };
+if (fs.existsSync(coversPath)) {
+  coversRaw = JSON.parse(fs.readFileSync(coversPath, 'utf8'));
+} else {
+  console.warn(`No covers file for ${venueArg} (${weekDir}) — continuing with empty covers`);
+}
 
 const tickets = ktRaw.tickets || ktRaw;
-const covers = coversRaw.covers || coversRaw;
+const covers = coversRaw.covers || coversRaw || [];
 
 // Load item details if available
 const itemDetailsPath = path.join(DATA_DIR, `item-details-${venueArg}.json`);
