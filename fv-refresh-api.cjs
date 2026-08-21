@@ -73,6 +73,32 @@ function fbGet(fbPath) {
   });
 }
 
+async function withFbRetry(fn, label, retries = 4) {
+  let lastErr = null;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      lastErr = e;
+      const code = e && e.code;
+      const transient = code === 'ECONNRESET' || code === 'ETIMEDOUT' || code === 'ECONNREFUSED' || code === 'EAI_AGAIN';
+      if (!transient || attempt >= retries) break;
+      const wait = 300 * attempt;
+      log(`Firebase ${label} retry ${attempt}/${retries} after ${code || e.message} (wait ${wait}ms)`);
+      await new Promise(r => setTimeout(r, wait));
+    }
+  }
+  throw lastErr;
+}
+
+async function fbPutRetry(fbPath, payload) {
+  return withFbRetry(() => fbPut(fbPath, payload), 'PUT ' + fbPath);
+}
+
+async function fbGetRetry(fbPath) {
+  return withFbRetry(() => fbGet(fbPath), 'GET ' + fbPath);
+}
+
 async function writePacingSnapshots(forecastRows) {
   const snapshotDay = miamiToday();
   const events = new Map();
@@ -95,32 +121,39 @@ async function writePacingSnapshots(forecastRows) {
 
   let created = 0;
   let preserved = 0;
-  await Promise.all(Array.from(events.values()).map(async event => {
+  let failed = 0;
+  /* Sequential (not Promise.all) — parallel Firebase writes caused ECONNRESET on Actions. */
+  for (const event of events.values()) {
     const fbPath = `/rdg/pacing/${event.key}/${snapshotDay}`;
-    const existing = await fbGet(fbPath);
+    try {
+      const existing = await fbGetRetry(fbPath);
 
-    // The first accurate API read of each Miami day is the immutable
-    // beginning-of-day baseline. A later backup run must not move it.
-    if (existing && existing.source === 'integrations_api'
-        && Number.isFinite(Number(existing.revenue))
-        && Number.isFinite(Number(existing.tables))) {
-      preserved++;
-      return;
+      // The first accurate API read of each Miami day is the immutable
+      // beginning-of-day baseline. A later backup run must not move it.
+      if (existing && existing.source === 'integrations_api'
+          && Number.isFinite(Number(existing.revenue))
+          && Number.isFinite(Number(existing.tables))) {
+        preserved++;
+        continue;
+      }
+
+      const status = await fbPutRetry(fbPath, {
+        tables: event.tables,
+        revenue: event.revenue,
+        source: 'integrations_api',
+        capturedAt: new Date().toISOString()
+      });
+      if (status < 200 || status >= 300) {
+        throw new Error(`Firebase PUT ${fbPath} returned HTTP ${status}`);
+      }
+      created++;
+    } catch (e) {
+      failed++;
+      log(`Pacing skip ${event.key}: ${e.code || e.message}`);
     }
+  }
 
-    const status = await fbPut(fbPath, {
-      tables: event.tables,
-      revenue: event.revenue,
-      source: 'integrations_api',
-      capturedAt: new Date().toISOString()
-    });
-    if (status < 200 || status >= 300) {
-      throw new Error(`Firebase PUT ${fbPath} returned HTTP ${status}`);
-    }
-    created++;
-  }));
-
-  return { day: snapshotDay, events: events.size, created, preserved };
+  return { day: snapshotDay, events: events.size, created, preserved, failed };
 }
 
 function buildLivePayload(forecastRows, period) {
@@ -180,7 +213,7 @@ function buildLivePayload(forecastRows, period) {
   try {
     pulled = await getForecastActuals({ venue: 'all' });
   } catch (e) {
-    await fbPut('/rdg/scrapeStatus/fourvenues', {
+    await fbPutRetry('/rdg/scrapeStatus/fourvenues', {
       ok: false,
       at: new Date().toISOString(),
       miamiDay: miamiToday(),
@@ -204,7 +237,7 @@ function buildLivePayload(forecastRows, period) {
 
   const hardFail = (pulled.errors || []).length >= ready.length;
   if (hardFail) {
-    await fbPut('/rdg/scrapeStatus/fourvenues', {
+    await fbPutRetry('/rdg/scrapeStatus/fourvenues', {
       ok: false,
       at: new Date().toISOString(),
       miamiDay: miamiToday(),
@@ -214,13 +247,18 @@ function buildLivePayload(forecastRows, period) {
     throw new Error('All venue API pulls failed');
   }
 
-  const pacing = await writePacingSnapshots(pulled.forecastRows);
-  log(`Firebase pacing ${pacing.day}: ${pacing.created} created · ${pacing.preserved} preserved · ${pacing.events} events`);
+  let pacing = { day: miamiToday(), events: 0, created: 0, preserved: 0, failed: 0 };
+  try {
+    pacing = await writePacingSnapshots(pulled.forecastRows);
+    log(`Firebase pacing ${pacing.day}: ${pacing.created} created · ${pacing.preserved} preserved · ${pacing.failed || 0} failed · ${pacing.events} events`);
+  } catch (e) {
+    log(`Pacing non-fatal: ${e.code || e.message}`);
+  }
 
-  const code = await fbPut('/rdg/forecastLive', livePayload);
+  const code = await fbPutRetry('/rdg/forecastLive', livePayload);
   log(`Firebase forecastLive HTTP ${code} · ${eventCount} events · $${Math.round(revenueSum).toLocaleString()}`);
 
-  const statusCode = await fbPut('/rdg/scrapeStatus/fourvenues', {
+  const statusCode = await fbPutRetry('/rdg/scrapeStatus/fourvenues', {
     ok: true,
     at: new Date().toISOString(),
     miamiDay: miamiToday(),
@@ -229,7 +267,7 @@ function buildLivePayload(forecastRows, period) {
     pacing,
     period: pulled.period,
     errors: pulled.errors || [],
-    schedule: 'Punctual dispatch ~8:25 ET · GitHub schedule = late backup',
+    schedule: 'Punctual dispatch ~8:25 ET · GitHub schedule = late backup · retries 9:00/9:30',
     what: 'FourVenues Integrations API (accepted + not-completed price) → Firebase forecastLive'
   });
   log(`Firebase scrapeStatus/fourvenues HTTP ${statusCode}`);
