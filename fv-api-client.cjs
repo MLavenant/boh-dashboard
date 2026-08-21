@@ -98,12 +98,12 @@ function isoDate(d) {
   return x.toISOString().slice(0, 10);
 }
 
-/** Default window: last 7 days through +40 days (covers dashboard Details +1 month). */
+/** Default window: last 7 days through +21 days (stable morning pull; +40 was too heavy). */
 function defaultDateRange(now = new Date()) {
   const start = new Date(now);
   start.setDate(start.getDate() - 7);
   const end = new Date(now);
-  end.setDate(end.getDate() + 40);
+  end.setDate(end.getDate() + 21);
   return { start: isoDate(start), end: isoDate(end) };
 }
 
