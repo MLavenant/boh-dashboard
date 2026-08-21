@@ -74,22 +74,39 @@ function resolveVenue(venueKeyOrName) {
   ) || null;
 }
 
-async function apiGet(apiKey, pathAndQuery) {
+async function apiGet(apiKey, pathAndQuery, { retries = 3 } = {}) {
   const url = pathAndQuery.startsWith('http') ? pathAndQuery : `${BASE}${pathAndQuery}`;
-  const res = await fetch(url, {
-    headers: {
-      'X-Api-Key': apiKey,
-      Accept: 'application/json'
+  let lastErr = null;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, {
+        headers: {
+          'X-Api-Key': apiKey,
+          Accept: 'application/json'
+        }
+      });
+      const text = await res.text();
+      let data = null;
+      try { data = JSON.parse(text); } catch (_) { data = { raw: text }; }
+      if (!res.ok) {
+        const msg = (data && (data.error || data.message)) || text.slice(0, 200);
+        const err = new Error(`FourVenues API ${res.status} ${pathAndQuery}: ${msg}`);
+        /* Retry transient rate limits / gateway errors. */
+        if ((res.status === 429 || res.status >= 500) && attempt < retries) {
+          await new Promise(r => setTimeout(r, 400 * attempt));
+          lastErr = err;
+          continue;
+        }
+        throw err;
+      }
+      return data;
+    } catch (e) {
+      lastErr = e;
+      if (attempt >= retries) throw e;
+      await new Promise(r => setTimeout(r, 400 * attempt));
     }
-  });
-  const text = await res.text();
-  let data = null;
-  try { data = JSON.parse(text); } catch (_) { data = { raw: text }; }
-  if (!res.ok) {
-    const msg = (data && (data.error || data.message)) || text.slice(0, 200);
-    throw new Error(`FourVenues API ${res.status} ${pathAndQuery}: ${msg}`);
   }
-  return data;
+  throw lastErr || new Error('FourVenues API failed');
 }
 
 function isoDate(d) {
@@ -98,12 +115,12 @@ function isoDate(d) {
   return x.toISOString().slice(0, 10);
 }
 
-/** Default window: last 7 days through +21 days (stable morning pull; +40 was too heavy). */
+/** Default window: last 7 days through +30 days (morning-stable; was +40 then +21). */
 function defaultDateRange(now = new Date()) {
   const start = new Date(now);
   start.setDate(start.getDate() - 7);
   const end = new Date(now);
-  end.setDate(end.getDate() + 21);
+  end.setDate(end.getDate() + 30);
   return { start: isoDate(start), end: isoDate(end) };
 }
 
