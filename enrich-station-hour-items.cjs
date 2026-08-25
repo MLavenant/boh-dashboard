@@ -256,13 +256,28 @@ function patchItemQty(stationDetails, stationHourItems) {
 
 async function main() {
   const venue = process.argv[2] || 'ava_coconut_grove';
-  const weekKey = process.argv[3] || '2026-W32';
+  let weekKey = process.argv[3];
+  if (!weekKey) {
+    const weeks = fs.readdirSync(path.join(ROOT, 'data'))
+      .filter((d) => /^\d{4}-W\d{2}$/.test(d))
+      .sort();
+    weekKey = weeks[weeks.length - 1] || '2026-W34';
+  }
   const weekPath = path.join(ROOT, `${venue}-data-${weekKey}.json`);
   if (!fs.existsSync(weekPath)) throw new Error('Missing ' + weekPath);
 
-  console.log(`Fetching item-details lastWeek for ${venue}...`);
-  const items = await fetchItemDetails(venue);
-  console.log(`Got ${items.length} item rows`);
+  // Prefer on-disk item-details for this week (exact week); fall back to Toast lastWeek export
+  const localItemsPath = path.join(ROOT, 'data', weekKey, `item-details-${venue}.json`);
+  let items;
+  if (fs.existsSync(localItemsPath)) {
+    const raw = JSON.parse(fs.readFileSync(localItemsPath, 'utf8'));
+    items = raw.items || raw;
+    console.log(`Using local item-details ${localItemsPath} (${items.length} rows)`);
+  } else {
+    console.log(`Fetching item-details lastWeek for ${venue}...`);
+    items = await fetchItemDetails(venue);
+    console.log(`Got ${items.length} item rows`);
+  }
 
   const week = JSON.parse(fs.readFileSync(weekPath, 'utf8'));
   const stationKeys = new Set(Object.keys(week.stationDetails || {}));
