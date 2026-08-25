@@ -234,6 +234,73 @@ async function downloadLatestSalesReports(opts) {
   return { messagesFound: messages.length, results, mailbox: _resolvedMailboxInfo };
 }
 
+/**
+ * Send email as GRAPH_MAILBOX (Application permission Mail.Send + admin consent).
+ * opts: {
+ *   to: string[], cc?: string[], subject, htmlBody,
+ *   attachments?: [{ name, contentType, contentBytesBase64, contentId?, isInline? }],
+ *   saveToSentItems?: boolean
+ * }
+ */
+async function sendMail(opts) {
+  const token = await getAppToken();
+  const mb = await mailboxPath(token);
+  const to = (opts.to || []).map(a => ({ emailAddress: { address: String(a).trim() } })).filter(r => r.emailAddress.address);
+  if (!to.length) throw new Error('sendMail: no To recipients');
+  const cc = (opts.cc || []).map(a => ({ emailAddress: { address: String(a).trim() } })).filter(r => r.emailAddress.address);
+  const message = {
+    subject: String(opts.subject || '').trim() || '(no subject)',
+    body: { contentType: 'HTML', content: String(opts.htmlBody || '') },
+    toRecipients: to
+  };
+  if (cc.length) message.ccRecipients = cc;
+  const atts = opts.attachments || [];
+  if (atts.length) {
+    message.attachments = atts.map(a => {
+      const row = {
+        '@odata.type': '#microsoft.graph.fileAttachment',
+        name: a.name,
+        contentType: a.contentType || 'application/octet-stream',
+        contentBytes: a.contentBytesBase64
+      };
+      if (a.contentId) {
+        row.contentId = a.contentId;
+        row.isInline = a.isInline !== false;
+      } else if (a.isInline) {
+        row.isInline = true;
+      }
+      return row;
+    });
+  }
+  const body = JSON.stringify({
+    message,
+    saveToSentItems: opts.saveToSentItems !== false
+  });
+  const res = await fetch(`https://graph.microsoft.com/v1.0${mb}/sendMail`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body
+  });
+  if (res.status === 202 || res.status === 200) {
+    log(`sendMail OK → ${to.map(t => t.emailAddress.address).join(', ')}`);
+    return { ok: true, status: res.status };
+  }
+  const text = await res.text();
+  let data = null;
+  try { data = JSON.parse(text); } catch (_) { data = { raw: text }; }
+  const msg = (data && data.error && data.error.message) || text.slice(0, 400);
+  const err = new Error(`Graph sendMail → ${res.status}: ${msg}`);
+  err.status = res.status;
+  err.data = data;
+  if (res.status === 403) {
+    err.message += ' — App needs Application permission Mail.Send + admin consent.';
+  }
+  throw err;
+}
+
 module.exports = {
   getAppToken,
   resolveMailboxPath,
@@ -243,5 +310,6 @@ module.exports = {
   extractSalesExcelUrl,
   downloadUrlToFile,
   downloadLatestSalesReports,
+  sendMail,
   getResolvedMailboxInfo: () => _resolvedMailboxInfo
 };

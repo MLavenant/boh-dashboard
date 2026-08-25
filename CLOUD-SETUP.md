@@ -82,6 +82,20 @@ workflow_dispatch / schedule
 
 No Outlook, Graph, Playwright, or `FV_SESSION_B64`. Same metric as Sales Overview export Base price.
 
+## Forecast flash email (auto “Send all emails”)
+
+Mon–Fri only, after FourVenues is green for the Miami day:
+
+| Time (ET) | Behavior |
+|-----------|----------|
+| **9:00** | If FV OK and not already sent today → send flash email (same To/Cc as dashboard). If FV not ready → wait. |
+| **9:30** | Retry once. If still cannot send → **one** alert to `matthias@rivieradininggroup.com`. |
+| Any later run | No duplicate flash email (Firebase `rdg/scrapeStatus/forecastEmail` lock). |
+
+Uses existing 9:00 / 9:30 `workflow_dispatch` retries (cron-job.org / Windows tasks). Script: `send-forecast-flash-email.cjs`.
+
+**Azure:** Application permission **Mail.Send** (+ admin consent) on the same app that already has Mail.Read. Without Mail.Send the job cannot send.
+
 ### Secrets (GitHub → Settings → Secrets → Actions)
 
 | Secret | Venue |
