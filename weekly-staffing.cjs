@@ -4,8 +4,7 @@
  * Usage:
  *   node weekly-staffing.cjs [weekLabel] [path-to-fte.xlsx]
  *
- * Steps: ingest FTE → fetch labor (--all) → rebuild venue day volume fields if needed
- *         → join staffing for each venue.
+ * Steps: Viktor FTE export (optional) → ingest FTE → fetch labor → join → balance QC.
  * Missing FTE workbook → warn and exit 0 (do not corrupt prior staffing).
  */
 'use strict';
@@ -21,8 +20,9 @@ function log(msg) {
   console.log(`[weekly-staffing] ${msg}`);
 }
 
-function run(args, { optional = false } = {}) {
-  const r = spawnSync(process.execPath, args, {
+function run(args, { optional = false, nodeArgs } = {}) {
+  const cmdArgs = nodeArgs || args;
+  const r = spawnSync(process.execPath, cmdArgs, {
     cwd: ROOT,
     encoding: 'utf8',
     env: process.env,
@@ -30,7 +30,7 @@ function run(args, { optional = false } = {}) {
   if (r.stdout) process.stdout.write(r.stdout);
   if (r.stderr) process.stderr.write(r.stderr);
   if (r.status !== 0) {
-    const msg = `${args.join(' ')} exited ${r.status}`;
+    const msg = `${cmdArgs.join(' ')} exited ${r.status}`;
     if (optional) {
       log(`WARN: ${msg}`);
       return false;
@@ -78,6 +78,14 @@ function findFteWorkbook(weekLabel, explicitPath) {
 function main() {
   const weekLabel = process.argv[2] || inferLatestWeek() || '2026-W30';
   const xlsxArg = process.argv[3];
+  const skipViktor = process.env.SKIP_VIKTOR_FTE === '1' || process.argv.includes('--skip-viktor');
+
+  // Prefer automated Viktor export; fall back to existing summary / Downloads
+  if (!xlsxArg && !skipViktor) {
+    const reuse = findFteWorkbook(weekLabel) ? ['--reuse'] : [];
+    run(['fetch-viktor-fte-week.mjs', weekLabel, ...reuse], { optional: true });
+  }
+
   const xlsx = findFteWorkbook(weekLabel, xlsxArg);
 
   if (!xlsx) {
@@ -113,6 +121,9 @@ function main() {
     }
   }
   if (!joinOk) log('WARN: staffing join reported errors');
+
+  run(['build-staffing-balance.cjs', weekLabel], { optional: true });
+
   log(`Staffing complete for ${ok}/${STAFFING_VENUES.length} venues`);
   if (ok === 0) process.exit(1);
 }

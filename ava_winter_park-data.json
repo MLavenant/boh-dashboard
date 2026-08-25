@@ -78135,13 +78135,16 @@
   "staffing": {
     "venue": "ava_winter_park",
     "weekLabel": "2026-W34",
-    "builtAt": "2026-08-25T16:08:43.138Z",
+    "builtAt": "2026-08-25T20:37:42.049Z",
     "matchStats": {
-      "laborShiftsMatched": 135,
-      "laborShiftsUnmatched": 312,
-      "rosterUnused": 2,
+      "laborShiftsMatched": 119,
+      "laborShiftsUnmatched": 328,
+      "rosterUnused": 6,
       "rosterTotal": 33,
-      "matchRate": 0.302
+      "matchRate": 0.266,
+      "bohLaborShiftsUnmatched": 4,
+      "bohMatchRate": 0.967,
+      "rosterCoverage": 0.818
     },
     "guestsSeated": {
       "total": 1589,
@@ -78170,12 +78173,12 @@
       "Garde Manger": {
         "family": "Garde Manger",
         "rosterCount": 6,
-        "weekHeadsUnique": 6,
-        "weekHours": 184.9,
+        "weekHeadsUnique": 5,
+        "weekHours": 175.12,
         "weekItemCount": 1254,
         "weekTicketCount": 893,
-        "weekItemsPerHeadDay": 54.5,
-        "weekItemsPerStaffHour": 6.78,
+        "weekItemsPerHeadDay": 57,
+        "weekItemsPerStaffHour": 7.16,
         "weekServiceHours": 50,
         "weekItemsPerServiceHour": 25.08,
         "weekAvgFulSec": 565.9,
@@ -78183,6 +78186,18 @@
           "Monday": {
             "heads": 2,
             "hours": 13.7,
+            "staff": [
+              {
+                "label": "Heidy C.",
+                "hours": 7.31,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Jamali S.",
+                "hours": 6.39,
+                "position": "Garde Manger"
+              }
+            ],
             "ticketCount": 60,
             "itemQty": 74,
             "volume": 74,
@@ -78210,6 +78225,18 @@
           "Tuesday": {
             "heads": 2,
             "hours": 14.84,
+            "staff": [
+              {
+                "label": "Heidy C.",
+                "hours": 8.21,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Jamali S.",
+                "hours": 6.63,
+                "position": "Garde Manger"
+              }
+            ],
             "ticketCount": 92,
             "itemQty": 147,
             "volume": 147,
@@ -78237,6 +78264,28 @@
           "Wednesday": {
             "heads": 4,
             "hours": 29.06,
+            "staff": [
+              {
+                "label": "Heidy C.",
+                "hours": 7.9,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Netanya H.",
+                "hours": 5.5,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Gloria R.",
+                "hours": 8,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Jamali S.",
+                "hours": 7.66,
+                "position": "Garde Manger"
+              }
+            ],
             "ticketCount": 105,
             "itemQty": 158,
             "volume": 158,
@@ -78264,6 +78313,23 @@
           "Thursday": {
             "heads": 3,
             "hours": 24.2,
+            "staff": [
+              {
+                "label": "Netanya H.",
+                "hours": 7.68,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Gloria R.",
+                "hours": 8.45,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Jamali S.",
+                "hours": 8.07,
+                "position": "Garde Manger"
+              }
+            ],
             "ticketCount": 95,
             "itemQty": 146,
             "volume": 146,
@@ -78291,6 +78357,18 @@
           "Friday": {
             "heads": 2,
             "hours": 20.16,
+            "staff": [
+              {
+                "label": "Joseph K.",
+                "hours": 9.38,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Gloria R.",
+                "hours": 10.78,
+                "position": "Garde Manger"
+              }
+            ],
             "ticketCount": 172,
             "itemQty": 212,
             "volume": 212,
@@ -78318,6 +78396,28 @@
           "Saturday": {
             "heads": 4,
             "hours": 38,
+            "staff": [
+              {
+                "label": "Heidy C.",
+                "hours": 8.88,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Netanya H.",
+                "hours": 8.4,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Joseph K.",
+                "hours": 9.41,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Gloria R.",
+                "hours": 11.31,
+                "position": "Garde Manger"
+              }
+            ],
             "ticketCount": 202,
             "itemQty": 298,
             "volume": 298,
@@ -78343,17 +78443,44 @@
             }
           },
           "Sunday": {
-            "heads": 6,
-            "hours": 44.94,
+            "heads": 5,
+            "hours": 35.16,
+            "staff": [
+              {
+                "label": "Heidy C.",
+                "hours": 7.8,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Netanya H.",
+                "hours": 6.63,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Joseph K.",
+                "hours": 5.57,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Gloria R.",
+                "hours": 8.32,
+                "position": "Garde Manger"
+              },
+              {
+                "label": "Jamali S.",
+                "hours": 6.84,
+                "position": "Garde Manger"
+              }
+            ],
             "ticketCount": 167,
             "itemQty": 219,
             "volume": 219,
             "volumeSource": "itemQty",
             "itemCount": 219,
-            "itemsPerHead": 36.5,
+            "itemsPerHead": 43.8,
             "serviceHours": 10,
             "itemsPerServiceHour": 21.9,
-            "itemsPerStaffHour": 4.87,
+            "itemsPerStaffHour": 6.23,
             "avgFulSec": 490.8,
             "qc": {
               "eligible": true,
@@ -78366,7 +78493,7 @@
               "nPeer": 8,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.91
+              "staffingRatio": 0.76
             }
           }
         }
@@ -78387,6 +78514,33 @@
           "Monday": {
             "heads": 5,
             "hours": 33.57,
+            "staff": [
+              {
+                "label": "Nicson B.",
+                "hours": 7.08,
+                "position": "Prep"
+              },
+              {
+                "label": "Kelsi B.",
+                "hours": 6.16,
+                "position": "Prep"
+              },
+              {
+                "label": "Jameson J.",
+                "hours": 6.72,
+                "position": "Prep"
+              },
+              {
+                "label": "Fernando M.",
+                "hours": 7.37,
+                "position": "Prep"
+              },
+              {
+                "label": "Judith R.",
+                "hours": 6.24,
+                "position": "Prep"
+              }
+            ],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -78414,6 +78568,28 @@
           "Tuesday": {
             "heads": 4,
             "hours": 25.67,
+            "staff": [
+              {
+                "label": "Kelsi B.",
+                "hours": 6.85,
+                "position": "Prep"
+              },
+              {
+                "label": "Jameson J.",
+                "hours": 5.67,
+                "position": "Prep"
+              },
+              {
+                "label": "Fernando M.",
+                "hours": 7.09,
+                "position": "Prep"
+              },
+              {
+                "label": "Omar S.",
+                "hours": 6.06,
+                "position": "Prep"
+              }
+            ],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -78441,6 +78617,28 @@
           "Wednesday": {
             "heads": 4,
             "hours": 23.08,
+            "staff": [
+              {
+                "label": "Nicson B.",
+                "hours": 4.51,
+                "position": "Prep"
+              },
+              {
+                "label": "Kelsi B.",
+                "hours": 5.39,
+                "position": "Prep"
+              },
+              {
+                "label": "Yasmin L.",
+                "hours": 6.25,
+                "position": "Prep"
+              },
+              {
+                "label": "Fernando M.",
+                "hours": 6.93,
+                "position": "Prep"
+              }
+            ],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -78468,6 +78666,28 @@
           "Thursday": {
             "heads": 4,
             "hours": 30.49,
+            "staff": [
+              {
+                "label": "Yasmin L.",
+                "hours": 7.95,
+                "position": "Prep"
+              },
+              {
+                "label": "Fernando M.",
+                "hours": 7.54,
+                "position": "Prep"
+              },
+              {
+                "label": "Judith R.",
+                "hours": 8.01,
+                "position": "Prep"
+              },
+              {
+                "label": "Omar S.",
+                "hours": 6.99,
+                "position": "Prep"
+              }
+            ],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -78495,6 +78715,38 @@
           "Friday": {
             "heads": 6,
             "hours": 50.92,
+            "staff": [
+              {
+                "label": "Nicson B.",
+                "hours": 8.14,
+                "position": "Prep"
+              },
+              {
+                "label": "Jameson J.",
+                "hours": 9.02,
+                "position": "Prep"
+              },
+              {
+                "label": "Fernando M.",
+                "hours": 9.2,
+                "position": "Prep"
+              },
+              {
+                "label": "Adrian P.",
+                "hours": 7.87,
+                "position": "Prep"
+              },
+              {
+                "label": "Judith R.",
+                "hours": 8.5,
+                "position": "Prep"
+              },
+              {
+                "label": "Omar S.",
+                "hours": 8.19,
+                "position": "Prep"
+              }
+            ],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -78522,6 +78774,33 @@
           "Saturday": {
             "heads": 5,
             "hours": 41.78,
+            "staff": [
+              {
+                "label": "Nicson B.",
+                "hours": 8.47,
+                "position": "Prep"
+              },
+              {
+                "label": "Kelsi B.",
+                "hours": 8.42,
+                "position": "Prep"
+              },
+              {
+                "label": "Jameson J.",
+                "hours": 8.58,
+                "position": "Prep"
+              },
+              {
+                "label": "Yasmin L.",
+                "hours": 9.45,
+                "position": "Prep"
+              },
+              {
+                "label": "Adrian P.",
+                "hours": 6.86,
+                "position": "Prep"
+              }
+            ],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -78549,6 +78828,33 @@
           "Sunday": {
             "heads": 5,
             "hours": 35.67,
+            "staff": [
+              {
+                "label": "Kelsi B.",
+                "hours": 6.86,
+                "position": "Prep"
+              },
+              {
+                "label": "Jameson J.",
+                "hours": 7.51,
+                "position": "Prep"
+              },
+              {
+                "label": "Yasmin L.",
+                "hours": 7.16,
+                "position": "Prep"
+              },
+              {
+                "label": "Adrian P.",
+                "hours": 6.89,
+                "position": "Prep"
+              },
+              {
+                "label": "Judith R.",
+                "hours": 7.25,
+                "position": "Prep"
+              }
+            ],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -78578,28 +78884,40 @@
       "Pastry": {
         "family": "Pastry",
         "rosterCount": 6,
-        "weekHeadsUnique": 6,
-        "weekHours": 239.05,
+        "weekHeadsUnique": 4,
+        "weekHours": 149.11,
         "weekItemCount": 1040,
         "weekTicketCount": 541,
-        "weekItemsPerHeadDay": 37.1,
-        "weekItemsPerStaffHour": 4.35,
+        "weekItemsPerHeadDay": 57.8,
+        "weekItemsPerStaffHour": 6.97,
         "weekServiceHours": 56,
         "weekItemsPerServiceHour": 18.57,
         "weekAvgFulSec": 558.1,
         "days": {
           "Monday": {
-            "heads": 4,
-            "hours": 28.82,
+            "heads": 2,
+            "hours": 14.61,
+            "staff": [
+              {
+                "label": "Edixon B.",
+                "hours": 7.23,
+                "position": "Pastry"
+              },
+              {
+                "label": "Guillermina R.",
+                "hours": 7.38,
+                "position": "Pastry"
+              }
+            ],
             "ticketCount": 38,
             "itemQty": 69,
             "volume": 69,
             "volumeSource": "itemQty",
             "itemCount": 69,
-            "itemsPerHead": 17.3,
+            "itemsPerHead": 34.5,
             "serviceHours": 6,
             "itemsPerServiceHour": 11.5,
-            "itemsPerStaffHour": 2.39,
+            "itemsPerStaffHour": 4.72,
             "avgFulSec": 482.4,
             "qc": {
               "eligible": true,
@@ -78616,35 +78934,64 @@
             }
           },
           "Tuesday": {
-            "heads": 3,
-            "hours": 22.41,
+            "heads": 2,
+            "hours": 14.02,
+            "staff": [
+              {
+                "label": "Edixon B.",
+                "hours": 6.92,
+                "position": "Pastry"
+              },
+              {
+                "label": "Guillermina R.",
+                "hours": 7.1,
+                "position": "Pastry"
+              }
+            ],
             "ticketCount": 38,
             "itemQty": 74,
             "volume": 74,
             "volumeSource": "itemQty",
             "itemCount": 74,
-            "itemsPerHead": 24.7,
+            "itemsPerHead": 37,
             "serviceHours": 6,
             "itemsPerServiceHour": 12.33,
-            "itemsPerStaffHour": 3.3,
+            "itemsPerStaffHour": 5.28,
             "avgFulSec": 595.8,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Operational bottleneck",
-              "code": "process_issue",
+              "label": "Likely understaffed",
+              "code": "understaffed_pressure",
               "source": "peer",
               "nPeer": 4,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.81
+              "staffingRatio": 0.63
             }
           },
           "Wednesday": {
             "heads": 3,
             "hours": 22.44,
+            "staff": [
+              {
+                "label": "Casey C.",
+                "hours": 7.59,
+                "position": "Pastry"
+              },
+              {
+                "label": "Guillermina R.",
+                "hours": 6.94,
+                "position": "Pastry"
+              },
+              {
+                "label": "Angela R.",
+                "hours": 7.91,
+                "position": "Pastry"
+              }
+            ],
             "ticketCount": 47,
             "itemQty": 88,
             "volume": 88,
@@ -78666,21 +79013,38 @@
               "nPeer": 5,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.48
+              "staffingRatio": 0.71
             }
           },
           "Thursday": {
-            "heads": 4,
-            "hours": 31.38,
+            "heads": 3,
+            "hours": 23.8,
+            "staff": [
+              {
+                "label": "Casey C.",
+                "hours": 8.07,
+                "position": "Pastry"
+              },
+              {
+                "label": "Guillermina R.",
+                "hours": 7.55,
+                "position": "Pastry"
+              },
+              {
+                "label": "Angela R.",
+                "hours": 8.18,
+                "position": "Pastry"
+              }
+            ],
             "ticketCount": 79,
             "itemQty": 145,
             "volume": 145,
             "volumeSource": "itemQty",
             "itemCount": 145,
-            "itemsPerHead": 36.3,
+            "itemsPerHead": 48.3,
             "serviceHours": 7,
             "itemsPerServiceHour": 20.71,
-            "itemsPerStaffHour": 4.62,
+            "itemsPerStaffHour": 6.09,
             "avgFulSec": 500.9,
             "qc": {
               "eligible": true,
@@ -78693,21 +79057,43 @@
               "nPeer": 6,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.66
+              "staffingRatio": 0.55
             }
           },
           "Friday": {
-            "heads": 6,
-            "hours": 51.49,
+            "heads": 4,
+            "hours": 34.04,
+            "staff": [
+              {
+                "label": "Edixon B.",
+                "hours": 7.01,
+                "position": "Pastry"
+              },
+              {
+                "label": "Casey C.",
+                "hours": 9.2,
+                "position": "Pastry"
+              },
+              {
+                "label": "Guillermina R.",
+                "hours": 8.16,
+                "position": "Pastry"
+              },
+              {
+                "label": "Angela R.",
+                "hours": 9.67,
+                "position": "Pastry"
+              }
+            ],
             "ticketCount": 95,
             "itemQty": 177.5,
             "volume": 177.5,
             "volumeSource": "itemQty",
             "itemCount": 177.5,
-            "itemsPerHead": 29.6,
+            "itemsPerHead": 44.4,
             "serviceHours": 7,
             "itemsPerServiceHour": 25.36,
-            "itemsPerStaffHour": 3.45,
+            "itemsPerStaffHour": 5.21,
             "avgFulSec": 458.5,
             "qc": {
               "eligible": true,
@@ -78720,21 +79106,33 @@
               "nPeer": 8,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.69
+              "staffingRatio": 0.56
             }
           },
           "Saturday": {
-            "heads": 4,
-            "hours": 46.79,
+            "heads": 2,
+            "hours": 21.72,
+            "staff": [
+              {
+                "label": "Casey C.",
+                "hours": 11.72,
+                "position": "Pastry"
+              },
+              {
+                "label": "Angela R.",
+                "hours": 10,
+                "position": "Pastry"
+              }
+            ],
             "ticketCount": 127,
             "itemQty": 274.5,
             "volume": 274.5,
             "volumeSource": "itemQty",
             "itemCount": 274.5,
-            "itemsPerHead": 68.6,
+            "itemsPerHead": 137.3,
             "serviceHours": 12,
             "itemsPerServiceHour": 22.88,
-            "itemsPerStaffHour": 5.87,
+            "itemsPerStaffHour": 12.64,
             "avgFulSec": 594.2,
             "qc": {
               "eligible": true,
@@ -78747,34 +79145,46 @@
               "nPeer": 8,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.37
+              "staffingRatio": 0.24
             }
           },
           "Sunday": {
-            "heads": 4,
-            "hours": 35.72,
+            "heads": 2,
+            "hours": 18.48,
+            "staff": [
+              {
+                "label": "Casey C.",
+                "hours": 10.58,
+                "position": "Pastry"
+              },
+              {
+                "label": "Angela R.",
+                "hours": 7.9,
+                "position": "Pastry"
+              }
+            ],
             "ticketCount": 117,
             "itemQty": 212,
             "volume": 212,
             "volumeSource": "itemQty",
             "itemCount": 212,
-            "itemsPerHead": 53,
+            "itemsPerHead": 106,
             "serviceHours": 11,
             "itemsPerServiceHour": 19.27,
-            "itemsPerStaffHour": 5.94,
+            "itemsPerStaffHour": 11.47,
             "avgFulSec": 661.6,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Balanced",
-              "code": "in_band",
+              "label": "Likely understaffed",
+              "code": "understaffed_pressure",
               "source": "peer",
               "nPeer": 8,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.77
+              "staffingRatio": 0.38
             }
           }
         }
@@ -78782,12 +79192,12 @@
       "Saute": {
         "family": "Saute",
         "rosterCount": 5,
-        "weekHeadsUnique": 5,
-        "weekHours": 194.01,
+        "weekHeadsUnique": 4,
+        "weekHours": 148.76,
         "weekItemCount": 1288,
         "weekTicketCount": 1270,
-        "weekItemsPerHeadDay": 51.5,
-        "weekItemsPerStaffHour": 6.64,
+        "weekItemsPerHeadDay": 64.4,
+        "weekItemsPerStaffHour": 8.66,
         "weekServiceHours": 53,
         "weekItemsPerServiceHour": 24.3,
         "weekAvgFulSec": 1007.5,
@@ -78795,6 +79205,18 @@
           "Monday": {
             "heads": 2,
             "hours": 12.54,
+            "staff": [
+              {
+                "label": "Naseem O.",
+                "hours": 6.86,
+                "position": "Saute"
+              },
+              {
+                "label": "Raul V.",
+                "hours": 5.68,
+                "position": "Saute"
+              }
+            ],
             "ticketCount": 78,
             "itemQty": 83,
             "volume": 83,
@@ -78820,17 +79242,29 @@
             }
           },
           "Tuesday": {
-            "heads": 3,
-            "hours": 18.9,
+            "heads": 2,
+            "hours": 11.38,
+            "staff": [
+              {
+                "label": "Naseem O.",
+                "hours": 5.28,
+                "position": "Saute"
+              },
+              {
+                "label": "Raul V.",
+                "hours": 6.1,
+                "position": "Saute"
+              }
+            ],
             "ticketCount": 135,
             "itemQty": 138,
             "volume": 138,
             "volumeSource": "itemQty",
             "itemCount": 138,
-            "itemsPerHead": 46,
+            "itemsPerHead": 69,
             "serviceHours": 6,
             "itemsPerServiceHour": 23,
-            "itemsPerStaffHour": 7.3,
+            "itemsPerStaffHour": 12.13,
             "avgFulSec": 1019.1,
             "qc": {
               "eligible": true,
@@ -78843,12 +79277,29 @@
               "nPeer": 7,
               "nHist": 1,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.73
+              "staffingRatio": 0.49
             }
           },
           "Wednesday": {
             "heads": 3,
             "hours": 21.23,
+            "staff": [
+              {
+                "label": "Oluwatimilehin I.",
+                "hours": 5.67,
+                "position": "Saute"
+              },
+              {
+                "label": "Kristy P.",
+                "hours": 8.36,
+                "position": "Saute"
+              },
+              {
+                "label": "Raul V.",
+                "hours": 7.2,
+                "position": "Saute"
+              }
+            ],
             "ticketCount": 143,
             "itemQty": 144,
             "volume": 144,
@@ -78874,17 +79325,34 @@
             }
           },
           "Thursday": {
-            "heads": 4,
-            "hours": 32.02,
+            "heads": 3,
+            "hours": 23.45,
+            "staff": [
+              {
+                "label": "Oluwatimilehin I.",
+                "hours": 6.43,
+                "position": "Saute"
+              },
+              {
+                "label": "Naseem O.",
+                "hours": 8.62,
+                "position": "Saute"
+              },
+              {
+                "label": "Kristy P.",
+                "hours": 8.4,
+                "position": "Saute"
+              }
+            ],
             "ticketCount": 163,
             "itemQty": 166,
             "volume": 166,
             "volumeSource": "itemQty",
             "itemCount": 166,
-            "itemsPerHead": 41.5,
+            "itemsPerHead": 55.3,
             "serviceHours": 6,
             "itemsPerServiceHour": 27.67,
-            "itemsPerStaffHour": 5.18,
+            "itemsPerStaffHour": 7.08,
             "avgFulSec": 1315.5,
             "qc": {
               "eligible": true,
@@ -78897,48 +79365,82 @@
               "nPeer": 7,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.63
+              "staffingRatio": 0.48
             }
           },
           "Friday": {
-            "heads": 3,
-            "hours": 24.32,
+            "heads": 2,
+            "hours": 14.63,
+            "staff": [
+              {
+                "label": "Oluwatimilehin I.",
+                "hours": 6.59,
+                "position": "Saute"
+              },
+              {
+                "label": "Kristy P.",
+                "hours": 8.04,
+                "position": "Saute"
+              }
+            ],
             "ticketCount": 224,
             "itemQty": 227,
             "volume": 227,
             "volumeSource": "itemQty",
             "itemCount": 227,
-            "itemsPerHead": 75.7,
+            "itemsPerHead": 113.5,
             "serviceHours": 7,
             "itemsPerServiceHour": 32.43,
-            "itemsPerStaffHour": 9.33,
+            "itemsPerStaffHour": 15.52,
             "avgFulSec": 926.2,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Balanced",
-              "code": "in_band",
+              "label": "Likely understaffed",
+              "code": "understaffed_pressure",
               "source": "peer",
               "nPeer": 7,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.33
+              "staffingRatio": 0.22
             }
           },
           "Saturday": {
-            "heads": 5,
-            "hours": 47.61,
+            "heads": 4,
+            "hours": 36.27,
+            "staff": [
+              {
+                "label": "Oluwatimilehin I.",
+                "hours": 7.99,
+                "position": "Saute"
+              },
+              {
+                "label": "Naseem O.",
+                "hours": 11.22,
+                "position": "Saute"
+              },
+              {
+                "label": "Kristy P.",
+                "hours": 8.75,
+                "position": "Saute"
+              },
+              {
+                "label": "Raul V.",
+                "hours": 8.31,
+                "position": "Saute"
+              }
+            ],
             "ticketCount": 318,
             "itemQty": 305,
             "volume": 305,
             "volumeSource": "itemQty",
             "itemCount": 305,
-            "itemsPerHead": 61,
+            "itemsPerHead": 76.3,
             "serviceHours": 12,
             "itemsPerServiceHour": 25.42,
-            "itemsPerStaffHour": 6.41,
+            "itemsPerStaffHour": 8.41,
             "avgFulSec": 1082.8,
             "qc": {
               "eligible": true,
@@ -78951,21 +79453,43 @@
               "nPeer": 7,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.62
+              "staffingRatio": 0.49
             }
           },
           "Sunday": {
-            "heads": 5,
-            "hours": 37.39,
+            "heads": 4,
+            "hours": 29.26,
+            "staff": [
+              {
+                "label": "Oluwatimilehin I.",
+                "hours": 6.93,
+                "position": "Saute"
+              },
+              {
+                "label": "Naseem O.",
+                "hours": 7.43,
+                "position": "Saute"
+              },
+              {
+                "label": "Kristy P.",
+                "hours": 7.92,
+                "position": "Saute"
+              },
+              {
+                "label": "Raul V.",
+                "hours": 6.98,
+                "position": "Saute"
+              }
+            ],
             "ticketCount": 209,
             "itemQty": 225,
             "volume": 225,
             "volumeSource": "itemQty",
             "itemCount": 225,
-            "itemsPerHead": 45,
+            "itemsPerHead": 56.3,
             "serviceHours": 11,
             "itemsPerServiceHour": 20.45,
-            "itemsPerStaffHour": 6.02,
+            "itemsPerStaffHour": 7.69,
             "avgFulSec": 807.4,
             "qc": {
               "eligible": true,
@@ -78978,7 +79502,7 @@
               "nPeer": 7,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.83
+              "staffingRatio": 0.67
             }
           }
         }
@@ -78999,6 +79523,28 @@
           "Monday": {
             "heads": 4,
             "hours": 27.08,
+            "staff": [
+              {
+                "label": "Zachary B.",
+                "hours": 6.28,
+                "position": "Robata"
+              },
+              {
+                "label": "Eduardo H.",
+                "hours": 6.75,
+                "position": "Robata"
+              },
+              {
+                "label": "Quinton H.",
+                "hours": 6.63,
+                "position": "Robata"
+              },
+              {
+                "label": "Juan S.",
+                "hours": 7.42,
+                "position": "Robata"
+              }
+            ],
             "ticketCount": 244,
             "itemQty": 161,
             "volume": 161,
@@ -79026,6 +79572,28 @@
           "Tuesday": {
             "heads": 4,
             "hours": 27.62,
+            "staff": [
+              {
+                "label": "Zachary B.",
+                "hours": 6.14,
+                "position": "Robata"
+              },
+              {
+                "label": "Bradley B.",
+                "hours": 6.85,
+                "position": "Robata"
+              },
+              {
+                "label": "Eduardo H.",
+                "hours": 7.29,
+                "position": "Robata"
+              },
+              {
+                "label": "Quinton H.",
+                "hours": 7.34,
+                "position": "Robata"
+              }
+            ],
             "ticketCount": 363,
             "itemQty": 216,
             "volume": 216,
@@ -79053,6 +79621,23 @@
           "Wednesday": {
             "heads": 3,
             "hours": 21.99,
+            "staff": [
+              {
+                "label": "Zachary B.",
+                "hours": 6.41,
+                "position": "Robata"
+              },
+              {
+                "label": "Bradley B.",
+                "hours": 7.4,
+                "position": "Robata"
+              },
+              {
+                "label": "Isaiah R.",
+                "hours": 8.18,
+                "position": "Robata"
+              }
+            ],
             "ticketCount": 423,
             "itemQty": 249,
             "volume": 249,
@@ -79080,6 +79665,18 @@
           "Thursday": {
             "heads": 2,
             "hours": 16.22,
+            "staff": [
+              {
+                "label": "Bradley B.",
+                "hours": 7.85,
+                "position": "Robata"
+              },
+              {
+                "label": "Isaiah R.",
+                "hours": 8.37,
+                "position": "Robata"
+              }
+            ],
             "ticketCount": 474,
             "itemQty": 340,
             "volume": 340,
@@ -79107,6 +79704,28 @@
           "Friday": {
             "heads": 4,
             "hours": 37.5,
+            "staff": [
+              {
+                "label": "Zachary B.",
+                "hours": 6.85,
+                "position": "Robata"
+              },
+              {
+                "label": "Eduardo H.",
+                "hours": 9.96,
+                "position": "Robata"
+              },
+              {
+                "label": "Quinton H.",
+                "hours": 9.56,
+                "position": "Robata"
+              },
+              {
+                "label": "Isaiah R.",
+                "hours": 11.13,
+                "position": "Robata"
+              }
+            ],
             "ticketCount": 642,
             "itemQty": 465,
             "volume": 465,
@@ -79134,6 +79753,33 @@
           "Saturday": {
             "heads": 5,
             "hours": 51.84,
+            "staff": [
+              {
+                "label": "Zachary B.",
+                "hours": 7.32,
+                "position": "Robata"
+              },
+              {
+                "label": "Bradley B.",
+                "hours": 8.99,
+                "position": "Robata"
+              },
+              {
+                "label": "Eduardo H.",
+                "hours": 10.21,
+                "position": "Robata"
+              },
+              {
+                "label": "Quinton H.",
+                "hours": 14.42,
+                "position": "Robata"
+              },
+              {
+                "label": "Isaiah R.",
+                "hours": 10.9,
+                "position": "Robata"
+              }
+            ],
             "ticketCount": 854,
             "itemQty": 577,
             "volume": 577,
@@ -79161,6 +79807,28 @@
           "Sunday": {
             "heads": 4,
             "hours": 26.66,
+            "staff": [
+              {
+                "label": "Zachary B.",
+                "hours": 3.16,
+                "position": "Robata"
+              },
+              {
+                "label": "Eduardo H.",
+                "hours": 8.34,
+                "position": "Robata"
+              },
+              {
+                "label": "Quinton H.",
+                "hours": 7.27,
+                "position": "Robata"
+              },
+              {
+                "label": "Isaiah R.",
+                "hours": 7.89,
+                "position": "Robata"
+              }
+            ],
             "ticketCount": 554,
             "itemQty": 308,
             "volume": 308,
@@ -79203,6 +79871,7 @@
           "Monday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -79230,6 +79899,7 @@
           "Tuesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -79257,6 +79927,7 @@
           "Wednesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -79284,6 +79955,7 @@
           "Thursday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -79311,6 +79983,7 @@
           "Friday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -79338,6 +80011,7 @@
           "Saturday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -79365,6 +80039,7 @@
           "Sunday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -79407,6 +80082,7 @@
           "Monday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 217,
             "itemQty": 118,
             "volume": 118,
@@ -79434,6 +80110,7 @@
           "Tuesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 326,
             "itemQty": 118,
             "volume": 118,
@@ -79461,6 +80138,7 @@
           "Wednesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 369,
             "itemQty": 168,
             "volume": 168,
@@ -79488,6 +80166,7 @@
           "Thursday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 425,
             "itemQty": 221,
             "volume": 221,
@@ -79515,6 +80194,7 @@
           "Friday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 621,
             "itemQty": 445,
             "volume": 445,
@@ -79542,6 +80222,7 @@
           "Saturday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 793,
             "itemQty": 651,
             "volume": 651,
@@ -79569,6 +80250,7 @@
           "Sunday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 585,
             "itemQty": 327,
             "volume": 327,

@@ -143,9 +143,9 @@ let html = htmlPart
 </div>`
   );
 
-// Add Station KPI bar before station pills
+// Stations tab: weekly items/staff by family; hide station selector + detail KPIs
 html = html.replace(
-  /<div class="section-title">Station Selector<\/div>\r?\n<div class="station-pills" id="stationPills"><\/div>/,
+  /<div class="section-title">Station Selector<\/div>\r?\n<div class="station-pills" id="stationPills"><\/div>[\s\S]*?<div class="station-detail" id="stationDetail">[\s\S]*?<\/div>(\r?\n\r?\n<div class="section-title"[^>]*>All Stations)/,
   `<div id="stationKpiBar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
   <div class="card" style="margin:0;text-align:center">
     <div style="font-size:11px;color:#9aa0aa;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">Overall Avg Fulfillment</div>
@@ -164,30 +164,24 @@ html = html.replace(
   </div>
 </div>
 <div class="card" id="hourlyThroughputCard" style="margin:18px 0;display:block">
-  <h2 style="margin:0 0 4px">Items / hour / staff</h2>
-  <p class="note" style="margin-top:0">This location only. Pick a <strong>station family</strong> (e.g. Pastry) or a <strong>Toast station</strong>, then a <strong>day</strong> (or Total). Hours <strong>10:00 → 02:00</strong>. <strong>Items include dishes with no target.</strong> Click an item count for the full sold list (name + time). Staff = cooks on that family that day.</p>
+  <h2 style="margin:0 0 4px">Items / staff · by day</h2>
+  <p class="note" style="margin-top:0">This location only. Pick a <strong>station family</strong> (e.g. Pastry). Rows = <strong>Monday → Sunday</strong>. Items = menu qty across Toast stations in that family. Click <strong>Staff</strong> to see who worked. Click an item count for the sold list.</p>
   <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
     <label style="font-size:12px;color:#9aa0aa">Family
       <select id="hourlyFamilySelect" onchange="onHourlyFamilyChange()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
     </label>
-    <label style="font-size:12px;color:#9aa0aa">Station
-      <select id="hourlyStationSelect" onchange="renderHourlyThroughput()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;min-width:160px"></select>
-    </label>
-    <label style="font-size:12px;color:#9aa0aa">Day
-      <select id="hourlyDaySelect" onchange="renderHourlyThroughput()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
-    </label>
   </div>
-  <div id="hourlyThroughputTable" style="overflow-x:auto"><p class="note" style="margin:0">Loading hourly table…</p></div>
+  <div id="hourlyThroughputTable" style="overflow-x:auto"><p class="note" style="margin:0">Loading table…</p></div>
   <p id="hourlyThroughputNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
 </div>
-<div class="section-title">Station Selector</div>
-<div class="station-pills" id="stationPills"></div>
+<div class="station-pills" id="stationPills" style="display:none"></div>
 <div class="card" id="staffingCard" style="margin-top:18px;display:none">
   <h2 style="margin:0 0 4px">Staffing by Station Family</h2>
   <p class="note" id="staffingNote" style="margin-top:0">Food-production families only (no FOH). Volume = <strong>item quantity</strong>. Read <strong style="color:#d9a441">items / person</strong> and <strong>fulfillment</strong> — no over/understaff labels.</p>
   <div id="staffingGrid" style="overflow-x:auto"></div>
   <p id="staffingMatchNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
-</div>`
+</div>
+<div class="station-detail" id="stationDetail" style="display:none"></div>$1`
 );
 
 // Add Assignment + Group + Settings tabs to nav
@@ -419,7 +413,7 @@ html = html.replace(
 </div>
 
 <div class="card" id="overviewHourlyHint" style="display:none;margin-bottom:14px;padding:12px 14px">
-  <p class="note" style="margin:0"><strong>Items / hour / staff</strong> by station family or Toast station is on the <button type="button" onclick="switchTab('stations', document.querySelector('.tab-btn[onclick*=stations]'))" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;padding:0;text-decoration:underline">Stations</button> tab — pick Family, Station, and Day.</p>
+  <p class="note" style="margin:0"><strong>Items / staff by day</strong> is on the <button type="button" onclick="switchTab('stations', document.querySelector('.tab-btn[onclick*=stations]'))" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;padding:0;text-decoration:underline">Stations</button> tab — pick a station family (Mon→Sun).</p>
 </div>
 
 <!-- Service Break Timeline (1-min) -->
@@ -2104,19 +2098,24 @@ function populateHourlyStationSelect(family, staffing, stationDetails, keepValue
 }
 
 function onHourlyFamilyChange() {
-  const famSel = document.getElementById('hourlyFamilySelect');
-  const d = getD();
-  const family = (famSel && famSel.value) || 'Pastry';
-  populateHourlyStationSelect(family, d.staffing, d.stationDetails || {}, '');
   renderHourlyThroughput();
+}
+
+function dayItemTotals(family, day, staffing, stationDetails, stationHourItems) {
+  let items = 0;
+  const events = [];
+  HOURLY_BAND.forEach(hk => {
+    const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, null, stationHourItems);
+    items += hit.items;
+    if (hit.events && hit.events.length) events.push(...hit.events);
+  });
+  return { items, events };
 }
 
 function renderHourlyThroughput() {
   const card = document.getElementById('hourlyThroughputCard');
   const hint = document.getElementById('overviewHourlyHint');
   const famSel = document.getElementById('hourlyFamilySelect');
-  const stSel = document.getElementById('hourlyStationSelect');
-  const daySel = document.getElementById('hourlyDaySelect');
   const tableEl = document.getElementById('hourlyThroughputTable');
   const noteEl = document.getElementById('hourlyThroughputNote');
   if (!card || !tableEl) return;
@@ -2134,14 +2133,13 @@ function renderHourlyThroughput() {
   if (!hasDetails) {
     card.style.display = '';
     if (hint) hint.style.display = '';
-    tableEl.innerHTML = '<p class="note" style="margin:0">No hourly station timing for this venue/week yet.</p>';
+    tableEl.innerHTML = '<p class="note" style="margin:0">No station timing for this venue/week yet.</p>';
     if (noteEl) noteEl.textContent = '';
     return;
   }
   card.style.display = '';
   if (hint) hint.style.display = '';
 
-  // Populate selectors once / keep selection
   const availableFamilies = HOURLY_FAMILIES.filter(f => {
     if (staffing && staffing.byFamily && staffing.byFamily[f]) return true;
     return stationsForFamily(f, staffing, stationDetails).some(st => stationDetails[st]);
@@ -2153,110 +2151,112 @@ function renderHourlyThroughput() {
     if (families.includes('Pastry')) famSel.value = 'Pastry';
     else if (families[0]) famSel.value = families[0];
   }
-  if (daySel && daySel.options.length < 2) {
-    daySel.innerHTML = '<option value="Total">Total (week)</option>' +
-      HOURLY_DAYS.map(day => '<option value="'+day+'">'+day+'</option>').join('');
-  }
 
   const family = (famSel && famSel.value) || families[0] || 'Pastry';
-  if (!stSel || stSel.dataset.family !== family || stSel.dataset.venue !== currentVenue) {
-    populateHourlyStationSelect(family, staffing, stationDetails, stSel && stSel.dataset.venue === currentVenue ? stSel.value : '');
-    if (stSel) {
-      stSel.dataset.family = family;
-      stSel.dataset.venue = currentVenue;
-    }
-  }
-
-  const stationFilter = (stSel && stSel.value) || '';
-  const dayMode = (daySel && daySel.value) || 'Total';
   const famStaff = staffing && staffing.byFamily ? staffing.byFamily[family] : null;
   const stationHourItems = d.stationHourItems || {};
   const hasItemListings = Object.keys(stationHourItems).length > 0;
 
-  const daysToSum = dayMode === 'Total' ? HOURLY_DAYS : [dayMode];
-  window._hourlyBucketEvents = {};
-  let html = '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:640px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
-    '<th style="text-align:left;padding:8px 10px">Hour</th>'+
+  window._hourlyDayEvents = {};
+  window._hourlyDayStaff = {};
+
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:520px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
+    '<th style="text-align:left;padding:8px 10px">Day</th>'+
     '<th style="text-align:right;padding:8px 10px">Items</th>'+
-    '<th style="text-align:right;padding:8px 10px">Staff on</th>'+
+    '<th style="text-align:right;padding:8px 10px">Staff</th>'+
     '<th style="text-align:right;padding:8px 10px;color:#d9a441">Items / staff</th>'+
-    '<th style="text-align:right;padding:8px 10px">Avg ful</th>'+
     '</tr></thead><tbody>';
 
-  let totalItems = 0, totalFulW = 0, totalFulN = 0;
+  let totalItems = 0;
   const staffSamples = [];
-  const allEvents = [];
 
-  HOURLY_BAND.forEach(hk => {
-    let items = 0, fulW = 0, fulN = 0;
-    let headsSum = 0, headsDays = 0;
-    const bucketEvents = [];
-    daysToSum.forEach(day => {
-      const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, stationFilter || null, stationHourItems);
-      items += hit.items;
-      if (hit.events && hit.events.length) bucketEvents.push(...hit.events);
-      if (hit.avgFulSec != null && (hit.tickets || hit.items) > 0) {
-        const w = hit.tickets || hit.items;
-        fulW += hit.avgFulSec * w;
-        fulN += w;
-      }
-      const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
-      if (cell && cell.heads > 0) {
-        headsSum += cell.heads;
-        headsDays += 1;
-      }
-    });
-    window._hourlyBucketEvents[hk] = bucketEvents;
-    allEvents.push(...bucketEvents);
-    const heads = dayMode === 'Total'
-      ? (headsDays > 0 ? +(headsSum / headsDays).toFixed(1) : null)
-      : (famStaff && famStaff.days && famStaff.days[dayMode] ? famStaff.days[dayMode].heads || null : null);
-    if (heads != null && heads > 0) staffSamples.push(heads);
-    totalItems += items;
-    totalFulW += fulW;
-    totalFulN += fulN;
-    const ips = heads > 0 ? +(items / heads).toFixed(1) : null;
-    const fulMin = fulN > 0 ? fulW / fulN / 60 : null;
-    const label = hk.replace('-', ':00–') + ':00';
-    const itemsCell = (items && hasItemListings)
-      ? '<button type="button" data-hour="'+hk+'" onclick="openHourlyItemList(this.dataset.hour)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+items+'</button>'
-      : (items || '—');
+  HOURLY_DAYS.forEach(day => {
+    const hit = dayItemTotals(family, day, staffing, stationDetails, stationHourItems);
+    const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
+    const heads = cell && cell.heads > 0 ? cell.heads : 0;
+    const staffList = (cell && Array.isArray(cell.staff) ? cell.staff : (cell && Array.isArray(cell.names) ? cell.names : [])) || [];
+    window._hourlyDayEvents[day] = hit.events || [];
+    window._hourlyDayStaff[day] = staffList;
+    totalItems += hit.items;
+    if (heads > 0) staffSamples.push(heads);
+    const ips = heads > 0 ? +(hit.items / heads).toFixed(1) : null;
+    const itemsCell = (hit.items && hasItemListings)
+      ? '<button type="button" data-day="'+day+'" onclick="openHourlyItemList(this.dataset.day)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+hit.items+'</button>'
+      : (hit.items || '—');
+    const staffCell = heads > 0
+      ? '<button type="button" data-day="'+day+'" onclick="openHourlyStaffList(this.dataset.day)" style="background:none;border:none;color:#e8eaed;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline" title="Show who worked">'+heads+'</button>'
+      : '—';
     html += '<tr style="border-top:1px solid #262a33">' +
-      '<td style="padding:7px 10px;color:#e8eaed;font-weight:600;white-space:nowrap">'+label+'</td>' +
-      '<td style="padding:7px 10px;text-align:right;color:#e8eaed">'+itemsCell+'</td>' +
-      '<td style="padding:7px 10px;text-align:right;color:#9aa0aa">'+(heads != null && heads > 0 ? heads : '—')+'</td>' +
-      '<td style="padding:7px 10px;text-align:right;font-weight:700;color:#d9a441">'+(ips != null ? ips : '—')+'</td>' +
-      '<td style="padding:7px 10px;text-align:right;color:'+(fulMin!=null?avgFulColorByMin(fulMin):'#9aa0aa')+'">'+(fulMin!=null?fulMin.toFixed(1)+'m':'—')+'</td>' +
+      '<td style="padding:8px 10px;color:#e8eaed;font-weight:600">'+day+'</td>' +
+      '<td style="padding:8px 10px;text-align:right;color:#e8eaed">'+itemsCell+'</td>' +
+      '<td style="padding:8px 10px;text-align:right">'+staffCell+'</td>' +
+      '<td style="padding:8px 10px;text-align:right;font-weight:700;color:#d9a441">'+(ips != null ? ips : '—')+'</td>' +
       '</tr>';
   });
 
-  window._hourlyBucketEvents.__total = allEvents;
   const avgHeads = staffSamples.length ? staffSamples.reduce((a,b)=>a+b,0)/staffSamples.length : null;
   const totalIps = avgHeads > 0 ? +(totalItems / avgHeads).toFixed(1) : null;
-  const totalFul = totalFulN > 0 ? totalFulW / totalFulN / 60 : null;
+  const allEvents = HOURLY_DAYS.flatMap(day => window._hourlyDayEvents[day] || []);
+  window._hourlyDayEvents.__total = allEvents;
   const totalItemsCell = (totalItems && hasItemListings)
-    ? '<button type="button" data-hour="__total" onclick="openHourlyItemList(this.dataset.hour)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+totalItems+'</button>'
+    ? '<button type="button" data-day="__total" onclick="openHourlyItemList(this.dataset.day)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+totalItems+'</button>'
     : totalItems;
+
   html += '<tr style="border-top:2px solid #3d4458;background:#13161c">' +
     '<td style="padding:8px 10px;color:#d9a441;font-weight:700">Total</td>' +
     '<td style="padding:8px 10px;text-align:right;font-weight:700;color:#e8eaed">'+totalItemsCell+'</td>' +
     '<td style="padding:8px 10px;text-align:right;color:#9aa0aa">'+(avgHeads!=null?avgHeads.toFixed(1)+' avg':'—')+'</td>' +
     '<td style="padding:8px 10px;text-align:right;font-weight:700;color:#d9a441">'+(totalIps!=null?totalIps:'—')+'</td>' +
-    '<td style="padding:8px 10px;text-align:right;color:'+(totalFul!=null?avgFulColorByMin(totalFul):'#9aa0aa')+'">'+(totalFul!=null?totalFul.toFixed(1)+'m':'—')+'</td>' +
     '</tr></tbody></table>';
 
   tableEl.innerHTML = html;
   const stList = stationsForFamily(family, staffing, stationDetails);
   if (noteEl) {
-    const scope = stationFilter
-      ? ('Toast station: '+stationFilter+' (family '+family+'). ')
-      : (stList.length ? ('Stations in '+family+': '+stList.join(', ')+'. ') : '');
-    noteEl.textContent = scope +
+    noteEl.textContent = (stList.length ? ('Stations in '+family+': '+stList.join(', ')+'. ') : '') +
       (hasItemListings
-        ? 'Items = menu item qty (includes items with no target). Click a count for the full sold list. '
-        : 'Items = kitchen ticket fires (no item listing yet for this venue/week). ') +
-      (famStaff ? 'Staff = family headcount for that day (not split per Toast station).' : 'No staffing join for this venue/family — items shown without staff divisor.');
+        ? 'Items = menu item qty (includes items with no target). Click a count for the sold list. '
+        : 'Items = kitchen ticket fires (no item listing yet). ') +
+      (famStaff
+        ? 'Staff = family headcount that day — click the number to see who.'
+        : 'No staffing join for this venue/family — items shown without staff divisor.');
   }
+}
+
+function openHourlyStaffList(day) {
+  closeHourlyItemList();
+  const staff = (window._hourlyDayStaff && window._hourlyDayStaff[day]) || [];
+  const famSel = document.getElementById('hourlyFamilySelect');
+  const family = (famSel && famSel.value) || '';
+  let body = '';
+  if (!staff.length) {
+    body = '<p class="note">No named staff on file for this day (headcount only, or no one matched).</p>';
+  } else {
+    body = '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
+      '<th style="text-align:left;padding:8px 6px">Staff</th>'+
+      '<th style="text-align:right;padding:8px 6px">Hours</th>'+
+      '<th style="text-align:left;padding:8px 6px">Position</th>'+
+      '</tr></thead><tbody>';
+    staff.forEach(n => {
+      const label = (n.label || n.name || '').replace(/</g,'&lt;');
+      body += '<tr style="border-top:1px solid #262a33">' +
+        '<td style="padding:6px;color:#e8eaed;font-weight:600">'+label+'</td>' +
+        '<td style="padding:6px;text-align:right;color:#9aa0aa">'+(n.hours != null ? n.hours : '—')+'</td>' +
+        '<td style="padding:6px;color:#9aa0aa">'+(n.position || '')+'</td>' +
+        '</tr>';
+    });
+    body += '</tbody></table>';
+  }
+  const modal = document.createElement('div');
+  modal.id = 'hourlyItemModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.onclick = (e) => { if (e.target === modal) closeHourlyItemList(); };
+  modal.innerHTML = '<div style="background:#12151c;border:1px solid #2d3448;border-radius:12px;max-width:560px;width:100%;max-height:80vh;overflow:hidden;display:flex;flex-direction:column" onclick="event.stopPropagation()">'+
+    '<div style="padding:16px 18px;border-bottom:1px solid #262a33;display:flex;justify-content:space-between;gap:12px;align-items:flex-start">'+
+      '<div><div style="font-size:16px;font-weight:700;color:#e8eaed">Staff on · '+day+'</div>'+
+      '<div style="font-size:12px;color:#9aa0aa;margin-top:4px">'+family+' family · '+staff.length+' people</div></div>'+
+      '<button type="button" onclick="closeHourlyItemList()" style="background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;padding:6px 12px;cursor:pointer">Close</button>'+
+    '</div><div style="padding:8px 14px 18px;overflow:auto">'+body+'</div></div>';
+  document.body.appendChild(modal);
 }
 
 function closeHourlyItemList() {
@@ -2264,22 +2264,19 @@ function closeHourlyItemList() {
   if (el) el.remove();
 }
 
-function openHourlyItemList(hourKey) {
+function openHourlyItemList(dayKey) {
   closeHourlyItemList();
-  const events = (window._hourlyBucketEvents && window._hourlyBucketEvents[hourKey]) || [];
+  const events = (window._hourlyDayEvents && window._hourlyDayEvents[dayKey]) ||
+    (window._hourlyBucketEvents && window._hourlyBucketEvents[dayKey]) || [];
   const famSel = document.getElementById('hourlyFamilySelect');
-  const stSel = document.getElementById('hourlyStationSelect');
-  const daySel = document.getElementById('hourlyDaySelect');
   const family = (famSel && famSel.value) || '';
-  const station = (stSel && stSel.value) || 'All in family';
-  const dayMode = (daySel && daySel.value) || 'Total';
-  const hourLabel = hourKey === '__total' ? 'All hours' : (hourKey.replace('-', ':00–') + ':00');
+  const dayLabel = dayKey === '__total' ? 'All week' : dayKey;
   const qty = events.reduce((a, e) => a + (e.q || 1), 0);
   const noTarget = events.reduce((a, e) => a + (e.tgt ? 0 : (e.q || 1)), 0);
 
   let body = '';
   if (!events.length) {
-    body = '<p class="note">No menu-item listing for this hour (ticket-only count).</p>';
+    body = '<p class="note">No menu-item listing for this day (ticket-only count).</p>';
   } else {
     body = '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
       '<th style="text-align:left;padding:8px 6px">When</th>'+
@@ -2308,8 +2305,8 @@ function openHourlyItemList(hourKey) {
   modal.onclick = function(ev) { if (ev.target === modal) closeHourlyItemList(); };
   modal.innerHTML = '<div style="background:#181b22;border:1px solid #2d3448;border-radius:12px;max-width:920px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.45)">'+
     '<div style="padding:16px 18px;border-bottom:1px solid #262a33;display:flex;justify-content:space-between;gap:12px;align-items:flex-start">'+
-      '<div><div style="font-size:16px;font-weight:700;color:#e8eaed">Sold items — '+hourLabel+'</div>'+
-      '<div style="font-size:12px;color:#9aa0aa;margin-top:4px">'+family+(station && station !== 'All in family' ? ' · '+station : '')+' · '+dayMode+
+      '<div><div style="font-size:16px;font-weight:700;color:#e8eaed">Sold items — '+dayLabel+'</div>'+
+      '<div style="font-size:12px;color:#9aa0aa;margin-top:4px">'+family+
       ' · '+qty+' items'+(noTarget ? ' · '+noTarget+' without target' : '')+'</div></div>'+
       '<button type="button" onclick="closeHourlyItemList()" style="background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;padding:6px 12px;cursor:pointer">Close</button>'+
     '</div><div style="padding:8px 14px 18px;overflow:auto">'+body+'</div></div>';
@@ -2512,19 +2509,25 @@ function renderStations() {
   }
 
   const pillsEl = document.getElementById('stationPills');
-  pillsEl.innerHTML = '';
-  groupSorted.forEach((s, idx) => {
-    const btn = document.createElement('button');
-    btn.className = 'station-pill ' + pillClass(s);
-    btn.innerHTML = pillLabel(s);
-    btn.onclick = () => {
-      document.querySelectorAll('.station-pill').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      renderStationDetail(s);
-    };
-    if (idx === 0) btn.classList.add('active');
-    pillsEl.appendChild(btn);
-  });
+  if (pillsEl) {
+    pillsEl.innerHTML = '';
+    // Station Selector grid is hidden — skip building pills / auto-opening detail
+    if (pillsEl.style.display !== 'none') {
+      groupSorted.forEach((s, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'station-pill ' + pillClass(s);
+        btn.innerHTML = pillLabel(s);
+        btn.onclick = () => {
+          document.querySelectorAll('.station-pill').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          renderStationDetail(s);
+        };
+        if (idx === 0) btn.classList.add('active');
+        pillsEl.appendChild(btn);
+      });
+      if (groupSorted[0]) renderStationDetail(groupSorted[0]);
+    }
+  }
 
   function renderStationDetail(s) {
     const det = STATION_DETAILS[s.station] || {};
@@ -2712,7 +2715,10 @@ function renderStations() {
       '</div></details>';
   }
 
-  renderStationDetail(sortedStations[0]);
+  const detailEl = document.getElementById('stationDetail');
+  if (detailEl && detailEl.style.display !== 'none' && sortedStations[0]) {
+    renderStationDetail(sortedStations[0]);
+  }
 
   // Station bar chart
   const stSorted = [...STATIONS].sort((a,b)=>b.avg_sec-a.avg_sec);

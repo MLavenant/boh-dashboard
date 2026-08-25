@@ -104,6 +104,199 @@ function resolveVenueSlug(raw) {
   return VENUE_SLUG_ALIASES[k] || null;
 }
 
+function stripDiacritics(s) {
+  return String(s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Parse "Last, First Middle" or "First Middle Last" → sorted key + tokens.
+ */
+function nameKey(raw) {
+  let s = String(raw || '').trim();
+  if (!s) return { key: '', tokens: [], display: '', compact: '' };
+  if (s.includes(',')) {
+    const [last, first] = s.split(',').map((x) => x.trim());
+    s = `${first || ''} ${last || ''}`.trim();
+  }
+  const tokens = stripDiacritics(s).split(' ').filter(Boolean);
+  const key = [...tokens].sort().join(' ');
+  return { key, tokens, display: s, compact: tokens.join('') };
+}
+
+function levenshtein(a, b) {
+  const s = String(a);
+  const t = String(b);
+  if (s === t) return 0;
+  if (!s.length) return t.length;
+  if (!t.length) return s.length;
+  const rows = s.length + 1;
+  const cols = t.length + 1;
+  const prev = new Array(cols);
+  const curr = new Array(cols);
+  for (let j = 0; j < cols; j++) prev[j] = j;
+  for (let i = 1; i < rows; i++) {
+    curr[0] = i;
+    for (let j = 1; j < cols; j++) {
+      const cost = s[i - 1] === t[j - 1] ? 0 : 1;
+      curr[j] = Math.min(curr[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+    }
+    for (let j = 0; j < cols; j++) prev[j] = curr[j];
+  }
+  return prev[cols - 1];
+}
+
+function tokenClose(a, b) {
+  if (!a || !b) return false;
+  if (a === b) return true;
+  const minLen = Math.min(a.length, b.length);
+  const maxLen = Math.max(a.length, b.length);
+  if (minLen < 3) return false;
+  // Compound surname fragments: beau ⊂ beaubrun
+  if (maxLen >= 7 && minLen >= 4 && (a.includes(b) || b.includes(a))) return true;
+  const dist = levenshtein(a, b);
+  const maxDist = maxLen <= 5 ? 1 : maxLen <= 9 ? 2 : 3;
+  if (dist > maxDist) return false;
+  // 1-char typos (Smith/Smyth): shared 2-letter prefix is enough
+  if (dist === 1) return a.slice(0, 2) === b.slice(0, 2);
+  const prefix = minLen <= 4 ? 2 : 3;
+  return a.slice(0, prefix) === b.slice(0, prefix);
+}
+
+/** First names: allow 1-char typos (Jon/John) but not Maria/Maritza. */
+function firstNameClose(a, b) {
+  if (!a || !b) return false;
+  if (a === b) return true;
+  if (Math.min(a.length, b.length) < 3) return false;
+  if (a.slice(0, 2) !== b.slice(0, 2)) return false;
+  return levenshtein(a, b) <= 1;
+}
+
+/** Adjacent token joins so "beau"+"brun" ↔ "beaubrun". */
+function expandTokenSet(tokens) {
+  const out = new Set(tokens);
+  out.add(tokens.join(''));
+  for (let i = 0; i < tokens.length; i++) {
+    let run = tokens[i];
+    for (let j = i + 1; j < tokens.length; j++) {
+      run += tokens[j];
+      out.add(run);
+    }
+  }
+  return out;
+}
+
+function setsOverlapFuzzy(setA, setB) {
+  for (const a of setA) {
+    for (const b of setB) {
+      if (tokenClose(a, b)) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Score 0–100 for Toast↔FTE name similarity. Threshold ≥72 is a confident match.
+ * Handles: order swaps, diacritics, compound surnames, 1–3 char spelling mistakes.
+ * Always requires a plausible first-name match to avoid middle-name collisions (Alec/Alej).
+ */
+function scoreNameMatch(a, b) {
+  if (!a || !b || !a.tokens?.length || !b.tokens?.length) return 0;
+  if (a.key && a.key === b.key) return 100;
+  if (a.compact && a.compact === b.compact && a.tokens.length >= 2 && b.tokens.length >= 2) return 98;
+
+  // One side is a single token (last-name only) — too ambiguous for a confident match
+  if (a.tokens.length === 1 || b.tokens.length === 1) {
+    if (a.tokens.length === 1 && b.tokens.length === 1) {
+      return tokenClose(a.tokens[0], b.tokens[0]) ? 100 : 0;
+    }
+    return 0;
+  }
+
+  const expA = expandTokenSet(a.tokens);
+  const expB = expandTokenSet(b.tokens);
+  // Compact equality still needs first-name agreement when both have ≥2 tokens
+  const firstA = a.tokens[0];
+  const firstB = b.tokens[0];
+  const lastA = a.tokens[a.tokens.length - 1];
+  const lastB = b.tokens[b.tokens.length - 1];
+  const firstOk = firstNameClose(firstA, firstB);
+
+  if (!firstOk) {
+    // Allow compound-surname-only rescue when compact forms match (Beaubrun already handled above)
+    return 0;
+  }
+
+  if (a.compact && expB.has(a.compact)) return 96;
+  if (b.compact && expA.has(b.compact)) return 96;
+
+  // Surname: last tokens, or joins that end with the last token (beau+brun, zambrano+gonzalez order)
+  const surnameForms = (tokens, exp) => {
+    const last = tokens[tokens.length - 1];
+    const set = new Set([last]);
+    for (const t of exp) {
+      if (t.length >= 5 && (t.endsWith(last) || last.endsWith(t) || t === last)) set.add(t);
+    }
+    // also adjacent pairs among trailing tokens
+    if (tokens.length >= 2) {
+      set.add(tokens[tokens.length - 2] + last);
+    }
+    if (tokens.length >= 3) {
+      set.add(tokens[tokens.length - 3] + tokens[tokens.length - 2] + last);
+    }
+    return set;
+  };
+  const surA = surnameForms(a.tokens, expA);
+  const surB = surnameForms(b.tokens, expB);
+  const lastOk = setsOverlapFuzzy(surA, surB);
+
+  let overlap = 0;
+  const usedB = new Set();
+  for (const ta of a.tokens) {
+    for (let i = 0; i < b.tokens.length; i++) {
+      if (usedB.has(i)) continue;
+      if (tokenClose(ta, b.tokens[i]) || (i === 0 && firstNameClose(ta, b.tokens[i]))) {
+        overlap++;
+        usedB.add(i);
+        break;
+      }
+    }
+  }
+
+  if (firstOk && lastOk) return overlap >= 2 ? 94 : 88;
+  // First name matches but surname only via fuzzy secondary tokens (multi-part names)
+  if (firstOk && overlap >= 2) return 80;
+  return 0;
+}
+
+const NAME_MATCH_THRESHOLD = 72;
+
+function namesMatch(a, b, threshold = NAME_MATCH_THRESHOLD) {
+  return scoreNameMatch(a, b) >= threshold;
+}
+
+/**
+ * Pick best roster row for a labor name. Returns { index, score, row } or null.
+ */
+function bestRosterMatch(laborNameKey, rosterByKey, threshold = NAME_MATCH_THRESHOLD) {
+  let bestIdx = -1;
+  let bestScore = 0;
+  for (let i = 0; i < rosterByKey.length; i++) {
+    const score = scoreNameMatch(laborNameKey, rosterByKey[i]);
+    if (score > bestScore) {
+      bestScore = score;
+      bestIdx = i;
+    }
+  }
+  if (bestIdx < 0 || bestScore < threshold) return null;
+  return { index: bestIdx, score: bestScore, row: rosterByKey[bestIdx] };
+}
+
 module.exports = {
   FOOD_FAMILIES,
   FOOD_FAMILY_SET,
@@ -114,4 +307,10 @@ module.exports = {
   normalizeFoodFamily,
   isFoodFamily,
   resolveVenueSlug,
+  stripDiacritics,
+  nameKey,
+  scoreNameMatch,
+  namesMatch,
+  bestRosterMatch,
+  NAME_MATCH_THRESHOLD,
 };

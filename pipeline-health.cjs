@@ -190,11 +190,56 @@ function checkVenueWeek(slug, week) {
         } else if (badNum) {
           checks.push({ id: 'staffing_join', source: 'Staffing', label: 'Staffing Join', status: 'fail', message: 'Non-finite IPSH metric' });
         } else {
-          checks.push({ id: 'staffing_join', source: 'Staffing', label: 'Staffing Join', status: 'pass', message: `${families.length} food families · matched ${st.matchStats?.laborShiftsMatched ?? '?'}`, meta: staffingRaw });
+          const bohRate = st.matchStats?.bohMatchRate;
+          const msg = `${families.length} food families · matched ${st.matchStats?.laborShiftsMatched ?? '?'}` +
+            (bohRate != null ? ` · BOH match ${(bohRate * 100).toFixed(0)}%` : '');
+          checks.push({ id: 'staffing_join', source: 'Staffing', label: 'Staffing Join', status: 'pass', message: msg, meta: staffingRaw });
         }
       }
     } catch (e) {
       checks.push({ id: 'staffing_join', source: 'Staffing', label: 'Staffing Join', status: 'warn', message: e.message });
+    }
+
+    // Private match-balance QC (Toast time entries ↔ Viktor FTE stations)
+    const balancePath = path.join(weekDir, `staffing-balance-${slug}.json`);
+    if (!fs.existsSync(balancePath)) {
+      checks.push({ id: 'staffing_balance', source: 'Staffing', label: 'Match Balance', status: 'warn', message: 'Missing staffing-balance file — run build-staffing-balance.cjs' });
+    } else {
+      try {
+        const bal = JSON.parse(fs.readFileSync(balancePath, 'utf8'));
+        const rate = bal.scores?.bohMatchRate ?? 0;
+        const bohPunches = bal.scores?.bohLaborEntries ?? 0;
+        if (slug === 'ava_coconut_grove' && bohPunches === 0) {
+          checks.push({
+            id: 'staffing_balance',
+            source: 'Staffing',
+            label: 'Match Balance',
+            status: 'warn',
+            message: 'AVA CG: Toast has 0 BOH time entries (Viktor roster present; heads=0 until BOH clocks CG)',
+            meta: fileMeta(balancePath),
+          });
+        } else if (rate < 0.85) {
+          checks.push({
+            id: 'staffing_balance',
+            source: 'Staffing',
+            label: 'Match Balance',
+            status: 'warn',
+            message: `BOH match ${(rate * 100).toFixed(1)}% < 85% · conflicts ${bal.scores?.stationConflicts ?? '?'} · unused roster ${bal.rosterUnused?.length ?? '?'}`,
+            meta: fileMeta(balancePath),
+          });
+        } else {
+          checks.push({
+            id: 'staffing_balance',
+            source: 'Staffing',
+            label: 'Match Balance',
+            status: 'pass',
+            message: `BOH match ${(rate * 100).toFixed(1)}% · coverage ${((bal.scores?.rosterCoverage || 0) * 100).toFixed(0)}% · conflicts ${bal.scores?.stationConflicts ?? 0}`,
+            meta: fileMeta(balancePath),
+          });
+        }
+      } catch (e) {
+        checks.push({ id: 'staffing_balance', source: 'Staffing', label: 'Match Balance', status: 'warn', message: e.message });
+      }
     }
   }
 
@@ -237,7 +282,7 @@ const pipelineSteps = [
   { step: 5, name: 'Fetch Toast Item Fulfillment', how: 'weekly-save-cloud.cjs → item-fulfillment-{venue}.json', when: 'Monday cloud job' },
   { step: 6, name: 'Fetch OpenTable Covers', how: 'weekly-save-cloud.cjs → covers-{venue}.json', when: 'Monday cloud job' },
   { step: 7, name: 'Process venue metrics', how: 'process-venue-data.cjs per venue', when: 'Monday cloud job' },
-  { step: 8, name: 'Food staffing join', how: 'weekly-staffing.cjs (FTE × Toast labor × volume)', when: 'Local Monday task after venue process' },
+  { step: 8, name: 'Food staffing join', how: 'fetch-viktor-fte-week.mjs → weekly-staffing.cjs (FTE × Toast labor × volume) → build-staffing-balance.cjs', when: 'Local Monday task after venue process' },
   { step: 9, name: 'Publish Firebase + Pages', how: 'boh-publish-firebase.cjs + build-unified-v2.cjs + git push', when: 'Monday cloud/local job' },
 ];
 
