@@ -32,11 +32,24 @@ if defined BOH_WEEK (
   node fetch-ot-covers-week.cjs %BOH_WEEK% >> auto-run.log 2>&1
 )
 
-:: 3) Process any missing venue week JSON from raw kitchen files
-node -e "const fs=require('fs'),path=require('path'),{execSync}=require('child_process');const root=path.join('data');const weeks=fs.readdirSync(root).filter(d=>/^\d{4}-W\d{2}$/.test(d)).sort();const w=weeks[weeks.length-1];if(!w)process.exit(0);console.log('Latest week dir',w);for(const v of ['claudie','casa_neos','ava_coconut_grove','ava_winter_park','mila']){const out=v+'-data-'+w+'.json';const kt=path.join(root,w,'kitchen-timing-'+v+'.json');if(fs.existsSync(kt)&&!fs.existsSync(out)){console.log('process',v,w);try{execSync('node process-venue-data.cjs '+v+' '+w,{stdio:'inherit'});}catch(e){console.error(e.message);process.exitCode=1;}}}" >> auto-run.log 2>&1
+:: 3) Always re-process venues after kitchen + OT covers so guests/covers land in week JSON
+if defined BOH_WEEK (
+  echo [%date% %time%] process-venue-data for %BOH_WEEK%... >> auto-run.log 2>&1
+  for %%V in (claudie casa_neos ava_coconut_grove ava_winter_park mila) do (
+    if exist "data\%BOH_WEEK%\kitchen-timing-%%V.json" (
+      node process-venue-data.cjs %%V %BOH_WEEK% >> auto-run.log 2>&1
+      if errorlevel 1 echo [%date% %time%] WARN: process-venue-data %%V failed >> auto-run.log 2>&1
+    )
+  )
+)
 
-:: 4) Staffing (warn-only)
-node weekly-staffing.cjs >> auto-run.log 2>&1
+:: 4) Staffing = FTE ingest + Toast labor time entries + station-family join
+if defined BOH_WEEK (
+  echo [%date% %time%] weekly-staffing %BOH_WEEK%... >> auto-run.log 2>&1
+  node weekly-staffing.cjs %BOH_WEEK% >> auto-run.log 2>&1
+) else (
+  node weekly-staffing.cjs >> auto-run.log 2>&1
+)
 if errorlevel 1 echo [%date% %time%] WARN: weekly-staffing.cjs failed >> auto-run.log 2>&1
 
 :: 5) Sold-item listings from local item-details
