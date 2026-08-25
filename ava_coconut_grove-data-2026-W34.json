@@ -77100,13 +77100,16 @@
   "staffing": {
     "venue": "ava_coconut_grove",
     "weekLabel": "2026-W34",
-    "builtAt": "2026-08-25T16:08:42.986Z",
+    "builtAt": "2026-08-25T20:37:41.933Z",
     "matchStats": {
       "laborShiftsMatched": 0,
       "laborShiftsUnmatched": 91,
       "rosterUnused": 29,
       "rosterTotal": 29,
-      "matchRate": 0
+      "matchRate": 0,
+      "bohLaborShiftsUnmatched": 0,
+      "bohMatchRate": 0,
+      "rosterCoverage": 0
     },
     "guestsSeated": {
       "total": 1925,
@@ -77153,6 +77156,7 @@
           "Monday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 24,
             "itemQty": 8,
             "volume": 8,
@@ -77180,6 +77184,7 @@
           "Tuesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 35,
             "itemQty": 13,
             "volume": 13,
@@ -77207,6 +77212,7 @@
           "Wednesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 49,
             "itemQty": 28,
             "volume": 28,
@@ -77234,6 +77240,7 @@
           "Thursday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 43,
             "itemQty": 13,
             "volume": 13,
@@ -77261,6 +77268,7 @@
           "Friday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 114,
             "itemQty": 51,
             "volume": 51,
@@ -77288,6 +77296,7 @@
           "Saturday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 146,
             "itemQty": 61,
             "volume": 61,
@@ -77315,6 +77324,7 @@
           "Sunday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 76,
             "itemQty": 44,
             "volume": 44,
@@ -77357,6 +77367,7 @@
           "Monday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 44,
             "itemQty": 36,
             "volume": 36,
@@ -77384,6 +77395,7 @@
           "Tuesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 53,
             "itemQty": 34,
             "volume": 34,
@@ -77411,6 +77423,7 @@
           "Wednesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 67,
             "itemQty": 52,
             "volume": 52,
@@ -77438,6 +77451,7 @@
           "Thursday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 89,
             "itemQty": 71,
             "volume": 71,
@@ -77465,6 +77479,7 @@
           "Friday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 151,
             "itemQty": 130,
             "volume": 130,
@@ -77492,6 +77507,7 @@
           "Saturday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 223,
             "itemQty": 184,
             "volume": 184,
@@ -77519,6 +77535,7 @@
           "Sunday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 152,
             "itemQty": 165,
             "volume": 165,
@@ -77561,6 +77578,7 @@
           "Monday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 37,
             "itemQty": 42,
             "volume": 42,
@@ -77588,6 +77606,7 @@
           "Tuesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 38,
             "itemQty": 36,
             "volume": 36,
@@ -77615,6 +77634,7 @@
           "Wednesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 48,
             "itemQty": 55,
             "volume": 55,
@@ -77642,6 +77662,7 @@
           "Thursday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 60,
             "itemQty": 60,
             "volume": 60,
@@ -77669,6 +77690,7 @@
           "Friday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 127,
             "itemQty": 136,
             "volume": 136,
@@ -77696,6 +77718,7 @@
           "Saturday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 175,
             "itemQty": 175,
             "volume": 175,
@@ -77723,6 +77746,7 @@
           "Sunday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 107,
             "itemQty": 138,
             "volume": 138,
@@ -77765,6 +77789,7 @@
           "Monday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -77792,6 +77817,7 @@
           "Tuesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -77819,6 +77845,7 @@
           "Wednesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -77846,6 +77873,7 @@
           "Thursday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -77873,6 +77901,7 @@
           "Friday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -77900,6 +77929,7 @@
           "Saturday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -77927,6 +77957,7 @@
           "Sunday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 0,
             "itemQty": 0,
             "volume": 0,
@@ -77969,6 +78000,7 @@
           "Monday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 12,
             "itemQty": 13,
             "volume": 13,
@@ -77996,6 +78028,7 @@
           "Tuesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 8,
             "itemQty": 7,
             "volume": 7,
@@ -78023,6 +78056,7 @@
           "Wednesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 19,
             "itemQty": 20,
             "volume": 20,
@@ -78050,6 +78084,7 @@
           "Thursday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 13,
             "itemQty": 12,
             "volume": 12,
@@ -78077,6 +78112,7 @@
           "Friday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 38,
             "itemQty": 47,
             "volume": 47,
@@ -78104,6 +78140,7 @@
           "Saturday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 51,
             "itemQty": 49,
             "volume": 49,
@@ -78131,6 +78168,7 @@
           "Sunday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 43,
             "itemQty": 49,
             "volume": 49,
@@ -78173,6 +78211,7 @@
           "Monday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 71,
             "itemQty": 114.35,
             "volume": 114.35,
@@ -78200,6 +78239,7 @@
           "Tuesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 100,
             "itemQty": 193.17000000000002,
             "volume": 193.17000000000002,
@@ -78227,6 +78267,7 @@
           "Wednesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 126,
             "itemQty": 234.45,
             "volume": 234.45,
@@ -78254,6 +78295,7 @@
           "Thursday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 152,
             "itemQty": 326.42,
             "volume": 326.42,
@@ -78281,6 +78323,7 @@
           "Friday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 299,
             "itemQty": 544.815,
             "volume": 544.815,
@@ -78308,6 +78351,7 @@
           "Saturday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 356,
             "itemQty": 756.695,
             "volume": 756.695,
@@ -78335,6 +78379,7 @@
           "Sunday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 248,
             "itemQty": 343.61,
             "volume": 343.61,
@@ -78377,6 +78422,7 @@
           "Monday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 22,
             "itemQty": 12,
             "volume": 12,
@@ -78404,6 +78450,7 @@
           "Tuesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 28,
             "itemQty": 14,
             "volume": 14,
@@ -78431,6 +78478,7 @@
           "Wednesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 37,
             "itemQty": 38,
             "volume": 38,
@@ -78458,6 +78506,7 @@
           "Thursday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 46,
             "itemQty": 50,
             "volume": 50,
@@ -78485,6 +78534,7 @@
           "Friday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 70,
             "itemQty": 50,
             "volume": 50,
@@ -78512,6 +78562,7 @@
           "Saturday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 124,
             "itemQty": 121,
             "volume": 121,
@@ -78539,6 +78590,7 @@
           "Sunday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 113,
             "itemQty": 171,
             "volume": 171,
@@ -78581,6 +78633,7 @@
           "Monday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 177,
             "itemQty": 153,
             "volume": 153,
@@ -78608,6 +78661,7 @@
           "Tuesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 211,
             "itemQty": 181,
             "volume": 181,
@@ -78635,6 +78689,7 @@
           "Wednesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 288,
             "itemQty": 238,
             "volume": 238,
@@ -78662,6 +78717,7 @@
           "Thursday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 339,
             "itemQty": 232,
             "volume": 232,
@@ -78689,6 +78745,7 @@
           "Friday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 682,
             "itemQty": 453,
             "volume": 453,
@@ -78716,6 +78773,7 @@
           "Saturday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 924,
             "itemQty": 721,
             "volume": 721,
@@ -78743,6 +78801,7 @@
           "Sunday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 564,
             "itemQty": 417,
             "volume": 417,
@@ -78785,6 +78844,7 @@
           "Monday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 23,
             "itemQty": 29,
             "volume": 29,
@@ -78812,6 +78872,7 @@
           "Tuesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 27,
             "itemQty": 26,
             "volume": 26,
@@ -78839,6 +78900,7 @@
           "Wednesday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 45,
             "itemQty": 50,
             "volume": 50,
@@ -78866,6 +78928,7 @@
           "Thursday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 50,
             "itemQty": 42,
             "volume": 42,
@@ -78893,6 +78956,7 @@
           "Friday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 111,
             "itemQty": 116,
             "volume": 116,
@@ -78920,6 +78984,7 @@
           "Saturday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 150,
             "itemQty": 142,
             "volume": 142,
@@ -78947,6 +79012,7 @@
           "Sunday": {
             "heads": 0,
             "hours": 0,
+            "staff": [],
             "ticketCount": 84,
             "itemQty": 98,
             "volume": 98,

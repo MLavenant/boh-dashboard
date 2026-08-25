@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-25T16:11:38.356Z",
+  "generatedAt": "2026-08-25T16:34:12.715Z",
   "latestWeek": "2026-W34",
   "availableWeeks": [
     "2026-W34",
@@ -230,8 +230,8 @@
           "message": "30 stations, curve=50, BP=none",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\casa_neos-data-2026-W34.json",
-            "mtime": "2026-08-25T16:08:42.028Z",
-            "size": 1752453,
+            "mtime": "2026-08-25T16:34:10.670Z",
+            "size": 1752550,
             "rows": 30
           }
         },
@@ -266,17 +266,30 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "10 food families · matched 267",
+          "message": "10 food families · matched 267 · BOH match 97%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W34\\staffing-casa_neos.json",
-            "mtime": "2026-08-25T16:08:42.108Z",
-            "size": 144784,
-            "rows": 10
+            "mtime": "2026-08-25T16:34:10.761Z",
+            "size": 258234,
+            "rows": 11
+          }
+        },
+        {
+          "id": "staffing_balance",
+          "source": "Staffing",
+          "label": "Match Balance",
+          "status": "pass",
+          "message": "BOH match 97.4% · coverage 92% · conflicts 0",
+          "meta": {
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W34\\staffing-balance-casa_neos.json",
+            "mtime": "2026-08-25T16:34:11.354Z",
+            "size": 205677,
+            "rows": 12
           }
         }
       ],
       "summary": {
-        "pass": 8,
+        "pass": 9,
         "warn": 0,
         "fail": 0
       },
@@ -346,8 +359,8 @@
           "message": "13 stations, curve=93, BP=none",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\ava_coconut_grove-data-2026-W34.json",
-            "mtime": "2026-08-25T16:08:43.025Z",
-            "size": 1691959,
+            "mtime": "2026-08-25T16:34:10.987Z",
+            "size": 1692047,
             "rows": 13
           }
         },
@@ -382,21 +395,34 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "9 food families · matched 0",
+          "message": "9 food families · matched 0 · BOH match 0%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W34\\staffing-ava_coconut_grove.json",
-            "mtime": "2026-08-25T16:08:43.075Z",
-            "size": 70062,
-            "rows": 10
+            "mtime": "2026-08-25T16:34:11.035Z",
+            "size": 72487,
+            "rows": 11
+          }
+        },
+        {
+          "id": "staffing_balance",
+          "source": "Staffing",
+          "label": "Match Balance",
+          "status": "warn",
+          "message": "AVA CG: Toast has 0 BOH time entries (Viktor roster present; heads=0 until BOH clocks CG)",
+          "meta": {
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W34\\staffing-balance-ava_coconut_grove.json",
+            "mtime": "2026-08-25T16:34:11.378Z",
+            "size": 25940,
+            "rows": 12
           }
         }
       ],
       "summary": {
         "pass": 8,
-        "warn": 0,
+        "warn": 1,
         "fail": 0
       },
-      "overall": "pass"
+      "overall": "warn"
     },
     {
       "slug": "ava_winter_park",
@@ -462,8 +488,8 @@
           "message": "8 stations, curve=59, BP=16",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\ava_winter_park-data-2026-W34.json",
-            "mtime": "2026-08-25T16:08:43.170Z",
-            "size": 1711090,
+            "mtime": "2026-08-25T16:34:11.085Z",
+            "size": 1711186,
             "rows": 8
           }
         },
@@ -498,17 +524,30 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "7 food families · matched 135",
+          "message": "7 food families · matched 135 · BOH match 97%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W34\\staffing-ava_winter_park.json",
-            "mtime": "2026-08-25T16:08:43.208Z",
-            "size": 94854,
-            "rows": 10
+            "mtime": "2026-08-25T16:34:11.115Z",
+            "size": 144612,
+            "rows": 11
+          }
+        },
+        {
+          "id": "staffing_balance",
+          "source": "Staffing",
+          "label": "Match Balance",
+          "status": "pass",
+          "message": "BOH match 97.1% · coverage 94% · conflicts 0",
+          "meta": {
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W34\\staffing-balance-ava_winter_park.json",
+            "mtime": "2026-08-25T16:34:11.394Z",
+            "size": 122290,
+            "rows": 12
           }
         }
       ],
       "summary": {
-        "pass": 8,
+        "pass": 9,
         "warn": 0,
         "fail": 0
       },
@@ -578,8 +617,8 @@
           "message": "11 stations, curve=76, BP=none",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\mila-data-2026-W34.json",
-            "mtime": "2026-08-25T16:08:42.327Z",
-            "size": 2475103,
+            "mtime": "2026-08-25T16:34:10.887Z",
+            "size": 2475237,
             "rows": 11
           }
         },
@@ -614,17 +653,30 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "9 food families · matched 222",
+          "message": "9 food families · matched 222 · BOH match 96%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W34\\staffing-mila.json",
-            "mtime": "2026-08-25T16:08:42.422Z",
-            "size": 127776,
-            "rows": 10
+            "mtime": "2026-08-25T16:34:10.937Z",
+            "size": 240707,
+            "rows": 11
+          }
+        },
+        {
+          "id": "staffing_balance",
+          "source": "Staffing",
+          "label": "Match Balance",
+          "status": "pass",
+          "message": "BOH match 96.0% · coverage 74% · conflicts 0",
+          "meta": {
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W34\\staffing-balance-mila.json",
+            "mtime": "2026-08-25T16:34:11.372Z",
+            "size": 177929,
+            "rows": 12
           }
         }
       ],
       "summary": {
-        "pass": 8,
+        "pass": 9,
         "warn": 0,
         "fail": 0
       },
@@ -632,11 +684,11 @@
     }
   ],
   "totals": {
-    "pass": 37,
-    "warn": 0,
+    "pass": 40,
+    "warn": 1,
     "fail": 0
   },
-  "overall": "pass",
+  "overall": "warn",
   "pipelineSteps": [
     {
       "step": 1,
@@ -683,7 +735,7 @@
     {
       "step": 8,
       "name": "Food staffing join",
-      "how": "weekly-staffing.cjs (FTE × Toast labor × volume)",
+      "how": "fetch-viktor-fte-week.mjs → weekly-staffing.cjs (FTE × Toast labor × volume) → build-staffing-balance.cjs",
       "when": "Local Monday task after venue process"
     },
     {

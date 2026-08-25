@@ -17,6 +17,8 @@ const {
   STAFFING_VENUES,
   resolveVenueSlug,
   normalizeFoodFamily,
+  nameKey,
+  bestRosterMatch,
 } = require('./boh-staffing-shared.cjs');
 
 const ROOT = process.env.BOH_ROOT || __dirname;
@@ -51,36 +53,62 @@ function stripDiacritics(s) {
     .trim();
 }
 
-function nameKey(raw) {
-  let s = String(raw || '').trim();
-  if (!s) return { key: '', tokens: [] };
-  if (s.includes(',')) {
-    const [last, first] = s.split(',').map((x) => x.trim());
-    s = `${first || ''} ${last || ''}`.trim();
+function loadNameAliases() {
+  const p = path.join(ROOT, 'data', 'fte', 'name-aliases.json');
+  if (!fs.existsSync(p)) return new Map();
+  try {
+    const j = loadJson(p);
+    const map = new Map();
+    const src = j.aliases || j;
+    for (const [from, to] of Object.entries(src)) {
+      if (from.startsWith('_')) continue;
+      const f = String(from || '').trim().toLowerCase();
+      const t = String(to || '').trim();
+      if (f && t) map.set(f, t);
+    }
+    return map;
+  } catch (_) {
+    return new Map();
   }
-  const tokens = stripDiacritics(s).split(' ').filter(Boolean);
-  const key = [...tokens].sort().join(' ');
-  return { key, tokens, display: s };
 }
 
-function namesMatch(a, b) {
-  if (!a.key || !b.key) return false;
-  if (a.key === b.key) return true;
-  const setA = new Set(a.tokens);
-  const setB = new Set(b.tokens);
-  const overlap = a.tokens.filter((t) => setB.has(t));
-  if (overlap.length >= Math.min(2, Math.max(a.tokens.length, b.tokens.length))) return true;
-  if (a.tokens.length >= 2 && b.tokens.length >= 2) {
-    const lastA = a.tokens[a.tokens.length - 1];
-    const lastB = b.tokens[b.tokens.length - 1];
-    const firstA = a.tokens[0];
-    const firstB = b.tokens[0];
-    if ((lastA === lastB || setA.has(lastB) || setB.has(lastA)) &&
-        (firstA === firstB || setA.has(firstB) || setB.has(firstA))) {
-      return true;
+function applyAlias(raw, aliases) {
+  const s = String(raw || '').trim();
+  if (!s) return s;
+  const hit = aliases.get(s.toLowerCase());
+  return hit || s;
+}
+
+/** Public dashboard label: "First L." — enough to see who, not full PII. */
+function shortStaffLabel(fullName) {
+  let s = String(fullName || '').trim();
+  if (!s) return '—';
+  // "Last, First" → treat as First + Last initial
+  if (s.includes(',')) {
+    const [lastPart, firstPart] = s.split(',').map((x) => x.trim());
+    if (firstPart && lastPart) {
+      const first = firstPart.split(/\s+/)[0];
+      const last = lastPart.split(/\s+/).pop();
+      const initial = (last || '').charAt(0).toUpperCase();
+      return initial ? `${first} ${initial}.` : first;
     }
   }
-  return false;
+  const parts = s.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0];
+  const first = parts[0];
+  const last = parts[parts.length - 1];
+  const initial = last.charAt(0).toUpperCase();
+  return initial ? `${first} ${initial}.` : first;
+}
+
+/** Jobs that should join to Viktor food-station families (excludes dish/receiver support). */
+const FOOD_STATION_JOB_RE =
+  /line cook|cdp|pastry|sushi|robata|saute|fry|garde|prep cook|expo|pizza|tempura|maki|grill|plancha|butcher|crudo|\braw\b|chef|training\s*-\s*boh|temp (line|cdp|pastry|prep)/i;
+
+function isFoodStationJobName(jobName) {
+  const j = String(jobName || '');
+  if (normalizeFoodFamily(j)) return true;
+  return FOOD_STATION_JOB_RE.test(j);
 }
 
 function stationToFamily(stationName, familyMap) {
@@ -365,10 +393,11 @@ function buildVenue(venueRaw, weekLabel) {
   const roster = rosterAll.filter((r) => FOOD_SET.has(normalizeFoodFamily(r.matrix) || r.matrix));
   if (!roster.length) throw new Error(`No food FTE roster rows for ${venue} in ${rosterPath}`);
 
+  const aliases = loadNameAliases();
   const rosterByKey = roster.map((r) => ({
     ...r,
     matrix: normalizeFoodFamily(r.matrix) || r.matrix,
-    ...nameKey(r.name),
+    ...nameKey(applyAlias(r.name, aliases)),
   }));
 
   const laborByEmpDay = new Map();
@@ -399,26 +428,37 @@ function buildVenue(venueRaw, weekLabel) {
   const usedRoster = new Set();
 
   for (const shift of laborByEmpDay.values()) {
-    const nk = nameKey(shift.payrollName || shift.employeeName);
-    let best = null;
-    for (let i = 0; i < rosterByKey.length; i++) {
-      if (namesMatch(nk, rosterByKey[i])) {
-        best = rosterByKey[i];
-        usedRoster.add(i);
-        break;
-      }
-    }
-    if (!best) {
+    const jobs = [...shift.jobs];
+    // Never join FOH-only punches onto the BOH food roster (avoids Server→cook false matches)
+    const foodStationShift = jobs.some(isFoodStationJobName);
+    if (!foodStationShift) {
       unmatchedLabor.push({
         date: shift.date,
         day: shift.day,
         employeeName: shift.employeeName,
         payrollName: shift.payrollName,
         hours: +shift.hours.toFixed(2),
-        jobs: [...shift.jobs],
+        jobs,
       });
       continue;
     }
+
+    const rawName = shift.payrollName || shift.employeeName;
+    const nk = nameKey(applyAlias(rawName, aliases));
+    const hit = bestRosterMatch(nk, rosterByKey);
+    if (!hit) {
+      unmatchedLabor.push({
+        date: shift.date,
+        day: shift.day,
+        employeeName: shift.employeeName,
+        payrollName: shift.payrollName,
+        hours: +shift.hours.toFixed(2),
+        jobs,
+      });
+      continue;
+    }
+    usedRoster.add(hit.index);
+    const best = hit.row;
     matched.push({
       date: shift.date,
       day: shift.day,
@@ -427,7 +467,8 @@ function buildVenue(venueRaw, weekLabel) {
       matrix: best.matrix,
       position: best.position,
       hours: +shift.hours.toFixed(2),
-      jobs: [...shift.jobs],
+      jobs,
+      nameMatchScore: hit.score,
     });
   }
 
@@ -566,6 +607,12 @@ function buildVenue(venueRaw, weekLabel) {
   const matchDenom = matched.length + unmatchedLabor.length;
   const matchRate = matchDenom > 0 ? matched.length / matchDenom : 0;
 
+  const unmatchedBohLabor = unmatchedLabor.filter((u) => (u.jobs || []).some(isFoodStationJobName));
+  const bohDenom = matched.length + unmatchedBohLabor.length;
+  const bohMatchRate = bohDenom > 0 ? matched.length / bohDenom : 0;
+  const rosterCoverage =
+    roster.length > 0 ? (roster.length - unmatchedRoster.length) / roster.length : 0;
+
   const staffing = {
     venue,
     weekLabel,
@@ -581,12 +628,16 @@ function buildVenue(venueRaw, weekLabel) {
       rosterUnused: unmatchedRoster.length,
       rosterTotal: roster.length,
       matchRate: +matchRate.toFixed(3),
+      bohLaborShiftsUnmatched: unmatchedBohLabor.length,
+      bohMatchRate: +bohMatchRate.toFixed(3),
+      rosterCoverage: +rosterCoverage.toFixed(3),
     },
     guestsSeated: venueData.guestsSeated || null,
     toastStationFamily,
     byFamily,
-    unmatchedLabor: unmatchedLabor.slice(0, 80),
-    unmatchedRoster: unmatchedRoster.slice(0, 80),
+    unmatchedLabor,
+    unmatchedRoster,
+    unmatchedBohLabor,
   };
 
   writePanelRows(weekLabel, venue, byFamily);
@@ -611,9 +662,16 @@ function buildVenue(venueRaw, weekLabel) {
     };
     for (const day of DAYS) {
       const cell = data.days[day];
+      // Public staff list: short labels only (First L.) — enough to see who was on
+      const staff = (cell.names || []).map((n) => ({
+        label: shortStaffLabel(n.toastName || n.name || ''),
+        hours: n.hours != null ? n.hours : null,
+        position: n.position || '',
+      }));
       publicByFamily[family].days[day] = {
         heads: cell.heads,
         hours: cell.hours,
+        staff,
         ticketCount: cell.ticketCount,
         itemQty: cell.itemQty,
         volume: cell.volume,
@@ -651,6 +709,7 @@ function buildVenue(venueRaw, weekLabel) {
     byFamily: publicByFamily,
     foodFamiliesOnly: true,
   };
+  // Keep BOH-only rates on public payload (no names) for pipeline / dashboard notes
   fs.writeFileSync(venueDataPath, JSON.stringify(venueData, null, 2));
 
   // Also refresh plain {venue}-data.json if present

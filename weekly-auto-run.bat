@@ -43,9 +43,19 @@ if defined BOH_WEEK (
   )
 )
 
-:: 4) Staffing = FTE ingest + Toast labor time entries + station-family join
+:: 3b) Viktor Ops FTE People export (Edge) — required before staffing join
+if defined BOH_WEEK (
+  echo [%date% %time%] Fetching Viktor FTE for %BOH_WEEK%... >> auto-run.log 2>&1
+  node fetch-viktor-fte-week.mjs %BOH_WEEK% --reuse >> auto-run.log 2>&1
+  if errorlevel 1 (
+    echo [%date% %time%] WARN: Viktor FTE fetch failed — trying existing summary xlsx >> auto-run.log 2>&1
+  )
+)
+
+:: 4) Staffing = FTE ingest + Toast labor time entries + station-family join + balance QC
 if defined BOH_WEEK (
   echo [%date% %time%] weekly-staffing %BOH_WEEK%... >> auto-run.log 2>&1
+  set SKIP_VIKTOR_FTE=1
   node weekly-staffing.cjs %BOH_WEEK% >> auto-run.log 2>&1
 ) else (
   node weekly-staffing.cjs >> auto-run.log 2>&1
