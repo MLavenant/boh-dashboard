@@ -131,8 +131,8 @@ jobs:
             at: now.toISOString(),
             atLocal: now.toLocaleString('en-US',{timeZone:'America/New_York'}),
             schedule: 'Punctual dispatch ~8:25 ET · GitHub schedule = late backup',
-            what: 'Toast bottle-service Actual → Firebase toastActuals + index.html',
-            message: 'Toast BS cloud FAILED'
+            what: 'Toast Excel BS → toastActuals + toastVipNights + vipTierActuals',
+            message: 'Toast BS+VIP cloud FAILED'
           });
           const req=https.request({
             hostname:'rdg-dj-dashboard-default-rtdb.firebaseio.com',

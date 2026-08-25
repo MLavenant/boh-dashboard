@@ -1,7 +1,11 @@
 /**
  * Toast BS Actual Updater
- * Fetches bottle service sales from Toast API and writes Firebase toastActuals
- * (calendar overlay). index.html SCHED is optional — dashboard uses sched-baked.js.
+ * Fetches bottle service sales from Toast API (Excel methodology) and writes:
+ *   - Firebase toastActuals          (day BS totals → calendar overlay)
+ *   - Firebase toastVipNights        (per-night VIP tierSummary → Weekly Flash)
+ *   - Firebase vipTierActuals        (week rollups → VIP week totals)
+ *
+ * index.html SCHED is optional — dashboard uses sched-baked.js + Firebase.
  */
 
 const axios  = require("axios");
@@ -25,6 +29,8 @@ const VENUES = {
 const {
   BS_CONFIG,
   getBsTables,
+  getVipTierMap,
+  getVipDisplayTiers,
   includeNoTable,
   isOperatingDay,
   isCnbcSummerRoof,
@@ -56,6 +62,21 @@ function getRelevantDates() {
   const dates = [];
   for (let i = 13; i >= 0; i--) dates.push(shift(todayStr, -i));
   return dates;
+}
+
+/** Match dashboard getISOWeek → "2026-W34" */
+function isoWeekKey(dateStr) {
+  const d = new Date(dateStr + "T12:00:00");
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+  const y = d.getFullYear();
+  const s = new Date(y, 0, 1);
+  const w = Math.ceil((((d - s) / 86400000) + 1) / 7);
+  return y + "-W" + w;
+}
+
+function eventKey(venue, date) {
+  return (venue + "_" + date).replace(/[^a-zA-Z0-9_-]/g, "_");
 }
 
 function fbPut(fbPath, payload) {
@@ -122,19 +143,23 @@ async function toastGetWithRetry(url, headers, tries = 6) {
   throw lastErr;
 }
 
-async function getTableGuids(token, venueGuid, bsNames) {
+async function getTableMaps(token, venueGuid, bsNames) {
   const res = await toastGetWithRetry(`${TOAST_BASE}/config/v2/tables`, {
     Authorization: `Bearer ${token}`,
     "Toast-Restaurant-External-ID": venueGuid,
   });
   const tables = Array.isArray(res.data) ? res.data : (res.data?.tables || []);
   const guids = new Set();
+  const guidToName = {};
   for (const t of tables) {
     const name = (t.name ?? t.tableName ?? "").trim();
-    if (t.guid && (bsNames.has(name) || bsNames.has(name.toUpperCase()) || bsNames.has(name.toLowerCase())))
+    if (!t.guid || !name) continue;
+    guidToName[t.guid] = name;
+    if (bsNames.has(name) || bsNames.has(name.toUpperCase()) || bsNames.has(name.toLowerCase())) {
       guids.add(t.guid);
+    }
   }
-  return guids;
+  return { guids, guidToName };
 }
 
 async function getAllOrders(token, venueGuid, date) {
@@ -154,28 +179,62 @@ async function getAllOrders(token, venueGuid, date) {
   return all;
 }
 
+function buildTierSummary(byTable, tierMap) {
+  const tierSummary = {};
+  let vipSold = 0;
+  let vipInv = 0;
+  for (const [tierName, tierCfg] of Object.entries(tierMap)) {
+    const tierTables = [...tierCfg.tables];
+    const sold = tierTables.filter(t => (byTable[t] || 0) > 0);
+    const totalSales = tierTables.reduce((s, t) => s + (byTable[t] || 0), 0);
+    const soldN = sold.length;
+    const avg = soldN ? Math.round(totalSales / soldN) : 0;
+    const rounded = Math.round(totalSales * 100) / 100;
+    tierSummary[tierName] = {
+      sold: soldN,
+      soldTables: soldN,
+      total: tierTables.length,
+      totalTables: tierTables.length,
+      sales: rounded,
+      totalSales: rounded,
+      avgPerTable: avg,
+      minPerTable: tierCfg.minPerTable,
+    };
+  }
+  return tierSummary;
+}
+
+/**
+ * @returns {{ byDate: Object, nights: Object }}
+ *   byDate[date] = BS total
+ *   nights[date] = { totalRevenue, bookedTables, totalTables, tierSummary, ... }
+ */
 async function fetchBsSales(venueKey, dates) {
   const cfg  = BS_CONFIG[venueKey];
   const guid = VENUES[venueKey];
   const token = await getToken();
-  const guidCache = new Map();
-  async function guidsForDate(date) {
+  const mapCache = new Map();
+  async function mapsForDate(date) {
     const key = (venueKey === "casa_neos" && isCnbcSummerRoof(date)) ? "roof" : "base";
-    if (!guidCache.has(key)) {
-      guidCache.set(key, await getTableGuids(token, guid, getBsTables(venueKey, date)));
+    if (!mapCache.has(key)) {
+      mapCache.set(key, await getTableMaps(token, guid, getBsTables(venueKey, date)));
     }
-    return guidCache.get(key);
+    return mapCache.get(key);
   }
   const byDate = {};
+  const nights = {};
 
   for (const date of dates) {
     if (!isOperatingDay(venueKey, date)) {
       byDate[date] = 0;
       continue;
     }
-    const bsGuids = await guidsForDate(date);
+    const { guids: bsGuids, guidToName } = await mapsForDate(date);
+    const tierMap = getVipTierMap(venueKey, date);
     const orders = await getAllOrders(token, guid, date);
     let total = 0;
+    const byTable = {};
+
     for (const order of orders) {
       const hasTable  = !!(order.table?.guid);
       const isBsTable = bsGuids.has(order.table?.guid ?? "");
@@ -193,17 +252,98 @@ async function fetchBsSales(venueKey, dates) {
         : (timeFrac >= startFrac && timeFrac <= cfg.endFrac);
       if (!inWindow) continue;
 
+      const tname = hasTable ? (guidToName[order.table.guid] || "") : "";
       for (const check of (order.checks || [])) {
         if (check.voided) continue;
         const amt = (check.selections || []).filter(s => !s.voided).reduce((s, sel) => s + (sel.price || 0), 0);
+        if (!amt) continue;
         total += amt;
+        if (tname) byTable[tname] = (byTable[tname] || 0) + amt;
       }
     }
-    byDate[date] = Math.round(total * 100) / 100;
-    if (total > 0) log(`  ${cfg.label} | ${date} → $${byDate[date].toLocaleString()}`);
+
+    const rounded = Math.round(total * 100) / 100;
+    byDate[date] = rounded;
+
+    const tierSummary = buildTierSummary(byTable, tierMap);
+    const displayTiers = getVipDisplayTiers(venueKey, date);
+    let vipSold = 0;
+    let vipInv = 0;
+    displayTiers.forEach(t => {
+      const x = tierSummary[t];
+      if (!x) return;
+      vipSold += x.soldTables || 0;
+      vipInv += x.totalTables || 0;
+    });
+    const allSold = Object.keys(byTable).filter(t => byTable[t] > 0).length;
+
+    nights[date] = {
+      venue: cfg.label,
+      date,
+      totalRevenue: Math.round(rounded),
+      bookedTables: allSold,
+      totalTables: vipInv || Object.values(tierMap).reduce((s, t) => s + t.tables.size, 0),
+      vipSoldTables: vipSold,
+      tierSummary,
+      hasData: rounded > 0 || allSold > 0,
+      _source: "toast_excel_bs",
+      _period: isoWeekKey(date),
+    };
+
+    if (total > 0) {
+      log(`  ${cfg.label} | ${date} → $${byDate[date].toLocaleString()} · VIP sold ${vipSold}/${vipInv}`);
+    }
     await sleep(200);
   }
-  return byDate;
+  return { byDate, nights };
+}
+
+function rollupWeekTiers(venueKey, nightsByDate) {
+  const weeks = {};
+  Object.keys(nightsByDate || {}).forEach(date => {
+    const night = nightsByDate[date];
+    if (!night || !night.tierSummary) return;
+    const wk = isoWeekKey(date);
+    const label = BS_CONFIG[venueKey].label;
+    const key = wk + "|" + label;
+    if (!weeks[key]) {
+      weeks[key] = {
+        source: "Toast actual · Excel methodology · auto",
+        tiers: {},
+        _dates: [],
+      };
+    }
+    weeks[key]._dates.push(date);
+    const display = getVipDisplayTiers(venueKey, date);
+    display.forEach(tname => {
+      const src = night.tierSummary[tname];
+      if (!src) return;
+      if (!weeks[key].tiers[tname]) {
+        weeks[key].tiers[tname] = {
+          soldTables: 0,
+          totalTables: src.totalTables || 0,
+          totalSales: 0,
+          avgPerTable: 0,
+          minPerTable: src.minPerTable || 0,
+        };
+      }
+      const dest = weeks[key].tiers[tname];
+      dest.soldTables += src.soldTables || 0;
+      dest.totalSales += src.totalSales || 0;
+      dest.totalTables = Math.max(dest.totalTables, src.totalTables || 0);
+      dest.minPerTable = src.minPerTable || dest.minPerTable;
+    });
+  });
+  Object.keys(weeks).forEach(k => {
+    const w = weeks[k];
+    Object.keys(w.tiers).forEach(t => {
+      const x = w.tiers[t];
+      x.totalSales = Math.round(x.totalSales);
+      x.avgPerTable = x.soldTables ? Math.round(x.totalSales / x.soldTables) : 0;
+    });
+    delete w._dates;
+  });
+  return weeks;
 }
 
 function applyBsActual(entry, newBsA) {
@@ -296,28 +436,35 @@ function updateSchedInHtml(html, salesByVenueDate) {
 }
 
 (async () => {
-  log("=== Toast BS Actual Update Starting ===");
+  log("=== Toast BS Actual + VIP Tiers Update Starting ===");
 
   const dates = getRelevantDates();
   log(`Date range: ${dates[0]} → ${dates[dates.length - 1]}`);
 
   const venueKeys = ["casa_neos", "mm_mila", "casa_neos_lounge"];
   const allResults = {};
+  const allNights = {};
   const failedVenues = [];
   const prevToast = await fbGet("/rdg/toastActuals");
   const prevByVenue = (prevToast && prevToast.byVenueDate) || {};
+  const prevVipNights = await fbGet("/rdg/toastVipNights");
+  const prevVipEvents = (prevVipNights && prevVipNights.events) || {};
+  const prevWeekTiers = await fbGet("/rdg/vipTierActuals") || {};
 
   for (let i = 0; i < venueKeys.length; i++) {
     const vk = venueKeys[i];
     if (i > 0) await sleep(1500);
     log(`\nFetching ${BS_CONFIG[vk].label}...`);
     try {
-      allResults[vk] = await fetchBsSales(vk, dates);
+      const pack = await fetchBsSales(vk, dates);
+      allResults[vk] = pack.byDate;
+      allNights[vk] = pack.nights;
     } catch (e) {
       log(`  ERROR: ${e.message}`);
       failedVenues.push(vk);
       const label = BS_CONFIG[vk].label;
       allResults[vk] = Object.assign({}, prevByVenue[label] || {});
+      allNights[vk] = {};
       log(`  Kept ${Object.keys(allResults[vk]).length} prior nights for ${label}`);
     }
   }
@@ -342,20 +489,52 @@ function updateSchedInHtml(html, salesByVenueDate) {
     log("\nDASHBOARD_PATH missing — Firebase toastActuals only.");
   }
 
+  /* Merge day totals into prior history (don't wipe older nights). */
   const byVenueDate = Object.assign({}, prevByVenue);
   for (const vk of venueKeys) {
-    byVenueDate[BS_CONFIG[vk].label] = allResults[vk];
+    const label = BS_CONFIG[vk].label;
+    byVenueDate[label] = Object.assign({}, prevByVenue[label] || {}, allResults[vk] || {});
   }
 
   const toastLivePayload = {
     updatedAt: new Date().toISOString(),
     miamiDay: miamiToday(),
-    source: "toast_api_cloud",
+    source: "toast_api_cloud_excel",
     byVenueDate,
     updates
   };
   const toastCode = await fbPut("/rdg/toastActuals", toastLivePayload);
   log(`Firebase toastActuals HTTP ${toastCode}`);
+
+  /* Per-night VIP tiers for Weekly Flash (any week in the lookback). */
+  const vipEvents = Object.assign({}, prevVipEvents);
+  let vipNightCount = 0;
+  for (const vk of venueKeys) {
+    const nights = allNights[vk] || {};
+    Object.keys(nights).forEach(date => {
+      const row = nights[date];
+      vipEvents[eventKey(row.venue, date)] = row;
+      vipNightCount++;
+    });
+  }
+  const vipNightsPayload = {
+    updatedAt: new Date().toISOString(),
+    miamiDay: miamiToday(),
+    source: "toast_excel_bs",
+    lookback: { from: dates[0], to: dates[dates.length - 1] },
+    events: vipEvents,
+  };
+  const vipNightsCode = await fbPut("/rdg/toastVipNights", vipNightsPayload);
+  log(`Firebase toastVipNights HTTP ${vipNightsCode} · ${vipNightCount} nights refreshed`);
+
+  /* Week rollups for VIP week totals. */
+  const weekTiers = Object.assign({}, prevWeekTiers);
+  for (const vk of venueKeys) {
+    const rolled = rollupWeekTiers(vk, allNights[vk] || {});
+    Object.assign(weekTiers, rolled);
+  }
+  const weekCode = await fbPut("/rdg/vipTierActuals", weekTiers);
+  log(`Firebase vipTierActuals HTTP ${weekCode} · ${Object.keys(weekTiers).length} week keys`);
 
   const positives = (updates || []).filter(u => (u.bs_a || 0) > 0).length;
   const zeros = (updates || []).filter(u => (u.bs_a || 0) === 0).length;
@@ -368,13 +547,14 @@ function updateSchedInHtml(html, salesByVenueDate) {
     at: new Date().toISOString(),
     atLocal: new Date().toLocaleString("en-US", { timeZone: "America/New_York" }),
     schedule: "Punctual dispatch ~8:25 ET · GitHub schedule = late backup",
-    what: "Toast bottle-service Actual → Firebase toastActuals (+ optional index.html)",
-    message: (toastOk ? "Toast BS cloud OK" : "Toast BS cloud PARTIAL") +
-      ` · ${positives} with sales · ${zeros} zero nights · ${changed} changed in file` + failNote,
+    what: "Toast Excel BS → toastActuals + toastVipNights + vipTierActuals",
+    message: (toastOk ? "Toast BS+VIP cloud OK" : "Toast BS+VIP cloud PARTIAL") +
+      ` · ${positives} with sales · ${zeros} zero nights · ${vipNightCount} VIP nights` + failNote,
     matched: updatedCount,
     changed,
     positives,
     zeros,
+    vipNightCount,
     failedVenues
   });
   log(`Firebase scrapeStatus/toast HTTP ${statusCode}`);
@@ -394,7 +574,7 @@ function updateSchedInHtml(html, salesByVenueDate) {
     }
   }
 
-  log("\n=== Toast BS Update Complete ===");
+  log("\n=== Toast BS + VIP Tiers Update Complete ===");
   if (!toastOk) process.exitCode = 1;
 })().catch(e => {
   console.error(e);

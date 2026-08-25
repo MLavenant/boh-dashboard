@@ -5,6 +5,9 @@
  * Casa Neos Beach Club MM Rooftop (Aug 1 – Sep 30): rooftop VIP + bar M* + dock,
  *   same 2:30–8:00 PM window — from
  *   "Bottle Service - Beach Club Sales Moved to MM Rooftop.xlsx"
+ *
+ * VIP display tiers (Flash columns) exclude BAR/Lounge/Booths/Seating/Cabana/Deck;
+ * those still count in BS day totals via getBsTables().
  */
 'use strict';
 
@@ -47,7 +50,7 @@ const BS_CONFIG = {
       '8','9','10','11','12','1A','2A','3A','4A','5A','6A','7A','8A','9A',
       '10A','11A','12A','S1','S2','S3','S4','S5','S6','S7','S8','S9','S10',
       'S11','S12','S13','S14','S15','S16','S17','S18','S19','S20','S21',
-      'S22','S23','S24','S25','S26','S27','S28','S29','S30','73',
+      'S22','S23','S24','S25','S26','S27','S28','S29','S30',
     ]),
     startFrac: 0.979167,
     endFrac: 0.208333,
@@ -65,9 +68,50 @@ const BS_CONFIG = {
     startFrac: 0.958333,
     endFrac: 0.208333,
     crossesMidnight: true,
-    includeNoTable: true,
+    /* Excel Bottle Service tab only sums named floor-plan tables (no blank / No Table). */
+    includeNoTable: false,
     sundayStartFrac: 0.75,
   },
+};
+
+/** VIP tier maps for Flash columns (BAR/Lounge still in BS totals via tables sets). */
+const VIP_TIER_MAP_BEACH = {
+  Diamond:   { tables: new Set(['34','51','52']), minPerTable: 4000 },
+  Prestige:  { tables: new Set(['31','41']), minPerTable: 3500 },
+  Platinum:  { tables: new Set(['32','33','35','36','42','43','45','46','47','48','49','53','54','55','56']), minPerTable: 2000 },
+  Gold:      { tables: new Set(['24','25','26','27','28']), minPerTable: 1500 },
+  Riverwalk: { tables: new Set(['19','20','21','22','23']), minPerTable: 1000 },
+  Cabana:    { tables: new Set(['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10','C1A','C2A','C3A','C4A','C5A','C6A','C7A','C8A','C9A','C10A']), minPerTable: 500 },
+  Deck:      { tables: new Set(['D1','D2','D3','D4','D5','D6','D7']), minPerTable: 500 },
+};
+
+const VIP_TIER_MAP_ROOFTOP = {
+  Diamond:  { tables: new Set(['61','63','81','83','73']), minPerTable: 4000 },
+  Prestige: { tables: new Set(['64','65','84','85','74']), minPerTable: 3500 },
+  Platinum: { tables: new Set(['66','68','76','75','88','86']), minPerTable: 2000 },
+  Gold:     { tables: new Set(['91','92','93','94']), minPerTable: 1500 },
+};
+
+const VIP_TIER_MAP_MILA = {
+  Diamond:  { tables: new Set(['305','306','307','408','408bis','407','405','409','406']), minPerTable: 2000 },
+  Prestige: { tables: new Set(['403','404']), minPerTable: 3000 },
+  Gold:     { tables: new Set(['402','304','303','302','301','308','410','401']), minPerTable: 1000 },
+  Booths:   { tables: new Set(['1','2','3','4','5','6','7','8','9','10','11','12','1A','2A','3A','4A','5A','6A','7A','8A','9A','10A','11A','12A']), minPerTable: 500 },
+  Seating:  { tables: new Set(['S1','S2','S3','S4','S5','S6','S7','S8','S9','S10','S11','S12','S13','S14','S15','S16','S17','S18','S19','S20','S21','S22','S23','S24','S25','S26','S27','S28','S29','S30']), minPerTable: 200 },
+};
+
+const VIP_TIER_MAP_CN_LOUNGE = {
+  Diamond:  { tables: new Set(['809','808','905','904','903','902']), minPerTable: 2000 },
+  Platinum: { tables: new Set(['810','906','907','908','909','910','911','912','901','807']), minPerTable: 1500 },
+  Gold:     { tables: new Set(['806','805','804','803']), minPerTable: 1000 },
+  Lounge:   { tables: new Set(['L1','L2','L3','L4','L5','L6','L7','L8','L9','L10','L11','L12','L1A','L2A','L3A','L4A','L5A','L6A','L7A','L8A','L9A','L10A','L11A','L12A']), minPerTable: 500 },
+};
+
+/** Flash VIP columns only (exclusions match js/flash-forecast.js _vipExcludedTiers). */
+const VIP_DISPLAY_TIERS = {
+  casa_neos: ['Diamond', 'Prestige', 'Platinum', 'Gold', 'Riverwalk'],
+  mm_mila: ['Diamond', 'Prestige', 'Gold'],
+  casa_neos_lounge: ['Diamond', 'Platinum', 'Gold'],
 };
 
 /** Aug 1 – Sep 30 (inclusive): Beach Club bottle service uses MM Rooftop floor plan. */
@@ -85,6 +129,22 @@ function getBsTables(venueKey, dateStr) {
     return cfg.rooftopTables;
   }
   return cfg.tables;
+}
+
+function getVipTierMap(venueKey, dateStr) {
+  if (venueKey === 'casa_neos') {
+    return isCnbcSummerRoof(dateStr) ? VIP_TIER_MAP_ROOFTOP : VIP_TIER_MAP_BEACH;
+  }
+  if (venueKey === 'mm_mila') return VIP_TIER_MAP_MILA;
+  if (venueKey === 'casa_neos_lounge') return VIP_TIER_MAP_CN_LOUNGE;
+  return {};
+}
+
+function getVipDisplayTiers(venueKey, dateStr) {
+  if (venueKey === 'casa_neos' && isCnbcSummerRoof(dateStr)) {
+    return ['Diamond', 'Prestige', 'Platinum', 'Gold'];
+  }
+  return VIP_DISPLAY_TIERS[venueKey] || [];
 }
 
 /** Whether unassigned (no-table) checks count toward BS for this venue/date. */
@@ -106,8 +166,15 @@ module.exports = {
   BS_CONFIG,
   CASA_NEOS_BEACH_TABLES,
   CASA_NEOS_ROOFTOP_TABLES,
+  VIP_TIER_MAP_BEACH,
+  VIP_TIER_MAP_ROOFTOP,
+  VIP_TIER_MAP_MILA,
+  VIP_TIER_MAP_CN_LOUNGE,
+  VIP_DISPLAY_TIERS,
   isCnbcSummerRoof,
   getBsTables,
+  getVipTierMap,
+  getVipDisplayTiers,
   includeNoTable,
   isOperatingDay,
 };
