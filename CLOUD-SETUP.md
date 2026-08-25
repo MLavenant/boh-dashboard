@@ -84,17 +84,27 @@ No Outlook, Graph, Playwright, or `FV_SESSION_B64`. Same metric as Sales Overvie
 
 ## Forecast flash email (auto “Send all emails”)
 
-Mon–Fri only, after FourVenues is green for the Miami day:
+**Current path (no Azure admin):** local **Outlook** on this PC at Mon–Fri **9:00 / 9:30** ET.
 
 | Time (ET) | Behavior |
 |-----------|----------|
-| **9:00** | If FV OK and not already sent today → send flash email (same To/Cc as dashboard). If FV not ready → wait. |
-| **9:30** | Retry once. If still cannot send → **one** alert to `matthias@rivieradininggroup.com`. |
-| Any later run | No duplicate flash email (Firebase `rdg/scrapeStatus/forecastEmail` lock). |
+| **9:00** | Cloud FV/Toast retry + local Outlook send if FourVenues OK (polls ~8 min). |
+| **9:30** | Retry once. If still cannot send → **one** alert to `matthias@rivieradininggroup.com` via Outlook. |
+| Lock | Firebase `rdg/scrapeStatus/forecastEmail` — max **one** flash email per Miami day. |
 
-Uses existing 9:00 / 9:30 `workflow_dispatch` retries (cron-job.org / Windows tasks). Script: `send-forecast-flash-email.cjs`.
+Install / refresh tasks:
+```powershell
+powershell -ExecutionPolicy Bypass -File C:\Users\MatthiasLavenant\Documents\boh-dashboard\install-rdg-morning-task.ps1
+```
 
-**Azure:** Application permission **Mail.Send** (+ admin consent) on the same app that already has Mail.Read. Without Mail.Send the job cannot send.
+Requires: PC on/awake, Outlook desktop signed in. Manual test:
+```bat
+set FORECAST_EMAIL_VIA=outlook
+set FORECAST_EMAIL_ATTEMPT=900
+node send-forecast-flash-email.cjs
+```
+
+**Later (laptop-off):** Azure Application permission **Mail.Send** + set workflow `FORECAST_EMAIL_VIA` back to `graph`.
 
 ### Secrets (GitHub → Settings → Secrets → Actions)
 
