@@ -205,7 +205,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <div class="wrap">
 <header>
   <h1 id="dashTitle">BOH Dashboard</h1>
-  <span class="badge" id="dashBadge">Latest 2026-W34 · Built 2026-08-25 20:37 UTC</span>
+  <span class="badge" id="dashBadge">Latest 2026-W34 · Built 2026-08-25 21:03 UTC</span>
 </header>
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
 <div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
@@ -263,69 +263,36 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
   <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
 </div>
 
-<!-- Overview: Staffing Performance (per location) — primary staffing view -->
-<div class="card" id="overviewStaffingCard" style="display:none;margin-bottom:14px">
-  <h2>Staffing Performance by Station Family</h2>
-  <p class="note">Per location. Volume = food item quantity. Main readouts: <strong style="color:#d9a441">items / person</strong> and <strong>fulfillment</strong>.</p>
-  <div id="overviewStaffingGrid" style="overflow-x:auto"></div>
-  <p id="overviewStaffingNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
-</div>
-
-<div class="card" id="overviewHourlyHint" style="display:none;margin-bottom:14px;padding:12px 14px">
-  <p class="note" style="margin:0"><strong>Items / staff by day</strong> is on the <button type="button" onclick="switchTab('stations', document.querySelector('.tab-btn[onclick*=stations]'))" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;padding:0;text-decoration:underline">Stations</button> tab — pick a station family (Mon→Sun).</p>
-</div>
-
-<!-- Service Break Timeline (1-min) -->
-<div class="card" id="serviceBreakCard">
-  <h2>Visual 1B — Service Break Timeline (1-min)</h2>
-  <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent tickets open</strong> in the kitchen. Gold line = <strong>avg fulfillment of those open tickets</strong>. Red band / markers = minutes where open-ticket avg &gt; 15 min. This is the live pressure view — different from Breaking Point (which is a capacity curve, not a clock).</p>
-  <div id="serviceBreakDayPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
-  <canvas id="cServiceBreak" style="max-height:420px"></canvas>
-  <div class="legend">
-    <span><span class="sw" style="background:#5aa9e6"></span>Concurrent tickets open</span>
-    <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment of open tickets (min)</span>
-    <span><span class="sw" style="background:#e2706a"></span>Over 15 min (break)</span>
+<!-- Visual 2 -->
+<div class="card">
+  <h2>Visual 2 — Breaking Point</h2>
+  <p class="note">Avg fulfillment time and guests vs concurrent ticket load.</p>
+  <div class="row two" style="margin-bottom:12px;gap:8px">
+    <div class="bpbox"><div class="big" id="kpiBP1">26</div><div class="l">tickets → kitchen falls behind</div></div>
+    <div class="bpbox"><div class="big" id="kpiBP2">141</div><div class="l">guests → kitchen falls behind</div></div>
   </div>
-  <div class="annotation-box" id="serviceBreakNote">Select a day to see minute-by-minute kitchen pressure.</div>
+  <canvas id="cBreaking" style="max-height:260px"></canvas>
+  <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
 </div>
 
-<!-- Visual 2+3 -->
-<div class="row two">
-  <div class="card">
-    <h2>Visual 2 — Breaking Point</h2>
-    <p class="note">Avg fulfillment time and guests vs concurrent ticket load.</p>
-    <div class="row two" style="margin-bottom:12px;gap:8px">
-      <div class="bpbox"><div class="big" id="kpiBP1">26</div><div class="l">tickets → kitchen falls behind</div></div>
-      <div class="bpbox"><div class="big" id="kpiBP2">141</div><div class="l">guests → kitchen falls behind</div></div>
-    </div>
-    <canvas id="cBreaking" style="max-height:260px"></canvas>
-    <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
-  </div>
-  <div class="card">
-    <h2>Visual 3 — Load vs Performance</h2>
-    <p class="note">Bucketed view (10-ticket steps): avg fulfillment time per band. <span style="color:#9aa0aa;font-size:11px">Buckets group all concurrent ticket counts in that range.</span></p>
-    <canvas id="cLoadPerf" style="max-height:260px"></canvas>
-    <div class="legend">
-      <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
-      <span><span class="sw" style="background:#e2706a"></span>15-min target</span>
-    </div>
-    <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
-  </div>
-</div>
-
-<!-- Stations Recap (between Visual 3 and Visual 4) -->
+<!-- Stations Recap -->
 <div class="card" id="stationsRecapCard">
   <h2>Stations Recap — This Week</h2>
   <p class="note">All food stations ranked worst → best vs target. Click a row to open Stations tab.</p>
   <div id="stationsRecap" style="overflow-x:auto"></div>
 </div>
 
-<!-- Visual 4: Station WoW -->
+<!-- Visual 4: Station WoW heatmap -->
 <div class="card">
   <h2>Visual 4 — Station Fulfillment — Week over Week</h2>
-  <p class="note">Avg fulfillment time per food station. Gold = current week. Reference line at 15 min target. Sorted worst → best.</p>
-  <p id="wowSubtitle" style="font-size:12px;color:#9aa0aa;margin:0 0 8px"></p>
-  <canvas id="cStationWoW" style="max-height:480px"></canvas>
+  <p class="note">Food stations (rows) × weeks (columns). Color = avg fulfillment — green ≤10 min · amber 10–15 · red &gt;15. Sorted worst → best by current week.</p>
+  <div id="stationWowHeatmap" style="overflow-x:auto;margin-top:8px"></div>
+  <div class="legend" style="margin-top:10px">
+    <span><span class="sw" style="background:#22c55e"></span>≤10 min</span>
+    <span><span class="sw" style="background:#f59e0b"></span>10–15 min</span>
+    <span><span class="sw" style="background:#ef4444"></span>&gt;15 min</span>
+    <span><span class="sw" style="background:#1a1d24"></span>No data</span>
+  </div>
   <div><span class="trend-badge" id="wowTrendBadge">📊 Week-over-week trend: available from Week 2</span></div>
 </div>
 
@@ -402,14 +369,16 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
   </div>
 </div>
 <div class="card" id="hourlyThroughputCard" style="margin:18px 0;display:block">
-  <h2 style="margin:0 0 4px">Items / staff · by day</h2>
-  <p class="note" style="margin-top:0">This location only. Pick a <strong>station family</strong> (e.g. Pastry). Rows = <strong>Monday → Sunday</strong>. Items = menu qty across Toast stations in that family. Click <strong>Staff</strong> to see who worked. Click an item count for the sold list.</p>
+  <h2 style="margin:0 0 4px">Items / staff · by day &amp; hour</h2>
+  <p class="note" style="margin-top:0">This location only. Pick a <strong>station family</strong> (e.g. Pastry). Summary by day, then <strong>hourly detail 10:00 → 02:00</strong>. Items = menu qty across Toast stations in that family. Click counts for sold lists; click <strong>Staff</strong> to see who worked that day.</p>
   <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
     <label style="font-size:12px;color:#9aa0aa">Family
       <select id="hourlyFamilySelect" onchange="onHourlyFamilyChange()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
     </label>
   </div>
   <div id="hourlyThroughputTable" style="overflow-x:auto"><p class="note" style="margin:0">Loading table…</p></div>
+  <div id="hourlyFulfillmentHeatmap" style="margin-top:22px;overflow-x:auto"></div>
+  <div id="stationFamilyVarianceSection" style="margin-top:22px;overflow-x:auto"></div>
   <p id="hourlyThroughputNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
 </div>
 <div class="station-pills" id="stationPills" style="display:none"></div>
@@ -1516,14 +1485,16 @@ function renderBreaking() {
 }
 
 // ============================================================
-// VISUAL 3: Load vs Performance
+// VISUAL 3: Load vs Performance (removed from overview)
 // ============================================================
 function renderLoadPerf() {
+  const canvas = document.getElementById('cLoadPerf');
+  if (!canvas) return;
   const TBK = getD().tbk;
   const thrLine={id:'thr',afterDraw(chart){const{ctx,chartArea:a,scales}=chart;if(!a||!scales.y)return;const thr=getThreshold();const yy=scales.y.getPixelForValue(thr);if(yy<a.top||yy>a.bottom)return;ctx.save();ctx.strokeStyle='#e2706a';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(a.left,yy);ctx.lineTo(a.right,yy);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#e2706a';ctx.font='11px sans-serif';ctx.fillText(thr+' min target',a.left+6,yy-4);ctx.restore();}};
   const existing = Chart.getChart('cLoadPerf');
   if (existing) existing.destroy();
-  new Chart(document.getElementById('cLoadPerf'),{type:'bar',data:{labels:TBK.map(b=>b.bucket),datasets:[{label:'Avg fulfillment (min)',data:TBK.map(b=>b.ful),backgroundColor:TBK.map(b=>b.ful>THRESHOLD?'#8a3f1a':'#d9a441'),borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Concurrent tickets open (bucket)'},grid:{display:false}},y:{title:{display:true,text:'Avg fulfillment (min)'},grid:{color:gc},suggestedMax:22}}},plugins:[thrLine]});
+  new Chart(canvas,{type:'bar',data:{labels:TBK.map(b=>b.bucket),datasets:[{label:'Avg fulfillment (min)',data:TBK.map(b=>b.ful),backgroundColor:TBK.map(b=>b.ful>THRESHOLD?'#8a3f1a':'#d9a441'),borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Concurrent tickets open (bucket)'},grid:{display:false}},y:{title:{display:true,text:'Avg fulfillment (min)'},grid:{color:gc},suggestedMax:22}}},plugins:[thrLine]});
 }
 
 // ============================================================
@@ -1846,99 +1817,82 @@ function renderHeatmaps() {
 }
 
 // ============================================================
-// VISUAL 6: Station Fulfillment Week-over-Week
+// VISUAL 4: Station Fulfillment Week-over-Week (heatmap)
 // ============================================================
 function renderStationWoW() {
-  const STATIONS = getD().stations.filter(s => isFoodStation(s.station));
+  const el = document.getElementById('stationWowHeatmap');
+  if (!el) return;
+
   const weeks = WEEKS.slice().sort((a, b) => String(a.key).localeCompare(String(b.key)));
   const numWeeks = weeks.length;
-
-  // Sort worst -> best by current week avg_sec desc
-  const sorted = [...STATIONS].sort((a,b) => b.avg_sec - a.avg_sec);
-  const labels = sorted.map(s => s.station);
-
-  const refLine = {
-    id: 'refLine15',
-    afterDraw(chart) {
-      const {ctx, chartArea:a, scales} = chart;
-      if (!a || !scales.x) return;
-      const x15 = scales.x.getPixelForValue(15);
-      if (x15 < a.left || x15 > a.right) return;
-      ctx.save();
-      ctx.strokeStyle = '#e2706a';
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([6,4]);
-      ctx.beginPath();
-      ctx.moveTo(x15, a.top);
-      ctx.lineTo(x15, a.bottom);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = '#e2706a';
-      ctx.font = '11px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('15 min', x15, a.top - 4);
-      ctx.restore();
-    }
-  };
-
-  const existing = Chart.getChart('cStationWoW');
-  if (existing) existing.destroy();
-
-  const palette = ['#22c55e','#5aa9e6','#d9a441','#a78bfa','#f472b6','#38bdf8'];
-  const datasets = weeks.map((w, wi) => {
-    const data = sorted.map(s => {
-      const st = (ALL_DATA[currentVenue]?.[w.key]?.stations || []).find(x => x.station === s.station);
-      return st && st.avg_sec > 0 ? +(st.avg_sec / 60).toFixed(2) : null;
-    });
-    const isCurrent = wi === weeks.findIndex(x => x.key === WEEKS[currentWeekIdx]?.key);
-    return {
-      label: w.label,
-      data,
-      backgroundColor: isCurrent ? data.map(v => v == null ? '#2d3448' : (v >= 15 ? '#ef4444' : v >= 10 ? '#f59e0b' : '#22c55e')) : (palette[wi % palette.length] + '99'),
-      borderColor: isCurrent ? data.map(v => v == null ? '#2d3448' : (v >= 15 ? '#ef4444' : v >= 10 ? '#f59e0b' : '#22c55e')) : palette[wi % palette.length],
-      borderWidth: isCurrent ? 1.5 : 1,
-      borderRadius: 3
-    };
-  });
-
-  new Chart(document.getElementById('cStationWoW'), {
-    type: 'bar',
-    data: { labels, datasets },
-    options: {
-      indexAxis: 'y',
-      interaction: { mode: 'index', intersect: false },
-      scales: {
-        x: {
-          title: { display: true, text: 'Avg fulfillment time (min)' },
-          grid: { color: gc },
-          min: 0
-        },
-        y: {
-          grid: { display: false },
-          ticks: { font: { size: 11 } }
-        }
-      },
-      plugins: {
-        legend: { display: numWeeks > 1, position: 'top', labels: { boxWidth: 12 } },
-        tooltip: { callbacks: {
-          label(ctx) {
-            if (ctx.parsed.x == null) return ctx.dataset.label + ': —';
-            return ctx.dataset.label + ': ' + ctx.parsed.x.toFixed(1) + ' min';
-          }
-        }}
-      }
-    },
-    plugins: [refLine]
-  });
-
   const badge = document.getElementById('wowTrendBadge');
   if (badge) {
     badge.textContent = numWeeks > 1
       ? '📊 Week-over-week trend: ' + numWeeks + ' weeks'
       : '📊 Week-over-week trend: available from Week 2';
   }
-  const wowSubEl = document.getElementById('wowSubtitle');
-  if (wowSubEl) wowSubEl.textContent = 'Grouped bars = weeks. Current week colored by ful band. Sorted by current week — worst at top.';
+
+  if (currentVenue === 'rdg_portfolio') {
+    el.innerHTML = '<p class="note" style="margin:0">Pick a restaurant pill to see station fulfillment by week.</p>';
+    return;
+  }
+
+  const stationNames = new Set();
+  weeks.forEach(w => {
+    ((ALL_DATA[currentVenue] && ALL_DATA[currentVenue][w.key] && ALL_DATA[currentVenue][w.key].stations) || [])
+      .filter(s => isFoodStation(s.station))
+      .forEach(s => stationNames.add(s.station));
+  });
+
+  const latestKey = weeks.length ? weeks[weeks.length - 1].key : null;
+  const curKey = WEEKS[currentWeekIdx] && WEEKS[currentWeekIdx].key;
+  const stations = [...stationNames].sort((a, b) => {
+    const sa = ((ALL_DATA[currentVenue] && ALL_DATA[currentVenue][latestKey] && ALL_DATA[currentVenue][latestKey].stations) || []).find(s => s.station === a);
+    const sb = ((ALL_DATA[currentVenue] && ALL_DATA[currentVenue][latestKey] && ALL_DATA[currentVenue][latestKey].stations) || []).find(s => s.station === b);
+    return ((sb && sb.avg_sec) || 0) - ((sa && sa.avg_sec) || 0);
+  });
+
+  if (!stations.length) {
+    el.innerHTML = '<p class="note" style="margin:0">No food station data for this location yet.</p>';
+    return;
+  }
+
+  let html = '<table style="border-collapse:collapse;font-size:12px;min-width:520px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">' +
+    '<th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Station</th>';
+  weeks.forEach(w => {
+    const on = w.key === curKey;
+    html += '<th style="text-align:center;padding:8px 10px;white-space:nowrap;background:#1e2533;color:' +
+      (on ? '#d9a441' : '#9aa0aa') + ';font-weight:' + (on ? '700' : '400') + '">' +
+      w.label + (on ? ' ●' : '') + '</th>';
+  });
+  html += '</tr></thead><tbody>';
+
+  stations.forEach(name => {
+    html += '<tr style="border-top:1px solid #262a33"><td style="padding:6px 10px;color:#e8eaed;font-weight:600;white-space:nowrap;background:#13161c;position:sticky;left:0;z-index:1">' +
+      name + '</td>';
+    weeks.forEach(w => {
+      const st = ((ALL_DATA[currentVenue] && ALL_DATA[currentVenue][w.key] && ALL_DATA[currentVenue][w.key].stations) || [])
+        .find(s => s.station === name);
+      const sec = st && st.avg_sec > 0 ? st.avg_sec : null;
+      const on = w.key === curKey;
+      if (sec == null) {
+        html += '<td style="padding:6px 8px;text-align:center;background:#1a1d24;color:#4b5563' +
+          (on ? ';outline:1px solid #3d4458' : '') + '">—</td>';
+        return;
+      }
+      const min = sec / 60;
+      const bg = hmColor(sec, 900);
+      const fg = textFor(bg);
+      const tip = name + ' · ' + w.label + ': ' + fmtSec(sec);
+      html += '<td title="' + tip + '" style="padding:6px 8px;text-align:center;font-weight:700;background:' + bg +
+        ';color:' + fg + (on ? ';outline:2px solid #d9a441;outline-offset:-2px' : '') + '">' +
+        min.toFixed(1) + '</td>';
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  el.innerHTML = html;
 }
 
 // ============================================================
@@ -2060,9 +2014,128 @@ function stationsForFamily(family, staffing, stationDetails) {
   const map = (staffing && staffing.toastStationFamily) || {};
   const fromMap = Object.entries(map).filter(([, f]) => f === family).map(([st]) => st);
   if (fromMap.length) return fromMap;
-  // Fallback: name contains family token
-  const token = family.toLowerCase().split(/\s+/)[0];
+  const token = family.toLowerCase().split(/s+/)[0];
   return Object.keys(stationDetails || {}).filter(st => st.toLowerCase().includes(token));
+}
+
+function hourBandLabel(hourKey) {
+  const [a, b] = hourKey.split('-').map(Number);
+  const pad = n => (n < 10 ? '0' : '') + n;
+  return pad(a) + ':00–' + pad(b) + ':00';
+}
+
+function hourBucketKey(day, hourKey) {
+  return day + '|' + hourKey;
+}
+
+function familyFulfillmentTarget(family, staffing, stationDetails) {
+  const stations = stationsForFamily(family, staffing, stationDetails);
+  const STATIONS = getD().stations || [];
+  let sum = 0, n = 0;
+  stations.forEach(st => {
+    const hit = STATIONS.find(s => stationNamesMatch(s.station, st));
+    if (hit && hit.exp_sec > 0) { sum += hit.exp_sec; n++; }
+  });
+  return n > 0 ? sum / n : 900;
+}
+
+function collectFamilyItemVariance(family, staffing, stationDetails) {
+  const stations = stationsForFamily(family, staffing, stationDetails);
+  const seen = new Set();
+  const rows = [];
+  function addRow(menuItem, station, qty, avgFulSec, targetSec) {
+    const key = menuItem.toLowerCase();
+    if (seen.has(key)) return;
+    if (!(targetSec > 0) || !(avgFulSec > 0)) return;
+    if ((qty || 0) < 3) return;
+    seen.add(key);
+    rows.push({
+      menuItem,
+      station,
+      qty: qty || 0,
+      avgFulSec,
+      targetSec,
+      varianceSec: avgFulSec - targetSec,
+    });
+  }
+  stations.forEach(st => {
+    getStaticItemsForStation(st).forEach(it => {
+      addRow(it.menuItem, st, it.qty, it.avgFulSec, it.targetSec);
+    });
+  });
+  (getD().assignmentData || []).forEach(d => {
+    if (!d.menuItem || !d.station) return;
+    if (!stations.some(st => stationNamesMatch(st, d.station))) return;
+    const tgt = getEffectiveTargetSec(d.menuItem, d.targetSec || 0);
+    addRow(d.menuItem, d.station, d.count || 0, d.avgFulSec, tgt);
+  });
+  return rows.sort((a, b) => b.varianceSec - a.varianceSec);
+}
+
+function renderFamilyFulfillmentHeatmap(family, staffing, stationDetails) {
+  const el = document.getElementById('hourlyFulfillmentHeatmap');
+  if (!el) return;
+  const target = familyFulfillmentTarget(family, staffing, stationDetails);
+  let html = '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">Avg fulfillment · day × hour</h3>' +
+    '<p class="note" style="margin:0 0 10px">Family aggregate across Toast stations. Green ≤ target · amber up to +15% · red &gt;+15%. Blank = no tickets.</p>' +
+    '<table style="border-collapse:collapse;font-size:11px;min-width:720px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">' +
+    '<th style="background:#1e2533;padding:6px 8px;text-align:left;white-space:nowrap">Day</th>';
+  HOURLY_BAND.forEach(hk => {
+    html += '<th style="background:#1e2533;padding:4px 5px;text-align:center;white-space:nowrap;min-width:46px">' + hourBandLabel(hk).replace(':00', '') + '</th>';
+  });
+  html += '</tr></thead><tbody>';
+  HOURLY_DAYS.forEach(day => {
+    html += '<tr><td style="background:#13161c;padding:6px 8px;color:#e8eaed;font-weight:600;white-space:nowrap">' + day.slice(0, 3) + '</td>';
+    HOURLY_BAND.forEach(hk => {
+      const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, null, {});
+      const sec = hit.avgFulSec;
+      const bg = hmColor(sec, target);
+      const fg = textFor(bg);
+      const tip = sec != null ? fmtSec(sec) + ' · tgt ' + fmtSec(target) + ' · ' + (hit.items || hit.tickets || 0) + ' items' : 'no data';
+      html += '<td title="' + tip + '" style="padding:4px 3px;background:' + bg + ';color:' + fg + ';text-align:center;font-weight:600">' +
+        (sec != null ? fmtSec(sec) : '') + '</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function renderFamilyItemVariance(family, staffing, stationDetails) {
+  const el = document.getElementById('stationFamilyVarianceSection');
+  if (!el) return;
+  const rows = collectFamilyItemVariance(family, staffing, stationDetails).slice(0, 10);
+  if (!rows.length) {
+    el.innerHTML = '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">Top 10 items · variance vs target</h3>' +
+      '<p class="note" style="margin:0">No targeted items with enough volume this week for this family.</p>';
+    return;
+  }
+  let html = '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">Top 10 items · variance vs target</h3>' +
+    '<p class="note" style="margin:0 0 10px">Family stations only. Ranked by avg fulfillment minus chef target (qty ≥ 3).</p>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:640px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">' +
+    '<th style="text-align:left;padding:8px">#</th>' +
+    '<th style="text-align:left;padding:8px">Item</th>' +
+    '<th style="text-align:left;padding:8px">Station</th>' +
+    '<th style="text-align:right;padding:8px">Qty</th>' +
+    '<th style="text-align:right;padding:8px">Avg</th>' +
+    '<th style="text-align:right;padding:8px">Target</th>' +
+    '<th style="text-align:right;padding:8px;color:#d9a441">Variance</th>' +
+    '</tr></thead><tbody>';
+  rows.forEach((row, i) => {
+    const over = row.varianceSec > 0;
+    const varStr = (over ? '+' : '') + fmtSec(Math.abs(row.varianceSec)) + (over ? ' over' : ' under');
+    html += '<tr style="border-top:1px solid #262a33">' +
+      '<td style="padding:8px;color:#6b7280">' + (i + 1) + '</td>' +
+      '<td style="padding:8px;color:#e8eaed;font-weight:600">' + row.menuItem.replace(/</g, '&lt;') + '</td>' +
+      '<td style="padding:8px;color:#9aa0aa">' + row.station + '</td>' +
+      '<td style="padding:8px;text-align:right;color:#9aa0aa">' + row.qty + '</td>' +
+      '<td style="padding:8px;text-align:right;font-weight:600;color:' + avgFulColorByMin(row.avgFulSec / 60) + '">' + fmtSec(row.avgFulSec) + '</td>' +
+      '<td style="padding:8px;text-align:right;color:#9aa0aa">' + fmtSec(row.targetSec) + '</td>' +
+      '<td style="padding:8px;text-align:right;font-weight:700;color:' + (over ? '#ef4444' : '#22c55e') + '">' + varStr + '</td>' +
+      '</tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
 }
 
 function sumFamilyHourItems(family, day, hourKey, staffing, stationDetails, stationFilter, stationHourItems) {
@@ -2133,6 +2206,8 @@ function renderHourlyThroughput() {
   const famSel = document.getElementById('hourlyFamilySelect');
   const tableEl = document.getElementById('hourlyThroughputTable');
   const noteEl = document.getElementById('hourlyThroughputNote');
+  const heatEl = document.getElementById('hourlyFulfillmentHeatmap');
+  const varEl = document.getElementById('stationFamilyVarianceSection');
   if (!card || !tableEl) return;
 
   if (currentVenue === 'rdg_portfolio') {
@@ -2149,6 +2224,8 @@ function renderHourlyThroughput() {
     card.style.display = '';
     if (hint) hint.style.display = '';
     tableEl.innerHTML = '<p class="note" style="margin:0">No station timing for this venue/week yet.</p>';
+    if (heatEl) heatEl.innerHTML = '';
+    if (varEl) varEl.innerHTML = '';
     if (noteEl) noteEl.textContent = '';
     return;
   }
@@ -2174,12 +2251,16 @@ function renderHourlyThroughput() {
 
   window._hourlyDayEvents = {};
   window._hourlyDayStaff = {};
+  window._hourlyBucketEvents = {};
 
-  let html = '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:520px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
+  const thStyle = 'color:#9aa0aa;border-bottom:1px solid #262a33';
+  const cellR = 'padding:8px 10px;text-align:right';
+  let html = '<h3 style="margin:0 0 8px;font-size:14px;color:#e8eaed">Daily summary</h3>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:520px;margin-bottom:20px"><thead><tr style="'+thStyle+'">'+
     '<th style="text-align:left;padding:8px 10px">Day</th>'+
-    '<th style="text-align:right;padding:8px 10px">Items</th>'+
-    '<th style="text-align:right;padding:8px 10px">Staff</th>'+
-    '<th style="text-align:right;padding:8px 10px;color:#d9a441">Items / staff</th>'+
+    '<th style="'+cellR+'">Items</th>'+
+    '<th style="'+cellR+'">Staff</th>'+
+    '<th style="'+cellR+';color:#d9a441">Items / staff</th>'+
     '</tr></thead><tbody>';
 
   let totalItems = 0;
@@ -2201,11 +2282,11 @@ function renderHourlyThroughput() {
     const staffCell = heads > 0
       ? '<button type="button" data-day="'+day+'" onclick="openHourlyStaffList(this.dataset.day)" style="background:none;border:none;color:#e8eaed;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline" title="Show who worked">'+heads+'</button>'
       : '—';
-    html += '<tr style="border-top:1px solid #262a33">' +
-      '<td style="padding:8px 10px;color:#e8eaed;font-weight:600">'+day+'</td>' +
-      '<td style="padding:8px 10px;text-align:right;color:#e8eaed">'+itemsCell+'</td>' +
-      '<td style="padding:8px 10px;text-align:right">'+staffCell+'</td>' +
-      '<td style="padding:8px 10px;text-align:right;font-weight:700;color:#d9a441">'+(ips != null ? ips : '—')+'</td>' +
+    html += '<tr style="border-top:1px solid #262a33;background:#13161c">' +
+      '<td style="padding:8px 10px;color:#e8eaed;font-weight:700">'+day+'</td>' +
+      '<td style="'+cellR+';color:#e8eaed;font-weight:600">'+itemsCell+'</td>' +
+      '<td style="'+cellR+'">'+staffCell+'</td>' +
+      '<td style="'+cellR+';font-weight:700;color:#d9a441">'+(ips != null ? ips : '—')+'</td>' +
       '</tr>';
   });
 
@@ -2217,14 +2298,60 @@ function renderHourlyThroughput() {
     ? '<button type="button" data-day="__total" onclick="openHourlyItemList(this.dataset.day)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+totalItems+'</button>'
     : totalItems;
 
-  html += '<tr style="border-top:2px solid #3d4458;background:#13161c">' +
+  html += '<tr style="border-top:2px solid #3d4458;background:#0f1218">' +
     '<td style="padding:8px 10px;color:#d9a441;font-weight:700">Total</td>' +
-    '<td style="padding:8px 10px;text-align:right;font-weight:700;color:#e8eaed">'+totalItemsCell+'</td>' +
-    '<td style="padding:8px 10px;text-align:right;color:#9aa0aa">'+(avgHeads!=null?avgHeads.toFixed(1)+' avg':'—')+'</td>' +
-    '<td style="padding:8px 10px;text-align:right;font-weight:700;color:#d9a441">'+(totalIps!=null?totalIps:'—')+'</td>' +
+    '<td style="'+cellR+';font-weight:700;color:#e8eaed">'+totalItemsCell+'</td>' +
+    '<td style="'+cellR+';color:#9aa0aa">'+(avgHeads!=null?avgHeads.toFixed(1)+' avg':'—')+'</td>' +
+    '<td style="'+cellR+';font-weight:700;color:#d9a441">'+(totalIps!=null?totalIps:'—')+'</td>' +
     '</tr></tbody></table>';
 
+  html += '<h3 style="margin:0 0 8px;font-size:14px;color:#e8eaed">Hourly detail · 10:00 → 02:00</h3>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:640px"><thead><tr style="'+thStyle+'">'+
+    '<th style="text-align:left;padding:6px 10px">Day</th>'+
+    '<th style="text-align:left;padding:6px 10px">Hour</th>'+
+    '<th style="'+cellR+'">Items</th>'+
+    '<th style="'+cellR+'">Staff</th>'+
+    '<th style="'+cellR+';color:#d9a441">Items / staff</th>'+
+    '<th style="'+cellR+'">Avg ful</th>'+
+    '</tr></thead><tbody>';
+
+  HOURLY_DAYS.forEach(day => {
+    const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
+    const heads = cell && cell.heads > 0 ? cell.heads : 0;
+    HOURLY_BAND.forEach((hk, hi) => {
+      const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, null, stationHourItems);
+      const bucketKey = hourBucketKey(day, hk);
+      window._hourlyBucketEvents[bucketKey] = hit.events || [];
+      const ips = heads > 0 && hit.items > 0 ? +(hit.items / heads).toFixed(1) : null;
+      const itemsCell = (hit.items && hasItemListings)
+        ? '<button type="button" data-bucket="'+bucketKey+'" onclick="openHourlyItemList(this.dataset.bucket)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:600;padding:0;text-decoration:underline">'+hit.items+'</button>'
+        : (hit.items || '—');
+      const staffCell = heads > 0
+        ? '<span title="Day headcount — same all hours">'+heads+'</span>'
+        : '—';
+      const fulCell = hit.avgFulSec != null
+        ? '<span style="color:'+avgFulColorByMin(hit.avgFulSec/60)+'">'+fmtSec(hit.avgFulSec)+'</span>'
+        : '—';
+      const dayCell = hi === 0
+        ? '<td rowspan="'+HOURLY_BAND.length+'" style="padding:6px 10px;color:#e8eaed;font-weight:600;vertical-align:top;border-top:1px solid #262a33;background:#13161c">'+day.slice(0,3)+'</td>'
+        : '';
+      html += '<tr style="border-top:1px solid #262a33">' +
+        dayCell +
+        '<td style="padding:5px 10px;color:#9aa0aa;white-space:nowrap">'+hourBandLabel(hk)+'</td>' +
+        '<td style="'+cellR+';padding:5px 10px">'+itemsCell+'</td>' +
+        '<td style="'+cellR+';padding:5px 10px;color:#9aa0aa">'+staffCell+'</td>' +
+        '<td style="'+cellR+';padding:5px 10px;font-weight:600;color:#d9a441">'+(ips != null ? ips : '—')+'</td>' +
+        '<td style="'+cellR+';padding:5px 10px">'+fulCell+'</td>' +
+        '</tr>';
+    });
+  });
+
+  html += '</tbody></table>';
   tableEl.innerHTML = html;
+
+  renderFamilyFulfillmentHeatmap(family, staffing, stationDetails);
+  renderFamilyItemVariance(family, staffing, stationDetails);
+
   const stList = stationsForFamily(family, staffing, stationDetails);
   if (noteEl) {
     noteEl.textContent = (stList.length ? ('Stations in '+family+': '+stList.join(', ')+'. ') : '') +
@@ -2232,7 +2359,7 @@ function renderHourlyThroughput() {
         ? 'Items = menu item qty (includes items with no target). Click a count for the sold list. '
         : 'Items = kitchen ticket fires (no item listing yet). ') +
       (famStaff
-        ? 'Staff = family headcount that day — click the number to see who.'
+        ? 'Staff = family headcount that day (same for all hours in that day) — click daily total to see who.'
         : 'No staffing join for this venue/family — items shown without staff divisor.');
   }
 }
@@ -2281,11 +2408,15 @@ function closeHourlyItemList() {
 
 function openHourlyItemList(dayKey) {
   closeHourlyItemList();
-  const events = (window._hourlyDayEvents && window._hourlyDayEvents[dayKey]) ||
-    (window._hourlyBucketEvents && window._hourlyBucketEvents[dayKey]) || [];
+  const events = (window._hourlyBucketEvents && window._hourlyBucketEvents[dayKey]) ||
+    (window._hourlyDayEvents && window._hourlyDayEvents[dayKey]) || [];
   const famSel = document.getElementById('hourlyFamilySelect');
   const family = (famSel && famSel.value) || '';
-  const dayLabel = dayKey === '__total' ? 'All week' : dayKey;
+  let dayLabel = dayKey === '__total' ? 'All week' : dayKey;
+  if (dayKey.includes('|')) {
+    const parts = dayKey.split('|');
+    dayLabel = parts[0] + ' · ' + hourBandLabel(parts[1]);
+  }
   const qty = events.reduce((a, e) => a + (e.q || 1), 0);
   const noTarget = events.reduce((a, e) => a + (e.tgt ? 0 : (e.q || 1)), 0);
 
