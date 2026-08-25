@@ -483,13 +483,65 @@ async function _doRefreshOTSession() {
   return session;
 }
 
+async function probeOTSession(session) {
+  if (!session?.token) return false;
+  try {
+    const r = await axios.get(
+      "https://guestcenter.opentable.com/gateway/long-proxies/restaurant-reporting/reportingBiDatasources/api/v5/reservations/",
+      {
+        params: {
+          rid: OT_RESTAURANTS.claudie,
+          startDate: "2026-01-01",
+          endDate: "2026-01-02",
+          offset: 0,
+          limit: 1,
+          sort: "-visitDate",
+          stateCategories: "seated,finished",
+          isVisitDate: true,
+        },
+        headers: {
+          Authorization: `Bearer ${session.token}`,
+          "User-Agent": "Mozilla/5.0",
+          Accept: "application/json",
+          Referer: "https://guestcenter.opentable.com/",
+          Cookie: session.cookies || "",
+        },
+        validateStatus: () => true,
+        timeout: 15000,
+      }
+    );
+    return r.status === 200;
+  } catch {
+    return false;
+  }
+}
+
 async function getOTSession() {
   if (fs.existsSync(OT_SESSION_FILE)) {
     const s = JSON.parse(fs.readFileSync(OT_SESSION_FILE, "utf8"));
     const age = (Date.now() - new Date(s.capturedAt).getTime()) / 60000;
-    if (age < 50 && s.token) return s;
+    // Prefer a live token for up to ~12h; Okta password refresh can LOCK_OUT the account
+    if (s.token && age < 12 * 60) {
+      if (age < 50 || (await probeOTSession(s))) return s;
+    }
+    if (s.token && (await probeOTSession(s))) {
+      console.log("  [OT] Reusing existing GuestCenter token (Okta refresh skipped)");
+      return s;
+    }
   }
-  return refreshOTSession();
+  try {
+    return await refreshOTSession();
+  } catch (err) {
+    // Last resort: reuse any saved token if Okta is locked out
+    if (fs.existsSync(OT_SESSION_FILE)) {
+      const s = JSON.parse(fs.readFileSync(OT_SESSION_FILE, "utf8"));
+      if (s.token && (await probeOTSession(s))) {
+        console.log("  [OT] Okta refresh failed; reusing working saved token");
+        return s;
+      }
+    }
+    throw err;
+  }
 }
 
 // ── OpenTable covers fetch ──────────────────────────────────────────────────
@@ -531,16 +583,20 @@ async function fetchOTCovers(venueKey, startDate, endDate) {
     offset += limit;
   }
 
-  // Filter & slim down
+  // Filter & slim down — GuestCenter v5 uses stateCategory + seatedDate/finishedDate
   const covers = allItems
-    .filter(r => ["Done", "SeatedDisputed", "Seated", "Finished", "Arrived"].includes(r.reservationStatus))
+    .filter(r => {
+      const st = String(r.stateCategory || r.reservationStatus || "").toLowerCase();
+      return ["done", "seateddisputed", "seated", "finished", "arrived"].includes(st.replace(/\s+/g, ""));
+    })
     .map(r => ({
-      visitDate:    r.visitDate     ? r.visitDate.slice(0, 10) : null,
+      visitDate:    r.visitDate     ? String(r.visitDate).slice(0, 10) : null,
       seatedTime:   r.seatedDate    || r.seatedTime    || null,
       finishedTime: r.finishedDate  || r.finishedTime  || r.departureTime || null,
       partySize:    r.partySize     ?? r.covers ?? null,
-      tableName:    r.tableId       || r.tableName || null,
-    }));
+      tableName:    r.tableId != null ? String(r.tableId) : (r.tableName || null),
+    }))
+    .filter(c => c.seatedTime && c.finishedTime);
 
   console.log(`  [OT] ${venueKey}: ${covers.length} covers`);
   return covers;

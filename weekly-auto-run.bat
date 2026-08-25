@@ -16,12 +16,20 @@ if errorlevel 1 (
 )
 copy /Y toast-session.json "C:\Cursor\toast-mcp-server\toast-session.json" >nul 2>&1
 
-:: 2) Fetch last full ISO week
+:: 2) Fetch last full ISO week (Toast kitchen + items; OT best-effort inside weekly-save)
 echo [%date% %time%] weekly-save.js starting... >> auto-run.log 2>&1
 node weekly-save.js >> auto-run.log 2>&1
 if errorlevel 1 (
   echo [%date% %time%] WARN: weekly-save.js exited non-zero — continuing with any venues that succeeded >> auto-run.log 2>&1
   set ERR=1
+)
+
+:: 2b) Backfill OpenTable covers via saved GuestCenter token (avoids Okta LOCK_OUT)
+node -e "const fs=require('fs');const weeks=fs.readdirSync('data').filter(d=>/^\d{4}-W\d{2}$/.test(d)).sort();process.stdout.write(weeks[weeks.length-1]||'');" > "%TEMP%\boh-week.txt"
+set /p BOH_WEEK=<"%TEMP%\boh-week.txt"
+if defined BOH_WEEK (
+  echo [%date% %time%] Fetching OT covers for %BOH_WEEK%... >> auto-run.log 2>&1
+  node fetch-ot-covers-week.cjs %BOH_WEEK% >> auto-run.log 2>&1
 )
 
 :: 3) Process any missing venue week JSON from raw kitchen files
