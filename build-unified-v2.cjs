@@ -2069,7 +2069,17 @@ const HOURLY_BAND = [
   '18-19','19-20','20-21','21-22','22-23','23-24','0-1','1-2'
 ];
 const HOURLY_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+/** Mon→Fri columns for hour×day heatmaps */
+const HOURLY_HEAT_DAYS = HOURLY_DAYS.slice(0, 5);
 const HOURLY_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
+
+function columnRelativeHeat(val, colMin, colMax) {
+  if (val == null || val <= 0) return { bg: '#13161c', fg: '#4b5563' };
+  if (colMax <= colMin) return { bg: '#d9a441', fg: '#0f1218' };
+  const t = (val - colMin) / (colMax - colMin);
+  const bg = lerpColor('#1a2840', '#d9a441', t);
+  return { bg, fg: textFor(bg) };
+}
 
 function stationsForFamily(family, staffing, stationDetails) {
   const map = (staffing && staffing.toastStationFamily) || {};
@@ -2137,24 +2147,26 @@ function renderFamilyFulfillmentHeatmap(family, staffing, stationDetails) {
   const el = document.getElementById('hourlyFulfillmentHeatmap');
   if (!el) return;
   const target = familyFulfillmentTarget(family, staffing, stationDetails);
-  let html = '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">Avg fulfillment · day × hour</h3>' +
-    '<p class="note" style="margin:0 0 10px">Family aggregate across Toast stations. Green ≤ target · amber up to +15% · red &gt;+15%. Blank = no tickets.</p>' +
-    '<table style="border-collapse:collapse;font-size:11px;min-width:720px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">' +
-    '<th style="background:#1e2533;padding:6px 8px;text-align:left;white-space:nowrap">Day</th>';
-  HOURLY_BAND.forEach(hk => {
-    html += '<th style="background:#1e2533;padding:4px 5px;text-align:center;white-space:nowrap;min-width:46px">' + hourBandLabel(hk).replace(':00', '') + '</th>';
+  let html = '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">Avg fulfillment · hour × day</h3>' +
+    '<p class="note" style="margin:0 0 10px">Rows = hours · columns = Mon→Fri. Green ≤ target · amber up to +15% · red &gt;+15%. Blank = no tickets.</p>' +
+    '<table style="border-collapse:collapse;font-size:11px;min-width:520px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">' +
+    '<th style="background:#1e2533;padding:6px 8px;text-align:left;white-space:nowrap">Hour</th>';
+  HOURLY_HEAT_DAYS.forEach(day => {
+    html += '<th style="background:#1e2533;padding:6px 10px;text-align:center;white-space:nowrap;min-width:52px">' + day.slice(0, 3) + '</th>';
   });
   html += '</tr></thead><tbody>';
-  HOURLY_DAYS.forEach(day => {
-    html += '<tr><td style="background:#13161c;padding:6px 8px;color:#e8eaed;font-weight:600;white-space:nowrap">' + day.slice(0, 3) + '</td>';
-    HOURLY_BAND.forEach(hk => {
+  HOURLY_BAND.forEach(hk => {
+    html += '<tr style="border-top:1px solid #262a33"><td style="background:#13161c;padding:5px 8px;color:#9aa0aa;white-space:nowrap;font-weight:600">' + hourBandLabel(hk) + '</td>';
+    HOURLY_HEAT_DAYS.forEach(day => {
       const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, null, {});
       const sec = hit.avgFulSec;
       const bg = hmColor(sec, target);
       const fg = textFor(bg);
-      const tip = sec != null ? fmtSec(sec) + ' · tgt ' + fmtSec(target) + ' · ' + (hit.items || hit.tickets || 0) + ' items' : 'no data';
-      html += '<td title="' + tip + '" style="padding:4px 3px;background:' + bg + ';color:' + fg + ';text-align:center;font-weight:600">' +
-        (sec != null ? fmtSec(sec) : '') + '</td>';
+      const tip = day.slice(0, 3) + ' ' + hourBandLabel(hk) + ': ' +
+        (sec != null ? fmtSec(sec) + ' · tgt ' + fmtSec(target) : 'no data') +
+        ' · ' + (hit.items || hit.tickets || 0) + ' items';
+      html += '<td title="' + tip + '" style="padding:5px 6px;background:' + bg + ';color:' + fg + ';text-align:center;font-weight:600">' +
+        (sec != null ? fmtSec(sec) : '—') + '</td>';
     });
     html += '</tr>';
   });
@@ -2366,48 +2378,88 @@ function renderHourlyThroughput() {
     '<td style="'+cellR+';font-weight:700;color:#d9a441">'+(totalIps!=null?totalIps:'—')+'</td>' +
     '</tr></tbody></table>';
 
-  html += '<h3 style="margin:0 0 8px;font-size:14px;color:#e8eaed">Hourly detail · 10:00 → 02:00</h3>' +
-    '<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:640px"><thead><tr style="'+thStyle+'">'+
-    '<th style="text-align:left;padding:6px 10px">Day</th>'+
-    '<th style="text-align:left;padding:6px 10px">Hour</th>'+
-    '<th style="'+cellR+'">Items</th>'+
-    '<th style="'+cellR+'">Staff</th>'+
-    '<th style="'+cellR+';color:#d9a441">Items / staff</th>'+
-    '<th style="'+cellR+'">Avg ful</th>'+
-    '</tr></thead><tbody>';
+  html += '<h3 style="margin:16px 0 8px;font-size:14px;color:#e8eaed">Items · hour × day</h3>' +
+    '<p class="note" style="margin:0 0 10px">Rows = hours (10:00→02:00) · columns = <strong>Mon→Fri</strong>. Color = busiest→quietest <em>within each day column</em>. Click a cell for the sold list.</p>' +
+    '<table style="border-collapse:collapse;font-size:12px;min-width:420px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
+    '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
+  HOURLY_HEAT_DAYS.forEach(day => {
+    html += '<th style="text-align:center;padding:6px 10px;background:#1e2533;min-width:52px">'+day.slice(0,3)+'</th>';
+  });
+  html += '</tr></thead><tbody>';
 
-  HOURLY_DAYS.forEach(day => {
-    const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
-    const heads = cell && cell.heads > 0 ? cell.heads : 0;
-    HOURLY_BAND.forEach((hk, hi) => {
+  const gridItems = {};
+  const colItemScale = {};
+  HOURLY_HEAT_DAYS.forEach(day => {
+    gridItems[day] = {};
+    HOURLY_BAND.forEach(hk => {
       const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, null, stationHourItems);
       const bucketKey = hourBucketKey(day, hk);
       window._hourlyBucketEvents[bucketKey] = hit.events || [];
-      const ips = heads > 0 && hit.items > 0 ? +(hit.items / heads).toFixed(1) : null;
-      const itemsCell = (hit.items && hasItemListings)
-        ? '<button type="button" data-bucket="'+bucketKey+'" onclick="openHourlyItemList(this.dataset.bucket)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:600;padding:0;text-decoration:underline">'+hit.items+'</button>'
-        : (hit.items || '—');
-      const staffCell = heads > 0
-        ? '<span title="Day headcount — same all hours">'+heads+'</span>'
-        : '—';
-      const fulCell = hit.avgFulSec != null
-        ? '<span style="color:'+avgFulColorByMin(hit.avgFulSec/60)+'">'+fmtSec(hit.avgFulSec)+'</span>'
-        : '—';
-      const dayCell = hi === 0
-        ? '<td rowspan="'+HOURLY_BAND.length+'" style="padding:6px 10px;color:#e8eaed;font-weight:600;vertical-align:top;border-top:1px solid #262a33;background:#13161c">'+day.slice(0,3)+'</td>'
-        : '';
-      html += '<tr style="border-top:1px solid #262a33">' +
-        dayCell +
-        '<td style="padding:5px 10px;color:#9aa0aa;white-space:nowrap">'+hourBandLabel(hk)+'</td>' +
-        '<td style="'+cellR+';padding:5px 10px">'+itemsCell+'</td>' +
-        '<td style="'+cellR+';padding:5px 10px;color:#9aa0aa">'+staffCell+'</td>' +
-        '<td style="'+cellR+';padding:5px 10px;font-weight:600;color:#d9a441">'+(ips != null ? ips : '—')+'</td>' +
-        '<td style="'+cellR+';padding:5px 10px">'+fulCell+'</td>' +
-        '</tr>';
+      gridItems[day][hk] = hit.items || 0;
     });
+    const vals = HOURLY_BAND.map(hk => gridItems[day][hk]).filter(v => v > 0);
+    colItemScale[day] = { min: vals.length ? Math.min(...vals) : 0, max: vals.length ? Math.max(...vals) : 0 };
   });
 
+  HOURLY_BAND.forEach(hk => {
+    html += '<tr style="border-top:1px solid #262a33"><td style="padding:5px 10px;color:#9aa0aa;white-space:nowrap;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">'+hourBandLabel(hk)+'</td>';
+    HOURLY_HEAT_DAYS.forEach(day => {
+      const items = gridItems[day][hk];
+      const scale = colItemScale[day];
+      const heat = columnRelativeHeat(items, scale.min, scale.max);
+      const bucketKey = hourBucketKey(day, hk);
+      const inner = items > 0
+        ? (hasItemListings
+          ? '<button type="button" data-bucket="'+bucketKey+'" onclick="openHourlyItemList(this.dataset.bucket)" style="background:none;border:none;color:inherit;cursor:pointer;font:inherit;font-weight:700;padding:0;width:100%;height:100%">' + items + '</button>'
+          : String(items))
+        : '—';
+      html += '<td title="'+day.slice(0,3)+' '+hourBandLabel(hk)+': '+items+' items" style="padding:5px 8px;text-align:center;font-weight:700;background:'+heat.bg+';color:'+heat.fg+'">'+inner+'</td>';
+    });
+    html += '</tr>';
+  });
   html += '</tbody></table>';
+
+  const hasStaff = HOURLY_HEAT_DAYS.some(day => {
+    const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
+    return cell && cell.heads > 0;
+  });
+  if (hasStaff) {
+    html += '<h3 style="margin:0 0 8px;font-size:14px;color:#d9a441">Items / staff · hour × day</h3>' +
+      '<p class="note" style="margin:0 0 10px">Same layout. Staff = day headcount (constant per column). Color = highest→lowest load per day.</p>' +
+      '<table style="border-collapse:collapse;font-size:12px;min-width:420px"><thead><tr style="'+thStyle+'">'+
+      '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
+    HOURLY_HEAT_DAYS.forEach(day => {
+      html += '<th style="text-align:center;padding:6px 10px;background:#1e2533;min-width:52px">'+day.slice(0,3)+'</th>';
+    });
+    html += '</tr></thead><tbody>';
+
+    const gridIps = {};
+    const colIpsScale = {};
+    HOURLY_HEAT_DAYS.forEach(day => {
+      gridIps[day] = {};
+      const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
+      const heads = cell && cell.heads > 0 ? cell.heads : 0;
+      HOURLY_BAND.forEach(hk => {
+        const items = gridItems[day][hk];
+        gridIps[day][hk] = heads > 0 && items > 0 ? +(items / heads).toFixed(1) : null;
+      });
+      const vals = HOURLY_BAND.map(hk => gridIps[day][hk]).filter(v => v != null && v > 0);
+      colIpsScale[day] = { min: vals.length ? Math.min(...vals) : 0, max: vals.length ? Math.max(...vals) : 0 };
+    });
+
+    HOURLY_BAND.forEach(hk => {
+      html += '<tr style="border-top:1px solid #262a33"><td style="padding:5px 10px;color:#9aa0aa;white-space:nowrap;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">'+hourBandLabel(hk)+'</td>';
+      HOURLY_HEAT_DAYS.forEach(day => {
+        const ips = gridIps[day][hk];
+        const scale = colIpsScale[day];
+        const heat = ips != null ? columnRelativeHeat(ips, scale.min, scale.max) : { bg: '#13161c', fg: '#4b5563' };
+        html += '<td style="padding:5px 8px;text-align:center;font-weight:700;background:'+heat.bg+';color:'+heat.fg+'">'+(ips != null ? ips : '—')+'</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+  }
+
   tableEl.innerHTML = html;
 
   renderFamilyFulfillmentHeatmap(family, staffing, stationDetails);
