@@ -101,6 +101,65 @@ function shortStaffLabel(fullName) {
   return initial ? `${first} ${initial}.` : first;
 }
 
+/** Per-person rollup for public STAFF view (short labels, no full names). */
+function buildPublicPlayers(byFamily) {
+  const players = new Map();
+  for (const [family, data] of Object.entries(byFamily)) {
+    if (!FOOD_SET.has(family)) continue;
+    for (const day of DAYS) {
+      const cell = data.days[day];
+      if (!cell || !cell.names?.length) continue;
+      const vol = cell.volume || 0;
+      const headN = cell.names.length;
+      for (const n of cell.names) {
+        const label = shortStaffLabel(n.toastName || n.name || '');
+        const key = label.toLowerCase();
+        if (!players.has(key)) {
+          players.set(key, {
+            label,
+            position: n.position || '',
+            families: new Set(),
+            weekHours: 0,
+            weekItems: 0,
+            days: {},
+          });
+        }
+        const p = players.get(key);
+        p.families.add(family);
+        const hrs = n.hours || 0;
+        p.weekHours += hrs;
+        const itemShare = headN > 0 ? vol / headN : 0;
+        p.weekItems += itemShare;
+        if (!p.days[day]) p.days[day] = { hours: 0, items: 0, families: [] };
+        p.days[day].hours += hrs;
+        p.days[day].items += itemShare;
+        if (!p.days[day].families.includes(family)) p.days[day].families.push(family);
+      }
+    }
+  }
+  return [...players.values()]
+    .map((p) => ({
+      label: p.label,
+      position: p.position,
+      families: [...p.families].sort(),
+      weekHours: +p.weekHours.toFixed(2),
+      weekItems: Math.round(p.weekItems),
+      weekItemsPerHour: p.weekHours > 0 ? +(p.weekItems / p.weekHours).toFixed(2) : null,
+      days: Object.fromEntries(
+        Object.entries(p.days).map(([d, v]) => [
+          d,
+          {
+            hours: +v.hours.toFixed(2),
+            items: Math.round(v.items),
+            itemsPerHour: v.hours > 0 ? +(v.items / v.hours).toFixed(2) : null,
+            families: v.families,
+          },
+        ])
+      ),
+    }))
+    .sort((a, b) => b.weekItems - a.weekItems);
+}
+
 /** Jobs that should join to Viktor food-station families (excludes dish/receiver support). */
 const FOOD_STATION_JOB_RE =
   /line cook|cdp|pastry|sushi|robata|saute|fry|garde|prep cook|expo|pizza|tempura|maki|grill|plancha|butcher|crudo|\braw\b|chef|training\s*-\s*boh|temp (line|cdp|pastry|prep)/i;
@@ -707,6 +766,7 @@ function buildVenue(venueRaw, weekLabel) {
     guestsSeated: staffing.guestsSeated,
     toastStationFamily,
     byFamily: publicByFamily,
+    players: buildPublicPlayers(byFamily),
     foodFamiliesOnly: true,
   };
   // Keep BOH-only rates on public payload (no names) for pipeline / dashboard notes
