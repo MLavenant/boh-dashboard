@@ -274,7 +274,7 @@ async function fetchKitchenTiming(venueKey) {
   const s3Url = triggerRes.headers["location"];
   if (!s3Url) throw new Error(`[${venueKey}] No S3 URL in response (status ${triggerRes.status})`);
 
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 45; i++) {
     await new Promise(r => setTimeout(r, 3000));
     const s3Res = await axios.get(s3Url, { validateStatus: () => true });
     const d = s3Res.data;
@@ -715,7 +715,10 @@ async function main() {
     }
   }
   if (processFailures > 0) {
-    throw new Error(`Venue processing failed for ${processFailures} venue(s)`);
+    console.error(`WARN: Venue processing failed for ${processFailures}/${PROCESS_VENUES.length} venue(s) — continuing with successful venues`);
+    if (processFailures === PROCESS_VENUES.length) {
+      throw new Error(`Venue processing failed for all ${processFailures} venue(s)`);
+    }
   }
 
   // ── Step 5: Rebuild the HTML dashboard ───────────────────────────────────
