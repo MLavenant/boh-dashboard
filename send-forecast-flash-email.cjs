@@ -23,12 +23,17 @@
 'use strict';
 
 const https = require('https');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const { spawnSync } = require('child_process');
 const { chromium } = require('playwright');
-const { sendMail } = require('./ms-graph-mail.cjs');
 
 const FB_DB = 'rdg-dj-dashboard-default-rtdb.firebaseio.com';
 const DASH_URL = process.env.FORECAST_DASHBOARD_URL || 'https://mlavenant.github.io/rdg-dj/';
 const ALERT_TO = (process.env.FORECAST_EMAIL_ALERT_TO || 'matthias@rivieradininggroup.com').trim();
+/* graph = Azure Mail.Send | outlook = local Outlook COM (no Azure admin) | skip = no-op */
+const VIA = String(process.env.FORECAST_EMAIL_VIA || 'graph').trim().toLowerCase();
 
 const FCAST_TO = [
   'michael@rivieradininggroup.com',
@@ -254,13 +259,17 @@ async function captureAllVenues() {
   }
 }
 
-function buildHtmlBody(results, todayLabel) {
+function buildHtmlBody(results, todayLabel, { embedDataUri = false } = {}) {
   let html = '<div style="font-family:Segoe UI,Arial,sans-serif;font-size:14px;color:#1c1c1e;line-height:1.5">';
   html += '<p>Hi team,</p>';
   html += `<p>Please find below our booking performance as of <b>${todayLabel}</b>.</p>`;
   results.forEach(r => {
     html += `<div style="margin:18px 0 8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#48484a">${r.venue}</div>`;
-    html += `<img src="cid:${r.cid}" alt="${r.venue} booking performance" style="max-width:100%;border:1px solid #e5e5ea;border-radius:8px;display:block"/>`;
+    if (embedDataUri) {
+      html += `<img src="data:image/jpeg;base64,${r.snapB64}" alt="${r.venue} booking performance" style="max-width:100%;border:1px solid #e5e5ea;border-radius:8px;display:block"/>`;
+    } else {
+      html += `<img src="cid:${r.cid}" alt="${r.venue} booking performance" style="max-width:100%;border:1px solid #e5e5ea;border-radius:8px;display:block"/>`;
+    }
   });
   html += '<p style="margin-top:18px;font-size:12px;color:#8e8e93">PDFs attached for each location (page 1 = Actual vs Target + Details; page 2 = Pick up pace).</p>';
   html += '<p style="margin-top:8px;font-size:11px;color:#8e8e93">Sent automatically after FourVenues Forecast BS Actual refreshed for today.</p>';
@@ -268,11 +277,71 @@ function buildHtmlBody(results, todayLabel) {
   return html;
 }
 
+function outlookSend({ to, cc, subject, htmlBody, attachmentPaths, alertOnly }) {
+  const ps1 = path.join(__dirname, 'outlook-send-mail.ps1');
+  if (!fs.existsSync(ps1)) throw new Error(`Missing ${ps1}`);
+  const args = [
+    '-NoProfile', '-ExecutionPolicy', 'Bypass',
+    '-File', ps1,
+    '-To', to.join(';'),
+    '-Subject', subject,
+    '-HtmlBodyPath', htmlBody
+  ];
+  if (cc && cc.length) args.push('-Cc', cc.join(';'));
+  if (attachmentPaths && attachmentPaths.length) {
+    args.push('-Attachments', attachmentPaths.join('|'));
+  }
+  if (alertOnly) args.push('-AlertOnly');
+  const r = spawnSync('powershell.exe', args, { encoding: 'utf8' });
+  if (r.stdout) process.stdout.write(r.stdout);
+  if (r.stderr) process.stderr.write(r.stderr);
+  if (r.status !== 0) {
+    throw new Error(`Outlook send failed (exit ${r.status}): ${(r.stderr || r.stdout || '').slice(0, 400)}`);
+  }
+}
+
+async function sendViaGraph(opts) {
+  const { sendMail } = require('./ms-graph-mail.cjs');
+  try {
+    await sendMail(opts);
+  } catch (e) {
+    if (e.status === 403 || /Mail\.Send/i.test(e.message || '')) {
+      const err = new Error('Azure Mail.Send not granted — use local Outlook path (FORECAST_EMAIL_VIA=outlook) until IT enables Mail.Send');
+      err.code = 'NO_MAIL_SEND';
+      throw err;
+    }
+    throw e;
+  }
+}
+
 async function sendFlashEmail(pack) {
   const d = new Date();
   const todayLabel = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
   const subject = `DJ Booking Performance Flash : Week ${pack.weekNum}`;
-  const htmlBody = buildHtmlBody(pack.results, todayLabel);
+
+  if (VIA === 'outlook') {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rdg-fcast-'));
+    const htmlPath = path.join(tmp, 'body.html');
+    const htmlBody = buildHtmlBody(pack.results, todayLabel, { embedDataUri: true });
+    fs.writeFileSync(htmlPath, htmlBody, 'utf8');
+    const attachmentPaths = [];
+    pack.results.forEach(r => {
+      const pdfPath = path.join(tmp, r.pdfName);
+      fs.writeFileSync(pdfPath, Buffer.from(r.pdfB64, 'base64'));
+      attachmentPaths.push(pdfPath);
+    });
+    outlookSend({
+      to: FCAST_TO,
+      cc: FCAST_CC,
+      subject,
+      htmlBody: htmlPath,
+      attachmentPaths
+    });
+    try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (_) {}
+    return subject;
+  }
+
+  const htmlBody = buildHtmlBody(pack.results, todayLabel, { embedDataUri: false });
   const attachments = [];
   pack.results.forEach(r => {
     attachments.push({
@@ -288,7 +357,7 @@ async function sendFlashEmail(pack) {
       contentBytesBase64: r.pdfB64
     });
   });
-  await sendMail({
+  await sendViaGraph({
     to: FCAST_TO,
     cc: FCAST_CC,
     subject,
@@ -307,7 +376,23 @@ async function sendFailureAlert(reason) {
     <p>Checked Mon–Fri at 9:00 ET, then again at 9:30 ET. Only one flash email is sent per day when FourVenues (Forecast BS Actual) is OK.</p>
     <p>Dashboard System page → FourVenues / Forecast email status for details.</p>
   </div>`;
-  await sendMail({
+
+  if (VIA === 'outlook') {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rdg-fcast-alert-'));
+    const htmlPath = path.join(tmp, 'alert.html');
+    fs.writeFileSync(htmlPath, html, 'utf8');
+    outlookSend({
+      to: [ALERT_TO],
+      subject: `ALERT: Forecast flash email failed · ${day}`,
+      htmlBody: htmlPath,
+      attachmentPaths: [],
+      alertOnly: true
+    });
+    try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (_) {}
+    return;
+  }
+
+  await sendViaGraph({
     to: [ALERT_TO],
     subject: `ALERT: Forecast flash email failed · ${day}`,
     htmlBody: html,
@@ -325,9 +410,14 @@ function resolveAttempt(et) {
 }
 
 (async () => {
+  if (VIA === 'skip') {
+    log('FORECAST_EMAIL_VIA=skip — cloud Graph send disabled (use local Outlook)');
+    process.exit(0);
+  }
+
   const et = etParts();
   const day = et.date;
-  log(`ET ${et.weekday} ${day} ${String(et.hour).padStart(2, '0')}:${String(et.minute).padStart(2, '0')} · attempt env=${process.env.FORECAST_EMAIL_ATTEMPT || 'auto'}`);
+  log(`ET ${et.weekday} ${day} ${String(et.hour).padStart(2, '0')}:${String(et.minute).padStart(2, '0')} · via=${VIA} · attempt env=${process.env.FORECAST_EMAIL_ATTEMPT || 'auto'}`);
 
   if (et.dow < 1 || et.dow > 5) {
     log('Weekend — skip');
@@ -365,14 +455,33 @@ function resolveAttempt(et) {
 
   const statusBase = {
     schedule: 'Mon–Fri 9:00 ET · retry 9:30 · only if FourVenues Forecast BS Actual OK · max 1/day',
-    what: 'Auto Forecast flash email (same recipients as dashboard Send all emails)',
+    what: VIA === 'outlook'
+      ? 'Auto Forecast flash email via local Outlook (no Azure Mail.Send needed)'
+      : 'Auto Forecast flash email via Microsoft Graph Mail.Send',
+    via: VIA,
     miamiDay: day,
     at: new Date().toISOString(),
     atLocal: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }),
     attempt
   };
 
-  if (!fvOk) {
+  /* Local Outlook: poll a few minutes for FV after the 9:00 cloud retry starts. */
+  if (!fvOk && VIA === 'outlook' && !isFinal) {
+    const deadline = Date.now() + 8 * 60 * 1000;
+    log('FourVenues not ready — polling up to 8 minutes…');
+    while (Date.now() < deadline) {
+      await new Promise(r => setTimeout(r, 30000));
+      try { fv = await fbGet('/rdg/scrapeStatus/fourvenues'); } catch (_) {}
+      if (fv && fv.ok === true && fv.miamiDay === day) {
+        log(`FourVenues became OK at ${fv.at}`);
+        break;
+      }
+    }
+  }
+  const fvOkNow = !!(fv && fv.ok === true && fv.miamiDay === day);
+  log(`FourVenues after wait ok=${fvOkNow}`);
+
+  if (!fvOkNow) {
     const reason = !fv
       ? 'FourVenues status missing'
       : (fv.ok === false

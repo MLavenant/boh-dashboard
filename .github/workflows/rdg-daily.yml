@@ -185,4 +185,6 @@ jobs:
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           GRAPH_MAILBOX: ${{ secrets.GRAPH_MAILBOX }}
           FORECAST_EMAIL_ALERT_TO: matthias@rivieradininggroup.com
+          # Until Azure Mail.Send is granted, sending is done on the PC via Outlook.
+          FORECAST_EMAIL_VIA: skip
         run: node send-forecast-flash-email.cjs
