@@ -1,21 +1,18 @@
 # Laptop-off automation (BOH Kitchen Dashboard)
 
 Website: https://mlavenant.github.io/boh-dashboard/dashboard.html  
-Robot: this repo (`boh-dashboard`) via **GitHub-hosted Actions**, matching DJ.
 
-The laptop can be off. BOH keeps the current Toast Web Admin kitchen reports
-by restoring an encrypted browser session from a GitHub Actions secret.
-
-## Timing model
+## Timing model (updated)
 
 | Priority | Trigger | Time | Notes |
 |----------|---------|------|-------|
-| Primary | GitHub Actions `schedule:` | Monday ~8:30 AM ET | Hosted runner; laptop off |
-| Backup | Second GitHub schedule | Monday ~9:00 AM ET | Retries the same idempotent week |
-| Manual | Actions → BOH Weekly Refresh | Any time | Pulls previous full week |
+| **1 – Primary** | Windows Task `BOH Dashboard Weekly Fetch` | **Monday 8:30 AM ET** | Runs on this laptop. Opens Edge to refresh Toast login, scrapes last full ISO week, publishes Firebase + Pages, refreshes GitHub secret. |
+| 2 – Backup | GitHub Actions `boh-weekly.yml` | Mon ~8:30 / ~9:00 ET | Often fails: Toast Cloudflare blocks hosted runners when cookies are stale. |
+| Manual | `C:\Cursor\boh-rdg-publish\weekly-auto-run.bat` | Any time | Same path as the Monday task |
 
-No self-hosted runner, Windows Task Scheduler, PAT, cron-job.org, or `gh auth`
-is required for the primary cloud job.
+**Why cloud alone is not enough:** Toast Web Admin cookies expire every few days, and GitHub-hosted IPs hit Cloudflare/login. The laptop Edge refresh is required before scrape.
+
+**Requirements for Monday success:** laptop on (and awake) at 8:30 AM ET; complete Cloudflare/2FA in the Edge window if prompted.
 
 ## What the weekly job writes
 
@@ -24,50 +21,31 @@ is required for the primary cloud job.
 | Path | Contents |
 |------|----------|
 | `/rdg/boh/meta` | `{ latestWeek, updatedAt, venues[] }` |
-| `/rdg/boh/weeks/{week}/{venue}` | Processed venue JSON only (~70–250 KB) |
-| `/rdg/scrapeStatus/bohWeekly` | Freshness + pass/fail for Settings → System |
-
-Never upload raw kitchen-timing dumps or `rolling.json`.
+| `/rdg/boh/weeks/{week}/{venue}` | Processed venue JSON |
+| `/rdg/scrapeStatus/bohWeekly` | Pass/fail for Settings → System |
 
 ### GitHub Pages
 
-Rebuilds `dashboard.html` (embedded fallback + Firebase live load) and pushes `main`.
+Rebuilds `dashboard.html` and pushes `main`.
 
 ## Secrets (GitHub → Settings → Secrets → Actions)
 
 | Secret | Use |
 |--------|-----|
-| `TOAST_SESSION_GZIP_B64` | Compressed Toast Web Admin browser session |
-| `OT_USERNAME` | OpenTable GuestCenter login |
-| `OT_PASSWORD` | OpenTable GuestCenter password |
-| `OT_CLIENT_ID` | Optional; default OpenTable client ID is built in |
+| `TOAST_SESSION_GZIP_B64` | Auto-refreshed by the laptop Monday job after Edge login |
+| `OT_USERNAME` / `OT_PASSWORD` | OpenTable covers (optional; kitchen metrics still publish if OT fails) |
 
-The workflow uses its default `GITHUB_TOKEN` with `contents: write` to update Pages.
+### Manual Toast session refresh
 
-### Create / refresh the Toast session secret
-
-1. Locally refresh Toast:
-   ```powershell
-   cd C:\Cursor\toast-mcp-server
-   node intercept.js
-   ```
-2. Compress and copy the session:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File .\prepare-boh-cloud-session.ps1
-   ```
-3. Add or update secret `TOAST_SESSION_GZIP_B64`:
-   https://github.com/MLavenant/boh-dashboard/settings/secrets/actions
-
-If System reports Toast 401/session expiry, repeat these three steps.
+```powershell
+cd C:\Cursor\boh-rdg-publish
+node toast-login-refresh.mjs
+powershell -ExecutionPolicy Bypass -File .\prepare-boh-cloud-session.ps1
+gh secret set TOAST_SESSION_GZIP_B64 --repo MLavenant/boh-dashboard --body (Get-Clipboard)
+```
 
 ## Manual / on-demand rerun
 
-Actions → **BOH Weekly Refresh** → Run workflow.
-
-## Local emergency (laptop)
-
 ```bat
-weekly-auto-run.bat
+C:\Cursor\boh-rdg-publish\weekly-auto-run.bat
 ```
-
-Still works as an emergency backup. GitHub-hosted Actions is primary.
