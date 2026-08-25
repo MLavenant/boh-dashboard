@@ -171,18 +171,13 @@ html = html.replace(
       <select id="hourlyFamilySelect" onchange="onHourlyFamilyChange()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
     </label>
   </div>
-  <div id="hourlyThroughputTable" style="overflow-x:auto"><p class="note" style="margin:0">Loading table…</p></div>
+  <div id="hourlyTicketQc" style="display:none;margin-bottom:14px;padding:12px 14px;background:#13161c;border:1px solid #2d3448;border-radius:10px"></div>
+  <div id="hourlyThroughputTable" style="overflow-x:auto;width:100%"><p class="note" style="margin:0">Loading table…</p></div>
   <div id="hourlyFulfillmentHeatmap" style="margin-top:22px;overflow-x:auto"></div>
   <div id="stationFamilyVarianceSection" style="margin-top:22px;overflow-x:auto"></div>
   <p id="hourlyThroughputNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
 </div>
 <div class="station-pills" id="stationPills" style="display:none"></div>
-<div class="card" id="staffingCard" style="margin-top:18px;display:none">
-  <h2 style="margin:0 0 4px">Staffing by Station Family</h2>
-  <p class="note" id="staffingNote" style="margin-top:0">Food-production families only (no FOH). Volume = <strong>item quantity</strong>. Read <strong style="color:#d9a441">items / person</strong> and <strong>fulfillment</strong> — no over/understaff labels.</p>
-  <div id="staffingGrid" style="overflow-x:auto"></div>
-  <p id="staffingMatchNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
-</div>
 <div class="station-detail" id="stationDetail" style="display:none"></div>$1`
 );
 
@@ -2028,38 +2023,18 @@ function buildStaffingTableHtml(staffing, guests) {
   return { html, note };
 }
 function renderStaffingGrid() {
-  const card = document.getElementById('staffingCard');
-  const grid = document.getElementById('staffingGrid');
-  const matchNote = document.getElementById('staffingMatchNote');
   const ovCard = document.getElementById('overviewStaffingCard');
   const ovGrid = document.getElementById('overviewStaffingGrid');
   const ovNote = document.getElementById('overviewStaffingNote');
 
   if (currentVenue === 'rdg_portfolio') {
-    if (card) card.style.display = 'none';
     if (ovCard) ovCard.style.display = 'none';
     const ht = document.getElementById('hourlyThroughputCard');
     if (ht) ht.style.display = 'none';
     return;
   }
-  const staffing = getD().staffing;
-  if (!staffing || !staffing.byFamily) {
-    if (card) card.style.display = 'none';
-    if (ovCard) ovCard.style.display = 'none';
-  } else {
-    const guests = staffing.guestsSeated || getD().guestsSeated;
-    const built = buildStaffingTableHtml(staffing, guests);
-    if (card && grid) {
-      card.style.display = '';
-      grid.innerHTML = built.html;
-      if (matchNote) matchNote.textContent = built.note;
-    }
-    if (ovCard && ovGrid) {
-      ovCard.style.display = '';
-      ovGrid.innerHTML = built.html;
-      if (ovNote) ovNote.textContent = built.note;
-    }
-  }
+  // Stations tab: family grid removed — use Items/staff + STAFF player view instead
+  if (ovCard) ovCard.style.display = 'none';
   renderHourlyThroughput();
 }
 
@@ -2069,8 +2044,6 @@ const HOURLY_BAND = [
   '18-19','19-20','20-21','21-22','22-23','23-24','0-1','1-2'
 ];
 const HOURLY_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-/** Mon→Fri columns for hour×day heatmaps */
-const HOURLY_HEAT_DAYS = HOURLY_DAYS.slice(0, 5);
 const HOURLY_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
 
 function columnRelativeHeat(val, colMin, colMax) {
@@ -2079,6 +2052,139 @@ function columnRelativeHeat(val, colMin, colMax) {
   const t = (val - colMin) / (colMax - colMin);
   const bg = lerpColor('#1a2840', '#d9a441', t);
   return { bg, fg: textFor(bg) };
+}
+
+function buildTicketQcHtml(d, staffing) {
+  const ts = d.ticketSummary || {};
+  const stations = d.stations || [];
+  const fireCount = ts.stationFireCount != null
+    ? ts.stationFireCount
+    : stations.reduce((s, st) => s + (st.count || 0), 0);
+  const itemQty = ts.itemQtyTotal != null
+    ? ts.itemQtyTotal
+    : Math.round((d.summary || []).reduce((s, r) => s + (r.qty || 0), 0));
+  const unique = ts.uniqueTickets != null ? ts.uniqueTickets : null;
+  const rawRows = ts.foodStationTicketRows != null ? ts.foodStationTicketRows : null;
+  const adj = ts.fulfillmentAdjustSec != null ? ts.fulfillmentAdjustSec : 60;
+  const ms = staffing && staffing.matchStats;
+  const bohMatch = ms && ms.bohMatchRate != null ? Math.round(ms.bohMatchRate * 100) : null;
+  let famRows = '';
+  if (staffing && staffing.byFamily) {
+    famRows = Object.entries(staffing.byFamily).map(([f, fam]) =>
+      '<tr style="border-top:1px solid #262a33"><td style="padding:4px 8px;color:#e8eaed">'+f+'</td>'+
+      '<td style="padding:4px 8px;text-align:right;color:#9aa0aa">'+(fam.weekTicketCount||0)+'</td>'+
+      '<td style="padding:4px 8px;text-align:right;color:#9aa0aa">'+(fam.weekItemCount||0)+'</td>'+
+      '<td style="padding:4px 8px;text-align:right;color:#e8eaed">'+(fam.weekAvgFulSec!=null?fmtFulMin(fam.weekAvgFulSec):'—')+'</td></tr>'
+    ).join('');
+  }
+  let warn = '';
+  if (bohMatch != null && bohMatch < 50) {
+    warn = '<p style="margin:8px 0 0;color:#f59e0b;font-size:12px">⚠ BOH labor match '+bohMatch+'% — staff / items-per-person stay empty until Toast kitchen punches link to Viktor FTE roster.</p>';
+  }
+  return '<div style="font-size:13px;color:#e8eaed;font-weight:600;margin-bottom:6px">Ticket &amp; fulfillment QC (this week)</div>'+
+    '<p class="note" style="margin:0 0 10px">Verify counts against Toast kitchen-timing + item-details exports. Fulfillment = fired→fulfilled on food-station tickets (−'+adj+'s adjust).</p>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:16px 28px;margin-bottom:10px;font-size:12px">'+
+    '<span><strong style="color:#d9a441">'+fireCount.toLocaleString()+'</strong> station ticket fires</span>'+
+    (unique != null ? '<span><strong style="color:#e8eaed">'+unique.toLocaleString()+'</strong> unique tickets (deduped)</span>' : '')+
+    (rawRows != null ? '<span><strong style="color:#9aa0aa">'+rawRows.toLocaleString()+'</strong> raw food rows</span>' : '')+
+    '<span><strong style="color:#e8eaed">'+itemQty.toLocaleString()+'</strong> item qty (item-details)</span>'+
+    '<span><strong style="color:#9aa0aa">'+stations.length+'</strong> stations</span>'+
+    '</div>'+
+    (famRows ? '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:4px"><thead><tr style="color:#9aa0aa">'+
+    '<th style="text-align:left;padding:4px 8px">Family</th><th style="text-align:right;padding:4px 8px">Tickets</th>'+
+    '<th style="text-align:right;padding:4px 8px">Items</th><th style="text-align:right;padding:4px 8px">Week ful</th></tr></thead><tbody>'+
+    famRows+'</tbody></table>' : '')+
+    warn;
+}
+
+function getStaffPlayers(staffing) {
+  if (!staffing) return [];
+  if (Array.isArray(staffing.players) && staffing.players.length) return staffing.players;
+  const players = new Map();
+  const byFamily = staffing.byFamily || {};
+  HOURLY_DAYS.forEach(day => {
+    Object.entries(byFamily).forEach(([family, fam]) => {
+      const cell = fam.days && fam.days[day];
+      if (!cell) return;
+      const staff = cell.staff || [];
+      const vol = cell.volume || cell.itemCount || 0;
+      const headN = staff.length || cell.heads || 0;
+      staff.forEach(s => {
+        const label = s.label || s.name || '—';
+        const key = label.toLowerCase();
+        if (!players.has(key)) {
+          players.set(key, { label, position: s.position || '', families: new Set(), weekHours: 0, weekItems: 0, days: {} });
+        }
+        const p = players.get(key);
+        p.families.add(family);
+        const hrs = s.hours || 0;
+        p.weekHours += hrs;
+        const itemShare = headN > 0 ? vol / headN : 0;
+        p.weekItems += itemShare;
+        if (!p.days[day]) p.days[day] = { hours: 0, items: 0, families: [] };
+        p.days[day].hours += hrs;
+        p.days[day].items += itemShare;
+        if (!p.days[day].families.includes(family)) p.days[day].families.push(family);
+      });
+    });
+  });
+  return [...players.values()].map(p => ({
+    label: p.label,
+    position: p.position,
+    families: [...p.families].sort(),
+    weekHours: +p.weekHours.toFixed(2),
+    weekItems: Math.round(p.weekItems),
+    weekItemsPerHour: p.weekHours > 0 ? +(p.weekItems / p.weekHours).toFixed(2) : null,
+    days: Object.fromEntries(Object.entries(p.days).map(([d, v]) => [d, {
+      hours: +v.hours.toFixed(2),
+      items: Math.round(v.items),
+      itemsPerHour: v.hours > 0 ? +(v.items / v.hours).toFixed(2) : null,
+      families: v.families,
+    }])),
+  })).sort((a, b) => b.weekItems - a.weekItems);
+}
+
+function renderStaffPlayersPanel(staffing, tableEl, heatEl, varEl, noteEl) {
+  const players = getStaffPlayers(staffing);
+  if (heatEl) heatEl.innerHTML = '';
+  if (varEl) varEl.innerHTML = '';
+  if (!players.length) {
+    tableEl.innerHTML = '<h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">STAFF — player evaluation</h3>'+
+      '<p class="note" style="margin:0">No matched kitchen labor this week. Need Toast BOH punches × Viktor FTE join before per-person stats populate.</p>';
+    if (noteEl) noteEl.textContent = 'STAFF view lists cooks with matched labor. Items are split evenly among staff on that family/day.';
+    return;
+  }
+  let html = '<h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">STAFF — player evaluation</h3>'+
+    '<p class="note" style="margin:0 0 12px">Per-person rollup across station families. Items ≈ family-day volume ÷ headcount. <strong>Items/hr</strong> = allocated items ÷ punched hours.</p>'+
+    '<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:960px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
+    '<th style="text-align:left;padding:8px;background:#1e2533;position:sticky;left:0;z-index:1">Player</th>'+
+    '<th style="text-align:left;padding:8px;background:#1e2533">Families</th>'+
+    '<th style="text-align:right;padding:8px;background:#1e2533">Week hrs</th>'+
+    '<th style="text-align:right;padding:8px;background:#1e2533">Week items</th>'+
+    '<th style="text-align:right;padding:8px;background:#1e2533;color:#d9a441">Items/hr</th>';
+  HOURLY_DAYS.forEach(day => {
+    html += '<th style="text-align:center;padding:8px 6px;background:#1e2533;min-width:72px">'+day.slice(0,3)+'<div style="font-size:9px;font-weight:400;color:#6b7280">items·hr</div></th>';
+  });
+  html += '</tr></thead><tbody>';
+  players.forEach(p => {
+    html += '<tr style="border-top:1px solid #262a33">'+
+      '<td style="padding:8px;color:#e8eaed;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+p.label+
+      '<div style="font-size:10px;color:#9aa0aa;font-weight:400">'+(p.position||'')+'</div></td>'+
+      '<td style="padding:8px;color:#9aa0aa;font-size:11px">'+(p.families||[]).join(', ')+'</td>'+
+      '<td style="padding:8px;text-align:right;color:#9aa0aa">'+p.weekHours+'</td>'+
+      '<td style="padding:8px;text-align:right;color:#e8eaed">'+p.weekItems+'</td>'+
+      '<td style="padding:8px;text-align:right;font-weight:700;color:#d9a441">'+(p.weekItemsPerHour!=null?p.weekItemsPerHour:'—')+'</td>';
+    HOURLY_DAYS.forEach(day => {
+      const c = p.days && p.days[day];
+      const iph = c && c.itemsPerHour != null ? c.itemsPerHour : null;
+      html += '<td style="padding:6px;text-align:center;font-size:11px;color:#e8eaed">'+
+        (iph != null ? '<strong style="color:#d9a441">'+iph+'</strong><div style="font-size:9px;color:#6b7280">'+(c.hours||0)+'h</div>' : '—')+'</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  tableEl.innerHTML = html;
+  if (noteEl) noteEl.textContent = players.length+' players with matched labor. Use family picker for station-family hour×day heatmaps.';
 }
 
 function stationsForFamily(family, staffing, stationDetails) {
@@ -2148,16 +2254,16 @@ function renderFamilyFulfillmentHeatmap(family, staffing, stationDetails) {
   if (!el) return;
   const target = familyFulfillmentTarget(family, staffing, stationDetails);
   let html = '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">Avg fulfillment · hour × day</h3>' +
-    '<p class="note" style="margin:0 0 10px">Rows = hours · columns = Mon→Fri. Green ≤ target · amber up to +15% · red &gt;+15%. Blank = no tickets.</p>' +
+    '<p class="note" style="margin:0 0 10px">Rows = hours · columns = Mon→Sun. Green ≤ target · amber up to +15% · red &gt;+15%. Blank = no tickets.</p>' +
     '<table style="border-collapse:collapse;font-size:11px;min-width:520px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">' +
     '<th style="background:#1e2533;padding:6px 8px;text-align:left;white-space:nowrap">Hour</th>';
-  HOURLY_HEAT_DAYS.forEach(day => {
+  HOURLY_DAYS.forEach(day => {
     html += '<th style="background:#1e2533;padding:6px 10px;text-align:center;white-space:nowrap;min-width:52px">' + day.slice(0, 3) + '</th>';
   });
   html += '</tr></thead><tbody>';
   HOURLY_BAND.forEach(hk => {
     html += '<tr style="border-top:1px solid #262a33"><td style="background:#13161c;padding:5px 8px;color:#9aa0aa;white-space:nowrap;font-weight:600">' + hourBandLabel(hk) + '</td>';
-    HOURLY_HEAT_DAYS.forEach(day => {
+    HOURLY_DAYS.forEach(day => {
       const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, null, {});
       const sec = hit.avgFulSec;
       const bg = hmColor(sec, target);
@@ -2281,6 +2387,7 @@ function renderHourlyThroughput() {
   const noteEl = document.getElementById('hourlyThroughputNote');
   const heatEl = document.getElementById('hourlyFulfillmentHeatmap');
   const varEl = document.getElementById('stationFamilyVarianceSection');
+  const qcEl = document.getElementById('hourlyTicketQc');
   if (!card || !tableEl) return;
 
   if (currentVenue === 'rdg_portfolio') {
@@ -2304,20 +2411,28 @@ function renderHourlyThroughput() {
   }
   card.style.display = '';
   if (hint) hint.style.display = '';
+  if (qcEl) {
+    qcEl.style.display = '';
+    qcEl.innerHTML = buildTicketQcHtml(d, staffing);
+  }
 
   const availableFamilies = HOURLY_FAMILIES.filter(f => {
     if (staffing && staffing.byFamily && staffing.byFamily[f]) return true;
     return stationsForFamily(f, staffing, stationDetails).some(st => stationDetails[st]);
   });
-  const families = availableFamilies.length ? availableFamilies : HOURLY_FAMILIES;
+  const families = ['STAFF'].concat(availableFamilies.length ? availableFamilies : HOURLY_FAMILIES);
   if (famSel && (!famSel.options.length || famSel.dataset.venue !== currentVenue)) {
     famSel.innerHTML = families.map(f => '<option value="'+f+'">'+f+'</option>').join('');
     famSel.dataset.venue = currentVenue;
     if (families.includes('Pastry')) famSel.value = 'Pastry';
-    else if (families[0]) famSel.value = families[0];
+    else if (families[1]) famSel.value = families[1];
   }
 
   const family = (famSel && famSel.value) || families[0] || 'Pastry';
+  if (family === 'STAFF') {
+    renderStaffPlayersPanel(staffing, tableEl, heatEl, varEl, noteEl);
+    return;
+  }
   const famStaff = staffing && staffing.byFamily ? staffing.byFamily[family] : null;
   const stationHourItems = d.stationHourItems || {};
   const hasItemListings = Object.keys(stationHourItems).length > 0;
@@ -2329,11 +2444,12 @@ function renderHourlyThroughput() {
   const thStyle = 'color:#9aa0aa;border-bottom:1px solid #262a33';
   const cellR = 'padding:8px 10px;text-align:right';
   let html = '<h3 style="margin:0 0 8px;font-size:14px;color:#e8eaed">Daily summary</h3>' +
-    '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:520px;margin-bottom:20px"><thead><tr style="'+thStyle+'">'+
+    '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px"><thead><tr style="'+thStyle+'">'+
     '<th style="text-align:left;padding:8px 10px">Day</th>'+
     '<th style="'+cellR+'">Items</th>'+
     '<th style="'+cellR+'">Staff</th>'+
     '<th style="'+cellR+';color:#d9a441">Items / staff</th>'+
+    '<th style="'+cellR+';color:#d9a441">Items / staff-hr</th>'+
     '</tr></thead><tbody>';
 
   let totalItems = 0;
@@ -2349,6 +2465,9 @@ function renderHourlyThroughput() {
     totalItems += hit.items;
     if (heads > 0) staffSamples.push(heads);
     const ips = heads > 0 ? +(hit.items / heads).toFixed(1) : null;
+    const dayCell = famStaff && famStaff.days ? famStaff.days[day] : null;
+    const ipsh = dayCell && dayCell.itemsPerStaffHour != null ? dayCell.itemsPerStaffHour
+      : (dayCell && dayCell.hours > 0 && hit.items > 0 ? +(hit.items / dayCell.hours).toFixed(2) : null);
     const itemsCell = (hit.items && hasItemListings)
       ? '<button type="button" data-day="'+day+'" onclick="openHourlyItemList(this.dataset.day)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+hit.items+'</button>'
       : (hit.items || '—');
@@ -2360,6 +2479,7 @@ function renderHourlyThroughput() {
       '<td style="'+cellR+';color:#e8eaed;font-weight:600">'+itemsCell+'</td>' +
       '<td style="'+cellR+'">'+staffCell+'</td>' +
       '<td style="'+cellR+';font-weight:700;color:#d9a441">'+(ips != null ? ips : '—')+'</td>' +
+      '<td style="'+cellR+';font-weight:700;color:#d9a441">'+(ipsh != null ? ipsh : '—')+'</td>' +
       '</tr>';
   });
 
@@ -2371,25 +2491,27 @@ function renderHourlyThroughput() {
     ? '<button type="button" data-day="__total" onclick="openHourlyItemList(this.dataset.day)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+totalItems+'</button>'
     : totalItems;
 
+  const weekIpsh = famStaff && famStaff.weekItemsPerStaffHour != null ? famStaff.weekItemsPerStaffHour : null;
   html += '<tr style="border-top:2px solid #3d4458;background:#0f1218">' +
     '<td style="padding:8px 10px;color:#d9a441;font-weight:700">Total</td>' +
     '<td style="'+cellR+';font-weight:700;color:#e8eaed">'+totalItemsCell+'</td>' +
     '<td style="'+cellR+';color:#9aa0aa">'+(avgHeads!=null?avgHeads.toFixed(1)+' avg':'—')+'</td>' +
     '<td style="'+cellR+';font-weight:700;color:#d9a441">'+(totalIps!=null?totalIps:'—')+'</td>' +
+    '<td style="'+cellR+';font-weight:700;color:#d9a441">'+(weekIpsh!=null?weekIpsh:'—')+'</td>' +
     '</tr></tbody></table>';
 
   html += '<h3 style="margin:16px 0 8px;font-size:14px;color:#e8eaed">Items · hour × day</h3>' +
-    '<p class="note" style="margin:0 0 10px">Rows = hours (10:00→02:00) · columns = <strong>Mon→Fri</strong>. Color = busiest→quietest <em>within each day column</em>. Click a cell for the sold list.</p>' +
-    '<table style="border-collapse:collapse;font-size:12px;min-width:420px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
+    '<p class="note" style="margin:0 0 10px">Rows = hours (10:00→02:00) · columns = <strong>Mon→Sun</strong> (full width). Color = busiest→quietest <em>within each day column</em>. Click a cell for the sold list.</p>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
     '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
-  HOURLY_HEAT_DAYS.forEach(day => {
+  HOURLY_DAYS.forEach(day => {
     html += '<th style="text-align:center;padding:6px 10px;background:#1e2533;min-width:52px">'+day.slice(0,3)+'</th>';
   });
   html += '</tr></thead><tbody>';
 
   const gridItems = {};
   const colItemScale = {};
-  HOURLY_HEAT_DAYS.forEach(day => {
+  HOURLY_DAYS.forEach(day => {
     gridItems[day] = {};
     HOURLY_BAND.forEach(hk => {
       const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, null, stationHourItems);
@@ -2403,7 +2525,7 @@ function renderHourlyThroughput() {
 
   HOURLY_BAND.forEach(hk => {
     html += '<tr style="border-top:1px solid #262a33"><td style="padding:5px 10px;color:#9aa0aa;white-space:nowrap;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">'+hourBandLabel(hk)+'</td>';
-    HOURLY_HEAT_DAYS.forEach(day => {
+    HOURLY_DAYS.forEach(day => {
       const items = gridItems[day][hk];
       const scale = colItemScale[day];
       const heat = columnRelativeHeat(items, scale.min, scale.max);
@@ -2419,23 +2541,23 @@ function renderHourlyThroughput() {
   });
   html += '</tbody></table>';
 
-  const hasStaff = HOURLY_HEAT_DAYS.some(day => {
+  const hasStaff = HOURLY_DAYS.some(day => {
     const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
     return cell && cell.heads > 0;
   });
   if (hasStaff) {
     html += '<h3 style="margin:0 0 8px;font-size:14px;color:#d9a441">Items / staff · hour × day</h3>' +
-      '<p class="note" style="margin:0 0 10px">Same layout. Staff = day headcount (constant per column). Color = highest→lowest load per day.</p>' +
-      '<table style="border-collapse:collapse;font-size:12px;min-width:420px"><thead><tr style="'+thStyle+'">'+
+      '<p class="note" style="margin:0 0 10px">Items ÷ day headcount for each hour. Color = highest→lowest per day column.</p>' +
+      '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
       '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
-    HOURLY_HEAT_DAYS.forEach(day => {
+    HOURLY_DAYS.forEach(day => {
       html += '<th style="text-align:center;padding:6px 10px;background:#1e2533;min-width:52px">'+day.slice(0,3)+'</th>';
     });
     html += '</tr></thead><tbody>';
 
     const gridIps = {};
     const colIpsScale = {};
-    HOURLY_HEAT_DAYS.forEach(day => {
+    HOURLY_DAYS.forEach(day => {
       gridIps[day] = {};
       const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
       const heads = cell && cell.heads > 0 ? cell.heads : 0;
@@ -2449,7 +2571,7 @@ function renderHourlyThroughput() {
 
     HOURLY_BAND.forEach(hk => {
       html += '<tr style="border-top:1px solid #262a33"><td style="padding:5px 10px;color:#9aa0aa;white-space:nowrap;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">'+hourBandLabel(hk)+'</td>';
-      HOURLY_HEAT_DAYS.forEach(day => {
+      HOURLY_DAYS.forEach(day => {
         const ips = gridIps[day][hk];
         const scale = colIpsScale[day];
         const heat = ips != null ? columnRelativeHeat(ips, scale.min, scale.max) : { bg: '#13161c', fg: '#4b5563' };

@@ -909,6 +909,14 @@ const output = {
   stationHourItems,
   stationDayVolume,
   assignmentData,
+  ticketSummary: {
+    foodStationTicketRows: foodTickets.length,
+    uniqueTickets: uniqueTickets.length,
+    stationFireCount: stations.reduce((s, st) => s + (st.count || 0), 0),
+    itemDetailSkuCount: summary.length,
+    itemQtyTotal: Math.round(summary.reduce((s, r) => s + (r.qty || 0), 0)),
+    fulfillmentAdjustSec: FULFILLMENT_ADJUST_SEC,
+  },
 };
 
 // Preserve previously joined staffing aggregates if present (rebuilt by weekly-staffing)
