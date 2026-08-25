@@ -27,6 +27,19 @@ const CODE_TO_VENUE = {
   '0TJ': 'ava_coconut_grove',
 };
 
+/**
+ * Viktor Ops FTE export (People tab) location label → BOH long slug.
+ * MILA 2F + 3F both roll into mila. Lounge/Commissary ignored for kitchen staffing.
+ */
+const LOCATION_TO_VENUE = {
+  'CASA NEOS': 'casa_neos',
+  'AVA WP': 'ava_winter_park',
+  'AVA CG': 'ava_coconut_grove',
+  'MILA 3F': 'mila',
+  'MILA 2F': 'mila',
+  MILA: 'mila',
+};
+
 /** Short alias → long slug used by venue week JSON filenames. */
 const VENUE_SLUG_ALIASES = {
   casa_neos: 'casa_neos',
@@ -95,6 +108,7 @@ module.exports = {
   FOOD_FAMILIES,
   FOOD_FAMILY_SET,
   CODE_TO_VENUE,
+  LOCATION_TO_VENUE,
   VENUE_SLUG_ALIASES,
   STAFFING_VENUES,
   normalizeFoodFamily,

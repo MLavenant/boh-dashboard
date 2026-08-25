@@ -77100,12 +77100,12 @@
   "staffing": {
     "venue": "ava_coconut_grove",
     "weekLabel": "2026-W34",
-    "builtAt": "2026-08-25T15:04:30.046Z",
+    "builtAt": "2026-08-25T16:08:42.986Z",
     "matchStats": {
       "laborShiftsMatched": 0,
       "laborShiftsUnmatched": 91,
-      "rosterUnused": 27,
-      "rosterTotal": 27,
+      "rosterUnused": 29,
+      "rosterTotal": 29,
       "matchRate": 0
     },
     "guestsSeated": {
@@ -77343,7 +77343,7 @@
       },
       "Saute": {
         "family": "Saute",
-        "rosterCount": 5,
+        "rosterCount": 6,
         "weekHeadsUnique": 0,
         "weekHours": 0,
         "weekItemCount": 672,
@@ -77545,32 +77545,32 @@
           }
         }
       },
-      "Pizza": {
-        "family": "Pizza",
-        "rosterCount": 2,
+      "Garde Manger": {
+        "family": "Garde Manger",
+        "rosterCount": 4,
         "weekHeadsUnique": 0,
         "weekHours": 0,
-        "weekItemCount": 197,
-        "weekTicketCount": 184,
+        "weekItemCount": 642,
+        "weekTicketCount": 592,
         "weekItemsPerHeadDay": null,
         "weekItemsPerStaffHour": null,
-        "weekServiceHours": 43,
-        "weekItemsPerServiceHour": 4.58,
-        "weekAvgFulSec": 523.7,
+        "weekServiceHours": 51,
+        "weekItemsPerServiceHour": 12.59,
+        "weekAvgFulSec": 408.7,
         "days": {
           "Monday": {
             "heads": 0,
             "hours": 0,
-            "ticketCount": 12,
-            "itemQty": 13,
-            "volume": 13,
+            "ticketCount": 37,
+            "itemQty": 42,
+            "volume": 42,
             "volumeSource": "itemQty",
-            "itemCount": 13,
+            "itemCount": 42,
             "itemsPerHead": null,
-            "serviceHours": 5,
-            "itemsPerServiceHour": 2.6,
+            "serviceHours": 4,
+            "itemsPerServiceHour": 10.5,
             "itemsPerStaffHour": null,
-            "avgFulSec": 550.2,
+            "avgFulSec": 535.4,
             "qc": {
               "eligible": false,
               "denyReason": "No staff"
@@ -77588,16 +77588,16 @@
           "Tuesday": {
             "heads": 0,
             "hours": 0,
-            "ticketCount": 8,
-            "itemQty": 7,
-            "volume": 7,
+            "ticketCount": 38,
+            "itemQty": 36,
+            "volume": 36,
             "volumeSource": "itemQty",
-            "itemCount": 7,
+            "itemCount": 36,
             "itemsPerHead": null,
-            "serviceHours": 4,
-            "itemsPerServiceHour": 1.75,
+            "serviceHours": 5,
+            "itemsPerServiceHour": 7.2,
             "itemsPerStaffHour": null,
-            "avgFulSec": 683.9,
+            "avgFulSec": 493.9,
             "qc": {
               "eligible": false,
               "denyReason": "No staff"
@@ -77615,16 +77615,16 @@
           "Wednesday": {
             "heads": 0,
             "hours": 0,
-            "ticketCount": 19,
-            "itemQty": 20,
-            "volume": 20,
+            "ticketCount": 48,
+            "itemQty": 55,
+            "volume": 55,
             "volumeSource": "itemQty",
-            "itemCount": 20,
+            "itemCount": 55,
             "itemsPerHead": null,
             "serviceHours": 5,
-            "itemsPerServiceHour": 4,
+            "itemsPerServiceHour": 11,
             "itemsPerStaffHour": null,
-            "avgFulSec": 656.5,
+            "avgFulSec": 307.2,
             "qc": {
               "eligible": false,
               "denyReason": "No staff"
@@ -77642,16 +77642,16 @@
           "Thursday": {
             "heads": 0,
             "hours": 0,
-            "ticketCount": 13,
-            "itemQty": 12,
-            "volume": 12,
+            "ticketCount": 60,
+            "itemQty": 60,
+            "volume": 60,
             "volumeSource": "itemQty",
-            "itemCount": 12,
+            "itemCount": 60,
             "itemsPerHead": null,
-            "serviceHours": 5,
-            "itemsPerServiceHour": 2.4,
+            "serviceHours": 7,
+            "itemsPerServiceHour": 8.57,
             "itemsPerStaffHour": null,
-            "avgFulSec": 531.7,
+            "avgFulSec": 335,
             "qc": {
               "eligible": false,
               "denyReason": "No staff"
@@ -77669,16 +77669,16 @@
           "Friday": {
             "heads": 0,
             "hours": 0,
-            "ticketCount": 38,
-            "itemQty": 47,
-            "volume": 47,
+            "ticketCount": 127,
+            "itemQty": 136,
+            "volume": 136,
             "volumeSource": "itemQty",
-            "itemCount": 47,
+            "itemCount": 136,
             "itemsPerHead": null,
-            "serviceHours": 6,
-            "itemsPerServiceHour": 7.83,
+            "serviceHours": 7,
+            "itemsPerServiceHour": 19.43,
             "itemsPerStaffHour": null,
-            "avgFulSec": 475.4,
+            "avgFulSec": 417.7,
             "qc": {
               "eligible": false,
               "denyReason": "No staff"
@@ -77696,16 +77696,16 @@
           "Saturday": {
             "heads": 0,
             "hours": 0,
-            "ticketCount": 51,
-            "itemQty": 49,
-            "volume": 49,
+            "ticketCount": 175,
+            "itemQty": 175,
+            "volume": 175,
             "volumeSource": "itemQty",
-            "itemCount": 49,
+            "itemCount": 175,
             "itemsPerHead": null,
-            "serviceHours": 8,
-            "itemsPerServiceHour": 6.13,
+            "serviceHours": 11,
+            "itemsPerServiceHour": 15.91,
             "itemsPerStaffHour": null,
-            "avgFulSec": 498.2,
+            "avgFulSec": 474.6,
             "qc": {
               "eligible": false,
               "denyReason": "No staff"
@@ -77723,16 +77723,16 @@
           "Sunday": {
             "heads": 0,
             "hours": 0,
-            "ticketCount": 43,
-            "itemQty": 49,
-            "volume": 49,
+            "ticketCount": 107,
+            "itemQty": 138,
+            "volume": 138,
             "volumeSource": "itemQty",
-            "itemCount": 49,
+            "itemCount": 138,
             "itemsPerHead": null,
-            "serviceHours": 10,
-            "itemsPerServiceHour": 4.9,
+            "serviceHours": 12,
+            "itemsPerServiceHour": 11.5,
             "itemsPerStaffHour": null,
-            "avgFulSec": 498.5,
+            "avgFulSec": 303.1,
             "qc": {
               "eligible": false,
               "denyReason": "No staff"
@@ -77937,6 +77937,210 @@
             "itemsPerServiceHour": null,
             "itemsPerStaffHour": null,
             "avgFulSec": null,
+            "qc": {
+              "eligible": false,
+              "denyReason": "No staff"
+            },
+            "signal": {
+              "label": "—",
+              "code": "closed_or_empty",
+              "source": null,
+              "nPeer": 0,
+              "nHist": 0,
+              "note": "No staff clocked",
+              "staffingRatio": null
+            }
+          }
+        }
+      },
+      "Pizza": {
+        "family": "Pizza",
+        "rosterCount": 2,
+        "weekHeadsUnique": 0,
+        "weekHours": 0,
+        "weekItemCount": 197,
+        "weekTicketCount": 184,
+        "weekItemsPerHeadDay": null,
+        "weekItemsPerStaffHour": null,
+        "weekServiceHours": 43,
+        "weekItemsPerServiceHour": 4.58,
+        "weekAvgFulSec": 523.7,
+        "days": {
+          "Monday": {
+            "heads": 0,
+            "hours": 0,
+            "ticketCount": 12,
+            "itemQty": 13,
+            "volume": 13,
+            "volumeSource": "itemQty",
+            "itemCount": 13,
+            "itemsPerHead": null,
+            "serviceHours": 5,
+            "itemsPerServiceHour": 2.6,
+            "itemsPerStaffHour": null,
+            "avgFulSec": 550.2,
+            "qc": {
+              "eligible": false,
+              "denyReason": "No staff"
+            },
+            "signal": {
+              "label": "—",
+              "code": "closed_or_empty",
+              "source": null,
+              "nPeer": 0,
+              "nHist": 0,
+              "note": "No staff clocked",
+              "staffingRatio": null
+            }
+          },
+          "Tuesday": {
+            "heads": 0,
+            "hours": 0,
+            "ticketCount": 8,
+            "itemQty": 7,
+            "volume": 7,
+            "volumeSource": "itemQty",
+            "itemCount": 7,
+            "itemsPerHead": null,
+            "serviceHours": 4,
+            "itemsPerServiceHour": 1.75,
+            "itemsPerStaffHour": null,
+            "avgFulSec": 683.9,
+            "qc": {
+              "eligible": false,
+              "denyReason": "No staff"
+            },
+            "signal": {
+              "label": "—",
+              "code": "closed_or_empty",
+              "source": null,
+              "nPeer": 0,
+              "nHist": 0,
+              "note": "No staff clocked",
+              "staffingRatio": null
+            }
+          },
+          "Wednesday": {
+            "heads": 0,
+            "hours": 0,
+            "ticketCount": 19,
+            "itemQty": 20,
+            "volume": 20,
+            "volumeSource": "itemQty",
+            "itemCount": 20,
+            "itemsPerHead": null,
+            "serviceHours": 5,
+            "itemsPerServiceHour": 4,
+            "itemsPerStaffHour": null,
+            "avgFulSec": 656.5,
+            "qc": {
+              "eligible": false,
+              "denyReason": "No staff"
+            },
+            "signal": {
+              "label": "—",
+              "code": "closed_or_empty",
+              "source": null,
+              "nPeer": 0,
+              "nHist": 0,
+              "note": "No staff clocked",
+              "staffingRatio": null
+            }
+          },
+          "Thursday": {
+            "heads": 0,
+            "hours": 0,
+            "ticketCount": 13,
+            "itemQty": 12,
+            "volume": 12,
+            "volumeSource": "itemQty",
+            "itemCount": 12,
+            "itemsPerHead": null,
+            "serviceHours": 5,
+            "itemsPerServiceHour": 2.4,
+            "itemsPerStaffHour": null,
+            "avgFulSec": 531.7,
+            "qc": {
+              "eligible": false,
+              "denyReason": "No staff"
+            },
+            "signal": {
+              "label": "—",
+              "code": "closed_or_empty",
+              "source": null,
+              "nPeer": 0,
+              "nHist": 0,
+              "note": "No staff clocked",
+              "staffingRatio": null
+            }
+          },
+          "Friday": {
+            "heads": 0,
+            "hours": 0,
+            "ticketCount": 38,
+            "itemQty": 47,
+            "volume": 47,
+            "volumeSource": "itemQty",
+            "itemCount": 47,
+            "itemsPerHead": null,
+            "serviceHours": 6,
+            "itemsPerServiceHour": 7.83,
+            "itemsPerStaffHour": null,
+            "avgFulSec": 475.4,
+            "qc": {
+              "eligible": false,
+              "denyReason": "No staff"
+            },
+            "signal": {
+              "label": "—",
+              "code": "closed_or_empty",
+              "source": null,
+              "nPeer": 0,
+              "nHist": 0,
+              "note": "No staff clocked",
+              "staffingRatio": null
+            }
+          },
+          "Saturday": {
+            "heads": 0,
+            "hours": 0,
+            "ticketCount": 51,
+            "itemQty": 49,
+            "volume": 49,
+            "volumeSource": "itemQty",
+            "itemCount": 49,
+            "itemsPerHead": null,
+            "serviceHours": 8,
+            "itemsPerServiceHour": 6.13,
+            "itemsPerStaffHour": null,
+            "avgFulSec": 498.2,
+            "qc": {
+              "eligible": false,
+              "denyReason": "No staff"
+            },
+            "signal": {
+              "label": "—",
+              "code": "closed_or_empty",
+              "source": null,
+              "nPeer": 0,
+              "nHist": 0,
+              "note": "No staff clocked",
+              "staffingRatio": null
+            }
+          },
+          "Sunday": {
+            "heads": 0,
+            "hours": 0,
+            "ticketCount": 43,
+            "itemQty": 49,
+            "volume": 49,
+            "volumeSource": "itemQty",
+            "itemCount": 49,
+            "itemsPerHead": null,
+            "serviceHours": 10,
+            "itemsPerServiceHour": 4.9,
+            "itemsPerStaffHour": null,
+            "avgFulSec": 498.5,
             "qc": {
               "eligible": false,
               "denyReason": "No staff"
@@ -78345,210 +78549,6 @@
             "itemsPerServiceHour": 14.25,
             "itemsPerStaffHour": null,
             "avgFulSec": 412.4,
-            "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
-            },
-            "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
-              "source": null,
-              "nPeer": 0,
-              "nHist": 0,
-              "note": "No staff clocked",
-              "staffingRatio": null
-            }
-          }
-        }
-      },
-      "Garde Manger": {
-        "family": "Garde Manger",
-        "rosterCount": 3,
-        "weekHeadsUnique": 0,
-        "weekHours": 0,
-        "weekItemCount": 642,
-        "weekTicketCount": 592,
-        "weekItemsPerHeadDay": null,
-        "weekItemsPerStaffHour": null,
-        "weekServiceHours": 51,
-        "weekItemsPerServiceHour": 12.59,
-        "weekAvgFulSec": 408.7,
-        "days": {
-          "Monday": {
-            "heads": 0,
-            "hours": 0,
-            "ticketCount": 37,
-            "itemQty": 42,
-            "volume": 42,
-            "volumeSource": "itemQty",
-            "itemCount": 42,
-            "itemsPerHead": null,
-            "serviceHours": 4,
-            "itemsPerServiceHour": 10.5,
-            "itemsPerStaffHour": null,
-            "avgFulSec": 535.4,
-            "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
-            },
-            "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
-              "source": null,
-              "nPeer": 0,
-              "nHist": 0,
-              "note": "No staff clocked",
-              "staffingRatio": null
-            }
-          },
-          "Tuesday": {
-            "heads": 0,
-            "hours": 0,
-            "ticketCount": 38,
-            "itemQty": 36,
-            "volume": 36,
-            "volumeSource": "itemQty",
-            "itemCount": 36,
-            "itemsPerHead": null,
-            "serviceHours": 5,
-            "itemsPerServiceHour": 7.2,
-            "itemsPerStaffHour": null,
-            "avgFulSec": 493.9,
-            "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
-            },
-            "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
-              "source": null,
-              "nPeer": 0,
-              "nHist": 0,
-              "note": "No staff clocked",
-              "staffingRatio": null
-            }
-          },
-          "Wednesday": {
-            "heads": 0,
-            "hours": 0,
-            "ticketCount": 48,
-            "itemQty": 55,
-            "volume": 55,
-            "volumeSource": "itemQty",
-            "itemCount": 55,
-            "itemsPerHead": null,
-            "serviceHours": 5,
-            "itemsPerServiceHour": 11,
-            "itemsPerStaffHour": null,
-            "avgFulSec": 307.2,
-            "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
-            },
-            "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
-              "source": null,
-              "nPeer": 0,
-              "nHist": 0,
-              "note": "No staff clocked",
-              "staffingRatio": null
-            }
-          },
-          "Thursday": {
-            "heads": 0,
-            "hours": 0,
-            "ticketCount": 60,
-            "itemQty": 60,
-            "volume": 60,
-            "volumeSource": "itemQty",
-            "itemCount": 60,
-            "itemsPerHead": null,
-            "serviceHours": 7,
-            "itemsPerServiceHour": 8.57,
-            "itemsPerStaffHour": null,
-            "avgFulSec": 335,
-            "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
-            },
-            "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
-              "source": null,
-              "nPeer": 0,
-              "nHist": 0,
-              "note": "No staff clocked",
-              "staffingRatio": null
-            }
-          },
-          "Friday": {
-            "heads": 0,
-            "hours": 0,
-            "ticketCount": 127,
-            "itemQty": 136,
-            "volume": 136,
-            "volumeSource": "itemQty",
-            "itemCount": 136,
-            "itemsPerHead": null,
-            "serviceHours": 7,
-            "itemsPerServiceHour": 19.43,
-            "itemsPerStaffHour": null,
-            "avgFulSec": 417.7,
-            "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
-            },
-            "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
-              "source": null,
-              "nPeer": 0,
-              "nHist": 0,
-              "note": "No staff clocked",
-              "staffingRatio": null
-            }
-          },
-          "Saturday": {
-            "heads": 0,
-            "hours": 0,
-            "ticketCount": 175,
-            "itemQty": 175,
-            "volume": 175,
-            "volumeSource": "itemQty",
-            "itemCount": 175,
-            "itemsPerHead": null,
-            "serviceHours": 11,
-            "itemsPerServiceHour": 15.91,
-            "itemsPerStaffHour": null,
-            "avgFulSec": 474.6,
-            "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
-            },
-            "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
-              "source": null,
-              "nPeer": 0,
-              "nHist": 0,
-              "note": "No staff clocked",
-              "staffingRatio": null
-            }
-          },
-          "Sunday": {
-            "heads": 0,
-            "hours": 0,
-            "ticketCount": 107,
-            "itemQty": 138,
-            "volume": 138,
-            "volumeSource": "itemQty",
-            "itemCount": 138,
-            "itemsPerHead": null,
-            "serviceHours": 12,
-            "itemsPerServiceHour": 11.5,
-            "itemsPerStaffHour": null,
-            "avgFulSec": 303.1,
             "qc": {
               "eligible": false,
               "denyReason": "No staff"

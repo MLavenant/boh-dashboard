@@ -78135,13 +78135,13 @@
   "staffing": {
     "venue": "ava_winter_park",
     "weekLabel": "2026-W34",
-    "builtAt": "2026-08-25T15:04:30.153Z",
+    "builtAt": "2026-08-25T16:08:43.138Z",
     "matchStats": {
-      "laborShiftsMatched": 126,
-      "laborShiftsUnmatched": 321,
-      "rosterUnused": 5,
-      "rosterTotal": 34,
-      "matchRate": 0.282
+      "laborShiftsMatched": 135,
+      "laborShiftsUnmatched": 312,
+      "rosterUnused": 2,
+      "rosterTotal": 33,
+      "matchRate": 0.302
     },
     "guestsSeated": {
       "total": 1589,
@@ -78169,13 +78169,13 @@
     "byFamily": {
       "Garde Manger": {
         "family": "Garde Manger",
-        "rosterCount": 5,
-        "weekHeadsUnique": 5,
-        "weekHours": 156.69,
+        "rosterCount": 6,
+        "weekHeadsUnique": 6,
+        "weekHours": 184.9,
         "weekItemCount": 1254,
         "weekTicketCount": 893,
-        "weekItemsPerHeadDay": 66,
-        "weekItemsPerStaffHour": 8,
+        "weekItemsPerHeadDay": 54.5,
+        "weekItemsPerStaffHour": 6.78,
         "weekServiceHours": 50,
         "weekItemsPerServiceHour": 25.08,
         "weekAvgFulSec": 565.9,
@@ -78235,57 +78235,57 @@
             }
           },
           "Wednesday": {
-            "heads": 3,
-            "hours": 23.56,
+            "heads": 4,
+            "hours": 29.06,
             "ticketCount": 105,
             "itemQty": 158,
             "volume": 158,
             "volumeSource": "itemQty",
             "itemCount": 158,
-            "itemsPerHead": 52.7,
+            "itemsPerHead": 39.5,
             "serviceHours": 6,
             "itemsPerServiceHour": 26.33,
-            "itemsPerStaffHour": 6.71,
+            "itemsPerStaffHour": 5.44,
             "avgFulSec": 511.6,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Likely understaffed",
-              "code": "understaffed_pressure",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "peer",
               "nPeer": 8,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.61
+              "staffingRatio": 0.82
             }
           },
           "Thursday": {
-            "heads": 2,
-            "hours": 16.52,
+            "heads": 3,
+            "hours": 24.2,
             "ticketCount": 95,
             "itemQty": 146,
             "volume": 146,
             "volumeSource": "itemQty",
             "itemCount": 146,
-            "itemsPerHead": 73,
+            "itemsPerHead": 48.7,
             "serviceHours": 6,
             "itemsPerServiceHour": 24.33,
-            "itemsPerStaffHour": 8.84,
+            "itemsPerStaffHour": 6.03,
             "avgFulSec": 622.8,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Likely understaffed",
-              "code": "understaffed_pressure",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "peer",
               "nPeer": 8,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.59
+              "staffingRatio": 0.88
             }
           },
           "Friday": {
@@ -78316,17 +78316,17 @@
             }
           },
           "Saturday": {
-            "heads": 3,
-            "hours": 29.6,
+            "heads": 4,
+            "hours": 38,
             "ticketCount": 202,
             "itemQty": 298,
             "volume": 298,
             "volumeSource": "itemQty",
             "itemCount": 298,
-            "itemsPerHead": 99.3,
+            "itemsPerHead": 74.5,
             "serviceHours": 11,
             "itemsPerServiceHour": 27.09,
-            "itemsPerStaffHour": 10.07,
+            "itemsPerStaffHour": 7.84,
             "avgFulSec": 639,
             "qc": {
               "eligible": true,
@@ -78339,21 +78339,21 @@
               "nPeer": 8,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.43
+              "staffingRatio": 0.57
             }
           },
           "Sunday": {
-            "heads": 5,
-            "hours": 38.31,
+            "heads": 6,
+            "hours": 44.94,
             "ticketCount": 167,
             "itemQty": 219,
             "volume": 219,
             "volumeSource": "itemQty",
             "itemCount": 219,
-            "itemsPerHead": 43.8,
+            "itemsPerHead": 36.5,
             "serviceHours": 10,
             "itemsPerServiceHour": 21.9,
-            "itemsPerStaffHour": 5.72,
+            "itemsPerStaffHour": 4.87,
             "avgFulSec": 490.8,
             "qc": {
               "eligible": true,
@@ -78366,7 +78366,7 @@
               "nPeer": 8,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.76
+              "staffingRatio": 0.91
             }
           }
         }
@@ -78577,7 +78577,7 @@
       },
       "Pastry": {
         "family": "Pastry",
-        "rosterCount": 7,
+        "rosterCount": 6,
         "weekHeadsUnique": 6,
         "weekHours": 239.05,
         "weekItemCount": 1040,
@@ -78720,7 +78720,7 @@
               "nPeer": 8,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.77
+              "staffingRatio": 0.69
             }
           },
           "Saturday": {
@@ -78747,7 +78747,7 @@
               "nPeer": 8,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.43
+              "staffingRatio": 0.37
             }
           },
           "Sunday": {
@@ -78781,56 +78781,56 @@
       },
       "Saute": {
         "family": "Saute",
-        "rosterCount": 4,
-        "weekHeadsUnique": 4,
-        "weekHours": 159.74,
+        "rosterCount": 5,
+        "weekHeadsUnique": 5,
+        "weekHours": 194.01,
         "weekItemCount": 1288,
         "weekTicketCount": 1270,
-        "weekItemsPerHeadDay": 64.4,
-        "weekItemsPerStaffHour": 8.06,
+        "weekItemsPerHeadDay": 51.5,
+        "weekItemsPerStaffHour": 6.64,
         "weekServiceHours": 53,
         "weekItemsPerServiceHour": 24.3,
         "weekAvgFulSec": 1007.5,
         "days": {
           "Monday": {
-            "heads": 1,
-            "hours": 6.86,
+            "heads": 2,
+            "hours": 12.54,
             "ticketCount": 78,
             "itemQty": 83,
             "volume": 83,
             "volumeSource": "itemQty",
             "itemCount": 83,
-            "itemsPerHead": 83,
+            "itemsPerHead": 41.5,
             "serviceHours": 5,
             "itemsPerServiceHour": 16.6,
-            "itemsPerStaffHour": 12.1,
+            "itemsPerStaffHour": 6.62,
             "avgFulSec": 883.7,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Likely understaffed",
-              "code": "understaffed_pressure",
+              "label": "Operational bottleneck",
+              "code": "process_issue",
               "source": "peer",
               "nPeer": 4,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.5
+              "staffingRatio": 1
             }
           },
           "Tuesday": {
-            "heads": 2,
-            "hours": 12.8,
+            "heads": 3,
+            "hours": 18.9,
             "ticketCount": 135,
             "itemQty": 138,
             "volume": 138,
             "volumeSource": "itemQty",
             "itemCount": 138,
-            "itemsPerHead": 69,
+            "itemsPerHead": 46,
             "serviceHours": 6,
             "itemsPerServiceHour": 23,
-            "itemsPerStaffHour": 10.78,
+            "itemsPerStaffHour": 7.3,
             "avgFulSec": 1019.1,
             "qc": {
               "eligible": true,
@@ -78843,34 +78843,34 @@
               "nPeer": 7,
               "nHist": 1,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.49
+              "staffingRatio": 0.73
             }
           },
           "Wednesday": {
-            "heads": 2,
-            "hours": 14.03,
+            "heads": 3,
+            "hours": 21.23,
             "ticketCount": 143,
             "itemQty": 144,
             "volume": 144,
             "volumeSource": "itemQty",
             "itemCount": 144,
-            "itemsPerHead": 72,
+            "itemsPerHead": 48,
             "serviceHours": 6,
             "itemsPerServiceHour": 24,
-            "itemsPerStaffHour": 10.26,
+            "itemsPerStaffHour": 6.78,
             "avgFulSec": 965.5,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Likely understaffed",
-              "code": "understaffed_pressure",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "peer",
               "nPeer": 7,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.31
+              "staffingRatio": 0.46
             }
           },
           "Thursday": {
@@ -78928,17 +78928,17 @@
             }
           },
           "Saturday": {
-            "heads": 4,
-            "hours": 39.3,
+            "heads": 5,
+            "hours": 47.61,
             "ticketCount": 318,
             "itemQty": 305,
             "volume": 305,
             "volumeSource": "itemQty",
             "itemCount": 305,
-            "itemsPerHead": 76.3,
+            "itemsPerHead": 61,
             "serviceHours": 12,
             "itemsPerServiceHour": 25.42,
-            "itemsPerStaffHour": 7.76,
+            "itemsPerStaffHour": 6.41,
             "avgFulSec": 1082.8,
             "qc": {
               "eligible": true,
@@ -78951,21 +78951,21 @@
               "nPeer": 7,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.49
+              "staffingRatio": 0.62
             }
           },
           "Sunday": {
-            "heads": 4,
-            "hours": 30.41,
+            "heads": 5,
+            "hours": 37.39,
             "ticketCount": 209,
             "itemQty": 225,
             "volume": 225,
             "volumeSource": "itemQty",
             "itemCount": 225,
-            "itemsPerHead": 56.3,
+            "itemsPerHead": 45,
             "serviceHours": 11,
             "itemsPerServiceHour": 20.45,
-            "itemsPerStaffHour": 7.4,
+            "itemsPerStaffHour": 6.02,
             "avgFulSec": 807.4,
             "qc": {
               "eligible": true,
@@ -78978,14 +78978,14 @@
               "nPeer": 7,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.67
+              "staffingRatio": 0.83
             }
           }
         }
       },
       "Robata": {
         "family": "Robata",
-        "rosterCount": 7,
+        "rosterCount": 6,
         "weekHeadsUnique": 6,
         "weekHours": 208.91,
         "weekItemCount": 2316,
@@ -79047,7 +79047,7 @@
               "nPeer": 4,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.41
+              "staffingRatio": 0.39
             }
           },
           "Wednesday": {
@@ -79182,14 +79182,14 @@
               "nPeer": 6,
               "nHist": 2,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.3
+              "staffingRatio": 0.28
             }
           }
         }
       },
       "Sushi": {
         "family": "Sushi",
-        "rosterCount": 3,
+        "rosterCount": 2,
         "weekHeadsUnique": 0,
         "weekHours": 0,
         "weekItemCount": 0,
