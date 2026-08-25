@@ -80,14 +80,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Skip Monday / Tuesday (ET)
+      - name: Skip Monday / Tuesday (ET) on scheduled runs only
         id: dow
         run: |
           DOW=$(TZ=America/New_York date +%u)
           echo "dow=$DOW" >> "$GITHUB_OUTPUT"
-          if [ "$DOW" = "1" ] || [ "$DOW" = "2" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "workflow_dispatch — Toast BS always runs (incl. Mon/Tue backfill)"
+          elif [ "$DOW" = "1" ] || [ "$DOW" = "2" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "Mon/Tue ET — Toast BS skipped"
+            echo "Mon/Tue ET — Toast BS scheduled run skipped"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
