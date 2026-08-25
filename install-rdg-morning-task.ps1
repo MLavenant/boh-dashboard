@@ -68,11 +68,15 @@ foreach ($pair in @(
   @{ Name = 'RDG Daily Cloud Retry 900'; Time = '09:00'; Tr = $retry900Tr },
   @{ Name = 'RDG Daily Cloud Retry 930'; Time = '09:30'; Tr = $retry930Tr }
 )) {
-  schtasks /Create /TN $pair.Name /TR $pair.Tr /SC DAILY /ST $pair.Time /RL LIMITED /F 2>$null | Out-Null
+  cmd /c "schtasks /Create /TN `"$($pair.Name)`" /TR `"$($pair.Tr)`" /SC DAILY /ST $($pair.Time) /RL LIMITED /F >nul 2>&1"
   if ($LASTEXITCODE -eq 0) {
-    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -WakeToRun -ExecutionTimeLimit (New-TimeSpan -Hours 1)
-    Set-ScheduledTask -TaskName $pair.Name -Settings $settings -ErrorAction SilentlyContinue | Out-Null
-    Write-Host "Also registered preferred name: $($pair.Name)" -ForegroundColor Green
+    try {
+      $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -WakeToRun -ExecutionTimeLimit (New-TimeSpan -Hours 1)
+      Set-ScheduledTask -TaskName $pair.Name -Settings $settings -ErrorAction SilentlyContinue | Out-Null
+      Write-Host "Also registered preferred name: $($pair.Name)" -ForegroundColor Green
+    } catch {
+      Write-Host "Preferred name registered (settings skipped): $($pair.Name)" -ForegroundColor DarkGray
+    }
   } else {
     Write-Host "Preferred name blocked (ok): $($pair.Name)" -ForegroundColor DarkGray
   }
