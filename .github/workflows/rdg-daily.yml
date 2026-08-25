@@ -156,3 +156,33 @@ jobs:
           git diff --staged --quiet && echo "No dashboard changes" && exit 0
           git commit -m "Auto-refresh: Toast BS Actual (cloud)"
           git push
+
+  # Forecast flash email (Mon–Fri · 9:00 ET primary · 9:30 final).
+  # Skips before 9:00, weekends, and if already sent today.
+  # Only sends when FourVenues scrapeStatus is OK for Miami today.
+  forecast-flash-email:
+    needs: [fourvenues-forecast]
+    if: always() && (needs.fourvenues-forecast.result == 'success' || needs.fourvenues-forecast.result == 'failure' || needs.fourvenues-forecast.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: npm ci || npm install
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Send Forecast flash email (gated)
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          GRAPH_MAILBOX: ${{ secrets.GRAPH_MAILBOX }}
+          FORECAST_EMAIL_ALERT_TO: matthias@rivieradininggroup.com
+        run: node send-forecast-flash-email.cjs
