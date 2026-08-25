@@ -55,13 +55,19 @@ function findFteWorkbook(weekLabel, explicitPath) {
     if (fs.existsSync(p)) return p;
   }
   const weekNum = (weekLabel.match(/W(\d+)/) || [])[1];
+  const n = Number(weekNum);
+  const downloads = path.join(process.env.USERPROFILE || '', 'Downloads');
+  // Prefer Viktor Ops FTE export (People tab) over legacy ADP "Data - Overall"
   const candidates = [
+    path.join(ROOT, 'data', 'fte', `RDG_FTE_Week_${weekNum}_summary.xlsx`),
+    path.join(ROOT, 'data', 'fte', `RDG_FTE_Week_${n}_summary.xlsx`),
+    path.join(downloads, `RDG_FTE_Week_${weekNum}_summary.xlsx`),
+    path.join(downloads, `RDG_FTE_Week_${n}_summary.xlsx`),
     path.join(ROOT, 'data', 'fte', `RDG_FTE_Week_${weekNum}.xlsx`),
-    path.join(ROOT, 'data', 'fte', `RDG_FTE_Week_${Number(weekNum)}.xlsx`),
+    path.join(ROOT, 'data', 'fte', `RDG_FTE_Week_${n}.xlsx`),
     path.join(ROOT, 'data', 'fte', `RDG_FTE_Week_${weekNum} .xlsx`),
-    path.join(process.env.USERPROFILE || '', 'Downloads', `RDG_FTE_Week_${weekNum} .xlsx`),
-    path.join(process.env.USERPROFILE || '', 'Downloads', `RDG_FTE_Week_${weekNum}.xlsx`),
-    path.join(ROOT, 'data', 'fte', 'RDG_FTE_Week_30.xlsx'),
+    path.join(downloads, `RDG_FTE_Week_${weekNum}.xlsx`),
+    path.join(downloads, `RDG_FTE_Week_${weekNum} .xlsx`),
   ];
   for (const c of candidates) {
     if (c && fs.existsSync(c)) return c;
