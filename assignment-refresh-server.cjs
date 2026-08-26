@@ -20,7 +20,7 @@ const VENUE_TO_SCRAPE = {
   casa_neos: 'casa_neos',
   ava_cg: 'ava_cg',
   ava_wp: 'ava_wp',
-  mila: null, // not ready
+  mila: 'mila',
 };
 
 const VENUE_TO_PROCESS = {

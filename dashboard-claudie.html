@@ -110,7 +110,7 @@ table.menu-tbl tr:hover td{background:#1e2533}
 
 <div class="kpis">
   <div class="kpi"><div class="v">22,927</div><div class="l">Food tickets (week)</div></div>
-  <div class="kpi alert"><div class="v">57</div><div class="l">Peak concurrent tickets</div></div>
+  <div class="kpi alert"><div class="v" id="kPeakConc">57</div><div class="l">Peak concurrent orders</div></div>
   <div class="kpi alert"><div class="v">26</div><div class="l">Breaking point (tickets)</div></div>
   <div class="kpi alert"><div class="v">141</div><div class="l">Breaking point (guests)</div></div>
   <div class="kpi"><div class="v">39.4</div><div class="l">Peak avg conc. (Sat 20–21)</div></div>
@@ -120,7 +120,7 @@ table.menu-tbl tr:hover td{background:#1e2533}
 <!-- Visual 1 -->
 <div class="card">
   <h2>Visual 1 — Kitchen Pressure Curve</h2>
-  <p class="note">X-axis = concurrent tickets open. Left Y = occurrences. Right Y = avg fulfillment (gold) and P75 fulfillment (red dashed). Breaking point = where avg fulfillment first crosses the 15-min target under load. Toggle a day to see that weekday only.</p>
+  <p class="note">X-axis = concurrent <strong>orders</strong> open (multi-station fires merged per check). Left Y = time intervals at that load. Right Y = avg fulfillment (gold) and duration-weighted P75 (red dashed). Breaking point = where avg fulfillment first crosses the 15-min target under load.</p>
   <div class="hm-toggle" id="pressureDayToggle">
     <button type="button" class="active" data-day="Total" onclick="setPressureDay('Total',this)">Total</button>
     <button type="button" data-day="Monday" onclick="setPressureDay('Monday',this)">Mon</button>
@@ -137,7 +137,7 @@ table.menu-tbl tr:hover td{background:#1e2533}
     <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
     <span><span class="sw" style="background:#e2706a;display:inline-block;width:20px;height:2px;vertical-align:middle;border-top:2px dashed #e2706a;background:none"></span>P75 fulfillment (min)</span>
   </div>
-  <div class="annotation-box">⚡ Breaking point at <strong>26 concurrent tickets</strong> — avg fulfillment jumps to 16.0 min.</div>
+  <div class="annotation-box" id="bpAnnotation">⚡ Breaking point at <strong>26 concurrent orders</strong> — avg fulfillment jumps to 16.0 min.</div><div id="bpMethodNote" style="font-size:11px;color:#9aa0aa;margin-top:4px">BP = first load band (≥10 orders, ≥5 intervals) where avg fulfillment exceeds target</div>
   <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
 </div>
 

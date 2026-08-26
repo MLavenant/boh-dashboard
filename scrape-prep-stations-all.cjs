@@ -60,6 +60,18 @@ const VENUE_CONFIGS = {
       return sample.some(s => /casa neos/i.test(s));
     },
   },
+  mila: {
+    mapKey: 'mila',
+    selectedSet: '500000000001501691',
+    menuMatch(name) {
+      const n = clean(name);
+      if (/wine|drink|bar|coffee|retail|reservation|n\s*\/\s*a bev|omakase|cocktail|spirit|sake|beer|tea\b/i.test(n)) return false;
+      return /dinner|lunch|brunch|food|^m-/i.test(n);
+    },
+    confirmSample(sample) {
+      return sample.some(s => /mila/i.test(s));
+    },
+  },
 };
 
 function clean(s) {
@@ -86,36 +98,61 @@ function parsePrepStationMap(html) {
 }
 
 async function ensureSession(context, page) {
+  const email = process.env.TOAST_EMAIL || '';
+  const password = process.env.TOAST_PASSWORD || '';
+
   await page.goto('https://www.toasttab.com/restaurants/admin/home', {
     waitUntil: 'domcontentloaded',
-    timeout: 60000,
+    timeout: 90000,
   });
-  for (let i = 0; i < 20; i++) {
+
+  for (let i = 0; i < 30; i++) {
     const title = await page.title().catch(() => '');
-    if (!/just a moment/i.test(title)) break;
-    await page.waitForTimeout(1500);
+    if (!/just a moment|security verification|cloudflare/i.test(title)) break;
+    console.log(`Cloudflare wait… (${i + 1})`);
+    await page.waitForTimeout(2000);
   }
-  await page.waitForTimeout(1500);
+
   if (!/\/login/i.test(page.url())) {
     console.log('Session OK');
     return;
   }
-  console.log('Session expired — logging in (complete 2FA if prompted)...');
+
+  if (!email || !password) {
+    throw new Error('Toast session expired — set TOAST_EMAIL / TOAST_PASSWORD in .env or run: node toast-login-refresh.mjs');
+  }
+
+  console.log('Session expired — logging in (complete 2FA in the browser if prompted)...');
   await page.goto('https://www.toasttab.com/restaurants/admin/login', {
     waitUntil: 'domcontentloaded',
-    timeout: 60000,
+    timeout: 90000,
   });
-  await page.waitForTimeout(2000);
-  const emailSel = 'input[type="text"], input[type="email"], input[name="username"], input[name="email"]';
-  await page.waitForSelector(emailSel, { state: 'visible', timeout: 90000 });
-  await page.fill(emailSel, process.env.TOAST_EMAIL || '');
-  await page.click('button[type="submit"]');
+
+  for (let i = 0; i < 40; i++) {
+    const title = await page.title().catch(() => '');
+    const url = page.url();
+    if (/security verification|just a moment|cloudflare/i.test(title)) {
+      console.log(`Login Cloudflare wait… (${i + 1})`);
+      await page.waitForTimeout(3000);
+      continue;
+    }
+    if (!url.includes('/login') || url.includes('/admin')) break;
+    await page.waitForTimeout(1500);
+  }
+
+  if (page.url().includes('/login')) {
+    await page.waitForSelector('input[type="text"], input[type="email"]', { state: 'visible', timeout: 120000 });
+    await page.fill('input[type="text"], input[type="email"]', email);
+    await page.click('button[type="submit"]');
+    await page.waitForTimeout(1200);
+    await page.waitForSelector('input[type="password"]', { state: 'visible', timeout: 60000 });
+    await page.fill('input[type="password"]', password);
+    await page.click('button[type="submit"]');
+    console.log('Waiting for admin home / 2FA (up to 3 min)...');
+  }
+
+  await page.waitForURL(/\/restaurants\/admin\//, { timeout: 180000 });
   await page.waitForTimeout(1500);
-  await page.waitForSelector('input[type="password"]', { state: 'visible', timeout: 30000 });
-  await page.fill('input[type="password"]', process.env.TOAST_PASSWORD || '');
-  await page.click('button[type="submit"]');
-  console.log('Waiting for login / 2FA (up to 180s)...');
-  await page.waitForURL(u => /toasttab\.com/i.test(u.href) && !/\/login/i.test(u.href), { timeout: 180000 });
   await context.storageState({ path: SESSION_FILE });
   console.log('Session saved.');
 }
@@ -299,7 +336,12 @@ async function run() {
   if (!fs.existsSync(path.join(ROOT, 'data'))) fs.mkdirSync(path.join(ROOT, 'data'));
 
   const hasSession = fs.existsSync(SESSION_FILE);
-  const browser = await chromium.launch({ headless: false, slowMo: 30, args: ['--start-maximized'] });
+  const browser = await chromium.launch({
+    channel: process.platform === 'win32' ? 'msedge' : undefined,
+    headless: false,
+    slowMo: 30,
+    args: ['--start-maximized'],
+  });
   const context = await browser.newContext({
     ...(hasSession ? { storageState: SESSION_FILE } : {}),
     viewport: { width: 1600, height: 1000 },

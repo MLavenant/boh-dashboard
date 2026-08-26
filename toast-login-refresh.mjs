@@ -7,12 +7,15 @@ import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 
-dotenv.config({ path: "C:\\Cursor\\toast-mcp-server\\.env", override: true });
+import { fileURLToPath } from "url";
 
-const SESSION_FILE = "C:\\Cursor\\toast-mcp-server\\toast-session.json";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '.env'), override: true });
+
+const SESSION_FILE = path.join(__dirname, 'toast-session.json');
 const ALSO_COPY = [
-  "C:\\Cursor\\boh-rdg-publish\\toast-session.json",
-  "C:\\Cursor\\toast-mcp-server\\toast-session.json",
+  path.join(__dirname, 'toast-session.json'),
+  'C:\\Cursor\\toast-mcp-server\\toast-session.json',
 ];
 
 async function main() {

@@ -282,6 +282,7 @@
     "CL-Fried Squid": {
       "stations": [
         "Fryer",
+        "Back Kitchen",
         "Cold Expo",
         "Garde Manger"
       ],
@@ -341,8 +342,7 @@
         "Pasta",
         "Hot Expo"
       ],
-      "targetSec": 720,
-      "source": "ref+toast"
+      "targetSec": 720
     },
     "CL-Squash Ravioli": {
       "stations": [
@@ -868,6 +868,7 @@
     "CL-Crab Croquettes": {
       "stations": [
         "Fryer",
+        "Back Kitchen",
         "Cold Expo",
         "Garde Manger"
       ],
@@ -909,6 +910,7 @@
     "CLPFL-Crab Croquettes": {
       "stations": [
         "Fryer",
+        "Back Kitchen",
         "Cold Expo",
         "Garde Manger"
       ],
@@ -920,8 +922,7 @@
         "Grill Meat",
         "Hot Expo"
       ],
-      "targetSec": 0,
-      "source": "toast-bulkeditor"
+      "targetSec": 0
     },
     "CLPFL-Rigatoni Pasta": {
       "stations": [
@@ -1044,6 +1045,15 @@
     "CL- Chocolate Nougat Complimentary": {
       "stations": [
         "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL- Lunch Chicken Milanese": {
+      "stations": [
+        "Fryer",
+        "Grill Meat",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
@@ -1206,8 +1216,9 @@
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
-    "CL-Chicken Pailard": {
+    "CL-Chicken Milanese": {
       "stations": [
+        "Fryer",
         "Grill Meat",
         "Hot Expo"
       ],
@@ -1232,15 +1243,15 @@
     "CL-Fleur de Courgette": {
       "stations": [
         "Fryer",
+        "Back Kitchen",
         "Cold Expo",
         "Garde Manger"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
-    "CL-Hanger Steak Frites": {
+    "CL-Hanger Steak": {
       "stations": [
-        "Fryer",
         "Grill Meat",
         "Hot Expo"
       ],
@@ -1262,6 +1273,95 @@
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
+    "CL-LMS Beef Tartare": {
+      "stations": [
+        "Cold Expo",
+        "Garde Manger"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-LMS Branzino Filet": {
+      "stations": [
+        "Grill Fish",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-LMS Chicken Milanese": {
+      "stations": [
+        "Fryer",
+        "Grill Meat",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-LMS Creme Brulee": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-LMS Gazpacho": {
+      "stations": [
+        "Cold Expo",
+        "Garde Manger"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-LMS Hanger Steak Frite": {
+      "stations": [
+        "Fryer",
+        "Grill Meat",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-LMS Miami Spice Lunch": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-LMS Rigatoni Pasta": {
+      "stations": [
+        "Pasta",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-LMS Tiramisu": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-LMS Tomato Salad": {
+      "stations": [
+        "Cold Expo",
+        "Garde Manger"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-LMS Zucchini Carpaccio": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
     "CL-Lobster Pasta Lunch": {
       "stations": [
         "Pasta",
@@ -1271,6 +1371,192 @@
       "source": "toast-bulkeditor"
     },
     "CL-Lunch Hanger Steak Frites": {
+      "stations": [
+        "Grill Meat",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Beef Tartare": {
+      "stations": [
+        "Cold Expo",
+        "Garde Manger"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Branzino Carpaccio": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Chocolate Mousse": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Crab Croquette": {
+      "stations": [
+        "Fryer",
+        "Back Kitchen",
+        "Cold Expo",
+        "Garde Manger"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Creme Brulee": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Gazpacho": {
+      "stations": [
+        "Cold Expo",
+        "Garde Manger"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Green Apple Sorbet": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Miami Spice": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Ricotta Ravioli": {
+      "stations": [
+        "Pasta",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Roasted Chicken": {
+      "stations": [
+        "Grill Meat",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Salmon": {
+      "stations": [
+        "Grill Fish",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Tenderloin": {
+      "stations": [
+        "Grill Meat",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MS Zucchini Carpaccio": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MSSD Amuse Bouche": {
+      "stations": [
+        "Cold Expo",
+        "Crudo",
+        "Garde Manger"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MSSD Beef Carpaccio": {
+      "stations": [
+        "Cold Expo",
+        "Crudo",
+        "Garde Manger"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MSSD Branzino Filet": {
+      "stations": [
+        "Grill Fish",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MSSD Broccolini": {
+      "stations": [
+        "Saut\\u00E9",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MSSD Burrata": {
+      "stations": [
+        "Cold Expo",
+        "Garde Manger"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MSSD Chocolate Mousse": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MSSD Miami Spice Signature Dining Experience": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MSSD Truffle Puree": {
+      "stations": [
+        "Saut\\u00E9",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MSSD Tuna Tartare": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-MSSD Wagyu Skirt Steak": {
       "stations": [
         "Grill Meat",
         "Hot Expo"
@@ -1343,6 +1629,22 @@
       "stations": [
         "Cold Expo",
         "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-Tiramisu SM": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CL-Truffle Pasta": {
+      "stations": [
+        "Pasta",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
@@ -1467,6 +1769,7 @@
     },
     "CLPF-Chicken": {
       "stations": [
+        "Fryer",
         "Grill Meat",
         "Hot Expo"
       ],
@@ -1523,9 +1826,8 @@
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
-    "CLPF-Truffle Toupie": {
+    "CLPF-Truffle Pasta": {
       "stations": [
-        "Fryer",
         "Pasta",
         "Hot Expo"
       ],
@@ -1542,7 +1844,7 @@
     },
     "CLPF-Zucchini Tempura": {
       "stations": [
-        "Fryer",
+        "Back Kitchen",
         "Cold Expo"
       ],
       "targetSec": 0,
@@ -1552,6 +1854,15 @@
       "stations": [
         "Cold Expo",
         "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CLPFL-Lunch Chicken Milanese": {
+      "stations": [
+        "Fryer",
+        "Grill Meat",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
@@ -1664,13 +1975,12 @@
     },
     "C-Amuse Bouche": {
       "stations": [
-        "Raw 2",
-        "Cold Expo 2",
+        "Garde Manger 1",
         "Cold Expo 1",
-        "Garde Manger 1"
+        "Raw 2",
+        "Cold Expo 2"
       ],
-      "targetSec": 480,
-      "source": "ref+toast"
+      "targetSec": 480
     },
     "C-Arancini": {
       "stations": [
@@ -2454,72 +2764,160 @@
       "targetSec": 720,
       "source": "ref+toast"
     },
-    "C- AB Chutoro Tartlet": {
+    "C-Add-Petrossian Caviar 5g": {
       "stations": [
+        "Raw 2",
         "Cold Expo 2"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
-    "C- AB Citrus Chutoro Tartar": {
+    "C-Amuse Bluefin Caviar": {
       "stations": [
-        "Cold Expo 2"
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
-    "C- AB Hamachi Veggie Roll": {
+    "C-Amuse Gambero Rosso": {
       "stations": [
-        "Cold Expo 2"
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
-    "C- AB Wagyu A5 Aburi Tartare": {
+    "C-Amuse Hamachi Cornet": {
       "stations": [
-        "Cold Expo 2"
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
-    "C-AB Crispy Kataifi Roll": {
+    "C-Amuse Hamachi Roll": {
       "stations": [
-        "Cold Expo 2"
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
-    "C-AB Wagyu Aburi Brioche": {
+    "C-Amuse Kumamoto Oyster": {
       "stations": [
-        "Cold Expo 2"
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
-    "C-Amuse Bouche 1": {
+    "C-Amuse Oyster Tiradito": {
       "stations": [
-        "Cold Expo 2"
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
-    "C-Amuse Bouche 2": {
+    "C-Amuse Salmon Beet": {
       "stations": [
-        "Cold Expo 2"
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
-    "C-Amuse Bouche 3": {
+    "C-Amuse Salmon Roll": {
       "stations": [
-        "Cold Expo 2"
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
-    "C-Amuse Bouche 4": {
+    "C-Amuse Salmon Tart": {
       "stations": [
-        "Cold Expo 2"
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "C-Amuse Scallop Tart": {
+      "stations": [
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "C-Amuse Seabass Basil": {
+      "stations": [
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "C-Amuse Seabass Nori": {
+      "stations": [
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "C-Amuse Spicy Tuna Tart": {
+      "stations": [
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "C-Amuse Summer Tuna Roll": {
+      "stations": [
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "C-Amuse Tuna Feuillete": {
+      "stations": [
+        "Raw 2",
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Garde Manger 1"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
@@ -2771,6 +3169,169 @@
       "targetSec": 0,
       "source": "toast-bulkeditor"
     },
+    "CMS-Apricot Creme Brulee": {
+      "stations": [
+        "Pastry 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMS-Chicken": {
+      "stations": [
+        "Meat"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMS-Filet": {
+      "stations": [
+        "Meat"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMS-Hummus": {
+      "stations": [
+        "Cold Expo 1",
+        "Garde Manger 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMS-Lava Cake": {
+      "stations": [
+        "Pastry 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMS-Miami Spice": {
+      "stations": [
+        "NO PRINT"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMS-Passion Fruit Crema": {
+      "stations": [
+        "Pastry 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMS-Pizza Fior Di Sol": {
+      "stations": [
+        "Hot Expo 1",
+        "Fry 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMS-Risotto": {
+      "stations": [
+        "Sautee 2"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMS-Salmon": {
+      "stations": [
+        "Fish"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMS-Seabass Carpaccio": {
+      "stations": [
+        "Raw 2",
+        "Cold Expo 2"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMS-Summer Salad": {
+      "stations": [
+        "Cold Expo 1",
+        "Garde Manger 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMS-Zucchini Eggplant": {
+      "stations": [
+        "Fry 2"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMSDE-Crisp Patatas": {
+      "stations": [
+        "Fry 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMSDE-Lava Cake": {
+      "stations": [
+        "Pastry 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMSDE-Miami Spice Dining Experience": {
+      "stations": [
+        "NO PRINT"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMSDE-Spicy Tuna Maki": {
+      "stations": [
+        "Maki 2",
+        "Cold Expo 2"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMSDE-Tenderloin": {
+      "stations": [
+        "Meat"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMSDE-Tonno Tartare": {
+      "stations": [
+        "Cold Expo 1",
+        "Garde Manger 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMSDE-Wagyu Carpaccio": {
+      "stations": [
+        "Grilll 1",
+        "Cold Expo 1",
+        "Hot Expo 1",
+        "Garde Manger 1"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMSDE-Whole Branzino": {
+      "stations": [
+        "Fish"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CMSDE-Zucchini Eggplant": {
+      "stations": [
+        "Fry 2"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
     "CSM-Apricot Creme Brulee": {
       "stations": [
         "Pastry 1"
@@ -2893,13 +3454,15 @@
       "stations": [
         "Cold Expo"
       ],
-      "targetSec": 300
+      "targetSec": 300,
+      "source": "ref+toast"
     },
     "ACG-Add-on Focaccia": {
       "stations": [
         "Cold Expo"
       ],
-      "targetSec": 0
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
     },
     "ACG-Sourdough Service": {
       "stations": [
@@ -4491,6 +5054,239 @@
         "Fish Market",
         "Fish",
         "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "ACC-Add-on Avocado Sliced": {
+      "stations": [
+        "Meat",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "ACC-Add-on Poached Egg ea": {
+      "stations": [
+        "Meat",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "ACC-Add-on Sunny Side Egg ea": {
+      "stations": [
+        "Meat",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "ACG-Add-Petrossian Caviar 5g": {
+      "stations": [
+        "Crudo",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "ACG-Kids Greek Yogurt": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "ACG-Parmesan Cheese": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "ACG-Small Dessert Platter": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGMSSE- Half Rack Lamb": {
+      "stations": [
+        "Meat",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGMSSE-Amuse Bouche": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGMSSE-Baklava": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGMSSE-Broccolini": {
+      "stations": [
+        "Saute",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGMSSE-Crisp Patatas": {
+      "stations": [
+        "Fry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGMSSE-Crispy Zucchini": {
+      "stations": [
+        "Fry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGMSSE-Hummus": {
+      "stations": [
+        "Salad",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGMSSE-Miami Spice Signature Experience": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGMSSE-Tuna Ceviche": {
+      "stations": [
+        "Crudo",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGMSSE-Whole Branzino": {
+      "stations": [
+        "Fish",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS- Tenderloin": {
+      "stations": [
+        "Meat",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS--Gelato 2 scoops": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS-Baklava": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS-Crispy Zucchini": {
+      "stations": [
+        "Fry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS-Greek Salad": {
+      "stations": [
+        "Salad",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS-Hummus": {
+      "stations": [
+        "Salad",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS-Keftedes": {
+      "stations": [
+        "Oven",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS-Lavraki Fillet": {
+      "stations": [
+        "Fish",
+        "Oven",
+        "Saute",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS-Melopita": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS-PF Miami Spice": {
+      "stations": [
+        "Meat",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS-Tajine": {
+      "stations": [
+        "Meat",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS-Truffle Pasta": {
+      "stations": [
+        "Hot Expo",
+        "Pasta"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AVACGPFMS-Tuna Ceviche": {
+      "stations": [
+        "Crudo",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
@@ -6994,7 +7790,8 @@
     },
     "M-12oz Wagyu Ribeye": {
       "stations": [
-        "Cold Expo"
+        "Robata",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -7015,13 +7812,16 @@
     },
     "M-Blini": {
       "stations": [
-        "Cold Expo"
+        "Saute 1",
+        "Cold Expo",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Chutoro Sashimi": {
       "stations": [
+        "No Print",
         "Cold Expo"
       ],
       "targetSec": 0,
@@ -7029,6 +7829,7 @@
     },
     "M-Hotate Sashimi": {
       "stations": [
+        "No Print",
         "Cold Expo"
       ],
       "targetSec": 0,
@@ -7036,21 +7837,25 @@
     },
     "M-Ice Cream / Sorbet": {
       "stations": [
-        "Cold Expo"
+        "No Print",
+        "Pastry"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-MILA Iris": {
       "stations": [
-        "Cold Expo"
+        "No Print",
+        "Cold Expo",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-MILA Oysters 12pcs": {
       "stations": [
-        "Cold Expo"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -7064,13 +7869,17 @@
     },
     "M-Petrossian Caviar 50gr": {
       "stations": [
-        "Cold Expo"
+        "Saute 1",
+        "Cold Expo",
+        "Crudo",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Sashimi Omakase": {
       "stations": [
+        "No Print",
         "Cold Expo"
       ],
       "targetSec": 0,
@@ -7078,6 +7887,7 @@
     },
     "M-Sashimi Sampler": {
       "stations": [
+        "No Print",
         "Cold Expo"
       ],
       "targetSec": 0,
@@ -7085,6 +7895,7 @@
     },
     "M-Side Lettuce": {
       "stations": [
+        "Garde Manger",
         "Cold Expo"
       ],
       "targetSec": 0,
@@ -7092,56 +7903,64 @@
     },
     "M-Wasabi Mash Potato": {
       "stations": [
-        "Cold Expo"
+        "Saute 2",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MEV-Beef Tenderloin": {
       "stations": [
-        "Cold Expo"
+        "Robata",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MEV-Chilean Seabass": {
       "stations": [
-        "Cold Expo"
+        "Saute 2",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MEV-Fried Eggplant": {
       "stations": [
-        "Cold Expo"
+        "Tempura",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MEV-Potato Millefeuille": {
       "stations": [
-        "Cold Expo"
+        "Tempura",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MEV-Seabream Carpaccio": {
       "stations": [
-        "Cold Expo"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MEV-Wagyu Dumpling": {
       "stations": [
-        "Cold Expo"
+        "Saute 2",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MP-Cauliflower Tempura": {
       "stations": [
-        "Cold Expo"
+        "Tempura",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -7204,6 +8023,7 @@
     },
     "M-AB Salmon Gunkan Tartare": {
       "stations": [
+        "Cold Expo",
         "Crudo"
       ],
       "targetSec": 0,
@@ -7211,91 +8031,102 @@
     },
     "M-Add-On Caviar Millefeuille (1ea)": {
       "stations": [
-        "Crudo"
+        "Tempura",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Akami Nigiri": {
       "stations": [
-        "Crudo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Akami Sashimi": {
       "stations": [
-        "Crudo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Berry Bowl": {
       "stations": [
-        "Crudo"
+        "No Print",
+        "Pastry"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Hamachi Nigiri": {
       "stations": [
-        "Crudo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Hamachi Sashimi": {
       "stations": [
-        "Crudo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Kampachi Sashimi": {
       "stations": [
-        "Crudo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-King Sake Nigiri": {
       "stations": [
-        "Crudo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Madai Nigiri": {
       "stations": [
-        "Crudo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Madai Sashimi": {
       "stations": [
-        "Crudo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Mushrooms": {
       "stations": [
-        "Crudo"
+        "Saute 1",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Octopus Skewer": {
       "stations": [
-        "Crudo"
+        "Saute 2",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Passion Fruit Vacherin": {
       "stations": [
-        "Crudo"
+        "No Print",
+        "Pastry"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -7309,56 +8140,64 @@
     },
     "M-Prime Ribeye": {
       "stations": [
-        "Crudo"
+        "Robata",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Sashimi Tasting": {
       "stations": [
-        "Crudo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Sauce Cold Pass": {
       "stations": [
-        "Crudo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Seabass": {
       "stations": [
-        "Crudo"
+        "Saute 2",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Spicy Chipotle Lamb (1 ea.)": {
       "stations": [
-        "Crudo"
+        "Robata",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Spinach Salad": {
       "stations": [
-        "Crudo"
+        "Garde Manger",
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Tuna Tartare": {
       "stations": [
-        "Crudo"
+        "Garde Manger",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Vegan Caviar Potato Millefeuille": {
       "stations": [
-        "Crudo"
+        "Tempura",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -7372,6 +8211,10 @@
     },
     "MG-Hoseki Regular": {
       "stations": [
+        "Saute 2",
+        "Tempura",
+        "Cold Expo",
+        "Robata",
         "Crudo"
       ],
       "targetSec": 0,
@@ -7379,14 +8222,17 @@
     },
     "MG-Hoseki Vegan": {
       "stations": [
-        "Crudo"
+        "Garde Manger",
+        "Saute 2",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MG-Mushroom Dumpling": {
       "stations": [
-        "Crudo"
+        "Saute 2",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -7442,21 +8288,22 @@
     },
     "M-Beetroot Maki": {
       "stations": [
-        "Garde Manger"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Foie Gras Toro Wagyu": {
       "stations": [
-        "Garde Manger"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Hamachi Crudo": {
       "stations": [
-        "Garde Manger"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -7470,42 +8317,47 @@
     },
     "M-Ikura Nigiri": {
       "stations": [
-        "Garde Manger"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Madai Crudo": {
       "stations": [
-        "Garde Manger"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-MILA House Salad": {
       "stations": [
-        "Garde Manger"
+        "Garde Manger",
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Seabream Carpaccio": {
       "stations": [
-        "Garde Manger"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Toro Foie Gras Nigiri": {
       "stations": [
-        "Garde Manger"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Truffle Wagyu Nigiri": {
       "stations": [
-        "Garde Manger"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -7617,6 +8469,7 @@
     },
     "Brunch Eggs": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -7869,7 +8722,8 @@
     },
     "M-1 Scoop Ice Cream / Sorbet": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Pastry"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -7883,6 +8737,7 @@
     },
     "M-Add-On Chicken Skewer (1ea)": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -7890,6 +8745,7 @@
     },
     "M-Add-On Dumpling (1ea)": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -7897,14 +8753,14 @@
     },
     "M-Add-on Eel Sauce": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Add-on Fresh Wasabi": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -7918,13 +8774,15 @@
     },
     "M-Add-on Pomme Gaufrette": {
       "stations": [
-        "Hot Expo"
+        "Garde Manger",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Add-On Salmon Crispy Rice (1ea)": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -7932,6 +8790,7 @@
     },
     "M-Add-On Sweet Corn (1ea)": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -7946,6 +8805,7 @@
     },
     "M-Artichokes": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -7953,27 +8813,31 @@
     },
     "M-Avocado (side)": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Avocado Nigiri": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Beetroot Tartare": {
       "stations": [
-        "Hot Expo"
+        "Garde Manger",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Black Cod": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -7981,13 +8845,15 @@
     },
     "M-Bluefin Toro Tartare": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Branzino (2lb)": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -7995,6 +8861,7 @@
     },
     "M-Broccolini": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8002,6 +8869,7 @@
     },
     "M-Brussels": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8016,6 +8884,7 @@
     },
     "M-Cauliflower Tempura": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8023,6 +8892,7 @@
     },
     "M-Caviar Potato Millefeuille": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8030,6 +8900,7 @@
     },
     "M-Chicken Yakitori": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8037,48 +8908,55 @@
     },
     "M-Chocolate Mousse Parfait": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Pastry"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Chutoro Caviar Nigiri": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Chutoro Nigiri": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Crab Salad": {
       "stations": [
-        "Hot Expo"
+        "Garde Manger",
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Crispy Shrimp Maki": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Dessert Fire": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Pastry"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Dover Sole": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8086,6 +8964,7 @@
     },
     "M-Edamame": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8107,13 +8986,15 @@
     },
     "M-Hirame Sashimi": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Hot Pot": {
       "stations": [
+        "Saute 1",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8121,6 +9002,7 @@
     },
     "M-Hot Stone": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8128,14 +9010,15 @@
     },
     "M-Hotate Nigiri": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Ikura Sashimi": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -8149,14 +9032,16 @@
     },
     "M-IN Beef Tartare": {
       "stations": [
-        "Hot Expo"
+        "Garde Manger",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-IN Dessert Selection": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo",
+        "Pastry"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -8184,7 +9069,8 @@
     },
     "M-IN Madai Sashimi": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -8205,6 +9091,7 @@
     },
     "M-IN Seabass": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8212,13 +9099,15 @@
     },
     "M-IN Spinach Salad": {
       "stations": [
-        "Hot Expo"
+        "Garde Manger",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-IN Wasabi Mashed Potato": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8226,6 +9115,7 @@
     },
     "M-Influencer Menu": {
       "stations": [
+        "Cold Expo",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8240,7 +9130,7 @@
     },
     "M-Japanese Uni Nigiri": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -8254,13 +9144,15 @@
     },
     "M-Kanpachi Nigiri": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-King Crab Pot": {
       "stations": [
+        "Saute 1",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8268,13 +9160,15 @@
     },
     "M-King Sake Sashimi": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Lobster Tempura": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8289,7 +9183,7 @@
     },
     "M-Mediterranean Vegetable Maki": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -8303,6 +9197,8 @@
     },
     "M-MILA Bonzai": {
       "stations": [
+        "No Print",
+        "Cold Expo",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8310,7 +9206,8 @@
     },
     "M-MILA Chocolate Lava Cake": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Pastry"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -8324,7 +9221,8 @@
     },
     "M-MILA Oysters 6pcs": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -8345,6 +9243,7 @@
     },
     "M-Mushroom Dumpling": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8352,6 +9251,7 @@
     },
     "M-Mushroom Dumpling (1ea)": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8359,13 +9259,15 @@
     },
     "M-Nigiri Omakase": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Octopus Skewer (1 ea)": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8373,13 +9275,17 @@
     },
     "M-Otoro Sashimi": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Petrossian Caviar 30gr": {
       "stations": [
+        "Saute 1",
+        "Cold Expo",
+        "Crudo",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8387,6 +9293,7 @@
     },
     "M-Plain Pasta": {
       "stations": [
+        "Saute 1",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8394,6 +9301,7 @@
     },
     "M-Poussin Hen": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8401,6 +9309,7 @@
     },
     "M-Salmon": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8408,13 +9317,14 @@
     },
     "M-Salmon Avocado Maki": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Salmon Crispy Rice": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8429,27 +9339,30 @@
     },
     "M-Seasonal Cheesecake": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Pastry"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Seaweed Salad": {
       "stations": [
-        "Hot Expo"
+        "Garde Manger",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Serrano Peppers": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Shishito": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8457,13 +9370,17 @@
     },
     "M-Side Rice Chips": {
       "stations": [
-        "Hot Expo"
+        "Garde Manger",
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Side Tomatoes": {
       "stations": [
+        "Garde Manger",
+        "Pastry",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8471,13 +9388,15 @@
     },
     "M-Special Occasion Scoop": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Pastry"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Spicy Chipotle Lamb": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8485,13 +9404,15 @@
     },
     "M-Spicy Hamachi Maki": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Spicy Tuna Crispy Rice": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8499,6 +9420,7 @@
     },
     "M-Spicy Tuna Crispy Rice (1ea)": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8506,13 +9428,15 @@
     },
     "M-Spicy Tuna Maki": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Sweet Corn": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8520,6 +9444,7 @@
     },
     "M-Temper Tomahawk": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8527,6 +9452,7 @@
     },
     "M-Tenderloin": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8534,6 +9460,7 @@
     },
     "M-Tomahawk": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8541,6 +9468,7 @@
     },
     "M-Truffle Pasta": {
       "stations": [
+        "Saute 1",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8548,6 +9476,7 @@
     },
     "M-Truffle Pasta w. Caviar": {
       "stations": [
+        "Saute 1",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8555,7 +9484,8 @@
     },
     "M-Truffle Scallop Maki": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -8569,13 +9499,15 @@
     },
     "M-Wagyu Beef Tartare": {
       "stations": [
-        "Hot Expo"
+        "Garde Manger",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Wagyu Gyoza": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8583,6 +9515,7 @@
     },
     "M-Wagyu Kagoshima": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8590,13 +9523,15 @@
     },
     "M-Yuzu Moon": {
       "stations": [
-        "Hot Expo"
+        "No Print",
+        "Pastry"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Zucchini Temp": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8611,6 +9546,7 @@
     },
     "MEV- Fried Eggplant & Zuchinni": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8618,13 +9554,16 @@
     },
     "MEV- Spinach Salad": {
       "stations": [
-        "Hot Expo"
+        "Garde Manger",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MEV- Sweet Corn": {
       "stations": [
+        "Saute 1",
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8632,6 +9571,7 @@
     },
     "MEV-Black Cod": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8639,6 +9579,7 @@
     },
     "MEV-Brussels Sprouts": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8646,20 +9587,23 @@
     },
     "MEV-Dessert Selection": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo",
+        "Pastry"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MEV-Hamachi Crudo": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MEV-Octopus": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8667,6 +9611,7 @@
     },
     "MEV-Ribeye": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8674,6 +9619,7 @@
     },
     "MEV-Salmon": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8681,6 +9627,7 @@
     },
     "MEV-Satay Chicken": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8688,27 +9635,29 @@
     },
     "MEV-Spinach Salad": {
       "stations": [
-        "Hot Expo"
+        "Garde Manger",
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MEV-Sushi Selection": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MEV-Sushi Selection Iris": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MEV-Truffle Pasta": {
       "stations": [
+        "Saute 1",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8716,6 +9665,7 @@
     },
     "MG-Chicken Yakitori": {
       "stations": [
+        "Robata",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8723,20 +9673,22 @@
     },
     "MG-Hamachi Crudo": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MG-Salmon Nigiri": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "MG-Tuna Crispy Rice": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8744,6 +9696,7 @@
     },
     "MG-Wagyu Gyoza": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8807,6 +9760,7 @@
     },
     "Premium Chef's Tasting Menu": {
       "stations": [
+        "Saute 1",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8814,20 +9768,22 @@
     },
     "PT 1/2 Dozen Oysters": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "PT A5 Wagyu Maki Roll": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "PT Brussels": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8835,6 +9791,7 @@
     },
     "PT Chilean Seabass": {
       "stations": [
+        "Saute 2",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8842,20 +9799,22 @@
     },
     "PT Madai Sashimi": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "PT Omakase Sashimi Sampler": {
       "stations": [
-        "Hot Expo"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "PT Salmon Crispy Rice Caviar": {
       "stations": [
+        "Tempura",
         "Hot Expo"
       ],
       "targetSec": 0,
@@ -8968,7 +9927,8 @@
     },
     "Chicken Skewers": {
       "stations": [
-        "Pastry"
+        "Saute 2",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -8996,14 +9956,14 @@
     },
     "M-Otoro Nigiri": {
       "stations": [
-        "Pastry"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "M-Sushi Rice (side)": {
       "stations": [
-        "Pastry"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
@@ -9087,59 +10047,2583 @@
     },
     "SG Beef Tenderloin": {
       "stations": [
-        "Pastry"
+        "Robata",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "SG Chicken Yakitori": {
       "stations": [
-        "Pastry"
+        "Robata",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "SG Hamachi Maki": {
       "stations": [
-        "Pastry"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "SG Mushroom Sauteed": {
       "stations": [
-        "Pastry"
+        "Saute 1",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "SG Seabream Carpaccio": {
       "stations": [
-        "Pastry"
+        "Cold Expo",
+        "Crudo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "SG Seared Salmon": {
       "stations": [
-        "Pastry"
+        "Saute 2",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "SG Spicy Tuna Maki": {
       "stations": [
-        "Pastry"
+        "Cold Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
     },
     "SG Wagyu Gyoza": {
       "stations": [
-        "Pastry"
+        "Saute 2",
+        "Hot Expo"
       ],
       "targetSec": 0,
       "source": "assignmentData-seed"
+    },
+    "15 Min Warning Crs 1": {
+      "stations": [
+        "Cold Expo",
+        "Pastry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "15 Min Warning Crs 2": {
+      "stations": [
+        "Cold Expo",
+        "Pastry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "15 Min Warning Crs 3": {
+      "stations": [
+        "Cold Expo",
+        "Pastry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "15 Min Warning Crs 4": {
+      "stations": [
+        "Cold Expo",
+        "Pastry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "15 Min Warning Crs 5": {
+      "stations": [
+        "Cold Expo",
+        "Pastry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Admin Fee": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "ALL IN PASTRY": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "ALL IN SAVORY": {
+      "stations": [
+        "Saute 1",
+        "Garde Manger",
+        "Saute 2",
+        "Tempura",
+        "Cold Expo",
+        "Robata (2)",
+        "Robata",
+        "Crudo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "AV Fee": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Beef Tataki": {
+      "stations": [
+        "Garde Manger",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Beef Tenderloin": {
+      "stations": [
+        "Robata (2)",
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Black Osetra Caviar": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Broccolini": {
+      "stations": [
+        "Cold Expo",
+        "Robata"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Brunch Mother day Dessert": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Brussels": {
+      "stations": [
+        "Tempura",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Cakeage Fee": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Champagne Wall": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CHEF MICHAEL'S MENU": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Chicken Breast": {
+      "stations": [
+        "Robata (2)",
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Cm 4pc Spicy Tuna": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CM BLACK COD": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CM Branzino": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Cm Cheesecake": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Cm Chocolate Mousse": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Cm Dumplings": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CM FRUIT SALAD": {
+      "stations": [
+        "Cold Expo",
+        "Pastry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Cm Greek Salad": {
+      "stations": [
+        "Garde Manger",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CM GREEK SALAD": {
+      "stations": [
+        "Cold Expo",
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CM Grilled Artichokes": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CM HAMACHI CRUDO": {
+      "stations": [
+        "Garde Manger",
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CM Octopus": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Cm Spicy Hamachi": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CM SUSHI/SASHIMI PLATTER": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CM TENDERLOIN": {
+      "stations": [
+        "Saute 2",
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CM Tuna Tartare": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "CM TUNA TARTARE": {
+      "stations": [
+        "Garde Manger",
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Custom Dinner Menu": {
+      "stations": [
+        "No Print",
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Eggs Benedict": {
+      "stations": [
+        "Saute 1",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Eggs Jar": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Entertainment Fee": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Event Deposit Taken": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "FIRE DESSERT PLATTER": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Fresh Wasabi": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Furniture Removal": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Hamachi Nigiri": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Ice Cream": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Ice Sculpture": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "ICO": {
+      "stations": [
+        "Saute 1",
+        "Garde Manger",
+        "Saute 2",
+        "Tempura",
+        "Cold Expo",
+        "Robata",
+        "Pastry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "IMPERIAL PACKAGE": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Kids Brunch": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "King Crab": {
+      "stations": [
+        "Tempura",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Kosher Meal Fee": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Lamb Kofte": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Avocado Toast": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Chestnut Mika Tart": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Chicken Kushiyaki": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Fruit Platter": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Hamachi Crudo": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Kumo": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Lamb Kofte": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Lava Cake": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Lemon Basil Tart": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Macaron": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Mandarin Tart": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Miso Eggplant": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Raspberry Cheesecake": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Salmon Crispy Rice": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Seated Dinner + 2 drinks": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M- MKT Spicy Tuna Brioche": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-48oz Porterhouse": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-AB Gochujang Miso Tuna": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-AB Salmon Jalapeno": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-AB Seabream Taco": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-AB Watermelon": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Aburi Nigiri": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Add-on Butter": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Add-on Creamy Ponzu": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Add-on Mila Wafu": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Add-on Parmesan Cheese": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Add-on Ponzu": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Add-on Romesco": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Add-on Side Truffle Oil": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Add-on spicy feta": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Add-on Truffle Aioli": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Add-on Tzatziki": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Add-On Vegan Millefeuille (1ea)": {
+      "stations": [
+        "Tempura",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Add-Petrossian Caviar 5g": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Aged Porterhouse": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Aged Ribeye": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Aji Nigiri": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Aji Sashimi": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Akamusu Sashimi": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Akamutsu Nigiri": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Avocado Truffle Maki Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Bar Fee": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Beet Sashimi": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Birthday Cake - Exotic Cake": {
+      "stations": [
+        "No Print",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Birthday Cake - Fig Cheesecake": {
+      "stations": [
+        "No Print",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Birthday Cake - Hazelnut Croustillant": {
+      "stations": [
+        "No Print",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Birthday Cake - Raspberry Flower": {
+      "stations": [
+        "No Print",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Bone in Striploin": {
+      "stations": [
+        "Robata (2)",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Branzino (4lb)": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Branzino Temp": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Burrata": {
+      "stations": [
+        "Garde Manger",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Cakeage Fee": {
+      "stations": [
+        "No Print",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Caviar": {
+      "stations": [
+        "Saute 1",
+        "Cold Expo",
+        "Crudo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Caviar Bump": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Caviar Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Chef Fee": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Chicken Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Chu Toro Aburi": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Crispy Feta Cheese": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Custom Cake": {
+      "stations": [
+        "No Print",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Dessert Platter": {
+      "stations": [
+        "No Print",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Dessert Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-DJ": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-DJ Equipment rental": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Domestic Sashimi": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Domestic Uni Nigiri": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Dry Aged Temp Ribeye": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Eggplant Caviar": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Exotic Fish by the LB": {
+      "stations": [
+        "Saute 1",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Firenarshal": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Fireshow": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Foie Gras Nigiri": {
+      "stations": [
+        "Saute 2",
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Hamachi Aburi": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Hamachi Kama": {
+      "stations": [
+        "Cold Expo",
+        "Robata"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Hirame Nigiri": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Hotpot Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Ice Cream & Sorbet Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Imperial Caviar Nigiri": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-IN Black Cod": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-IN Grilled Octopus": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-IN Skirt Steak": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-IN Spicy Lamb": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-IN Spicy Tuna Rice": {
+      "stations": [
+        "Tempura",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-IN Wagyu Toro Aburi Maki": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Japanese Uni Sashimi": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Kinmadai Nigiri": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Kinmadai Sashimi": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Lamb Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Lobster Dumpling": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Macaroons": {
+      "stations": [
+        "No Print",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Madai Aburi": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Maguro Sashimi Omakase": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Maki Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Maki Station (Copy)": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Maki Station 3.0": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MILA Ambrosia (AB)": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MILA Custom Menu": {
+      "stations": [
+        "No Print",
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MILA Iris (AB)": {
+      "stations": [
+        "No Print",
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MILA Laurel (AB)": {
+      "stations": [
+        "No Print",
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MILA Oysters 24pcs": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Cheesecake": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Chicken Yakitori": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Fruit Salad": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS House Salad": {
+      "stations": [
+        "Garde Manger",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Lava Cake": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Miami Spice": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Mushroom Dumpling": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Poussin": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Salmon": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Seabream Carpaccio": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Sushi Sampler": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Truffle Pasta": {
+      "stations": [
+        "Saute 1",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Tuna Crispy Rice": {
+      "stations": [
+        "Tempura",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-MS Wagyu Skirt Steak": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Ora King Salmon Aburi": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Parmesan Cheese": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Petrossian Caviar 125gr": {
+      "stations": [
+        "Saute 1",
+        "Cold Expo",
+        "Crudo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Petrossian Caviar 250gr": {
+      "stations": [
+        "Saute 1",
+        "Cold Expo",
+        "Crudo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Porterhouse": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Potato Millefeuille Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Prime Ribeye Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Pumpkin Risotto": {
+      "stations": [
+        "Saute 1",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Rainbow Carpaccio": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Raw Bar Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Robata Salad Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Salmon Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Seafood Platter": {
+      "stations": [
+        "Garde Manger",
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Seafood Platter W Caviar": {
+      "stations": [
+        "Garde Manger",
+        "Cold Expo",
+        "Crudo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Seared Foie Gras": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Security": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-SECURITY": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Shaved Black Truffles (per gr)": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Shaved White Truffles (per gr)": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Shima Aji Nigiri": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Shima Aji Sashimi": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Skirt Steak": {
+      "stations": [
+        "Robata (2)",
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Sourdough Bread": {
+      "stations": [
+        "Garde Manger",
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Special Cinco Jotas": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Stone Crab Claw": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Stone Crab Claw (1 ea)": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Suzuki Nigiri": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Suzuki Sashimi": {
+      "stations": [
+        "No Print",
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Sweet Corn Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Temper 70oz Au. Wagyu Tomahawk": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Temper Dry Aged Ribeye Special": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Temper Porterhouse": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Tenderloin Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Tomahawk Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Toro Tartar Maki": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Tropical Fruit Salad": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Truffle Pasta Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Uni": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Vegetarian Menu": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Vegetarian Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Wagyu Aburi": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Wagyu slider (1ea)": {
+      "stations": [
+        "Saute 1",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Wagyu Sliders": {
+      "stations": [
+        "Tempura",
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "M-Whole Daurade Sashimi": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Macaroons": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Maple Passed $35": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Maple Passed $55": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Maple Passed $75": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Maple Passed $95": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Asparagus": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Avocado Grapefruit Salad": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Avocado Salad": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Baby Kale": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Bagel Plain": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Bagel Sesame": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Brussel Sprouts": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Cauliflower Tempura": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Chicken Kofta": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Couscous Salad": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Lemon Wedge": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-MILA House Salad": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Octopus Takoyaki": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Pina Colada Tart": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Seaweed Salad": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MB-Tabbouleh": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MC-Avocado Toast": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MC-Beef Tartar": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MC-Black Cod": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MC-Cauliflower Tempura": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MC-Chicken Yakitori": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MC-Grilled Shrimp": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MC-Hamachi Crudo": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MC-Madai Sashimi": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MC-Octopus Skewer": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MC-Seabass Carpaccio": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MC-Truffle Salmon Crudo": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MC-Tuna Tartare": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Mediterranean Dorade": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MEV- Wagyu Dumplings": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MEV-Broccolini": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MEV-Madai Sashimi": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MEV-Mushroom Hotpot": {
+      "stations": [
+        "Saute 1",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MEV-Sushi Selection Laurel": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MEV-Wagyu Skirt Steak": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MEV-Whole Branzino": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MG-Zucchini Nigiri": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MILA Brunch": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MILA Cedar Passed $82.50": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MILA Cedar Passed 115": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MILA Cedar Passed 85": {
+      "stations": [
+        "No Print",
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MILA Cedar Passed 95": {
+      "stations": [
+        "No Print",
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MILA Chopped Salad": {
+      "stations": [
+        "Garde Manger",
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MILA SPICE SIGNATURE OMAKASE": {
+      "stations": [
+        "Pastry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MILLESIME PACKAGE": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Minimum not Met": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Miso Seabass": {
+      "stations": [
+        "Robata (2)",
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MP-Avocado Toast": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MP-Beef Millefeuille": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MP-Chicken Yakitori": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MP-Hamachi Crudo": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MP-Madai Crudo": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MP-Salmon Crispy Rice": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MP-Seabass": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "MP-Tuna Tartare": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Nigiri Selection": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Nigiri to Maki Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "OMAKASE - 5+ SIGNATURE": {
+      "stations": [
+        "Pastry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Overtime Fee": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Panna Cotta": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Pork Belly Banh Mi": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "PRINTER TESTING": {
+      "stations": [
+        "Saute 1",
+        "Garde Manger",
+        "Saute 2",
+        "Tempura",
+        "Cold Expo",
+        "Prep",
+        "Robata (2)",
+        "Pastry",
+        "Hot Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "PT CABANA EXPERIENCE": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "PT DESSERT PLATTER": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "PT Signature Sushi Platter": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "PT Wagyu Skirt Steak": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "RESERVE PACKAGE": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Robata Grilled Bone in Ribeye Station": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "S-Louvar Sashimi": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Salmon": {
+      "stations": [
+        "Saute 2",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Salmon Maki": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Salmon Nigiri": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Sashimi Selection": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Seafood Platter W Caviar": {
+      "stations": [
+        "Saute 1",
+        "Cold Expo",
+        "Crudo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "SG Chocolate Lava Cake": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Short rib 'Kalbi' br": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Shrimp Cocktail": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Side Bread- Egg in a Jar": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Skirt Steak": {
+      "stations": [
+        "Robata (2)",
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Soba Salad": {
+      "stations": [
+        "Cold Expo",
+        "Crudo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "SP-70 oz Australian Wagyu Tomahawk": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "SP-Aged Ribeye": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Spicy Hamachi Maki": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Spicy Tuna Maki": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Sushi Rice": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Sweet Corn": {
+      "stations": [
+        "Cold Expo",
+        "Robata"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "TABLE MOVED": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Temp Aged Porterhouse": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Tuna Nigiri": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "V Bar Mila Spritz": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "V Bar N/A Spritz": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Vbar Aperol Spritz": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Vbar Hugo Spritz": {
+      "stations": [
+        "No Print"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Vegan Hotpot": {
+      "stations": [
+        "Saute 1",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Vegetable Maki": {
+      "stations": [
+        "Cold Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "VG-Avocado Chocolate Mousse": {
+      "stations": [
+        "Cold Expo",
+        "Pastry",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "VG-Broccolini": {
+      "stations": [
+        "Robata (2)",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "VG-Eggplant Tempura": {
+      "stations": [
+        "Tempura",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "VG-Greek Salad": {
+      "stations": [
+        "Tempura",
+        "Cold Expo",
+        "Crudo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "VG-HOP Ceviche": {
+      "stations": [
+        "Cold Expo",
+        "Crudo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "VG-Hotpot": {
+      "stations": [
+        "Saute 1",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "VG-Shishito Peppers": {
+      "stations": [
+        "Tempura",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "VG-Sushi Selection": {
+      "stations": [
+        "Cold Expo",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Waffles": {
+      "stations": [
+        "Cold Expo",
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Wagyu Gyoza": {
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Wagyu Miyazaki": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
+    },
+    "Whole Branzino": {
+      "stations": [
+        "Robata",
+        "Hot Expo"
+      ],
+      "targetSec": 0,
+      "source": "toast-bulkeditor"
     }
   }
 }

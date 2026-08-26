@@ -246,16 +246,42 @@ Object.keys(hmGuests).forEach(day => {
 });
 
 // ---- workloadOverall using event-based intervals (matches Python algorithm) ----
-// Step 1: Deduplicate foodTickets by (Check #, Fired Date, Fulfillment Time)
-// A ticket with N stations generates N rows — collapse to 1 logical ticket.
-const seenKeys = new Set();
-const uniqueTickets = foodTickets.filter(t => {
-  const key = `${t['Check #']}||${t['Fired Date']}||${t['Fulfillment Time']}`;
-  if (seenKeys.has(key)) return false;
-  seenKeys.add(key);
-  return true;
-});
-console.log(`Unique tickets (deduped): ${uniqueTickets.length}`);
+// Merge multi-station rows into one logical order per (Check #, Fired Date).
+// Toast fires the same check on Cold Expo, Hot Expo, Saute, etc. — each gets its own row.
+// Counting those separately inflated concurrency (~93) and diluted avg fulfillment (~3 min).
+function mergeOrderTickets(rows) {
+  const groups = new Map();
+  rows.forEach(t => {
+    const key = `${t['Check #']}||${t['Fired Date']}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(t);
+  });
+  return [...groups.values()].map(stationRows => {
+    const fired = new Date(Math.min(...stationRows.map(r => r._fired.getTime())));
+    const fulfilled = new Date(Math.max(...stationRows.map(r => r._fulfilled.getTime())));
+    const fulSec = (fulfilled.getTime() - fired.getTime()) / 1000;
+    return { ...stationRows[0], _fired: fired, _fulfilled: fulfilled, _fulSec: fulSec };
+  });
+}
+
+const orderTickets = mergeOrderTickets(foodTickets);
+console.log(`Order tickets (merged): ${orderTickets.length} from ${foodTickets.length} station fires`);
+
+// Legacy alias — curve / breaking point / service-break use merged orders, not per-station rows
+const uniqueTickets = orderTickets;
+
+function weightedP75Min(entries) {
+  if (!entries.length) return 0;
+  const sorted = [...entries].sort((a, b) => a.val - b.val);
+  const totalW = sorted.reduce((s, x) => s + x.weight, 0);
+  if (totalW <= 0) return sorted[sorted.length - 1].val / 60;
+  let cum = 0;
+  for (const v of sorted) {
+    cum += v.weight;
+    if (cum >= totalW * 0.75) return v.val / 60;
+  }
+  return sorted[sorted.length - 1].val / 60;
+}
 
 // Step 2: Build duration-weighted interval curve
 function buildIntervalCurve(ticketList) {
@@ -295,9 +321,8 @@ function buildIntervalCurve(ticketList) {
   return Object.entries(byConc).map(([k, ivs]) => {
     const totalDur = ivs.reduce((s, iv) => s + iv.duration_sec, 0);
     const ful_min = ivs.reduce((s, iv) => s + (iv.avg_ful_sec / 60) * iv.duration_sec, 0) / totalDur;
-    const sorted = [...ivs].sort((a, b) => a.avg_ful_sec - b.avg_ful_sec);
-    const p75idx = Math.min(Math.floor(sorted.length * 0.75), sorted.length - 1);
-    const p75_min = sorted[p75idx].avg_ful_sec / 60;
+    const p75Entries = ivs.map(iv => ({ val: iv.avg_ful_sec, weight: iv.duration_sec }));
+    const p75_min = weightedP75Min(p75Entries);
     const guestSum = ivs.reduce((s, iv) => s + iv.guests * iv.duration_sec, 0);
     const guests = totalDur > 0 ? guestSum / totalDur : 0;
     return {
@@ -553,16 +578,45 @@ Object.keys(stationDetails).forEach(st => {
   stationDetailsOut[st] = { byDayHour, hourly, breakingHours };
 });
 
-// ---- Build ticket lookup by server+table+date (fuzzy match) ----
-// Kitchen timing tickets don't share orderId/checkId with item-details rows.
-// We match on server firstname + table + date prefix (e.g. "7/6/26").
-const ticketByKey = {};
-foodTickets.forEach(t => {
-  const datePfx = (t['Fired Date'] || '').slice(0, 6); // "7/6/26"
-  const key = (t['Server'] || '').split(' ')[0] + '|' + (t['Table'] || '') + '|' + datePfx;
-  if (!ticketByKey[key]) ticketByKey[key] = [];
-  ticketByKey[key].push(t);
-});
+// ---- Item → station from Toast prep map (item-station-map.json); targets fixed in map ----
+function stripName(s) {
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+function lookupItemAssignment(menuItem) {
+  let info = ITEM_ASSIGNMENTS[menuItem];
+  if (!info) {
+    const want = stripName(menuItem);
+    const hit = Object.keys(ITEM_ASSIGNMENTS).find(k => stripName(k) === want);
+    if (hit) info = ITEM_ASSIGNMENTS[hit];
+  }
+  return info || null;
+}
+function resolveAssignedStation(menuItem) {
+  const info = lookupItemAssignment(menuItem);
+  if (!info || !Array.isArray(info.stations)) return null;
+  const ranked = info.stations.filter(st => st && isFood(st) && !/no\s*print/i.test(st));
+  const cookFirst = ranked.find(st => !/expo|pass/i.test(st));
+  return cookFirst || ranked[0] || null;
+}
+function resolveKitchenStation(assignedName) {
+  if (!assignedName) return null;
+  const keys = Object.keys(stationDetailsOut);
+  const want = stripName(assignedName);
+  for (const k of keys) {
+    if (stripName(k) === want) return k;
+  }
+  let best = null;
+  let bestLen = 0;
+  for (const k of keys) {
+    const kn = stripName(k);
+    if ((kn.includes(want) || want.includes(kn)) && Math.min(kn.length, want.length) > bestLen) {
+      best = k;
+      bestLen = Math.min(kn.length, want.length);
+    }
+  }
+  return best;
+}
+
 
 // ---- Beverage filter for station items ----
 const BEVERAGE_KEYWORDS = [
@@ -606,130 +660,106 @@ function isExcludedMenuItem(name) {
   return false;
 }
 
-// ---- stationItemsArr: per-station item volume + avg fulfillment ----
-const stationItemsMap = {}; // { station: { itemName: { qty, totalFulSec, count } } }
-
-// Canonical station: once an item is assigned to a station, always use that station.
-// This prevents items like "CL-Crab Croquettes" from appearing under multiple stations.
-const itemFirstStation = {};
-
-itemDetails.forEach(item => {
-  if (!item.menuItem) return;
-  if (isExcludedMenuItem(item.menuItem)) return;
-  const datePfx = (item.sentDate || '').slice(0, 6);
-  const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
-  const matches = ticketByKey[key] || [];
-  if (matches.length === 0) return;
-
-  const t = matches[0];
-  const station = t['Station'];
-  if (!station || !isFood(station)) return;
-
-  // Lock to the first-seen station for this item (canonical mapping)
-  if (!itemFirstStation[item.menuItem]) {
-    itemFirstStation[item.menuItem] = station;
-  }
-  const canonicalStation = itemFirstStation[item.menuItem];
-
-  if (!stationItemsMap[canonicalStation]) stationItemsMap[canonicalStation] = {};
-  if (!stationItemsMap[canonicalStation][item.menuItem]) {
-    stationItemsMap[canonicalStation][item.menuItem] = { qty: 0, totalFulSec: 0, count: 0 };
-  }
-  stationItemsMap[canonicalStation][item.menuItem].qty += (item.qty || 1);
-  if (t._fulSec != null) {
-    stationItemsMap[canonicalStation][item.menuItem].totalFulSec += t._fulSec;
-    stationItemsMap[canonicalStation][item.menuItem].count++;
-  }
-});
-
-// Convert to array format: { station: [{menuItem, qty, avgFulSec}] }
-const stationItemsArr = {};
-Object.keys(stationItemsMap).forEach(station => {
-  stationItemsArr[station] = Object.entries(stationItemsMap[station])
-    .map(([menuItem, d]) => ({
-      menuItem,
-      qty: d.qty,
-      avgFulSec: d.count > 0 ? +(d.totalFulSec / d.count).toFixed(1) : null,
-    }))
-    .sort((a, b) => b.qty - a.qty);
-});
-
-// ---- assignmentData: flat list of food items with canonical station + fulfillment ----
-// Join stationItemsArr (item→station) with item-fulfillment (item→avgSeconds from Toast report)
-const itemToStation = {};
-Object.entries(stationItemsArr).forEach(([station, items]) => {
-  items.forEach(it => {
-    if (!itemToStation[it.menuItem]) itemToStation[it.menuItem] = station;
-  });
-});
-
+// ---- Item fulfillment report (Toast custom report — item-level avg time) ----
 const itemFulPath = path.join(DATA_DIR, `item-fulfillment-${venueArg}.json`);
 let itemFulfillmentItems = [];
 if (fs.existsSync(itemFulPath)) {
   try {
     const raw = JSON.parse(fs.readFileSync(itemFulPath, 'utf8'));
     itemFulfillmentItems = raw.items || [];
-  } catch(e) { console.warn('Could not load item-fulfillment:', e.message); }
+  } catch (e) { console.warn('Could not load item-fulfillment:', e.message); }
 }
-
-const assignmentData = itemFulfillmentItems
-  .filter(it => it.menuItem && !isExcludedMenuItem(it.menuItem))
-  .map(it => {
-    const station = itemToStation[it.menuItem] || null;
-    const targetSec = station ? (derivedStationTargets[station] || null) : null;
-    return {
-      menuItem: it.menuItem,
-      station,
-      targetSec,
-      avgFulSec: it.avgSeconds != null ? adjustFulSec(it.avgSeconds) : null,
-      count: it.count || 0,
-    };
-  })
-  .filter(it => it.station)
-  .sort((a, b) => (a.station || '').localeCompare(b.station || '') || a.menuItem.localeCompare(b.menuItem));
-
-console.log(`Assignment data for ${venueArg}: ${assignmentData.length} items across ${new Set(assignmentData.map(i=>i.station)).size} stations`);
-
-// ---- menuItems: overall item volume + avg fulfillment across all stations ----
-const menuItemsMap = {}; // { menuItem: { qty, totalFulSec, count } }
-itemDetails.forEach(item => {
-  if (!item.menuItem || isExcludedMenuItem(item.menuItem)) return;
-  const datePfx = (item.sentDate || '').slice(0, 6);
-  const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
-  const matches = ticketByKey[key] || [];
-  if (!menuItemsMap[item.menuItem]) menuItemsMap[item.menuItem] = { qty: 0, totalFulSec: 0, count: 0 };
-  menuItemsMap[item.menuItem].qty += (item.qty || 1);
-  if (matches.length > 0 && matches[0]._fulSec != null) {
-    menuItemsMap[item.menuItem].totalFulSec += matches[0]._fulSec;
-    menuItemsMap[item.menuItem].count++;
-  }
-});
-
-// Volume from item-details; Avg Time from Toast custom item-fulfillment report
-// (not ticket-level kitchen-timing join — that understates item cook time).
 const fulAvgByItem = {};
+const fulCountByItem = {};
 itemFulfillmentItems.forEach(it => {
   if (!it.menuItem || isExcludedMenuItem(it.menuItem)) return;
   if (it.avgSeconds != null && Number(it.avgSeconds) > 0) {
     fulAvgByItem[it.menuItem] = +adjustFulSec(Number(it.avgSeconds)).toFixed(1);
   }
+  if (it.count > 0) fulCountByItem[it.menuItem] = it.count;
+});
+
+// ---- stationItemsArr: sold qty by prep-mapped station ----
+const stationItemsMap = {};
+const qtyByItem = {};
+itemDetails.forEach(item => {
+  if (!item.menuItem || isExcludedMenuItem(item.menuItem)) return;
+  qtyByItem[item.menuItem] = (qtyByItem[item.menuItem] || 0) + (item.qty || 1);
+  const station = resolveKitchenStation(resolveAssignedStation(item.menuItem));
+  if (!station) return;
+  if (!stationItemsMap[station]) stationItemsMap[station] = {};
+  if (!stationItemsMap[station][item.menuItem]) {
+    stationItemsMap[station][item.menuItem] = { qty: 0, avgFulSec: fulAvgByItem[item.menuItem] ?? null };
+  }
+  stationItemsMap[station][item.menuItem].qty += (item.qty || 1);
+});
+
+const stationItemsArr = {};
+Object.keys(stationItemsMap).forEach(station => {
+  stationItemsArr[station] = Object.entries(stationItemsMap[station])
+    .map(([menuItem, d]) => ({
+      menuItem,
+      qty: d.qty,
+      avgFulSec: d.avgFulSec,
+      targetSec: (lookupItemAssignment(menuItem)?.targetSec > 0) ? lookupItemAssignment(menuItem).targetSec : null,
+    }))
+    .sort((a, b) => b.qty - a.qty);
+});
+
+// ---- assignmentData: full prep map × live fulfillment (item targets from map, not station average) ----
+const assignmentRows = new Map();
+Object.entries(ITEM_ASSIGNMENTS).forEach(([menuItem, info]) => {
+  if (isExcludedMenuItem(menuItem)) return;
+  const stations = (info.stations || []).filter(st => st && isFood(st) && !/no\s*print/i.test(st));
+  if (!stations.length) return;
+  const station = resolveKitchenStation(resolveAssignedStation(menuItem));
+  if (!station) return;
+  assignmentRows.set(menuItem, {
+    menuItem,
+    station,
+    stations,
+    targetSec: info.targetSec > 0 ? info.targetSec : null,
+    avgFulSec: fulAvgByItem[menuItem] ?? null,
+    count: fulCountByItem[menuItem] || qtyByItem[menuItem] || 0,
+  });
+});
+
+const assignmentData = [...assignmentRows.values()]
+  .sort((a, b) => (a.station || '').localeCompare(b.station || '') || a.menuItem.localeCompare(b.menuItem));
+
+console.log(`Assignment data for ${venueArg}: ${assignmentData.length} prep-mapped items across ${new Set(assignmentData.map(i => i.station)).size} stations (${assignmentData.filter(i => i.targetSec > 0).length} with target)`);
+
+// ---- menuItems: overall item volume + avg fulfillment ----
+const menuItemsMap = {};
+itemDetails.forEach(item => {
+  if (!item.menuItem || isExcludedMenuItem(item.menuItem)) return;
+  if (!menuItemsMap[item.menuItem]) menuItemsMap[item.menuItem] = { qty: 0 };
+  menuItemsMap[item.menuItem].qty += (item.qty || 1);
 });
 
 const summary = Object.entries(menuItemsMap)
-  .map(([menuItem, d]) => ({
-    menuItem,
-    qty: d.qty,
-    avgFulSec: fulAvgByItem[menuItem] != null
-      ? fulAvgByItem[menuItem]
-      : (d.count > 0 ? +(d.totalFulSec / d.count).toFixed(1) : null),
-  }))
+  .map(([menuItem, d]) => {
+    const info = lookupItemAssignment(menuItem);
+    return {
+      menuItem,
+      qty: d.qty,
+      avgFulSec: fulAvgByItem[menuItem] ?? null,
+      targetSec: info && info.targetSec > 0 ? info.targetSec : null,
+      station: resolveKitchenStation(resolveAssignedStation(menuItem)) || null,
+    };
+  })
   .sort((a, b) => b.qty - a.qty);
 
-// Items in fulfillment with no item-details rows this week (still show Avg Time)
 Object.entries(fulAvgByItem).forEach(([menuItem, avgFulSec]) => {
-  if (!menuItemsMap[menuItem]) {
-    summary.push({ menuItem, qty: 0, avgFulSec });
-  }
+  if (menuItemsMap[menuItem]) return;
+  const info = lookupItemAssignment(menuItem);
+  summary.push({
+    menuItem,
+    qty: 0,
+    avgFulSec,
+    targetSec: info && info.targetSec > 0 ? info.targetSec : null,
+    station: resolveKitchenStation(resolveAssignedStation(menuItem)) || null,
+  });
 });
 
 // ---- guestsSeated: OpenTable party-size totals (privacy-safe aggregates) ----
@@ -768,45 +798,8 @@ Object.keys(stationDetailsOut).forEach(st => {
   });
 });
 
-function stripName(s) {
-  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-}
-function resolveAssignedStation(menuItem) {
-  let info = ITEM_ASSIGNMENTS[menuItem];
-  if (!info) {
-    const want = stripName(menuItem);
-    const hit = Object.keys(ITEM_ASSIGNMENTS).find(k => stripName(k) === want);
-    if (hit) info = ITEM_ASSIGNMENTS[hit];
-  }
-  if (!info || !Array.isArray(info.stations)) return null;
-  // Prefer first food production station (skip expo/no-print when a cook station exists)
-  const ranked = info.stations.filter(st => st && isFood(st) && !/no\s*print/i.test(st));
-  const cookFirst = ranked.find(st => !/expo|pass/i.test(st));
-  return cookFirst || ranked[0] || null;
-}
-// Match assignment station name onto a kitchen station that actually fired this week
-function resolveKitchenStation(assignedName) {
-  if (!assignedName) return null;
-  if (stationDayVolume[assignedName]) return assignedName;
-  const want = stripName(assignedName);
-  const keys = Object.keys(stationDayVolume);
-  let best = null;
-  let bestLen = 0;
-  for (const k of keys) {
-    const kn = stripName(k);
-    if (kn === want) return k;
-    if ((kn.includes(want) || want.includes(kn)) && Math.min(kn.length, want.length) > bestLen) {
-      best = k;
-      bestLen = Math.min(kn.length, want.length);
-    }
-  }
-  return best;
-}
-
-// Roll food item qty onto station+day using chef/Toast assignment (item quantity),
-// falling back to first kitchen-ticket station only when unmapped.
+// Roll food item qty onto station+day using Toast prep-station map only.
 let qtyAssigned = 0;
-let qtyFallback = 0;
 let qtySkipped = 0;
 itemDetails.forEach(item => {
   if (!item.menuItem || isExcludedMenuItem(item.menuItem)) return;
@@ -815,18 +808,7 @@ itemDetails.forEach(item => {
   const day = DAYS[fired.getDay()];
   const qty = item.qty || 1;
 
-  let station = resolveKitchenStation(resolveAssignedStation(item.menuItem));
-  let via = 'assignment';
-  if (!station) {
-    const datePfx = (item.sentDate || '').slice(0, 6);
-    const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
-    const matches = ticketByKey[key] || [];
-    station = itemFirstStation[item.menuItem] || (matches[0] && matches[0]['Station']) || null;
-    if (station && isFood(station) && !itemFirstStation[item.menuItem]) {
-      itemFirstStation[item.menuItem] = station;
-    }
-    via = 'ticket';
-  }
+  const station = resolveKitchenStation(resolveAssignedStation(item.menuItem));
   if (!station || !isFood(station) || /no\s*print/i.test(station)) {
     qtySkipped += qty;
     return;
@@ -836,10 +818,9 @@ itemDetails.forEach(item => {
     stationDayVolume[station][day] = { ticketCount: 0, itemQty: 0, avgFulSec: null };
   }
   stationDayVolume[station][day].itemQty += qty;
-  if (via === 'assignment') qtyAssigned += qty;
-  else qtyFallback += qty;
+  qtyAssigned += qty;
 });
-console.log(`Item qty→station: assigned=${qtyAssigned}, ticket-fallback=${qtyFallback}, skipped=${qtySkipped}`);
+console.log(`Item qty→station: prep-mapped=${qtyAssigned}, unmapped/skipped=${qtySkipped}`);
 
 // ---- stationHourItems: full sold listing by station / day / hour (menu item qty) ----
 const stationHourItems = {};
@@ -847,19 +828,13 @@ itemDetails.forEach(item => {
   if (!item.menuItem || isExcludedMenuItem(item.menuItem)) return;
   const fired = parseDate(item.sentDate);
   if (!fired) return;
-  let station = resolveKitchenStation(resolveAssignedStation(item.menuItem));
-  if (!station) {
-    const datePfx = (item.sentDate || '').slice(0, 6);
-    const key = (item.server || '').split(' ')[0] + '|' + (item.table || '') + '|' + datePfx;
-    const matches = ticketByKey[key] || [];
-    station = itemFirstStation[item.menuItem] || (matches[0] && matches[0]['Station']) || null;
-  }
+  const station = resolveKitchenStation(resolveAssignedStation(item.menuItem));
   if (!station || !isFood(station) || /no\s*print/i.test(station)) return;
   const day = DAYS[fired.getDay()];
   const hr = fired.getHours();
   const hrKey = `${hr}-${hr + 1}`;
   const qty = item.qty || 1;
-  const info = ITEM_ASSIGNMENTS[item.menuItem] || null;
+  const info = lookupItemAssignment(item.menuItem);
   const hasTarget = !!(info && info.targetSec > 0);
   if (!stationHourItems[station]) stationHourItems[station] = {};
   if (!stationHourItems[station][day]) stationHourItems[station][day] = {};
@@ -910,8 +885,13 @@ const output = {
   stationDayVolume,
   assignmentData,
   ticketSummary: {
+    rawKitchenRows: tickets.length,
+    nonFoodExcluded: skippedNonFood,
+    openOrUnclosed: skippedOpen,
+    over90MinExcluded: skippedLong,
     foodStationTicketRows: foodTickets.length,
-    uniqueTickets: uniqueTickets.length,
+    orderCount: orderTickets.length,
+    uniqueTickets: orderTickets.length,
     stationFireCount: stations.reduce((s, st) => s + (st.count || 0), 0),
     itemDetailSkuCount: summary.length,
     itemQtyTotal: Math.round(summary.reduce((s, r) => s + (r.qty || 0), 0)),
