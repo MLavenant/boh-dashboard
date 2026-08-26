@@ -205,7 +205,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <div class="wrap">
 <header>
   <h1 id="dashTitle">BOH Dashboard</h1>
-  <span class="badge" id="dashBadge">Latest 2026-W34 · Built 2026-08-26 23:19 UTC</span>
+  <span class="badge" id="dashBadge">Latest 2026-W34 · Built 2026-08-26 23:26 UTC</span>
 </header>
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
 <div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
@@ -354,14 +354,29 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <div class="section-title">Items Per Staff</div>
 <div class="card" id="itemsPerStaffCard" style="margin:0 0 18px">
   <h2 style="margin:0 0 4px">ITEMS PER STAFF</h2>
-  <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Three tables for the <strong>selected week</strong> (W33 or W34). Pick a station family to compare all locations, then drill into this location’s hourly load, staffing, and fulfillment.</p>
+  <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Stations dashboard — compare locations and drill into hourly load, staffing, and fulfillment. Items/staff needs FTE×labor join (currently W33 &amp; W34).</p>
   <p id="itemsPerStaffWeekNote" class="note" style="display:none;margin:8px 0 0;color:#f59e0b"></p>
   <div id="itemsPerStaffBody">
-    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px">
+    <div id="ipsScopeBar" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px;padding:12px 14px;background:#13161c;border:1px solid #262a33;border-radius:10px">
+      <label style="font-size:12px;color:#9aa0aa">View
+        <select id="ipsViewMode" onchange="onIpsViewModeChange()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit">
+          <option value="week">Week</option>
+          <option value="period">Period (4-4-5)</option>
+          <option value="year">Fiscal year</option>
+        </select>
+      </label>
+      <span id="ipsWeekScopeNote" class="note" style="margin:0;font-size:12px">Week follows selector above.</span>
+      <label id="ipsPeriodWrap" style="display:none;font-size:12px;color:#9aa0aa">Period
+        <select id="ipsPeriodSelect" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+      </label>
+      <label id="ipsYearWrap" style="display:none;font-size:12px;color:#9aa0aa">Fiscal year
+        <select id="ipsYearSelect" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+      </label>
       <label style="font-size:12px;color:#9aa0aa">Station family
         <select id="ipsStationFamily" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
       </label>
     </div>
+    <div id="ipsMissingBanner" style="display:none;margin-bottom:14px;padding:12px 14px;background:#2a2210;border:1px solid #854d0e;border-radius:10px;font-size:12px;color:#fcd34d"></div>
     <div id="ipsTable1Summary" style="margin-bottom:24px"></div>
     <div id="ipsTable2Hourly" style="margin-bottom:24px"></div>
     <div id="ipsTable3Fulfillment"></div>
@@ -2638,14 +2653,179 @@ function openHourlyItemList(dayKey) {
 }
 
 // ============================================================
-// ITEMS PER STAFF — cross-location summary + location detail (W33/W34)
+// ITEMS PER STAFF — fiscal 4-4-5 calendar + 3-table Stations dashboard
 // ============================================================
 const IPS_WEEK_KEYS = new Set(['2026-W33', '2026-W34']);
 const IPS_VENUE_KEYS = ['claudie', 'casaneos', 'ava_cg', 'ava_wp', 'mila'];
+const FISCAL_START_MS = Date.parse('2025-12-29T12:00:00Z');
+let ipsViewMode = 'week';
+let ipsPeriodKey = null;
+let ipsFiscalYear = 2026;
 
-function ipsWeekActive() {
+function isoWeekMonday(weekKey) {
+  const m = String(weekKey || '').match(/(d{4})-W(d{2})/);
+  if (!m) return null;
+  const y = +m[1], w = +m[2];
+  const jan4 = new Date(Date.UTC(y, 0, 4));
+  const dow = jan4.getUTCDay() || 7;
+  const mon = new Date(jan4);
+  mon.setUTCDate(jan4.getUTCDate() - dow + 1 + (w - 1) * 7);
+  return mon;
+}
+
+function fiscalWeekIndex(weekKey) {
+  const mon = isoWeekMonday(weekKey);
+  if (!mon) return null;
+  const idx = Math.floor((mon.getTime() - FISCAL_START_MS) / (7 * 86400000));
+  return idx >= 0 ? idx : null;
+}
+
+function buildFiscalPeriods() {
+  const pattern = [4, 4, 5];
+  const periods = [];
+  let weekIdx = 0;
+  for (let fy = 2026; fy <= 2027; fy++) {
+    for (let p = 1; p <= 13; p++) {
+      const len = pattern[(p - 1) % 3];
+      const weekKeys = [];
+      for (let i = 0; i < len; i++) {
+        const wkIdx = weekIdx + i;
+        const hit = (WEEKS || []).find(w => fiscalWeekIndex(w.key) === wkIdx);
+        if (hit) weekKeys.push(hit.key);
+        else {
+          const mon = new Date(FISCAL_START_MS + wkIdx * 7 * 86400000);
+          const iso = isoWeekKeyFromDate(mon);
+          if (iso) weekKeys.push(iso);
+        }
+      }
+      periods.push({
+        key: 'FY'+fy+'-P'+p,
+        fy,
+        period: p,
+        label: 'FY'+fy+' P'+p+' ('+len+'w)',
+        weekKeys,
+        weekCount: len,
+      });
+      weekIdx += len;
+    }
+  }
+  return periods;
+}
+
+function isoWeekKeyFromDate(d) {
+  const date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const day = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - day);
+  const year = date.getUTCFullYear();
+  const yearStart = new Date(Date.UTC(year, 0, 1));
+  const week = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+  return year + '-W' + String(week).padStart(2, '0');
+}
+
+const FISCAL_PERIODS = buildFiscalPeriods();
+
+function weekDataExists(weekKey) {
+  return IPS_VENUE_KEYS.some(vk => ALL_DATA[vk]?.[weekKey]);
+}
+
+function weekStaffingExists(weekKey) {
+  return IPS_VENUE_KEYS.some(vk => ALL_DATA[vk]?.[weekKey]?.staffing?.byFamily);
+}
+
+function onIpsViewModeChange() {
+  const sel = document.getElementById('ipsViewMode');
+  ipsViewMode = (sel && sel.value) || 'week';
+  const pw = document.getElementById('ipsPeriodWrap');
+  const yw = document.getElementById('ipsYearWrap');
+  const wn = document.getElementById('ipsWeekScopeNote');
+  if (pw) pw.style.display = ipsViewMode === 'period' ? '' : 'none';
+  if (yw) yw.style.display = ipsViewMode === 'year' ? '' : 'none';
+  if (wn) wn.style.display = ipsViewMode === 'week' ? '' : 'none';
+  initIpsScopeSelectors();
+  renderItemsPerStaff();
+}
+
+function initIpsScopeSelectors() {
+  const pSel = document.getElementById('ipsPeriodSelect');
+  const ySel = document.getElementById('ipsYearSelect');
+  if (pSel && !pSel.options.length) {
+    pSel.innerHTML = FISCAL_PERIODS.map(p =>
+      '<option value="'+p.key+'">'+p.label+'</option>'
+    ).join('');
+    const cur = WEEKS[currentWeekIdx]?.key;
+    const fidx = fiscalWeekIndex(cur);
+    let pick = FISCAL_PERIODS[0]?.key;
+    if (fidx != null) {
+      let acc = 0;
+      for (const p of FISCAL_PERIODS) {
+        if (fidx >= acc && fidx < acc + p.weekCount) { pick = p.key; break; }
+        acc += p.weekCount;
+      }
+    }
+    ipsPeriodKey = pick;
+    pSel.value = pick;
+  }
+  if (ySel && !ySel.options.length) {
+    ySel.innerHTML = [2026, 2027].map(y => '<option value="'+y+'">FY'+y+'</option>').join('');
+    ySel.value = String(ipsFiscalYear);
+  }
+  if (pSel) ipsPeriodKey = pSel.value;
+  if (ySel) ipsFiscalYear = parseInt(ySel.value, 10) || 2026;
+}
+
+function getIpsScope() {
+  if (ipsViewMode === 'period') {
+    const pSel = document.getElementById('ipsPeriodSelect');
+    const p = FISCAL_PERIODS.find(x => x.key === (pSel?.value || ipsPeriodKey));
+    const weekKeys = (p?.weekKeys || []).filter(wk => weekDataExists(wk));
+    return { label: p?.label || 'Period', weekKeys, period: p };
+  }
+  if (ipsViewMode === 'year') {
+    const ySel = document.getElementById('ipsYearSelect');
+    const fy = parseInt(ySel?.value || ipsFiscalYear, 10) || 2026;
+    const weekKeys = FISCAL_PERIODS.filter(p => p.fy === fy).flatMap(p => p.weekKeys).filter(wk => weekDataExists(wk));
+    return { label: 'FY'+fy, weekKeys, fy };
+  }
   const wk = WEEKS[currentWeekIdx]?.key;
-  return wk && IPS_WEEK_KEYS.has(wk);
+  const label = WEEKS[currentWeekIdx]?.label || wk || 'Week';
+  return { label, weekKeys: wk ? [wk] : [] };
+}
+
+function renderIpsMissingBanner(scope) {
+  const el = document.getElementById('ipsMissingBanner');
+  if (!el) return;
+  const weekKeys = scope.weekKeys || [];
+  if (!weekKeys.length) {
+    el.style.display = '';
+    el.innerHTML = '<strong>Missing data:</strong> no weekly JSON for this scope. Run the weekly pipeline for these ISO weeks.';
+    return;
+  }
+  const lines = [];
+  const noStaffWeeks = weekKeys.filter(wk => !weekStaffingExists(wk));
+  if (noStaffWeeks.length) {
+    lines.push('<strong>Staff / items-per-staff missing</strong> for '+noStaffWeeks.map(wk => wk.replace('2026-','')).join(', ')+' — need FTE×labor join (currently W33 & W34). Items still show where item-details exist.');
+  }
+  if (currentVenue === 'claudie' && weekKeys.some(wk => !ALL_DATA.claudie?.[wk]?.staffing)) {
+    lines.push('<strong>Claudie staffing</strong> not joined yet — Table 1 shows — for Claudie; other venues may still populate.');
+  }
+  const noItemWeeks = weekKeys.filter(wk => !IPS_VENUE_KEYS.some(vk => Object.keys(ALL_DATA[vk]?.[wk]?.stationHourItems || {}).length));
+  if (noItemWeeks.length && noItemWeeks.length < weekKeys.length) {
+    lines.push('Item-details hourly lists missing for some weeks: '+noItemWeeks.map(wk => wk.replace('2026-','')).join(', ')+'.');
+  }
+  if (ipsViewMode !== 'week') {
+    const expected = scope.period ? scope.period.weekKeys : FISCAL_PERIODS.filter(p => p.fy === scope.fy).flatMap(p => p.weekKeys);
+    const missingFiles = (expected || []).filter(wk => !weekDataExists(wk));
+    if (missingFiles.length) {
+      lines.push('<strong>Weeks in fiscal calendar without saved data:</strong> '+missingFiles.map(wk => wk.replace('2026-','')).join(', ')+'.');
+    }
+  }
+  if (!lines.length) {
+    el.style.display = 'none';
+    el.innerHTML = '';
+    return;
+  }
+  el.style.display = '';
+  el.innerHTML = lines.join('<br>');
 }
 
 function getFamilyDayMetrics(venueKey, weekKey, family, day) {
@@ -2672,7 +2852,61 @@ function getFamilyDayMetrics(venueKey, weekKey, family, day) {
   if (itemsPerHead == null && heads > 0 && items > 0) {
     itemsPerHead = +(items / heads).toFixed(1);
   }
-  return { items, heads, itemsPerHead, staff };
+  return { items, heads, itemsPerHead, staff, weekKey };
+}
+
+function getFamilyDayMetricsAgg(venueKey, weekKeys, family, day) {
+  let totalItems = 0, totalHeads = 0, staff = [];
+  let weeksWithData = 0, weeksWithStaff = 0;
+  weekKeys.forEach(wk => {
+    const m = getFamilyDayMetrics(venueKey, wk, family, day);
+    if (!m) return;
+    weeksWithData++;
+    totalItems += m.items || 0;
+    if (m.heads > 0) { totalHeads += m.heads; weeksWithStaff++; }
+    if (m.staff?.length) staff = staff.concat(m.staff);
+  });
+  const itemsPerHead = totalHeads > 0 && totalItems > 0 ? +(totalItems / totalHeads).toFixed(1) : null;
+  return { items: totalItems, heads: totalHeads || null, itemsPerHead, staff, weeksWithData, weeksWithStaff };
+}
+
+function sumFamilyHourItemsAgg(weekKeys, family, day, hourKey, venueKey) {
+  let items = 0, tickets = 0, fulWeighted = 0, fulN = 0;
+  const events = [];
+  weekKeys.forEach(wk => {
+    const data = ALL_DATA[venueKey || currentVenue]?.[wk];
+    if (!data) return;
+    const hit = sumFamilyHourItems(family, day, hourKey, data.staffing, data.stationDetails || {}, null, data.stationHourItems || {});
+    items += hit.items || 0;
+    tickets += hit.tickets || 0;
+    if (hit.avgFulSec > 0 && (hit.tickets || 0) > 0) {
+      fulWeighted += hit.avgFulSec * hit.tickets;
+      fulN += hit.tickets;
+    }
+    if (hit.events?.length) events.push(...hit.events);
+  });
+  return { items, tickets, avgFulSec: fulN > 0 ? fulWeighted / fulN : null, events };
+}
+
+function dayItemTotalsAgg(weekKeys, family, day, venueKey) {
+  let items = 0;
+  const events = [];
+  weekKeys.forEach(wk => {
+    const d = ALL_DATA[venueKey || currentVenue]?.[wk];
+    if (!d) return;
+    const hit = dayItemTotals(family, day, d.staffing, d.stationDetails || {}, d.stationHourItems || {});
+    items += hit.items || 0;
+    if (hit.events?.length) events.push(...hit.events);
+  });
+  return { items, events };
+}
+
+function venueHasItemListings(weekKeys, venueKey) {
+  return (weekKeys || []).some(wk => Object.keys(ALL_DATA[venueKey || currentVenue]?.[wk]?.stationHourItems || {}).length > 0);
+}
+
+function venueHasStationDetails(weekKeys, venueKey) {
+  return (weekKeys || []).some(wk => Object.keys(ALL_DATA[venueKey || currentVenue]?.[wk]?.stationDetails || {}).length > 0);
 }
 
 function globalRelativeHeat(val, min, max) {
@@ -2683,12 +2917,15 @@ function globalRelativeHeat(val, min, max) {
   return { bg, fg: textFor(bg) };
 }
 
-function populateIpsFamilySelect(sel, weekKey, preferred) {
+function populateIpsFamilySelect(sel, weekKeys, preferred) {
   if (!sel) return;
+  const keys = Array.isArray(weekKeys) ? weekKeys : (weekKeys ? [weekKeys] : []);
   const found = new Set();
   IPS_VENUE_KEYS.forEach(vk => {
-    const st = ALL_DATA[vk]?.[weekKey]?.staffing?.byFamily || {};
-    Object.keys(st).forEach(f => { if (HOURLY_FAMILIES.includes(f)) found.add(f); });
+    keys.forEach(wk => {
+      const st = ALL_DATA[vk]?.[wk]?.staffing?.byFamily || {};
+      Object.keys(st).forEach(f => { if (HOURLY_FAMILIES.includes(f)) found.add(f); });
+    });
   });
   const families = HOURLY_FAMILIES.filter(f => found.has(f));
   const list = families.length ? families : HOURLY_FAMILIES;
@@ -2700,40 +2937,32 @@ function populateIpsFamilySelect(sel, weekKey, preferred) {
   else if (list[0]) sel.value = list[0];
 }
 
-function populateIpsVenueSelect(sel) {
-  if (!sel) return;
-  const labels = {"claudie":"Claudie","casaneos":"Casa Neos","ava_cg":"AVA Coconut Grove","ava_wp":"AVA Winter Park","mila":"MILA"};
-  const prev = sel.value;
-  sel.innerHTML = IPS_VENUE_KEYS.map(k =>
-    '<option value="'+k+'">'+((labels[k] || k).replace(/"/g,'&quot;'))+'</option>'
-  ).join('');
-  if (prev && IPS_VENUE_KEYS.includes(prev)) sel.value = prev;
-  else if (IPS_VENUE_KEYS.includes(currentVenue)) sel.value = currentVenue;
-  else sel.value = IPS_VENUE_KEYS[0];
-}
-
 function getIpsFamily() {
   const sel = document.getElementById('ipsStationFamily');
   return (sel && sel.value) || 'Pastry';
 }
 
-function renderIpsTable1Summary(weekKey, family) {
+function renderIpsTable1Summary(scope, family) {
   const el = document.getElementById('ipsTable1Summary');
   if (!el) return;
   const labels = {"claudie":"Claudie","casaneos":"Casa Neos","ava_cg":"AVA Coconut Grove","ava_wp":"AVA Winter Park","mila":"MILA"};
-  const weekLabel = WEEKS[currentWeekIdx]?.label || weekKey;
+  const weekKeys = scope.weekKeys || [];
+  const scopeLabel = scope.label || 'Scope';
   const matrix = [];
   IPS_VENUE_KEYS.forEach(vk => {
     HOURLY_DAYS.forEach(day => {
-      const m = getFamilyDayMetrics(vk, weekKey, family, day);
+      const m = weekKeys.length === 1
+        ? getFamilyDayMetrics(vk, weekKeys[0], family, day)
+        : getFamilyDayMetricsAgg(vk, weekKeys, family, day);
       if (m && m.itemsPerHead != null && m.itemsPerHead > 0) matrix.push(m.itemsPerHead);
     });
   });
   const gMin = matrix.length ? Math.min(...matrix) : 0;
   const gMax = matrix.length ? Math.max(...matrix) : 0;
   const thStyle = 'color:#9aa0aa;border-bottom:1px solid #262a33';
+  const aggNote = weekKeys.length > 1 ? ' · totals summed across '+weekKeys.length+' weeks' : '';
   let html = '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">Table 1 — All locations · items ÷ staff by day</h3>' +
-    '<p class="note" style="margin:0 0 10px">'+weekLabel+' · '+family+' · total items ÷ total staff per day. Rows = locations · columns = days.</p>' +
+    '<p class="note" style="margin:0 0 10px">'+scopeLabel+' · '+family+aggNote+' · total items ÷ total staff per day. Rows = locations · columns = days.</p>' +
     '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:640px"><thead><tr style="'+thStyle+'">'+
     '<th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Location</th>';
   HOURLY_DAYS.forEach(day => {
@@ -2743,7 +2972,9 @@ function renderIpsTable1Summary(weekKey, family) {
   IPS_VENUE_KEYS.forEach(vk => {
     html += '<tr style="border-top:1px solid #262a33"><td style="padding:8px 10px;color:#e8eaed;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+(labels[vk]||vk)+'</td>';
     HOURLY_DAYS.forEach(day => {
-      const m = getFamilyDayMetrics(vk, weekKey, family, day) || {};
+      const m = weekKeys.length === 1
+        ? (getFamilyDayMetrics(vk, weekKeys[0], family, day) || {})
+        : (getFamilyDayMetricsAgg(vk, weekKeys, family, day) || {});
       const ips = m.itemsPerHead;
       const heat = globalRelativeHeat(ips, gMin, gMax);
       const tip = (labels[vk]||vk)+' · '+day+' · '+family+
@@ -2756,28 +2987,23 @@ function renderIpsTable1Summary(weekKey, family) {
   });
   html += '</tbody></table>';
   if (!matrix.length) {
-    html += '<p class="note" style="margin:10px 0 0">No items/staff cells for <strong>'+family+'</strong> this week.</p>';
+    html += '<p class="note" style="margin:10px 0 0">No items/staff cells for <strong>'+family+'</strong> in this scope — check staffing join or pick another family.</p>';
   }
   el.innerHTML = html;
 }
 
-function renderIpsTable2Hourly(weekKey, family) {
+function renderIpsTable2Hourly(scope, family) {
   const el = document.getElementById('ipsTable2Hourly');
   if (!el) return;
   const labels = {"claudie":"Claudie","casaneos":"Casa Neos","ava_cg":"AVA Coconut Grove","ava_wp":"AVA Winter Park","mila":"MILA"};
-  const d = getD();
-  const staffing = d.staffing;
-  const stationDetails = d.stationDetails || {};
-  const stationHourItems = d.stationHourItems || {};
-  const famStaff = staffing && staffing.byFamily ? staffing.byFamily[family] : null;
-  const hasItemListings = Object.keys(stationHourItems).length > 0;
-  const weekLabel = WEEKS[currentWeekIdx]?.label || weekKey;
+  const weekKeys = scope.weekKeys || [];
+  const scopeLabel = scope.label || 'Scope';
   const thStyle = 'color:#9aa0aa;border-bottom:1px solid #262a33';
   const cellR = 'padding:8px 10px;text-align:center';
 
-  if (!Object.keys(stationDetails).length) {
+  if (!weekKeys.length || !venueHasStationDetails(weekKeys, currentVenue)) {
     el.innerHTML = '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">Table 2 — This location · items, items/staff &amp; staff</h3>'+
-      '<p class="note" style="margin:0">No station timing for this venue/week yet.</p>';
+      '<p class="note" style="margin:0">No station timing for this venue/scope yet.</p>';
     return;
   }
 
@@ -2785,10 +3011,11 @@ function renderIpsTable2Hourly(weekKey, family) {
   window._hourlyDayStaff = {};
   window._hourlyBucketEvents = {};
 
+  const hasItemListings = venueHasItemListings(weekKeys, currentVenue);
+  const aggNote = weekKeys.length > 1 ? ' · '+weekKeys.length+' weeks aggregated' : '';
   let html = '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">Table 2 — '+(labels[currentVenue]||currentVenue)+' · items, items/staff &amp; staff by hour</h3>' +
-    '<p class="note" style="margin:0 0 12px">'+weekLabel+' · '+family+' · daily totals then hour×day (10:00→02:00). Click item counts for sold lists; click staff for roster.</p>';
+    '<p class="note" style="margin:0 0 12px">'+scopeLabel+' · '+family+aggNote+' · daily totals then hour×day (10:00→02:00). Staff = daily headcount (same across hours). Click item counts for sold lists; click staff for roster.</p>';
 
-  // Daily summary rows: staff, items/staff, total items
   html += '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:18px;min-width:640px"><thead><tr style="'+thStyle+'">'+
     '<th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Metric</th>';
   HOURLY_DAYS.forEach(day => {
@@ -2801,12 +3028,24 @@ function renderIpsTable2Hourly(weekKey, family) {
   const rowItems = ['<tr style="border-top:1px solid #262a33"><td style="padding:8px 10px;color:#e8eaed;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">Total items</td>'];
 
   const gridItems = {};
+  const gridStaff = {};
+  const gridIps = {};
   const colItemScale = {};
+  const colStaffScale = {};
+  const colIpsScale = {};
+
   HOURLY_DAYS.forEach(day => {
-    const hit = dayItemTotals(family, day, staffing, stationDetails, stationHourItems);
-    const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
-    const heads = cell && cell.heads > 0 ? cell.heads : 0;
-    const staffList = (cell && Array.isArray(cell.staff) ? cell.staff : []) || [];
+    const hit = weekKeys.length === 1
+      ? (() => {
+          const d = ALL_DATA[currentVenue]?.[weekKeys[0]];
+          return dayItemTotals(family, day, d?.staffing, d?.stationDetails || {}, d?.stationHourItems || {});
+        })()
+      : dayItemTotalsAgg(weekKeys, family, day, currentVenue);
+    const m = weekKeys.length === 1
+      ? (getFamilyDayMetrics(currentVenue, weekKeys[0], family, day) || {})
+      : (getFamilyDayMetricsAgg(currentVenue, weekKeys, family, day) || {});
+    const heads = m.heads > 0 ? m.heads : 0;
+    const staffList = Array.isArray(m.staff) ? m.staff : [];
     window._hourlyDayEvents[day] = hit.events || [];
     window._hourlyDayStaff[day] = staffList;
     const ips = heads > 0 && hit.items > 0 ? +(hit.items / heads).toFixed(1) : null;
@@ -2821,126 +3060,149 @@ function renderIpsTable2Hourly(weekKey, family) {
     rowItems.push('<td style="'+cellR+';color:#e8eaed;font-weight:600">'+itemsCell+'</td>');
 
     gridItems[day] = {};
+    gridStaff[day] = {};
+    gridIps[day] = {};
     HOURLY_BAND.forEach(hk => {
-      const bucket = sumFamilyHourItems(family, day, hk, staffing, stationDetails, null, stationHourItems);
+      const bucket = weekKeys.length === 1
+        ? (() => {
+            const d = ALL_DATA[currentVenue]?.[weekKeys[0]];
+            return sumFamilyHourItems(family, day, hk, d?.staffing, d?.stationDetails || {}, null, d?.stationHourItems || {});
+          })()
+        : sumFamilyHourItemsAgg(weekKeys, family, day, hk, currentVenue);
       window._hourlyBucketEvents[hourBucketKey(day, hk)] = bucket.events || [];
       gridItems[day][hk] = bucket.items || 0;
+      gridStaff[day][hk] = heads > 0 ? heads : null;
+      gridIps[day][hk] = heads > 0 && gridItems[day][hk] > 0 ? +(gridItems[day][hk] / heads).toFixed(1) : null;
     });
-    const vals = HOURLY_BAND.map(hk => gridItems[day][hk]).filter(v => v > 0);
-    colItemScale[day] = { min: vals.length ? Math.min(...vals) : 0, max: vals.length ? Math.max(...vals) : 0 };
+    const itemVals = HOURLY_BAND.map(hk => gridItems[day][hk]).filter(v => v > 0);
+    colItemScale[day] = { min: itemVals.length ? Math.min(...itemVals) : 0, max: itemVals.length ? Math.max(...itemVals) : 0 };
+    const staffVals = HOURLY_BAND.map(hk => gridStaff[day][hk]).filter(v => v != null && v > 0);
+    colStaffScale[day] = { min: staffVals.length ? Math.min(...staffVals) : 0, max: staffVals.length ? Math.max(...staffVals) : 0 };
+    const ipsVals = HOURLY_BAND.map(hk => gridIps[day][hk]).filter(v => v != null && v > 0);
+    colIpsScale[day] = { min: ipsVals.length ? Math.min(...ipsVals) : 0, max: ipsVals.length ? Math.max(...ipsVals) : 0 };
   });
   html += rowStaff.join('')+'</tr>'+rowIps.join('')+'</tr>'+rowItems.join('')+'</tr></tbody></table>';
 
-  // Items · hour × day
-  html += '<h4 style="margin:16px 0 8px;font-size:14px;color:#e8eaed">Total items · hour × day</h4>' +
-    '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
-    '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
+  function hourHeatTable(title, grid, scaleMap, fmt, allowClick) {
+    let t = '<h4 style="margin:16px 0 8px;font-size:14px;color:#e8eaed">'+title+'</h4>' +
+      '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
+      '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
+    HOURLY_DAYS.forEach(day => {
+      t += '<th style="text-align:center;padding:6px 10px;background:#1e2533;min-width:52px">'+day.slice(0,3)+'</th>';
+    });
+    t += '</tr></thead><tbody>';
+    HOURLY_BAND.forEach(hk => {
+      t += '<tr style="border-top:1px solid #262a33"><td style="padding:5px 10px;color:#9aa0aa;white-space:nowrap;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">'+hourBandLabel(hk)+'</td>';
+      HOURLY_DAYS.forEach(day => {
+        const val = grid[day][hk];
+        const scale = scaleMap[day];
+        const heat = val != null && val > 0 ? columnRelativeHeat(val, scale.min, scale.max) : { bg: '#13161c', fg: '#4b5563' };
+        const bucketKey = hourBucketKey(day, hk);
+        let inner = fmt(val);
+        if (allowClick && val > 0 && hasItemListings) {
+          inner = '<button type="button" data-bucket="'+bucketKey+'" onclick="openHourlyItemList(this.dataset.bucket)" style="background:none;border:none;color:inherit;cursor:pointer;font:inherit;font-weight:700;padding:0;width:100%;height:100%">'+inner+'</button>';
+        }
+        t += '<td style="padding:5px 8px;text-align:center;font-weight:700;background:'+heat.bg+';color:'+heat.fg+'">'+inner+'</td>';
+      });
+      t += '</tr>';
+    });
+    t += '</tbody></table>';
+    return t;
+  }
+
+  html += hourHeatTable('Total items · hour × day', gridItems, colItemScale, v => (v > 0 ? String(v) : '—'), true);
+  html += hourHeatTable('Staff (heads) · hour × day', gridStaff, colStaffScale, v => (v != null && v > 0 ? String(v) : '—'), false);
+  html += hourHeatTable('Items / staff · hour × day', gridIps, colIpsScale, v => (v != null ? String(v) : '—'), false);
+
+  el.innerHTML = html;
+}
+
+function renderIpsTable3Fulfillment(scope, family) {
+  const el = document.getElementById('ipsTable3Fulfillment');
+  if (!el) return;
+  const weekKeys = scope.weekKeys || [];
+  const scopeLabel = scope.label || 'Scope';
+  let target = 600;
+  for (const wk of weekKeys) {
+    const d = ALL_DATA[currentVenue]?.[wk];
+    if (d?.stationDetails) {
+      target = familyFulfillmentTarget(family, d.staffing, d.stationDetails);
+      break;
+    }
+  }
+  const aggNote = weekKeys.length > 1 ? ' · '+weekKeys.length+' weeks aggregated' : '';
+  let html = '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">Table 3 — Avg fulfillment · hour × day</h3>' +
+    '<p class="note" style="margin:0 0 10px">'+scopeLabel+' · '+family+aggNote+' · rows = hours · columns = Mon→Sun. Green ≤ target · amber up to +15% · red &gt;+15%. Blank = no tickets.</p>' +
+    '<table style="border-collapse:collapse;font-size:11px;min-width:520px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">' +
+    '<th style="background:#1e2533;padding:6px 8px;text-align:left;white-space:nowrap">Hour</th>';
   HOURLY_DAYS.forEach(day => {
-    html += '<th style="text-align:center;padding:6px 10px;background:#1e2533;min-width:52px">'+day.slice(0,3)+'</th>';
+    html += '<th style="background:#1e2533;padding:6px 10px;text-align:center;white-space:nowrap;min-width:52px">' + day.slice(0, 3) + '</th>';
   });
   html += '</tr></thead><tbody>';
   HOURLY_BAND.forEach(hk => {
-    html += '<tr style="border-top:1px solid #262a33"><td style="padding:5px 10px;color:#9aa0aa;white-space:nowrap;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">'+hourBandLabel(hk)+'</td>';
+    html += '<tr style="border-top:1px solid #262a33"><td style="background:#13161c;padding:5px 8px;color:#9aa0aa;white-space:nowrap;font-weight:600">' + hourBandLabel(hk) + '</td>';
     HOURLY_DAYS.forEach(day => {
-      const items = gridItems[day][hk];
-      const scale = colItemScale[day];
-      const heat = columnRelativeHeat(items, scale.min, scale.max);
-      const bucketKey = hourBucketKey(day, hk);
-      const inner = items > 0
-        ? (hasItemListings
-          ? '<button type="button" data-bucket="'+bucketKey+'" onclick="openHourlyItemList(this.dataset.bucket)" style="background:none;border:none;color:inherit;cursor:pointer;font:inherit;font-weight:700;padding:0;width:100%;height:100%">'+items+'</button>'
-          : String(items))
-        : '—';
-      html += '<td style="padding:5px 8px;text-align:center;font-weight:700;background:'+heat.bg+';color:'+heat.fg+'">'+inner+'</td>';
+      const hit = weekKeys.length === 1
+        ? (() => {
+            const d = ALL_DATA[currentVenue]?.[weekKeys[0]];
+            return sumFamilyHourItems(family, day, hk, d?.staffing, d?.stationDetails || {}, null, d?.stationHourItems || {});
+          })()
+        : sumFamilyHourItemsAgg(weekKeys, family, day, hk, currentVenue);
+      const sec = hit.avgFulSec;
+      const bg = hmColor(sec, target);
+      const fg = textFor(bg);
+      const tip = day.slice(0, 3) + ' ' + hourBandLabel(hk) + ': ' +
+        (sec != null ? fmtSec(sec) + ' · tgt ' + fmtSec(target) : 'no data') +
+        ' · ' + (hit.items || hit.tickets || 0) + ' items';
+      html += '<td title="' + tip + '" style="padding:5px 6px;background:' + bg + ';color:' + fg + ';text-align:center;font-weight:600">' +
+        (sec != null ? fmtSec(sec) : '—') + '</td>';
     });
     html += '</tr>';
   });
   html += '</tbody></table>';
-
-  // Items / staff · hour × day
-  const hasStaff = HOURLY_DAYS.some(day => {
-    const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
-    return cell && cell.heads > 0;
-  });
-  if (hasStaff) {
-    html += '<h4 style="margin:0 0 8px;font-size:14px;color:#d9a441">Items / staff · hour × day</h4>' +
-      '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px"><thead><tr style="'+thStyle+'">'+
-      '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
-    HOURLY_DAYS.forEach(day => {
-      html += '<th style="text-align:center;padding:6px 10px;background:#1e2533;min-width:52px">'+day.slice(0,3)+'</th>';
-    });
-    html += '</tr></thead><tbody>';
-    const gridIps = {};
-    const colIpsScale = {};
-    HOURLY_DAYS.forEach(day => {
-      gridIps[day] = {};
-      const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
-      const heads = cell && cell.heads > 0 ? cell.heads : 0;
-      HOURLY_BAND.forEach(hk => {
-        const items = gridItems[day][hk];
-        gridIps[day][hk] = heads > 0 && items > 0 ? +(items / heads).toFixed(1) : null;
-      });
-      const vals = HOURLY_BAND.map(hk => gridIps[day][hk]).filter(v => v != null && v > 0);
-      colIpsScale[day] = { min: vals.length ? Math.min(...vals) : 0, max: vals.length ? Math.max(...vals) : 0 };
-    });
-    HOURLY_BAND.forEach(hk => {
-      html += '<tr style="border-top:1px solid #262a33"><td style="padding:5px 10px;color:#9aa0aa;white-space:nowrap;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">'+hourBandLabel(hk)+'</td>';
-      HOURLY_DAYS.forEach(day => {
-        const ips = gridIps[day][hk];
-        const scale = colIpsScale[day];
-        const heat = ips != null ? columnRelativeHeat(ips, scale.min, scale.max) : { bg: '#13161c', fg: '#4b5563' };
-        html += '<td style="padding:5px 8px;text-align:center;font-weight:700;background:'+heat.bg+';color:'+heat.fg+'">'+(ips!=null?ips:'—')+'</td>';
-      });
-      html += '</tr>';
-    });
-    html += '</tbody></table>';
-  } else {
-    html += '<p class="note" style="margin:0">No matched staff this week — items/staff hourly grid needs FTE×labor join.</p>';
-  }
-
   el.innerHTML = html;
 }
 
 function renderItemsPerStaff() {
   const card = document.getElementById('itemsPerStaffCard');
-  const weekNote = document.getElementById('itemsPerStaffWeekNote');
   const body = document.getElementById('itemsPerStaffBody');
   const noteEl = document.getElementById('itemsPerStaffNote');
-  const weekKey = WEEKS[currentWeekIdx]?.key;
+  const weekNote = document.getElementById('itemsPerStaffWeekNote');
 
   if (currentVenue === 'rdg_portfolio') {
     if (card) card.style.display = 'none';
     return;
   }
   if (card) card.style.display = '';
-
-  if (!ipsWeekActive()) {
-    if (weekNote) {
-      weekNote.style.display = '';
-      weekNote.textContent = 'Items per staff tables are built for W33 and W34 only. Switch the week selector above.';
-    }
-    if (body) body.style.display = 'none';
-    ['ipsTable1Summary','ipsTable2Hourly','ipsTable3Fulfillment'].forEach(id => {
-      const t = document.getElementById(id);
-      if (t) t.innerHTML = '';
-    });
-    return;
-  }
   if (weekNote) weekNote.style.display = 'none';
   if (body) body.style.display = '';
 
+  initIpsScopeSelectors();
+  const scope = getIpsScope();
+  renderIpsMissingBanner(scope);
+
+  if (!scope.weekKeys.length) {
+    ['ipsTable1Summary','ipsTable2Hourly','ipsTable3Fulfillment'].forEach(id => {
+      const t = document.getElementById(id);
+      if (t) t.innerHTML = '<p class="note" style="margin:0">No weekly data for this scope.</p>';
+    });
+    if (noteEl) noteEl.textContent = '';
+    return;
+  }
+
   const famSel = document.getElementById('ipsStationFamily');
-  populateIpsFamilySelect(famSel, weekKey, 'Pastry');
+  populateIpsFamilySelect(famSel, scope.weekKeys, 'Pastry');
   const family = getIpsFamily();
-  const d = getD();
 
-  renderIpsTable1Summary(weekKey, family);
-  renderIpsTable2Hourly(weekKey, family);
-  renderFamilyFulfillmentHeatmap(family, d.staffing, d.stationDetails || {}, 'ipsTable3Fulfillment');
+  renderIpsTable1Summary(scope, family);
+  renderIpsTable2Hourly(scope, family);
+  renderIpsTable3Fulfillment(scope, family);
 
+  const refWk = scope.weekKeys[scope.weekKeys.length - 1];
+  const d = ALL_DATA[currentVenue]?.[refWk] || getD();
   const stList = stationsForFamily(family, d.staffing, d.stationDetails || {});
   if (noteEl) {
-    noteEl.textContent = (WEEKS[currentWeekIdx]?.label || weekKey)+' · '+family+
+    noteEl.textContent = scope.label+' · '+family+
       (stList.length ? ' · Stations: '+stList.join(', ')+'.' : '.')+
       ' Table 1 compares all RDG locations; Tables 2–3 follow the location pill above.';
   }
