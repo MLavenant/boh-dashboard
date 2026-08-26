@@ -140,8 +140,14 @@ let html = htmlPart
     ${rollingWeeks.map((w,i) => `<option value="${i}"${i===rollingWeeks.length-1?' selected':''}>${w.label}</option>`).join('')}
   </select>
   <button id="weekNext" onclick="changeWeek(1)" style="background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">&#8250;</button>
-</div>
-<div class="card" id="itemsPerStaffCard" style="margin:12px 0 18px">
+</div>`
+  );
+
+// Stations tab: weekly items/staff by family; hide station selector + detail KPIs
+html = html.replace(
+  /<div class="section-title">Station Selector<\/div>\r?\n<div class="station-pills" id="stationPills"><\/div>[\s\S]*?<div class="station-detail" id="stationDetail">[\s\S]*?<\/div>(\r?\n\r?\n<div class="section-title"[^>]*>All Stations)/,
+  `<div class="section-title">Items Per Staff</div>
+<div class="card" id="itemsPerStaffCard" style="margin:0 0 18px">
   <h2 style="margin:0 0 4px">ITEMS PER STAFF</h2>
   <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Cross-location station throughput for <strong>W33 &amp; W34</strong>. Items from item-details allocations (prep-station map) ÷ matched FTE headcount. Quickly compare e.g. Pastry Friday: MILA vs Claudie items per cook.</p>
   <p id="itemsPerStaffWeekNote" class="note" style="display:none;margin:8px 0 0;color:#f59e0b"></p>
@@ -170,13 +176,8 @@ let html = htmlPart
       <div id="ipsDetailHourly" style="margin-top:16px;overflow-x:auto"></div>
     </div>
   </div>
-</div>`
-  );
-
-// Stations tab: weekly items/staff by family; hide station selector + detail KPIs
-html = html.replace(
-  /<div class="section-title">Station Selector<\/div>\r?\n<div class="station-pills" id="stationPills"><\/div>[\s\S]*?<div class="station-detail" id="stationDetail">[\s\S]*?<\/div>(\r?\n\r?\n<div class="section-title"[^>]*>All Stations)/,
-  `<div id="stationKpiBar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
+</div>
+<div id="stationKpiBar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
   <div class="card" style="margin:0;text-align:center">
     <div style="font-size:11px;color:#9aa0aa;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">Overall Avg Fulfillment</div>
     <div id="skpiAvg" style="font-size:2.5rem;font-weight:700;line-height:1.1">—</div>
@@ -193,6 +194,7 @@ html = html.replace(
     <div style="font-size:11px;color:#9aa0aa;margin-top:2px" id="skpiWorstSub"></div>
   </div>
 </div>
+<div class="section-title">Items / Staff · Hourly</div>
 <div class="card" id="hourlyThroughputCard" style="margin:18px 0;display:block">
   <h2 style="margin:0 0 4px">Items / staff · by day &amp; hour</h2>
   <p class="note" style="margin-top:0">This location only. Pick a <strong>station family</strong> (e.g. Pastry). Summary by day, then <strong>hourly detail 10:00 → 02:00</strong>. Items = menu qty across Toast stations in that family. Click counts for sold lists; click <strong>Staff</strong> to see who worked that day.</p>
@@ -397,6 +399,7 @@ html = html.replace(
 <div id="menuWorstOffenders"`,
   `<section id="tab-menu" class="tab-section">
 
+<div class="section-title">Items Per Staff</div>
 <div class="card" id="itemsPerStaffMenuCard" style="margin-bottom:16px">
   <h2 style="margin:0 0 4px">ITEMS PER STAFF — item-details view</h2>
   <p class="note" style="margin-top:0">Station-family drill-down for <strong>W33 &amp; W34</strong> at the active location pill. Items = menu qty from item-details allocations; staff = FTE × Toast labor.</p>

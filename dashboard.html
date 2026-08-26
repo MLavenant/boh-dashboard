@@ -205,7 +205,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <div class="wrap">
 <header>
   <h1 id="dashTitle">BOH Dashboard</h1>
-  <span class="badge" id="dashBadge">Latest 2026-W34 · Built 2026-08-26 21:11 UTC</span>
+  <span class="badge" id="dashBadge">Latest 2026-W34 · Built 2026-08-26 21:23 UTC</span>
 </header>
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
 <div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
@@ -215,36 +215,6 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
     <option value="0">W27</option><option value="1">W28</option><option value="2">W29</option><option value="3">W30</option><option value="4">W31</option><option value="5">W32</option><option value="6">W33</option><option value="7" selected>W34</option>
   </select>
   <button id="weekNext" onclick="changeWeek(1)" style="background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">&#8250;</button>
-</div>
-<div class="card" id="itemsPerStaffCard" style="margin:12px 0 18px">
-  <h2 style="margin:0 0 4px">ITEMS PER STAFF</h2>
-  <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Cross-location station throughput for <strong>W33 &amp; W34</strong>. Items from item-details allocations (prep-station map) ÷ matched FTE headcount. Quickly compare e.g. Pastry Friday: MILA vs Claudie items per cook.</p>
-  <p id="itemsPerStaffWeekNote" class="note" style="display:none;margin:8px 0 0;color:#f59e0b"></p>
-  <div id="itemsPerStaffBody">
-    <div style="margin-bottom:22px">
-      <h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">Summary — all locations · items / staff by day</h3>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px">
-        <label style="font-size:12px;color:#9aa0aa">Station family
-          <select id="ipsSummaryFamily" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
-        </label>
-      </div>
-      <p class="note" style="margin:0 0 8px">Rows = locations · columns = days. Color = highest→lowest <em>across the whole matrix</em> for this family.</p>
-      <div id="ipsSummaryHeatmap" style="overflow-x:auto"></div>
-    </div>
-    <div style="border-top:1px solid #262a33;padding-top:18px">
-      <h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">Details — one location · station family · day</h3>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
-        <label style="font-size:12px;color:#9aa0aa">Location
-          <select id="ipsDetailVenue" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
-        </label>
-        <label style="font-size:12px;color:#9aa0aa">Station family
-          <select id="ipsDetailFamily" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
-        </label>
-      </div>
-      <div id="ipsDetailTable" style="overflow-x:auto"></div>
-      <div id="ipsDetailHourly" style="margin-top:16px;overflow-x:auto"></div>
-    </div>
-  </div>
 </div>
 
 <nav class="tab-nav">
@@ -381,6 +351,37 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <!-- ========== TAB 2: STATIONS ========== -->
 <section id="tab-stations" class="tab-section">
 
+<div class="section-title">Items Per Staff</div>
+<div class="card" id="itemsPerStaffCard" style="margin:0 0 18px">
+  <h2 style="margin:0 0 4px">ITEMS PER STAFF</h2>
+  <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Cross-location station throughput for <strong>W33 &amp; W34</strong>. Items from item-details allocations (prep-station map) ÷ matched FTE headcount. Quickly compare e.g. Pastry Friday: MILA vs Claudie items per cook.</p>
+  <p id="itemsPerStaffWeekNote" class="note" style="display:none;margin:8px 0 0;color:#f59e0b"></p>
+  <div id="itemsPerStaffBody">
+    <div style="margin-bottom:22px">
+      <h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">Summary — all locations · items / staff by day</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px">
+        <label style="font-size:12px;color:#9aa0aa">Station family
+          <select id="ipsSummaryFamily" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+        </label>
+      </div>
+      <p class="note" style="margin:0 0 8px">Rows = locations · columns = days. Color = highest→lowest <em>across the whole matrix</em> for this family.</p>
+      <div id="ipsSummaryHeatmap" style="overflow-x:auto"></div>
+    </div>
+    <div style="border-top:1px solid #262a33;padding-top:18px">
+      <h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">Details — one location · station family · day</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
+        <label style="font-size:12px;color:#9aa0aa">Location
+          <select id="ipsDetailVenue" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+        </label>
+        <label style="font-size:12px;color:#9aa0aa">Station family
+          <select id="ipsDetailFamily" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+        </label>
+      </div>
+      <div id="ipsDetailTable" style="overflow-x:auto"></div>
+      <div id="ipsDetailHourly" style="margin-top:16px;overflow-x:auto"></div>
+    </div>
+  </div>
+</div>
 <div id="stationKpiBar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
   <div class="card" style="margin:0;text-align:center">
     <div style="font-size:11px;color:#9aa0aa;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">Overall Avg Fulfillment</div>
@@ -398,6 +399,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
     <div style="font-size:11px;color:#9aa0aa;margin-top:2px" id="skpiWorstSub"></div>
   </div>
 </div>
+<div class="section-title">Items / Staff · Hourly</div>
 <div class="card" id="hourlyThroughputCard" style="margin:18px 0;display:block">
   <h2 style="margin:0 0 4px">Items / staff · by day &amp; hour</h2>
   <p class="note" style="margin-top:0">This location only. Pick a <strong>station family</strong> (e.g. Pastry). Summary by day, then <strong>hourly detail 10:00 → 02:00</strong>. Items = menu qty across Toast stations in that family. Click counts for sold lists; click <strong>Staff</strong> to see who worked that day.</p>
@@ -438,6 +440,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <!-- ========== TAB 3: MENU ITEMS ========== -->
 <section id="tab-menu" class="tab-section">
 
+<div class="section-title">Items Per Staff</div>
 <div class="card" id="itemsPerStaffMenuCard" style="margin-bottom:16px">
   <h2 style="margin:0 0 4px">ITEMS PER STAFF — item-details view</h2>
   <p class="note" style="margin-top:0">Station-family drill-down for <strong>W33 &amp; W34</strong> at the active location pill. Items = menu qty from item-details allocations; staff = FTE × Toast labor.</p>
