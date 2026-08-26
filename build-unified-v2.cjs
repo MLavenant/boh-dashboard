@@ -140,6 +140,36 @@ let html = htmlPart
     ${rollingWeeks.map((w,i) => `<option value="${i}"${i===rollingWeeks.length-1?' selected':''}>${w.label}</option>`).join('')}
   </select>
   <button id="weekNext" onclick="changeWeek(1)" style="background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">&#8250;</button>
+</div>
+<div class="card" id="itemsPerStaffCard" style="margin:12px 0 18px">
+  <h2 style="margin:0 0 4px">ITEMS PER STAFF</h2>
+  <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Cross-location station throughput for <strong>W33 &amp; W34</strong>. Items from item-details allocations (prep-station map) ÷ matched FTE headcount. Quickly compare e.g. Pastry Friday: MILA vs Claudie items per cook.</p>
+  <p id="itemsPerStaffWeekNote" class="note" style="display:none;margin:8px 0 0;color:#f59e0b"></p>
+  <div id="itemsPerStaffBody">
+    <div style="margin-bottom:22px">
+      <h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">Summary — all locations · items / staff by day</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px">
+        <label style="font-size:12px;color:#9aa0aa">Station family
+          <select id="ipsSummaryFamily" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+        </label>
+      </div>
+      <p class="note" style="margin:0 0 8px">Rows = locations · columns = days. Color = highest→lowest <em>across the whole matrix</em> for this family.</p>
+      <div id="ipsSummaryHeatmap" style="overflow-x:auto"></div>
+    </div>
+    <div style="border-top:1px solid #262a33;padding-top:18px">
+      <h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">Details — one location · station family · day</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
+        <label style="font-size:12px;color:#9aa0aa">Location
+          <select id="ipsDetailVenue" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+        </label>
+        <label style="font-size:12px;color:#9aa0aa">Station family
+          <select id="ipsDetailFamily" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+        </label>
+      </div>
+      <div id="ipsDetailTable" style="overflow-x:auto"></div>
+      <div id="ipsDetailHourly" style="margin-top:16px;overflow-x:auto"></div>
+    </div>
+  </div>
 </div>`
   );
 
@@ -285,13 +315,13 @@ html = html.replace(
 <div class="section-title">Item–Station Assignment</div>
 <div class="card">
   <h2>Menu Item → Station Mapping</h2>
-  <p class="note">Stations = Toast Bulk Editor prep stations (monthly scrape). <strong>Target</strong> = item fulfillment goal in minutes — from REF/chef map where set; click to edit items still missing a target. Browser edits → <em>Export chef targets</em> → <code>chef-target-overrides.json</code>.</p>
+  <p class="note">Stations from Toast Bulk Editor (monthly refresh). <strong>Target</strong> = item should be fulfilled in X minutes — click to edit; chefs set targets for new items. Saves in your browser; use <em>Export chef targets</em> then drop file into repo as <code>chef-target-overrides.json</code>. REF/TARGET values are never overwritten by the scrape.</p>
   <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
     <input id="assignSearch" type="text" placeholder="Search items…" oninput="applyAssignFilter()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;width:220px;outline:none">
     <select id="assignTargetFilter" onchange="applyAssignFilter()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;outline:none">
       <option value="all">All items</option>
-      <option value="no-target">No target set</option>
-      <option value="has-target">Has target</option>
+      <option value="no-target">No chef target</option>
+      <option value="has-target">Has chef target</option>
       <option value="no-station">No station</option>
     </select>
     <button type="button" onclick="exportChefTargets()" style="padding:6px 14px;background:#2d3448;border:1px solid #3d4458;color:#e8eaed;border-radius:8px;font-size:13px;cursor:pointer">Export chef targets</button>
@@ -359,7 +389,38 @@ html = html.replace(
 <footer>`
 );
 
-// Cross-location item searcher at top of Menu Items tab
+// Cross-location item searcher + ITEMS PER STAFF on Menu Items tab
+html = html.replace(
+  `<section id="tab-menu" class="tab-section">
+
+<div class="section-title">Menu Item Performance</div>
+<div id="menuWorstOffenders"`,
+  `<section id="tab-menu" class="tab-section">
+
+<div class="card" id="itemsPerStaffMenuCard" style="margin-bottom:16px">
+  <h2 style="margin:0 0 4px">ITEMS PER STAFF — item-details view</h2>
+  <p class="note" style="margin-top:0">Station-family drill-down for <strong>W33 &amp; W34</strong> at the active location pill. Items = menu qty from item-details allocations; staff = FTE × Toast labor.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px">
+    <label style="font-size:12px;color:#9aa0aa">Station family
+      <select id="ipsMenuFamily" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+    </label>
+  </div>
+  <div id="ipsMenuDetailTable" style="overflow-x:auto"></div>
+  <div id="ipsMenuDetailHourly" style="margin-top:14px;overflow-x:auto"></div>
+</div>
+
+<div class="card" id="crossVenueItemSearchCard" style="margin-bottom:16px">
+  <h2>Search item across all locations</h2>
+  <p class="note">Type a dish (e.g. <strong>Tomahawk</strong>). Matches location prefixes (C- / CL- / ACG- / …) and light typos. Shows avg fulfillment for the <strong>selected week</strong> at every venue that sells it.</p>
+  <input class="search-bar" id="crossVenueItemSearch" placeholder="🔍 Search dish across Claudie, Casa Neos, AVA, MILA…" oninput="runCrossVenueItemSearch()" autocomplete="off" style="max-width:480px">
+  <div id="crossVenueItemResults" style="margin-top:12px"></div>
+</div>
+
+<div class="section-title">Menu Item Performance — this location</div>
+<div id="menuWorstOffenders"`
+);
+
+// Legacy replace kept for shells that still have the old menu tab opener (no-op when already patched)
 html = html.replace(
   `<!-- ========== TAB 3: MENU ITEMS ========== -->
 <section id="tab-menu" class="tab-section">
@@ -370,6 +431,13 @@ html = html.replace(
   <input class="search-bar" id="menuSearch" placeholder="🔍 Search menu items…" oninput="applyMenuFilters()">`,
   `<!-- ========== TAB 3: MENU ITEMS ========== -->
 <section id="tab-menu" class="tab-section">
+
+<div class="card" id="itemsPerStaffMenuCard" style="margin-bottom:16px">
+  <h2 style="margin:0 0 4px">ITEMS PER STAFF — item-details view</h2>
+  <p class="note" style="margin-top:0">Same station-family drill-down as the header section (W33 &amp; W34). Items = menu qty allocated via prep-station map; staff = matched FTE × Toast labor.</p>
+  <div id="ipsMenuDetailTable" style="overflow-x:auto"></div>
+  <div id="ipsMenuDetailHourly" style="margin-top:14px;overflow-x:auto"></div>
+</div>
 
 <div class="card" id="crossVenueItemSearchCard" style="margin-bottom:16px">
   <h2>Search item across all locations</h2>
@@ -388,8 +456,8 @@ html = html.replace(
 html = html
   .replace('<div class="kpi"><div class="v">22,927</div><div class="l">Food tickets (week)</div></div>',
            '<div class="kpi"><div class="v" id="kFoodTickets">22,927</div><div class="l">Food tickets (week)</div></div>')
-    .replace('<div class="kpi alert"><div class="v">57</div><div class="l">Peak concurrent tickets</div></div>',
-           '<div class="kpi alert"><div class="v" id="kPeakConc">57</div><div class="l">Peak concurrent orders</div></div>')
+  .replace('<div class="kpi alert"><div class="v">57</div><div class="l">Peak concurrent tickets</div></div>',
+           '<div class="kpi alert"><div class="v" id="kPeakConc">57</div><div class="l">Peak concurrent tickets</div></div>')
   .replace('<div class="kpi alert"><div class="v">26</div><div class="l">Breaking point (tickets)</div></div>',
            '<div class="kpi alert"><div class="v" id="kBP1">26</div><div class="l">Breaking point (tickets)</div></div>')
   .replace('<div class="kpi alert"><div class="v">141</div><div class="l">Breaking point (guests)</div></div>',
@@ -459,11 +527,11 @@ html = html.replace(
 <!-- Service Break Timeline (1-min) -->
 <div class="card" id="serviceBreakCard">
   <h2>Visual 1B — Service Break Timeline (1-min)</h2>
-  <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent orders open</strong> in the kitchen. Gold line = <strong>avg fulfillment of those open orders</strong>. Red band / markers = minutes where open-order avg &gt; 15 min. This is the live pressure view — different from Breaking Point (which is a capacity curve, not a clock).</p>
+  <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent tickets open</strong> in the kitchen. Gold line = <strong>avg fulfillment of those open tickets</strong>. Red band / markers = minutes where open-ticket avg &gt; 15 min. This is the live pressure view — different from Breaking Point (which is a capacity curve, not a clock).</p>
   <div id="serviceBreakDayPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
   <canvas id="cServiceBreak" style="max-height:420px"></canvas>
   <div class="legend">
-    <span><span class="sw" style="background:#5aa9e6"></span>Concurrent orders open</span>
+    <span><span class="sw" style="background:#5aa9e6"></span>Concurrent tickets open</span>
     <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment of open tickets (min)</span>
     <span><span class="sw" style="background:#e2706a"></span>Over 15 min (break)</span>
   </div>
@@ -873,7 +941,7 @@ function isPortfolioFoodItem(name, stations, avgSec) {
   return true;
 }
 
-// Static prep-station map helpers (item-station-map.json = Toast prep + fixed targets)
+// Static REF assignment helpers (authoritative item → stations + target)
 function venueSlugForMap() {
   const map = { claudie:'claudie', casaneos:'casa_neos', ava_cg:'ava_cg', ava_wp:'ava_wp', mila:'mila' };
   return map[currentVenue] || currentVenue;
@@ -944,7 +1012,7 @@ function getItemLiveByName() {
   });
   return byName;
 }
-/** Items for a station — from Toast prep map. Avg time from item-fulfillment report. */
+/** Items for a station — ONLY from static REF map. Avg Time from item-fulfillment. */
 function getStaticItemsForStation(stationName) {
   const map = getStaticItemMap();
   const liveByName = getItemLiveByName();
@@ -1214,14 +1282,14 @@ function renderPressure() {
       {type:'line',label:'Avg fulfillment (min)',data:CURVE.map(d=>d.ful),borderColor:'#d9a441',backgroundColor:'rgba(217,164,65,0.0)',tension:0.3,pointRadius:2,pointHoverRadius:5,borderWidth:2.5,yAxisID:'y1',order:1},
       {type:'line',label:'P75 fulfillment (min)',data:CURVE.map(d=>d.p75),borderColor:'#e2706a',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:0.3,yAxisID:'y1',order:1}
     ]},
-    options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent orders open'},grid:{color:gc}},y:{position:'left',title:{display:true,text:'Occurrences'},grid:{color:gc},min:0},y1:{position:'right',title:{display:true,text:'Fulfillment time (min)'},grid:{display:false},min:0,suggestedMax:24}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
+    options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent tickets open'},grid:{color:gc}},y:{position:'left',title:{display:true,text:'Occurrences'},grid:{color:gc},min:0},y1:{position:'right',title:{display:true,text:'Fulfillment time (min)'},grid:{display:false},min:0,suggestedMax:24}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
     plugins:[bpPlugin]
   });
   const dayLabel = pressureDay === 'Total' ? 'all days' : pressureDay;
   const annEl = document.getElementById('bpAnnotation');
   if (annEl) {
     if (BP != null) {
-      annEl.innerHTML = '⚡ Breaking point at <strong>'+BP+' concurrent orders</strong> ('+dayLabel+') — avg fulfillment jumps to '+(CURVE.find(d=>d.conc===BP)||{ful:'?'}).ful+' min.';
+      annEl.innerHTML = '⚡ Breaking point at <strong>'+BP+' concurrent tickets</strong> ('+dayLabel+') — avg fulfillment jumps to '+(CURVE.find(d=>d.conc===BP)||{ful:'?'}).ful+' min.';
     } else {
       annEl.innerHTML = 'No breaking point detected for <strong>'+dayLabel+'</strong> — avg fulfillment stays below threshold across observed load levels.';
     }
@@ -1434,7 +1502,7 @@ function renderServiceBreakTimeline() {
       datasets: [
         {
           type: 'bar',
-          label: 'Concurrent orders open',
+          label: 'Concurrent tickets open',
           data: conc,
           backgroundColor: brokenFlags.map(b => b ? 'rgba(226,112,106,0.55)' : 'rgba(74,159,255,0.45)'),
           borderWidth: 0,
@@ -1474,7 +1542,7 @@ function renderServiceBreakTimeline() {
             },
           },
         },
-        y: { position: 'left', title: { display: true, text: 'Concurrent orders open' }, grid: { color: gc }, min: 0 },
+        y: { position: 'left', title: { display: true, text: 'Concurrent tickets open' }, grid: { color: gc }, min: 0 },
         y1: { position: 'right', title: { display: true, text: 'Avg fulfillment (min)' }, grid: { display: false }, min: 0, suggestedMax: Math.max(22, thr + 4) },
       },
       plugins: {
@@ -1535,7 +1603,7 @@ function renderBreaking() {
       {type:'line',label:'Avg fulfillment (min)',data:CURVE.map(d=>d.ful),borderColor:'#d9a441',backgroundColor:'rgba(217,164,65,0.12)',fill:true,tension:0.3,pointRadius:0,yAxisID:'y',order:1},
       {type:'line',label:'Avg guests seated',data:CURVE.map(d=>d.guests),borderColor:'#5aa9e6',backgroundColor:'rgba(90,169,230,0.08)',fill:true,tension:0.3,pointRadius:0,yAxisID:'y1',order:2}
     ]},
-    options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent orders open'},grid:{color:gc}},y:{position:'left',title:{display:true,text:'Avg fulfillment (min)'},grid:{color:gc},suggestedMax:22},y1:{position:'right',title:{display:true,text:'Avg guests seated'},grid:{display:false},suggestedMax:200}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
+    options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent tickets open'},grid:{color:gc}},y:{position:'left',title:{display:true,text:'Avg fulfillment (min)'},grid:{color:gc},suggestedMax:22},y1:{position:'right',title:{display:true,text:'Avg guests seated'},grid:{display:false},suggestedMax:200}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
     plugins:[refLines]
   });
 }
@@ -1550,7 +1618,7 @@ function renderLoadPerf() {
   const thrLine={id:'thr',afterDraw(chart){const{ctx,chartArea:a,scales}=chart;if(!a||!scales.y)return;const thr=getThreshold();const yy=scales.y.getPixelForValue(thr);if(yy<a.top||yy>a.bottom)return;ctx.save();ctx.strokeStyle='#e2706a';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(a.left,yy);ctx.lineTo(a.right,yy);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#e2706a';ctx.font='11px sans-serif';ctx.fillText(thr+' min target',a.left+6,yy-4);ctx.restore();}};
   const existing = Chart.getChart('cLoadPerf');
   if (existing) existing.destroy();
-  new Chart(canvas,{type:'bar',data:{labels:TBK.map(b=>b.bucket),datasets:[{label:'Avg fulfillment (min)',data:TBK.map(b=>b.ful),backgroundColor:TBK.map(b=>b.ful>THRESHOLD?'#8a3f1a':'#d9a441'),borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Concurrent orders open (bucket)'},grid:{display:false}},y:{title:{display:true,text:'Avg fulfillment (min)'},grid:{color:gc},suggestedMax:22}}},plugins:[thrLine]});
+  new Chart(canvas,{type:'bar',data:{labels:TBK.map(b=>b.bucket),datasets:[{label:'Avg fulfillment (min)',data:TBK.map(b=>b.ful),backgroundColor:TBK.map(b=>b.ful>THRESHOLD?'#8a3f1a':'#d9a441'),borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Concurrent tickets open (bucket)'},grid:{display:false}},y:{title:{display:true,text:'Avg fulfillment (min)'},grid:{color:gc},suggestedMax:22}}},plugins:[thrLine]});
 }
 
 // ============================================================
@@ -2063,11 +2131,9 @@ function buildTicketQcHtml(d, staffing) {
   const itemQty = ts.itemQtyTotal != null
     ? ts.itemQtyTotal
     : Math.round((d.summary || []).reduce((s, r) => s + (r.qty || 0), 0));
-  const unique = ts.orderCount != null ? ts.orderCount : (ts.uniqueTickets != null ? ts.uniqueTickets : null);
-  const rawKitchen = ts.rawKitchenRows != null ? ts.rawKitchenRows : null;
-  const foodRows = ts.foodStationTicketRows != null ? ts.foodStationTicketRows : null;
-  const nonFoodEx = ts.nonFoodExcluded != null ? ts.nonFoodExcluded : null;
-  const adj = ts.fulfillmentAdjustSec != null ? ts.fulfillmentAdjustSec : 5;
+  const unique = ts.uniqueTickets != null ? ts.uniqueTickets : null;
+  const rawRows = ts.foodStationTicketRows != null ? ts.foodStationTicketRows : null;
+  const adj = ts.fulfillmentAdjustSec != null ? ts.fulfillmentAdjustSec : 60;
   const ms = staffing && staffing.matchStats;
   const bohMatch = ms && ms.bohMatchRate != null ? Math.round(ms.bohMatchRate * 100) : null;
   let famRows = '';
@@ -2084,15 +2150,13 @@ function buildTicketQcHtml(d, staffing) {
     warn = '<p style="margin:8px 0 0;color:#f59e0b;font-size:12px">⚠ BOH labor match '+bohMatch+'% — staff / items-per-person stay empty until Toast kitchen punches link to Viktor FTE roster.</p>';
   }
   return '<div style="font-size:13px;color:#e8eaed;font-weight:600;margin-bottom:6px">Ticket &amp; fulfillment QC (this week)</div>'+
-    '<p class="note" style="margin:0 0 10px">Toast Ticket Details row count includes bar, No Print, water, etc. Dashboard uses closed food-station rows only. Fulfillment = Fired→Fulfilled per row (−'+adj+'s adjust).</p>'+
+    '<p class="note" style="margin:0 0 10px">Verify counts against Toast kitchen-timing + item-details exports. Fulfillment = fired→fulfilled on food-station tickets (−'+adj+'s adjust).</p>'+
     '<div style="display:flex;flex-wrap:wrap;gap:16px 28px;margin-bottom:10px;font-size:12px">'+
-    (rawKitchen != null ? '<span><strong style="color:#9aa0aa">'+rawKitchen.toLocaleString()+'</strong> Toast export rows</span>' : '')+
-    (nonFoodEx != null ? '<span><strong style="color:#9aa0aa">−'+nonFoodEx.toLocaleString()+'</strong> non-food stations</span>' : '')+
-    '<span><strong style="color:#d9a441">'+fireCount.toLocaleString()+'</strong> food station fires</span>'+
-    (unique != null ? '<span><strong style="color:#e8eaed">'+unique.toLocaleString()+'</strong> orders (merged)</span>' : '')+
-    (foodRows != null && foodRows !== fireCount ? '<span><strong style="color:#9aa0aa">'+foodRows.toLocaleString()+'</strong> food rows</span>' : '')+
+    '<span><strong style="color:#d9a441">'+fireCount.toLocaleString()+'</strong> station ticket fires</span>'+
+    (unique != null ? '<span><strong style="color:#e8eaed">'+unique.toLocaleString()+'</strong> unique tickets (deduped)</span>' : '')+
+    (rawRows != null ? '<span><strong style="color:#9aa0aa">'+rawRows.toLocaleString()+'</strong> raw food rows</span>' : '')+
     '<span><strong style="color:#e8eaed">'+itemQty.toLocaleString()+'</strong> item qty (item-details)</span>'+
-    '<span><strong style="color:#9aa0aa">'+stations.length+'</strong> food stations</span>'+
+    '<span><strong style="color:#9aa0aa">'+stations.length+'</strong> stations</span>'+
     '</div>'+
     (famRows ? '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:4px"><thead><tr style="color:#9aa0aa">'+
     '<th style="text-align:left;padding:4px 8px">Family</th><th style="text-align:right;padding:4px 8px">Tickets</th>'+
@@ -2698,6 +2762,286 @@ function openHourlyItemList(dayKey) {
   document.body.appendChild(modal);
 }
 
+// ============================================================
+// ITEMS PER STAFF — cross-location summary + location detail (W33/W34)
+// ============================================================
+const IPS_WEEK_KEYS = new Set(['2026-W33', '2026-W34']);
+const IPS_VENUE_KEYS = ['claudie', 'casaneos', 'ava_cg', 'ava_wp', 'mila'];
+
+function ipsWeekActive() {
+  const wk = WEEKS[currentWeekIdx]?.key;
+  return wk && IPS_WEEK_KEYS.has(wk);
+}
+
+function getFamilyDayMetrics(venueKey, weekKey, family, day) {
+  const d = ALL_DATA[venueKey]?.[weekKey];
+  if (!d) return null;
+  const staffing = d.staffing;
+  const stationDetails = d.stationDetails || {};
+  const stationHourItems = d.stationHourItems || {};
+  const dayCell = staffing?.byFamily?.[family]?.days?.[day];
+  let items = null;
+  let heads = null;
+  let itemsPerHead = null;
+  let staff = [];
+  if (dayCell) {
+    items = dayCell.volume != null ? dayCell.volume : (dayCell.itemCount || 0);
+    heads = dayCell.heads > 0 ? dayCell.heads : null;
+    itemsPerHead = dayCell.itemsPerHead != null ? dayCell.itemsPerHead : null;
+    staff = Array.isArray(dayCell.staff) ? dayCell.staff : [];
+  }
+  if (items == null || items === 0) {
+    const hit = dayItemTotals(family, day, staffing, stationDetails, stationHourItems);
+    items = hit.items || 0;
+  }
+  if (itemsPerHead == null && heads > 0 && items > 0) {
+    itemsPerHead = +(items / heads).toFixed(1);
+  }
+  return { items, heads, itemsPerHead, staff };
+}
+
+function globalRelativeHeat(val, min, max) {
+  if (val == null || val <= 0) return { bg: '#13161c', fg: '#4b5563' };
+  if (max <= min) return { bg: '#d9a441', fg: '#0f1218' };
+  const t = (val - min) / (max - min);
+  const bg = lerpColor('#1a2840', '#d9a441', t);
+  return { bg, fg: textFor(bg) };
+}
+
+function populateIpsFamilySelect(sel, weekKey, preferred) {
+  if (!sel) return;
+  const found = new Set();
+  IPS_VENUE_KEYS.forEach(vk => {
+    const st = ALL_DATA[vk]?.[weekKey]?.staffing?.byFamily || {};
+    Object.keys(st).forEach(f => { if (HOURLY_FAMILIES.includes(f)) found.add(f); });
+  });
+  const families = HOURLY_FAMILIES.filter(f => found.has(f));
+  const list = families.length ? families : HOURLY_FAMILIES;
+  const prev = sel.value;
+  sel.innerHTML = list.map(f => '<option value="'+f+'">'+f+'</option>').join('');
+  if (prev && list.includes(prev)) sel.value = prev;
+  else if (preferred && list.includes(preferred)) sel.value = preferred;
+  else if (list.includes('Pastry')) sel.value = 'Pastry';
+  else if (list[0]) sel.value = list[0];
+}
+
+function populateIpsVenueSelect(sel) {
+  if (!sel) return;
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const prev = sel.value;
+  sel.innerHTML = IPS_VENUE_KEYS.map(k =>
+    '<option value="'+k+'">'+((labels[k] || k).replace(/"/g,'&quot;'))+'</option>'
+  ).join('');
+  if (prev && IPS_VENUE_KEYS.includes(prev)) sel.value = prev;
+  else if (IPS_VENUE_KEYS.includes(currentVenue)) sel.value = currentVenue;
+  else sel.value = IPS_VENUE_KEYS[0];
+}
+
+function renderIpsSummaryHeatmap(weekKey, family) {
+  const el = document.getElementById('ipsSummaryHeatmap');
+  if (!el) return;
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const matrix = [];
+  IPS_VENUE_KEYS.forEach(vk => {
+    HOURLY_DAYS.forEach(day => {
+      const m = getFamilyDayMetrics(vk, weekKey, family, day);
+      if (m && m.itemsPerHead != null && m.itemsPerHead > 0) matrix.push(m.itemsPerHead);
+    });
+  });
+  const gMin = matrix.length ? Math.min(...matrix) : 0;
+  const gMax = matrix.length ? Math.max(...matrix) : 0;
+  const thStyle = 'color:#9aa0aa;border-bottom:1px solid #262a33';
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:640px"><thead><tr style="'+thStyle+'">'+
+    '<th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Location</th>';
+  HOURLY_DAYS.forEach(day => {
+    html += '<th style="text-align:center;padding:8px 8px;background:#1e2533;min-width:56px">'+day.slice(0,3)+'</th>';
+  });
+  html += '</tr></thead><tbody>';
+  IPS_VENUE_KEYS.forEach(vk => {
+    html += '<tr style="border-top:1px solid #262a33"><td style="padding:8px 10px;color:#e8eaed;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+(labels[vk]||vk)+'</td>';
+    HOURLY_DAYS.forEach(day => {
+      const m = getFamilyDayMetrics(vk, weekKey, family, day) || {};
+      const ips = m.itemsPerHead;
+      const heat = globalRelativeHeat(ips, gMin, gMax);
+      const tip = (labels[vk]||vk)+' · '+day+' · '+family+
+        '\\nItems: '+(m.items!=null?m.items:'—')+
+        ' · Staff: '+(m.heads!=null?m.heads:'—')+
+        ' · Items/staff: '+(ips!=null?ips:'—');
+      const disp = ips != null ? ips : '—';
+      html += '<td title="'+tip.replace(/"/g,'&quot;')+'" style="padding:8px 6px;text-align:center;font-weight:700;background:'+heat.bg+';color:'+heat.fg+'">'+disp+'</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  if (!matrix.length) {
+    html += '<p class="note" style="margin:10px 0 0">No items/staff cells for <strong>'+family+'</strong> this week — need FTE×labor join and item-details volume at each venue.</p>';
+  }
+  el.innerHTML = html;
+}
+
+function renderIpsDetailBlock(venueKey, weekKey, family, tableEl, hourlyEl) {
+  if (!tableEl) return;
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const d = ALL_DATA[venueKey]?.[weekKey];
+  if (!d) {
+    tableEl.innerHTML = '<p class="note" style="margin:0">No data for this location/week.</p>';
+    if (hourlyEl) hourlyEl.innerHTML = '';
+    return;
+  }
+  const staffing = d.staffing;
+  const stationDetails = d.stationDetails || {};
+  const stationHourItems = d.stationHourItems || {};
+  const thStyle = 'color:#9aa0aa;border-bottom:1px solid #262a33';
+  const cellR = 'padding:8px 10px;text-align:center';
+  let html = '<p class="note" style="margin:0 0 10px"><strong>'+(labels[venueKey]||venueKey)+'</strong> · '+family+' · '+WEEKS[currentWeekIdx].label+'</p>'+
+    '<table style="width:100%;border-collapse:collapse;font-size:13px;min-width:640px"><thead><tr style="'+thStyle+'">'+
+    '<th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Metric</th>';
+  HOURLY_DAYS.forEach(day => {
+    html += '<th style="'+cellR+';background:#1e2533;min-width:56px">'+day.slice(0,3)+'</th>';
+  });
+  html += '<th style="'+cellR+';background:#1e2533;color:#d9a441">Week</th></tr></thead><tbody>';
+
+  const rowIps = ['<tr style="border-top:1px solid #262a33;background:#1a2030"><td style="padding:8px 10px;color:#d9a441;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">Items / staff</td>'];
+  const rowStaff = ['<tr style="border-top:1px solid #262a33"><td style="padding:8px 10px;color:#e8eaed;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">Staff (heads)</td>'];
+  const rowItems = ['<tr style="border-top:1px solid #262a33"><td style="padding:8px 10px;color:#e8eaed;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">Total items</td>'];
+  let weekItems = 0;
+  let staffSamples = [];
+  HOURLY_DAYS.forEach(day => {
+    const m = getFamilyDayMetrics(venueKey, weekKey, family, day) || {};
+    weekItems += m.items || 0;
+    if (m.heads > 0) staffSamples.push(m.heads);
+    rowIps.push('<td style="'+cellR+';font-weight:700;color:#d9a441">'+(m.itemsPerHead!=null?m.itemsPerHead:'—')+'</td>');
+    rowStaff.push('<td style="'+cellR+'">'+(m.heads!=null&&m.heads>0?m.heads:'—')+'</td>');
+    rowItems.push('<td style="'+cellR+';color:#e8eaed;font-weight:600">'+(m.items!=null&&m.items>0?Math.round(m.items):'—')+'</td>');
+  });
+  const famStaff = staffing?.byFamily?.[family];
+  const weekIph = famStaff?.weekItemsPerHeadDay;
+  const avgHeads = staffSamples.length ? staffSamples.reduce((a,b)=>a+b,0)/staffSamples.length : null;
+  const weekIps = avgHeads > 0 ? +(weekItems / avgHeads).toFixed(1) : null;
+  rowIps.push('<td style="'+cellR+';font-weight:700;color:#d9a441">'+(weekIph!=null?weekIph:(weekIps!=null?weekIps:'—'))+'</td>');
+  rowStaff.push('<td style="'+cellR+';color:#9aa0aa">'+(avgHeads!=null?avgHeads.toFixed(1)+' avg':'—')+'</td>');
+  rowItems.push('<td style="'+cellR+';font-weight:700;color:#e8eaed">'+Math.round(weekItems)+'</td>');
+  html += rowIps.join('')+'</tr>'+rowStaff.join('')+'</tr>'+rowItems.join('')+'</tr></tbody></table>';
+
+  // Staff names row (expandable per day)
+  html += '<details style="margin-top:12px"><summary style="cursor:pointer;font-size:13px;color:#d9a441;font-weight:600">Staff roster by day</summary>'+
+    '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;min-width:640px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
+    '<th style="text-align:left;padding:6px 8px">Day</th><th style="text-align:left;padding:6px 8px">Who worked</th><th style="text-align:right;padding:6px 8px">Hours</th></tr></thead><tbody>';
+  HOURLY_DAYS.forEach(day => {
+    const m = getFamilyDayMetrics(venueKey, weekKey, family, day) || {};
+    const names = (m.staff || []).map(s => {
+      const lbl = (s.label || s.name || '—').replace(/</g,'&lt;');
+      const hrs = s.hours != null ? ' ('+s.hours+'h)' : '';
+      return lbl+hrs;
+    }).join(', ') || '—';
+    html += '<tr style="border-top:1px solid #262a33"><td style="padding:6px 8px;color:#e8eaed;font-weight:600">'+day.slice(0,3)+'</td>'+
+      '<td style="padding:6px 8px;color:#9aa0aa">'+names+'</td>'+
+      '<td style="padding:6px 8px;text-align:right;color:#9aa0aa">'+(m.heads||0)+'</td></tr>';
+  });
+  html += '</tbody></table></details>';
+  tableEl.innerHTML = html;
+
+  if (!hourlyEl) return;
+  const hasStaff = HOURLY_DAYS.some(day => {
+    const m = getFamilyDayMetrics(venueKey, weekKey, family, day);
+    return m && m.heads > 0;
+  });
+  if (!hasStaff) {
+    hourlyEl.innerHTML = '<p class="note" style="margin:0">No matched staff for hourly items/staff — items-only hour×day below.</p>';
+  }
+  let hhtml = '<h4 style="margin:0 0 8px;font-size:14px;color:#e8eaed">Items / staff · hour × day</h4>'+
+    '<p class="note" style="margin:0 0 10px">Hourly items ÷ that day’s headcount. Color = busiest→quietest within each day column.</p>'+
+    '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px"><thead><tr style="'+thStyle+'">'+
+    '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
+  HOURLY_DAYS.forEach(day => {
+    hhtml += '<th style="text-align:center;padding:6px 8px;background:#1e2533;min-width:52px">'+day.slice(0,3)+'</th>';
+  });
+  hhtml += '</tr></thead><tbody>';
+  const gridIps = {};
+  const colScale = {};
+  HOURLY_DAYS.forEach(day => {
+    gridIps[day] = {};
+    const m = getFamilyDayMetrics(venueKey, weekKey, family, day) || {};
+    const heads = m.heads > 0 ? m.heads : 0;
+    HOURLY_BAND.forEach(hk => {
+      const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, null, stationHourItems);
+      gridIps[day][hk] = heads > 0 && hit.items > 0 ? +(hit.items / heads).toFixed(1) : null;
+    });
+    const vals = HOURLY_BAND.map(hk => gridIps[day][hk]).filter(v => v != null && v > 0);
+    colScale[day] = { min: vals.length ? Math.min(...vals) : 0, max: vals.length ? Math.max(...vals) : 0 };
+  });
+  HOURLY_BAND.forEach(hk => {
+    hhtml += '<tr style="border-top:1px solid #262a33"><td style="padding:5px 10px;color:#9aa0aa;white-space:nowrap;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">'+hourBandLabel(hk)+'</td>';
+    HOURLY_DAYS.forEach(day => {
+      const ips = gridIps[day][hk];
+      const scale = colScale[day];
+      const heat = ips != null ? columnRelativeHeat(ips, scale.min, scale.max) : { bg: '#13161c', fg: '#4b5563' };
+      hhtml += '<td style="padding:5px 8px;text-align:center;font-weight:700;background:'+heat.bg+';color:'+heat.fg+'">'+(ips!=null?ips:'—')+'</td>';
+    });
+    hhtml += '</tr>';
+  });
+  hhtml += '</tbody></table>';
+  hourlyEl.innerHTML = hhtml;
+}
+
+function renderItemsPerStaff() {
+  const card = document.getElementById('itemsPerStaffCard');
+  const menuCard = document.getElementById('itemsPerStaffMenuCard');
+  const weekNote = document.getElementById('itemsPerStaffWeekNote');
+  const body = document.getElementById('itemsPerStaffBody');
+  const weekKey = WEEKS[currentWeekIdx]?.key;
+
+  if (currentVenue === 'rdg_portfolio') {
+    if (card) card.style.display = 'none';
+    if (menuCard) menuCard.style.display = 'none';
+    return;
+  }
+  if (card) card.style.display = '';
+  if (menuCard) menuCard.style.display = '';
+
+  if (!ipsWeekActive()) {
+    if (weekNote) {
+      weekNote.style.display = '';
+      weekNote.textContent = 'Items per staff comparison is built for W33 and W34 only. Switch the week selector above.';
+    }
+    if (body) body.style.display = 'none';
+    if (menuCard) {
+      const mt = document.getElementById('ipsMenuDetailTable');
+      const mh = document.getElementById('ipsMenuDetailHourly');
+      if (mt) mt.innerHTML = '<p class="note" style="margin:0">Select week W33 or W34 to view items/staff from item-details + FTE data.</p>';
+      if (mh) mh.innerHTML = '';
+    }
+    return;
+  }
+  if (weekNote) weekNote.style.display = 'none';
+  if (body) body.style.display = '';
+
+  const sumFamSel = document.getElementById('ipsSummaryFamily');
+  const detVenueSel = document.getElementById('ipsDetailVenue');
+  const detFamSel = document.getElementById('ipsDetailFamily');
+  populateIpsFamilySelect(sumFamSel, weekKey, 'Pastry');
+  populateIpsVenueSelect(detVenueSel);
+  populateIpsFamilySelect(detFamSel, weekKey, sumFamSel?.value || 'Pastry');
+
+  const summaryFamily = sumFamSel?.value || 'Pastry';
+  const detailVenue = detVenueSel?.value || currentVenue;
+  const detailFamily = detFamSel?.value || summaryFamily;
+
+  renderIpsSummaryHeatmap(weekKey, summaryFamily);
+  renderIpsDetailBlock(detailVenue, weekKey, detailFamily,
+    document.getElementById('ipsDetailTable'),
+    document.getElementById('ipsDetailHourly'));
+
+  // Menu Items tab — follows active location pill + menu family picker
+  const menuVenue = IPS_VENUE_KEYS.includes(currentVenue) ? currentVenue : detailVenue;
+  const menuFamSel = document.getElementById('ipsMenuFamily');
+  populateIpsFamilySelect(menuFamSel, weekKey, detailFamily);
+  const menuFamily = menuFamSel?.value || detailFamily;
+  renderIpsDetailBlock(menuVenue, weekKey, menuFamily,
+    document.getElementById('ipsMenuDetailTable'),
+    document.getElementById('ipsMenuDetailHourly'));
+}
+
 function renderStations() {
   renderStaffingGrid();
   const STATIONS = getD().stations;
@@ -2916,7 +3260,7 @@ function renderStations() {
 
   function renderStationDetail(s) {
     const det = STATION_DETAILS[s.station] || {};
-    // Items at this station from Toast prep-station map
+    // ONLY items from static REF assignment for this station
     const items = getStaticItemsForStation(s.station);
     const ratio = s.exp_sec > 0 ? s.avg_sec / s.exp_sec : null;
     let statusClass = 'status-red', statusText = 'Over target';
@@ -3085,7 +3429,7 @@ function renderStations() {
       '</div>'+
       '<div style="font-size:13px;font-weight:600;color:#d9a441;margin-bottom:4px">Hourly Heatmap (Day × Hour)</div>'+
       hmHtml+
-      '<div style="font-size:13px;font-weight:600;color:#d9a441;margin:16px 0 4px">Menu Items at this station (prep-station map)</div>'+
+      '<div style="font-size:13px;font-weight:600;color:#d9a441;margin:16px 0 4px">Menu Items at this station (from static REF assignment)</div>'+
       itemsHtml +
       '<details style="margin-top:16px;cursor:pointer"><summary style="font-size:13px;font-weight:600;color:#d9a441;outline:none">❓ WHY is this station slow? (top 3 items)</summary>' +
       '<div style="margin-top:8px;background:#1a1d25;border-radius:8px;padding:10px;border:1px solid #2d3448">' +
@@ -3310,7 +3654,7 @@ function runCrossVenueItemSearch() {
 }
 
 function renderMenuItems() {
-  // Menu items from Toast prep map; avg time from item-fulfillment
+  // ONLY items from static REF assignment; Avg Time from item-fulfillment
   const staticMap = getStaticItemMap();
   const hasStatic = Object.keys(staticMap).length > 0;
   const liveByName = getItemLiveByName();
@@ -4206,7 +4550,7 @@ function renderPageSummary() {
     html += '<span style="color:#22c55e;font-weight:700;font-size:15px">✅ All stations on target this week.</span>';
   }
   if (peakDay && peakHr) {
-    const concTxt = peakConc ? peakConc + ' concurrent orders' : '';
+    const concTxt = peakConc ? peakConc + ' concurrent tickets' : '';
     html += ' <span style="color:#9aa0aa;font-size:14px">Kitchen peaks on ' + peakDay + ' ' + peakHr + ' with ' + Math.round(peakVal) + ' guests' + (concTxt ? ' and ' + concTxt : '') + '.</span>';
   }
   if (top2.length >= 2) {
@@ -4395,7 +4739,7 @@ function renderSettings() {
   const mschedOk = !!msched.matchesExpected;
   html += '<div class="card">';
   html += '<h2>Monthly Prep Stations Scrape</h2>';
-  html += '<p class="note">Expected: 1st of every month at 9:00 AM. Scrapes Toast Bulk Editor for Claudie, AVA CG, AVA WP, Casa Neos, MILA — updates stations only; REF targets preserved.</p>';
+  html += '<p class="note">Expected: 1st of every month at 9:00 AM. Scrapes Toast Bulk Editor for Claudie, AVA CG, AVA WP, Casa Neos — updates stations only; REF targets preserved.</p>';
   html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Task registered</td><td style="padding:8px 0;text-align:right;font-weight:600;color:' + (msched.exists?'#22c55e':'#ef4444') + '">' + (msched.exists?'Yes':'No') + '</td></tr>';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (msched.months||'—') + ' day ' + (msched.days||'—') + ' @ ' + (msched.startTime||'') + '</td></tr>';
@@ -4494,6 +4838,10 @@ function renderAll() {
     if (ht) ht.style.display = 'none';
     const oh = document.getElementById('overviewHourlyHint');
     if (oh) oh.style.display = 'none';
+    const ips = document.getElementById('itemsPerStaffCard');
+    if (ips) ips.style.display = 'none';
+    const ipsMenu = document.getElementById('itemsPerStaffMenuCard');
+    if (ipsMenu) ipsMenu.style.display = 'none';
     return;
   }
   applyDerivedStationTargets();
@@ -4508,6 +4856,7 @@ function renderAll() {
   renderStationsRecap();
   renderPressure();
   renderStaffingGrid();
+  renderItemsPerStaff();
   renderServiceBreakTimeline();
   renderBreaking();
   renderLoadPerf();
@@ -4695,7 +5044,7 @@ finalHtml = finalHtml
   )
   .replace(
     '<div class="annotation-box">⚡ Breaking point at <strong>26 concurrent tickets</strong> — avg fulfillment jumps to 16.0 min.</div>',
-    '<div class="annotation-box" id="bpAnnotation">⚡ Breaking point at <strong>26 concurrent orders</strong> — avg fulfillment jumps to 16.0 min.</div><div id="bpMethodNote" style="font-size:11px;color:#9aa0aa;margin-top:4px">BP = first load band (≥10 orders, ≥5 intervals) where avg fulfillment exceeds target</div>'
+    '<div class="annotation-box" id="bpAnnotation">⚡ Breaking point at <strong>26 concurrent tickets</strong> — avg fulfillment jumps to 16.0 min.</div><div id="bpMethodNote" style="font-size:11px;color:#9aa0aa;margin-top:4px">BP detected via P75 fulfillment</div>'
   );
 
 // ── Write output ──────────────────────────────────────────────────────────────
