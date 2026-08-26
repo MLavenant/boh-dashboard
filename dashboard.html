@@ -205,7 +205,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <div class="wrap">
 <header>
   <h1 id="dashTitle">BOH Dashboard</h1>
-  <span class="badge" id="dashBadge">Latest 2026-W34 · Built 2026-08-26 23:26 UTC</span>
+  <span class="badge" id="dashBadge">Latest 2026-W34 · Built 2026-08-26 23:27 UTC</span>
 </header>
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
 <div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
@@ -354,7 +354,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <div class="section-title">Items Per Staff</div>
 <div class="card" id="itemsPerStaffCard" style="margin:0 0 18px">
   <h2 style="margin:0 0 4px">ITEMS PER STAFF</h2>
-  <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Stations dashboard — compare locations and drill into hourly load, staffing, and fulfillment. Items/staff needs FTE×labor join (currently W33 &amp; W34).</p>
+  <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Stations dashboard — compare locations and drill into hourly load, staffing, and fulfillment. Select week, fiscal period (4-4-5 from 12/29/2025), or full fiscal year. Items/staff requires FTE×labor join.</p>
   <p id="itemsPerStaffWeekNote" class="note" style="display:none;margin:8px 0 0;color:#f59e0b"></p>
   <div id="itemsPerStaffBody">
     <div id="ipsScopeBar" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px;padding:12px 14px;background:#13161c;border:1px solid #262a33;border-radius:10px">
@@ -2655,7 +2655,6 @@ function openHourlyItemList(dayKey) {
 // ============================================================
 // ITEMS PER STAFF — fiscal 4-4-5 calendar + 3-table Stations dashboard
 // ============================================================
-const IPS_WEEK_KEYS = new Set(['2026-W33', '2026-W34']);
 const IPS_VENUE_KEYS = ['claudie', 'casaneos', 'ava_cg', 'ava_wp', 'mila'];
 const FISCAL_START_MS = Date.parse('2025-12-29T12:00:00Z');
 let ipsViewMode = 'week';
