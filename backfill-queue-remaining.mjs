@@ -6,6 +6,7 @@ import path from "path";
 import { spawnSync } from "child_process";
 import { fileURLToPath } from "url";
 import { runBackfill } from "./backfill-venue-tickets.mjs";
+import { runLaborBackfill } from "./backfill-labor.mjs";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const LOG = path.join(ROOT, "data", "backfill-queue.log");
@@ -103,8 +104,32 @@ async function main() {
   }
 
   saveJSON(path.join(ROOT, "data", "backfill-all-status.json"), results);
-  log("\n🎉 ALL REQUESTED VENUES FINISHED (or see errors above)");
-  log("Casa Neos → Time Entries OK | Claudie, AVA CG, MILA tickets pulled W01–W34");
+  log("\n🎉 ALL TICKET BACKFILLS FINISHED (or see errors above)");
+
+  log("\n=== Starting labor time entries (all 4 venues) ===");
+  const laborSummaries = await runLaborBackfill({
+    all: true,
+    from: "2026-W01",
+    to: "2026-W34",
+    skipExisting: true,
+    probeOnly: false,
+  });
+
+  const laborReady = ["casa_neos", "claudie", "ava_coconut_grove", "mila"].every(
+    (v) => laborSummaries[v]?.ready
+  );
+  saveJSON(path.join(ROOT, "data", "backfill-labor-all-status.json"), {
+    summaries: laborSummaries,
+    allReady: laborReady,
+    at: new Date().toISOString(),
+  });
+
+  if (laborReady) {
+    log("\n🎉 ALL LOCATIONS READY — tickets + time entries W01–W34");
+    log("You can now run FTE ingest + build-station-staffing per week.");
+  } else {
+    log("\n⚠ Labor backfill incomplete — re-run: node backfill-labor.mjs --all --skip-existing");
+  }
 }
 
 function saveJSON(p, d) { fs.writeFileSync(p, JSON.stringify(d, null, 2)); }
