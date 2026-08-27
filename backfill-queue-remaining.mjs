@@ -59,10 +59,21 @@ async function waitForCasaNeos() {
     if (!running) {
       log(`✅ Casa Neos process finished (${done}/${CASA_TARGET_WEEKS} weeks, ${failed.length} failed)`);
       if (failed.length) log(`   Failed weeks to retry: ${failed.join(", ")}`);
-      return;
+      return failed;
     }
     log(`Casa Neos in progress… ${done}/${CASA_TARGET_WEEKS} weeks (running=${running})`);
     await new Promise((r) => setTimeout(r, 60000));
+  }
+}
+
+function retryCasaNeosWeeks(weeks) {
+  if (!weeks.length) return;
+  log(`Retrying Casa Neos failed weeks: ${weeks.join(", ")}`);
+  for (const week of weeks) {
+    const r = spawnSync(process.execPath, [
+      "backfill-casa-neos-tickets.mjs", "--week", week, "--skip-existing",
+    ], { cwd: ROOT, encoding: "utf8", stdio: "inherit" });
+    if (r.status !== 0) log(`⚠ Casa Neos ${week} retry exited ${r.status}`);
   }
 }
 
@@ -70,7 +81,10 @@ async function main() {
   fs.mkdirSync(path.join(ROOT, "data"), { recursive: true });
   log("=== Backfill queue: Claudie → AVA CG → MILA ===");
 
-  await waitForCasaNeos();
+  const failedWeeks = await waitForCasaNeos();
+  retryCasaNeosWeeks(failedWeeks);
+
+  log("✅ Casa Neos tickets done — you can start Time Entries week-to-week for Casa Neos");
 
   const results = { casa_neos: "complete", venues: {} };
   for (const { venue, label } of NEXT_VENUES) {
