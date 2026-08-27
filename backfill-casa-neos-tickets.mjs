@@ -88,12 +88,27 @@ function listWeeks(fromKey, toKey) {
   return weeks;
 }
 
-/** Toast Custom Date encoding used by Kitchen / Item Details CSV export. */
-function toastCustomDateRange(startDate, endDate) {
-  // MM/DD/YYYY - MM/DD/YYYY (matches Toast report UI "Custom Date")
-  const [ys, ms, ds] = startDate.split("-");
-  const [ye, me, de] = endDate.split("-");
-  return `${ms}/${ds}/${ys} - ${me}/${de}/${ye}`;
+/** Toast custom range for CSV export — reportDateRange=custom + MM-dd-yyyy fields. */
+function toastCustomQueryParams(startDate, endDate) {
+  const fmt = (iso) => {
+    const [y, m, d] = iso.split("-");
+    return `${m}-${d}-${y}`;
+  };
+  return {
+    reportDateRange: "custom",
+    reportDateStart: fmt(startDate),
+    reportDateEnd: fmt(endDate),
+  };
+}
+
+function buildReportQs(params, groupId) {
+  const p = new URLSearchParams({
+    excel: "true",
+    numberOfRestaurants: "1",
+    reportGroupIds: groupId,
+    ...params,
+  });
+  return p.toString();
 }
 
 function getSessionCookies() {
@@ -162,10 +177,7 @@ async function pollCsvExport(s3Url, label, maxPolls = 45) {
 }
 
 async function fetchKitchenTimingWeek(cookies, startDate, endDate) {
-  const dateRange = toastCustomDateRange(startDate, endDate);
-  const qs =
-    `excel=true&reportDateRange=${encodeURIComponent(dateRange)}` +
-    `&numberOfRestaurants=1&reportGroupIds=${GROUP_ID}`;
+  const qs = buildReportQs(toastCustomQueryParams(startDate, endDate), GROUP_ID);
   const triggerRes = await axios.get(
     `${TOAST_ADMIN}/restaurantkitchenreports/kitchendetailstable?${qs}`,
     { headers: reportHeaders(cookies), validateStatus: () => true, maxRedirects: 0 }
@@ -180,10 +192,7 @@ async function fetchKitchenTimingWeek(cookies, startDate, endDate) {
 }
 
 async function fetchItemDetailsWeek(cookies, startDate, endDate) {
-  const dateRange = toastCustomDateRange(startDate, endDate);
-  const qs =
-    `excel=true&reportDateRange=${encodeURIComponent(dateRange)}` +
-    `&numberOfRestaurants=1&reportGroupIds=${GROUP_ID}`;
+  const qs = buildReportQs(toastCustomQueryParams(startDate, endDate), GROUP_ID);
   const triggerRes = await axios.get(
     `${TOAST_ADMIN}/restaurants/admin/reports/menu/toplevelitemselections?${qs}`,
     { headers: reportHeaders(cookies), validateStatus: () => true, maxRedirects: 0 }
