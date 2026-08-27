@@ -1,0 +1,91 @@
+name: Casa Neos Ticket Backfill (one-time)
+
+# Same Toast CSV export as weekly-save.js — week-by-week W01→W34.
+# Requires fresh TOAST_SESSION_GZIP_B64 (run toast-login-refresh.mjs + prepare-boh-cloud-session.ps1 locally).
+
+on:
+  workflow_dispatch:
+    inputs:
+      from_week:
+        description: "First ISO week (default 2026-W01)"
+        required: false
+        default: "2026-W01"
+      to_week:
+        description: "Last ISO week (default 2026-W34)"
+        required: false
+        default: "2026-W34"
+      skip_existing:
+        description: "Skip weeks that already have kitchen-timing + item-details files"
+        required: false
+        default: "true"
+
+jobs:
+  backfill:
+    runs-on: windows-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore Toast Web Admin session
+        shell: powershell
+        env:
+          TOAST_SESSION_GZIP_B64: ${{ secrets.TOAST_SESSION_GZIP_B64 }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:TOAST_SESSION_GZIP_B64)) {
+            throw "Missing GitHub secret TOAST_SESSION_GZIP_B64 — refresh on laptop first"
+          }
+          $compressed = [Convert]::FromBase64String($env:TOAST_SESSION_GZIP_B64)
+          $input = [IO.MemoryStream]::new($compressed)
+          $gzip = [IO.Compression.GzipStream]::new($input, [IO.Compression.CompressionMode]::Decompress)
+          $output = [IO.File]::Create((Join-Path $env:GITHUB_WORKSPACE "toast-session.json"))
+          $gzip.CopyTo($output)
+          $output.Dispose(); $gzip.Dispose(); $input.Dispose()
+          $session = Get-Content toast-session.json -Raw | ConvertFrom-Json
+          if (-not $session.cookies -or $session.cookies.Count -eq 0) {
+            throw "Decoded Toast session contains no cookies"
+          }
+          Write-Host "Toast session restored ($($session.cookies.Count) cookies)"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        shell: cmd
+        run: npm ci || npm install
+
+      - name: Probe session
+        shell: cmd
+        env:
+          BOH_ROOT: ${{ github.workspace }}
+          TOAST_SESSION_FILE: ${{ github.workspace }}\toast-session.json
+        run: node backfill-casa-neos-tickets.mjs --probe-only
+
+      - name: Run Casa Neos backfill
+        shell: cmd
+        env:
+          BOH_ROOT: ${{ github.workspace }}
+          TOAST_SESSION_FILE: ${{ github.workspace }}\toast-session.json
+        run: |
+          set EXTRA=
+          if "${{ inputs.skip_existing }}"=="true" set EXTRA=--skip-existing
+          node backfill-casa-neos-tickets.mjs --from ${{ inputs.from_week }} --to ${{ inputs.to_week }} %EXTRA%
+
+      - name: Commit backfill data
+        shell: powershell
+        run: |
+          git config user.name "rdg-bot"
+          git config user.email "rdg-bot@users.noreply.github.com"
+          git add data/backfill-casa-neos-status.json data/2026-W*/kitchen-timing-casa_neos.json data/2026-W*/item-details-casa_neos.json casa_neos-data-2026-W*.json 2>$null
+          $staged = @(git diff --staged --name-only)
+          if ($staged.Count -eq 0) { Write-Host "No new files to commit"; exit 0 }
+          git commit -m "One-time Casa Neos ticket backfill ($($env:GITHUB_RUN_ID))"
+          git pull --rebase origin main
+          git push origin HEAD:main
