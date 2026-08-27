@@ -9,7 +9,7 @@ import { runBackfill } from "./backfill-venue-tickets.mjs";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const LOG = path.join(ROOT, "data", "backfill-queue.log");
-const CASA_STATUS = path.join(ROOT, "data", "backfill-casa_neos-status.json");
+const CASA_STATUS = path.join(ROOT, "data", "backfill-casa-neos-status.json");
 
 const NEXT_VENUES = [
   { venue: "claudie", label: "Claudie" },
@@ -23,37 +23,46 @@ function log(msg) {
   fs.appendFileSync(LOG, line + "\n");
 }
 
-function casaNeosComplete() {
-  if (!fs.existsSync(CASA_STATUS)) return false;
-  try {
-    const s = JSON.parse(fs.readFileSync(CASA_STATUS, "utf8"));
-    return s.summary?.readyForTimeEntries === true;
-  } catch { return false; }
-}
+const CASA_TARGET_WEEKS = 34;
 
 function casaNeosRunning() {
   try {
-    const out = spawnSync("pgrep", ["-f", "backfill-casa-neos-tickets"], { encoding: "utf8" });
+    const out = spawnSync("pgrep", ["-f", "backfill-casa-neos-tickets.mjs"], { encoding: "utf8" });
     return (out.stdout || "").trim().length > 0;
   } catch { return false; }
+}
+
+function casaNeosWeeksDone() {
+  if (!fs.existsSync(CASA_STATUS)) return 0;
+  try {
+    const s = JSON.parse(fs.readFileSync(CASA_STATUS, "utf8"));
+    return Object.values(s.weeks || {}).filter((w) => w.kitchenTickets > 0).length;
+  } catch { return 0; }
+}
+
+function casaNeosFailedWeeks() {
+  if (!fs.existsSync(CASA_STATUS)) return [];
+  try {
+    const s = JSON.parse(fs.readFileSync(CASA_STATUS, "utf8"));
+    return Object.entries(s.weeks || {})
+      .filter(([, w]) => w.error)
+      .map(([k]) => k);
+  } catch { return []; }
 }
 
 async function waitForCasaNeos() {
   log("Waiting for Casa Neos backfill to complete…");
   while (true) {
-    if (casaNeosComplete()) {
-      log("✅ Casa Neos COMPLETE");
+    const running = casaNeosRunning();
+    const done = casaNeosWeeksDone();
+    const failed = casaNeosFailedWeeks();
+    if (!running) {
+      log(`✅ Casa Neos process finished (${done}/${CASA_TARGET_WEEKS} weeks, ${failed.length} failed)`);
+      if (failed.length) log(`   Failed weeks to retry: ${failed.join(", ")}`);
       return;
     }
-    if (!casaNeosRunning()) {
-      const s = fs.existsSync(CASA_STATUS) ? JSON.parse(fs.readFileSync(CASA_STATUS, "utf8")) : null;
-      if (s?.summary?.done >= 30) {
-        log("Casa Neos process stopped — continuing queue");
-        return;
-      }
-      log("Casa Neos process not running and not complete — waiting 30s");
-    }
-    await new Promise((r) => setTimeout(r, 30000));
+    log(`Casa Neos in progress… ${done}/${CASA_TARGET_WEEKS} weeks (running=${running})`);
+    await new Promise((r) => setTimeout(r, 60000));
   }
 }
 
