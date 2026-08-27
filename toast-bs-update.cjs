@@ -59,8 +59,9 @@ function miamiToday() {
 
 function getRelevantDates() {
   const todayStr = miamiToday();
+  const lookback = Math.max(1, Math.min(90, Number(process.env.TOAST_LOOKBACK_DAYS || 30) || 30));
   const dates = [];
-  for (let i = 13; i >= 0; i--) dates.push(shift(todayStr, -i));
+  for (let i = lookback - 1; i >= 0; i--) dates.push(shift(todayStr, -i));
   return dates;
 }
 
