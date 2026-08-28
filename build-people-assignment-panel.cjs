@@ -210,8 +210,31 @@ function main() {
     },
     needsAssignment,
     assigned: alreadyAssigned,
-    autoAssigned: autoAssigned.slice(0, 200),
+    autoAssigned: autoAssigned,
+    allPeople: [...needsAssignment, ...alreadyAssigned, ...autoAssigned]
+      .sort(sortFn)
+      .map((r) => ({
+        key: r.key,
+        displayName: r.displayName,
+        payrollName: r.payrollName,
+        primaryJob: r.primaryJob,
+        hours: r.hours,
+        venues: r.venues,
+        assignedFamily: r.assignedFamily,
+        fteFamily: r.fteFamily,
+        autoFamily: r.autoFamily,
+        status: r.status,
+      })),
   };
+
+  // Deduplicate allPeople by key (assigned list may overlap)
+  const seenAll = new Set();
+  panel.allPeople = panel.allPeople.filter((r) => {
+    if (seenAll.has(r.key)) return false;
+    seenAll.add(r.key);
+    return true;
+  });
+  panel.counts.totalUnique = panel.allPeople.length;
 
   fs.mkdirSync(FTE_DIR, { recursive: true });
   const outPath = path.join(FTE_DIR, 'people-assignment-panel.json');

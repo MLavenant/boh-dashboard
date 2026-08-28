@@ -411,14 +411,14 @@ html = html.replace(
 <div class="section-title">People — Station Assignment</div>
 <div class="card">
   <h2>Assign Line Cook / CDP / Chef de Partie to a station family</h2>
-  <p class="note">Prep Cook → Prep, Pastry Cook → Pastry, Sushi Cook → Sushi (auto). Only generic Toast titles need a station. Assignments change staff heads per family and items/staff heatmaps after you export + rebuild.</p>
+  <p class="note">Global list across <strong>all locations</strong> (not filtered by the venue pill). Prep/Pastry/Sushi auto-map; Line Cook / CDP / Chef de Partie need a station. One row per person even if they worked multiple venues.</p>
   <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
     <input id="peopleSearch" type="text" placeholder="Search name or job…" oninput="renderPeople()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;width:220px;outline:none">
     <select id="peopleFilter" onchange="renderPeople()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;outline:none">
+      <option value="all">All locations — every unique cook</option>
       <option value="needs">Needs assignment</option>
-      <option value="assigned">Assigned</option>
+      <option value="assigned">Assigned / FTE-covered</option>
       <option value="auto">Auto-mapped (Prep/Pastry/…)</option>
-      <option value="all">All food cooks</option>
     </select>
     <button type="button" onclick="exportPeopleAssignments()" style="padding:6px 14px;background:#2d3448;border:1px solid #3d4458;color:#e8eaed;border-radius:8px;font-size:13px;cursor:pointer">Export assignments</button>
     <span id="peopleCount" style="font-size:12px;color:#9aa0aa"></span>
@@ -430,6 +430,7 @@ html = html.replace(
         <tr style="background:#1e2533;text-align:left">
           <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Name</th>
           <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Toast job</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Locations</th>
           <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;text-align:right">Hours (YTD)</th>
           <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">FTE hint</th>
           <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Station family</th>
@@ -5153,15 +5154,23 @@ function renderPeople() {
   if (!body) return;
   const panel = (typeof PEOPLE_ASSIGNMENT_PANEL !== 'undefined' && PEOPLE_ASSIGNMENT_PANEL) || {};
   const families = panel.families || ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
-  const filter = (document.getElementById('peopleFilter') || {}).value || 'needs';
+  const filter = (document.getElementById('peopleFilter') || {}).value || 'all';
   const q = ((document.getElementById('peopleSearch') || {}).value || '').trim().toLowerCase();
   const assigns = mergedPeopleAssignments();
+  const venueLabels = {
+    casa_neos: 'Casa Neos', mila: 'MILA', ava_coconut_grove: 'AVA CG',
+    ava_winter_park: 'AVA WP', claudie: 'Claudie', casa_neos_lounge: 'CN Lounge',
+  };
 
+  // Always global — never filtered by the venue pill (currentVenue)
   let rows = [];
-  if (filter === 'needs' || filter === 'all') rows = rows.concat(panel.needsAssignment || []);
-  if (filter === 'assigned' || filter === 'all') rows = rows.concat(panel.assigned || []);
-  if (filter === 'auto' || filter === 'all') rows = rows.concat(panel.autoAssigned || []);
-  // de-dupe by key
+  if (filter === 'all' && Array.isArray(panel.allPeople) && panel.allPeople.length) {
+    rows = panel.allPeople.slice();
+  } else {
+    if (filter === 'needs' || filter === 'all') rows = rows.concat(panel.needsAssignment || []);
+    if (filter === 'assigned' || filter === 'all') rows = rows.concat(panel.assigned || []);
+    if (filter === 'auto' || filter === 'all') rows = rows.concat(panel.autoAssigned || []);
+  }
   const seen = new Set();
   rows = rows.filter(r => {
     if (!r || !r.key || seen.has(r.key)) return false;
@@ -5172,18 +5181,20 @@ function renderPeople() {
     rows = rows.filter(r =>
       (r.displayName || '').toLowerCase().includes(q) ||
       (r.payrollName || '').toLowerCase().includes(q) ||
-      (r.primaryJob || '').toLowerCase().includes(q)
+      (r.primaryJob || '').toLowerCase().includes(q) ||
+      Object.keys(r.venues || {}).some(v => (venueLabels[v] || v).toLowerCase().includes(q))
     );
   }
   rows.sort((a, b) => (b.hours || 0) - (a.hours || 0));
 
   if (countEl) {
+    const total = (panel.counts && panel.counts.totalUnique) || rows.length;
     const n = (panel.counts && panel.counts.needsAssignment) || (panel.needsAssignment || []).length;
-    countEl.textContent = rows.length + ' shown · ' + n + ' still need a station';
+    countEl.textContent = rows.length + ' shown · ' + total + ' unique cooks (all locations) · ' + n + ' need a station';
   }
 
   if (!rows.length) {
-    body.innerHTML = '<tr><td colspan="5" style="padding:16px;color:#9aa0aa">No people in this filter. Run <code>node build-people-assignment-panel.cjs</code> then rebuild the dashboard.</td></tr>';
+    body.innerHTML = '<tr><td colspan="6" style="padding:16px;color:#9aa0aa">No people in this filter. Run <code>node build-people-assignment-panel.cjs</code> then rebuild the dashboard.</td></tr>';
     return;
   }
 
@@ -5195,11 +5206,13 @@ function renderPeople() {
     const fte = r.fteFamily ? (r.fteFamily + (r.ftePosition ? ' (' + r.ftePosition + ')' : '')) : '—';
     const auto = r.autoFamily ? '<span style="color:#86efac">auto: ' + r.autoFamily + '</span>' : '';
     const job = r.primaryJob || Object.keys(r.jobs || {})[0] || '—';
+    const locs = Object.keys(r.venues || {}).map(v => venueLabels[v] || v).sort().join(', ') || '—';
     return '<tr style="border-bottom:1px solid #1e2533">' +
       '<td style="padding:8px 10px;color:#e8eaed">' + (r.displayName || r.payrollName || r.key) +
         (r.payrollName && r.payrollName !== r.displayName ? '<div style="font-size:11px;color:#9aa0aa">' + r.payrollName + '</div>' : '') +
       '</td>' +
       '<td style="padding:8px 10px;color:#c4c8d0">' + job + (auto ? '<div style="font-size:11px">' + auto + '</div>' : '') + '</td>' +
+      '<td style="padding:8px 10px;color:#9aa0aa;font-size:12px">' + locs + '</td>' +
       '<td style="padding:8px 10px;text-align:right;color:#e8eaed">' + (r.hours != null ? r.hours.toLocaleString() : '—') + '</td>' +
       '<td style="padding:8px 10px;color:#9aa0aa">' + fte + '</td>' +
       '<td style="padding:8px 10px"><select data-people-key="' + r.key + '" onchange="updatePeopleAssignment(this)" style="padding:4px 8px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:6px;font-size:12px;font-family:inherit">' + opts + '</select></td>' +
