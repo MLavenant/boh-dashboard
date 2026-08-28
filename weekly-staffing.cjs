@@ -95,6 +95,10 @@ function main() {
 
   log(`Week ${weekLabel} · FTE=${xlsx}`);
   run(['ingest-fte-roster.cjs', xlsx, weekLabel]);
+  // Keep weekly bank in sync when this week's Viktor export lands
+  run(['build-fte-weekly-bank.cjs', '--xlsx', xlsx, '--as-of', weekLabel, '--from', '2026-W01', '--to', weekLabel], {
+    optional: true,
+  });
 
   // Refresh guestsSeated / stationDayVolume on venue week JSON when kitchen inputs exist
   for (const venue of STAFFING_VENUES) {

@@ -29,28 +29,86 @@ const CODE_TO_VENUE = {
 
 /**
  * Viktor Ops FTE export (People tab) location label → BOH long slug.
- * MILA 2F + 3F both roll into mila. Lounge/Commissary ignored for kitchen staffing.
+ * MILA 2F + 3F both roll into mila.
+ * Claudie included for FTE bank / CDP (station staffing join may still be venue-scoped).
  */
 const LOCATION_TO_VENUE = {
   'CASA NEOS': 'casa_neos',
+  'CASA NEOS LOUNGE': 'casa_neos_lounge',
   'AVA WP': 'ava_winter_park',
   'AVA CG': 'ava_coconut_grove',
   'MILA 3F': 'mila',
   'MILA 2F': 'mila',
   MILA: 'mila',
+  CLAUDIE: 'claudie',
+  Commissary: 'commissary',
+  COMMISSARY: 'commissary',
 };
 
 /** Short alias → long slug used by venue week JSON filenames. */
 const VENUE_SLUG_ALIASES = {
   casa_neos: 'casa_neos',
+  casa_neos_lounge: 'casa_neos_lounge',
   mila: 'mila',
   ava_wp: 'ava_winter_park',
   ava_winter_park: 'ava_winter_park',
   ava_cg: 'ava_coconut_grove',
   ava_coconut_grove: 'ava_coconut_grove',
+  claudie: 'claudie',
+  commissary: 'commissary',
 };
 
+/** Venues used by station-staffing join (kitchen heatmaps). */
 const STAFFING_VENUES = ['casa_neos', 'mila', 'ava_coconut_grove', 'ava_winter_park'];
+
+/** All venues present in Viktor FTE bank (includes Claudie / lounge / commissary). */
+const FTE_BANK_VENUES = [
+  'casa_neos',
+  'casa_neos_lounge',
+  'mila',
+  'ava_coconut_grove',
+  'ava_winter_park',
+  'claudie',
+  'commissary',
+];
+
+/**
+ * ISO week Monday/Sunday (UTC date strings YYYY-MM-DD).
+ */
+function isoWeekRange(weekLabel) {
+  const m = String(weekLabel).match(/^(\d{4})-W(\d{2})$/);
+  if (!m) throw new Error(`Bad week label: ${weekLabel}`);
+  const year = +m[1];
+  const week = +m[2];
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const day = jan4.getUTCDay() || 7;
+  const monday = new Date(jan4);
+  monday.setUTCDate(jan4.getUTCDate() - day + 1 + (week - 1) * 7);
+  const sunday = new Date(monday);
+  sunday.setUTCDate(monday.getUTCDate() + 6);
+  const fmt = (d) => d.toISOString().slice(0, 10);
+  return { weekKey: weekLabel, startDate: fmt(monday), endDate: fmt(sunday) };
+}
+
+function listIsoWeeks(fromKey, toKey) {
+  const weeks = [];
+  let cur = isoWeekRange(fromKey);
+  const end = isoWeekRange(toKey);
+  for (let i = 0; i < 80; i++) {
+    weeks.push(cur);
+    if (cur.weekKey === end.weekKey) break;
+    const nextMon = new Date(cur.startDate + 'T12:00:00Z');
+    nextMon.setUTCDate(nextMon.getUTCDate() + 7);
+    const y = nextMon.getUTCFullYear();
+    const jan4 = new Date(Date.UTC(y, 0, 4));
+    const day = jan4.getUTCDay() || 7;
+    const week1Mon = new Date(jan4);
+    week1Mon.setUTCDate(jan4.getUTCDate() - day + 1);
+    const weekNum = Math.round((nextMon - week1Mon) / (7 * 86400000)) + 1;
+    cur = isoWeekRange(`${nextMon.getUTCFullYear()}-W${String(weekNum).padStart(2, '0')}`);
+  }
+  return weeks;
+}
 
 /**
  * Normalize FTE Matrix / alias → canonical food family, or null if non-food.
@@ -304,6 +362,9 @@ module.exports = {
   LOCATION_TO_VENUE,
   VENUE_SLUG_ALIASES,
   STAFFING_VENUES,
+  FTE_BANK_VENUES,
+  isoWeekRange,
+  listIsoWeeks,
   normalizeFoodFamily,
   isFoodFamily,
   resolveVenueSlug,
