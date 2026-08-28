@@ -55,8 +55,8 @@ function dayName(dateStr) {
 }
 
 async function getToken() {
-  const clientId = process.env.TOAST_CLIENT_ID;
-  const clientSecret = process.env.TOAST_API_SECRET;
+  const clientId = process.env.TOAST_CLIENT_ID || 'jsS6dB6QotBhmPsOAyBTfl0jFyhAE9ZC';
+  const clientSecret = process.env.TOAST_API_SECRET || 'nyUrcOs_cG4V4YN5f82Z-3esSdg_-mtw7BgtFi59MIypXpuRsquUqOSkHMYy8MA9';
   if (!clientId || !clientSecret) throw new Error('Missing TOAST_CLIENT_ID / TOAST_API_SECRET');
   const res = await axios.post(`${TOAST_BASE}/authentication/v1/authentication/login`, {
     clientId,
@@ -163,6 +163,9 @@ async function fetchVenue(venueRaw, weekLabel, token) {
   return outPath;
 }
 
+/** Venues targeted by one-time ticket + labor backfill (W01–W34). */
+const LABOR_BACKFILL_VENUES = ['casa_neos', 'claudie', 'ava_coconut_grove', 'mila'];
+
 async function main() {
   const arg1 = process.argv[2] || 'casa_neos';
   const weekLabel = process.argv[3] || '2026-W30';
@@ -174,10 +177,27 @@ async function main() {
     }
     return;
   }
+  if (arg1 === '--all-backfill') {
+    for (const v of LABOR_BACKFILL_VENUES) {
+      await fetchVenue(v, weekLabel, token);
+    }
+    return;
+  }
   await fetchVenue(arg1, weekLabel, token);
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  fetchVenue,
+  getToken,
+  isoWeekDates,
+  VENUE_GUIDS,
+  STAFFING_VENUES,
+  LABOR_BACKFILL_VENUES,
+};

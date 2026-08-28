@@ -1,0 +1,34 @@
+{
+  "note": "Toast job title → station family. Specific cook titles auto-map. Generic Line Cook / CDP / Chef de Partie require person-level assignment in people-station-assignments.json (People tab).",
+  "autoMap": {
+    "Prep Cook": "Prep",
+    "Prep": "Prep",
+    "Pastry Cook": "Pastry",
+    "Pastry": "Pastry",
+    "Sushi Cook": "Sushi",
+    "Sushi Prep": "Sushi",
+    "Sushi": "Sushi",
+    "Butcher": "Prep",
+    "Expo": "Expo",
+    "Food Expeditor": "Expo",
+    "Saute": "Saute",
+    "Fry": "Fry",
+    "Garde Manger": "Garde Manger",
+    "Crudo": "Raw",
+    "Raw": "Raw",
+    "Robata": "Robata",
+    "Pizza": "Pizza",
+    "Temp Pastry": "Pastry",
+    "Temp Prep": "Prep",
+    "Temp Prep Cook": "Prep"
+  },
+  "needsAssignment": [
+    "Line Cook",
+    "Temp Line Cook",
+    "CDP",
+    "Sr. CDP",
+    "Chef de Partie",
+    "Cook",
+    "Temp CDP"
+  ]
+}

@@ -28,6 +28,79 @@ const FOOD_SET = new Set(FOOD_FAMILIES);
 // Expo/Prep/Fry qty↔labor joins are often imperfect — label caution, do not invent volumes
 const WEAK_ATTR_FAMILIES = new Set(['Expo', 'Prep', 'Fry']);
 
+let _jobFamilyMap = null;
+let _peopleAssignments = null;
+
+function loadJobFamilyMap() {
+  if (_jobFamilyMap) return _jobFamilyMap;
+  const p = path.join(ROOT, 'toast-job-family-map.json');
+  _jobFamilyMap = fs.existsSync(p)
+    ? JSON.parse(fs.readFileSync(p, 'utf8'))
+    : { autoMap: {}, needsAssignment: ['Line Cook', 'CDP', 'Chef de Partie', 'Cook'] };
+  return _jobFamilyMap;
+}
+
+function loadPeopleAssignments() {
+  if (_peopleAssignments) return _peopleAssignments;
+  const p = path.join(ROOT, 'people-station-assignments.json');
+  const raw = fs.existsSync(p)
+    ? JSON.parse(fs.readFileSync(p, 'utf8'))
+    : { assignments: {} };
+  const map = new Map();
+  for (const [k, v] of Object.entries(raw.assignments || {})) {
+    const fam = normalizeFoodFamily(v) || (FOOD_SET.has(v) ? v : null);
+    if (!fam) continue;
+    map.set(String(k).trim().toLowerCase(), fam);
+    // also index by nameKey when key looks like a display name
+    const nk = nameKey(k);
+    if (nk.key) map.set(nk.key, fam);
+  }
+  _peopleAssignments = map;
+  return map;
+}
+
+/** Auto family from specific Toast jobs (Prep Cook→Prep, Pastry Cook→Pastry, …). */
+function autoFamilyFromJobs(jobs) {
+  const cfg = loadJobFamilyMap();
+  const autoMap = cfg.autoMap || {};
+  let best = null;
+  let bestRank = -1;
+  for (const job of jobs || []) {
+    const low = String(job || '').trim().toLowerCase();
+    const mapped =
+      normalizeFoodFamily(autoMap[job]) ||
+      normalizeFoodFamily(autoMap[low]) ||
+      normalizeFoodFamily(job);
+    if (!mapped || !FOOD_SET.has(mapped)) continue;
+    // Prefer explicit autoMap hits over fuzzy title normalize
+    const rank = autoMap[job] || autoMap[low] ? 2 : 1;
+    if (rank > bestRank) {
+      best = mapped;
+      bestRank = rank;
+    }
+  }
+  return best;
+}
+
+function personAssignedFamily(payrollName, employeeName) {
+  const map = loadPeopleAssignments();
+  const nk = nameKey(payrollName || employeeName);
+  if (nk.key && map.has(nk.key)) return map.get(nk.key);
+  for (const cand of [payrollName, employeeName]) {
+    if (!cand) continue;
+    const hit = map.get(String(cand).trim().toLowerCase());
+    if (hit) return hit;
+  }
+  return null;
+}
+
+function jobNeedsPersonAssignment(jobs) {
+  const needs = new Set(
+    (loadJobFamilyMap().needsAssignment || []).map((j) => String(j).trim().toLowerCase())
+  );
+  return (jobs || []).some((j) => needs.has(String(j).trim().toLowerCase()));
+}
+
 const GUARDS = {
   minHours: 4,
   minHeads: 1,
@@ -167,7 +240,12 @@ const FOOD_STATION_JOB_RE =
 function isFoodStationJobName(jobName) {
   const j = String(jobName || '');
   if (normalizeFoodFamily(j)) return true;
-  return FOOD_STATION_JOB_RE.test(j);
+  if (FOOD_STATION_JOB_RE.test(j)) return true;
+  const cfg = loadJobFamilyMap();
+  const low = j.trim().toLowerCase();
+  if ((cfg.needsAssignment || []).some((x) => String(x).toLowerCase() === low)) return true;
+  if (cfg.autoMap && (cfg.autoMap[j] || cfg.autoMap[low])) return true;
+  return false;
 }
 
 function stationToFamily(stationName, familyMap) {
@@ -504,8 +582,16 @@ function buildVenue(venueRaw, weekLabel) {
 
     const rawName = shift.payrollName || shift.employeeName;
     const nk = nameKey(applyAlias(rawName, aliases));
+    const personFamily = personAssignedFamily(shift.payrollName, shift.employeeName);
+    const autoFamily = autoFamilyFromJobs(jobs);
     const hit = bestRosterMatch(nk, rosterByKey);
-    if (!hit) {
+    // Precedence: People-tab assignment → Toast auto-map (Prep/Pastry/…) → FTE Position
+    const matrix =
+      personFamily ||
+      autoFamily ||
+      (hit ? hit.row.matrix : null);
+
+    if (!matrix || !FOOD_SET.has(matrix)) {
       unmatchedLabor.push({
         date: shift.date,
         day: shift.day,
@@ -513,21 +599,24 @@ function buildVenue(venueRaw, weekLabel) {
         payrollName: shift.payrollName,
         hours: +shift.hours.toFixed(2),
         jobs,
+        needsAssignment: jobNeedsPersonAssignment(jobs),
       });
       continue;
     }
-    usedRoster.add(hit.index);
-    const best = hit.row;
+
+    if (hit) usedRoster.add(hit.index);
+    const best = hit ? hit.row : null;
     matched.push({
       date: shift.date,
       day: shift.day,
-      employeeName: shift.employeeName || best.name,
-      rosterName: best.name,
-      matrix: best.matrix,
-      position: best.position,
+      employeeName: shift.employeeName || best?.name || rawName,
+      rosterName: best?.name || rawName,
+      matrix,
+      position: best?.position || jobs[0] || '',
       hours: +shift.hours.toFixed(2),
       jobs,
-      nameMatchScore: hit.score,
+      nameMatchScore: hit ? hit.score : null,
+      matrixSource: personFamily ? 'people_assignment' : autoFamily ? 'toast_job_auto' : 'fte_roster',
     });
   }
 

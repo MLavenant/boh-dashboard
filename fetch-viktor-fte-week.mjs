@@ -1,12 +1,13 @@
 /**
- * Weekly Viktor Ops FTE Excel export (People tab).
+ * Weekly Viktor Ops FTE Excel export (People + New hires + Terminations).
  *
- * Opens the share dashboard in Edge, clicks Export to Excel, validates the
- * People sheet + week label, saves to data/fte/RDG_FTE_Week_{NN}_summary.xlsx.
+ * Opens the share dashboard in Edge/Chrome, clicks Export to Excel, validates
+ * People / New hires / Terminations sheets + week label, saves to
+ * data/fte/RDG_FTE_Week_{NN}_summary.xlsx.
  *
  * Usage:
  *   node fetch-viktor-fte-week.mjs [2026-W34]
- *   node fetch-viktor-fte-week.mjs 2026-W34 --reuse   # skip browser if file already valid
+ *   node fetch-viktor-fte-week.mjs 2026-W34 --reuse
  *
  * Env:
  *   VIKTOR_FTE_DASHBOARD_URL  share URL with ?t=…
@@ -56,13 +57,17 @@ function outPathForWeek(weekLabel) {
 function validateWorkbook(xlsxPath, expectedWeek) {
   if (!fs.existsSync(xlsxPath)) throw new Error(`Missing workbook: ${xlsxPath}`);
   const wb = XLSX.readFile(xlsxPath);
-  if (!wb.SheetNames.includes('People')) {
-    throw new Error(`People sheet missing. Sheets: ${wb.SheetNames.join(', ')}`);
+  const required = ['People', 'New hires', 'Terminations'];
+  const missing = required.filter((s) => !wb.SheetNames.includes(s));
+  if (missing.length) {
+    throw new Error(`Missing sheets [${missing.join(', ')}]. Found: ${wb.SheetNames.join(', ')}`);
   }
   const people = XLSX.utils.sheet_to_json(wb.Sheets.People, { defval: '' });
   if (people.length < 50) {
     throw new Error(`People sheet too thin (${people.length} rows)`);
   }
+  const hires = XLSX.utils.sheet_to_json(wb.Sheets['New hires'], { defval: '' });
+  const terms = XLSX.utils.sheet_to_json(wb.Sheets.Terminations, { defval: '' });
   const { weekNum, n } = weekNumFromLabel(expectedWeek);
   let foundWeek = null;
   if (wb.Sheets.Summary) {
@@ -83,7 +88,13 @@ function validateWorkbook(xlsxPath, expectedWeek) {
       `Week mismatch: workbook week ${foundWeek} ≠ expected ${weekNum} (${expectedWeek})`
     );
   }
-  return { peopleRows: people.length, foundWeek: foundWeek || weekNum, sheets: wb.SheetNames };
+  return {
+    peopleRows: people.length,
+    hireRows: hires.length,
+    termRows: terms.length,
+    foundWeek: foundWeek || weekNum,
+    sheets: wb.SheetNames,
+  };
 }
 
 async function downloadViaPlaywright(destPath) {
@@ -96,11 +107,18 @@ async function downloadViaPlaywright(destPath) {
   const headless = process.env.VIKTOR_FTE_HEADLESS === '1';
   console.log(`Opening Viktor FTE dashboard (${headless ? 'headless' : 'headed Edge'})…`);
 
-  const browser = await chromium.launch({
-    channel: 'msedge',
-    headless,
-    slowMo: headless ? 0 : 40,
-  });
+  // Prefer Edge on Windows; fall back to Chrome / bundled Chromium in cloud.
+  let browser;
+  const launchOpts = { headless, slowMo: headless ? 0 : 40 };
+  try {
+    browser = await chromium.launch({ ...launchOpts, channel: 'msedge' });
+  } catch {
+    try {
+      browser = await chromium.launch({ ...launchOpts, channel: 'chrome' });
+    } catch {
+      browser = await chromium.launch(launchOpts);
+    }
+  }
   const context = await browser.newContext({ acceptDownloads: true });
   const page = await context.newPage();
 
@@ -145,7 +163,7 @@ async function main() {
     try {
       const meta = validateWorkbook(dest, weekLabel);
       console.log(
-        `Reusing existing ${path.basename(dest)} (${meta.peopleRows} people, week ${meta.foundWeek})`
+        `Reusing existing ${path.basename(dest)} (${meta.peopleRows} people, ${meta.hireRows} hires, ${meta.termRows} terms, week ${meta.foundWeek})`
       );
       console.log(dest);
       return;
@@ -156,7 +174,9 @@ async function main() {
 
   await downloadViaPlaywright(dest);
   const meta = validateWorkbook(dest, weekLabel);
-  console.log(`OK: ${meta.peopleRows} People rows · week ${meta.foundWeek} · sheets ${meta.sheets.join(',')}`);
+  console.log(
+    `OK: ${meta.peopleRows} People · ${meta.hireRows} New hires · ${meta.termRows} Terminations · week ${meta.foundWeek} · sheets ${meta.sheets.join(',')}`
+  );
   console.log(dest);
 }
 
