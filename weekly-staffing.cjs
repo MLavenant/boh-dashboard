@@ -99,6 +99,7 @@ function main() {
   run(['build-fte-weekly-bank.cjs', '--xlsx', xlsx, '--as-of', weekLabel, '--from', '2026-W01', '--to', weekLabel], {
     optional: true,
   });
+  run(['build-people-assignment-panel.cjs', '--from', '2026-W01', '--to', weekLabel], { optional: true });
 
   // Refresh guestsSeated / stationDayVolume on venue week JSON when kitchen inputs exist
   for (const venue of STAFFING_VENUES) {

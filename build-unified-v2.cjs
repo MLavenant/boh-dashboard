@@ -60,6 +60,20 @@ try {
   CHEF_TARGET_OVERRIDES = JSON.parse(fs.readFileSync(path.join(DIR, 'chef-target-overrides.json'), 'utf8'));
 } catch(e) { /* file not found, skip */ }
 
+let PEOPLE_ASSIGNMENT_PANEL = { needsAssignment: [], assigned: [], autoAssigned: [], families: [], counts: {} };
+try {
+  PEOPLE_ASSIGNMENT_PANEL = JSON.parse(
+    fs.readFileSync(path.join(DIR, 'data', 'fte', 'people-assignment-panel.json'), 'utf8')
+  );
+} catch(e) { /* run build-people-assignment-panel.cjs */ }
+
+let PEOPLE_STATION_ASSIGNMENTS = { assignments: {} };
+try {
+  PEOPLE_STATION_ASSIGNMENTS = JSON.parse(
+    fs.readFileSync(path.join(DIR, 'people-station-assignments.json'), 'utf8')
+  );
+} catch(e) { /* optional */ }
+
 // Pipeline health / sanity check status
 let PIPELINE_HEALTH = {};
 try {
@@ -199,11 +213,18 @@ html = html.replace(
 <div class="station-detail" id="stationDetail" style="display:none"></div>$1`
 );
 
-// Add Assignment + Group + Settings tabs to nav
-html = html.replace(
-  '<button class="tab-btn" onclick="switchTab(\'menu\',this)">Menu Items</button>\n</nav>',
-  '<button class="tab-btn" onclick="switchTab(\'menu\',this)">Menu Items</button>\n  <button class="tab-btn" onclick="switchTab(\'assignment\',this)">📋 Assignment</button>\n  <button class="tab-btn" onclick="switchTab(\'group\',this)">🏢 Group</button>\n  <button class="tab-btn" onclick="switchTab(\'settings\',this)">⚙️ Settings</button>\n</nav>'
-);
+// Add Assignment + Group + People + Settings tabs to nav
+{
+  const navRe = /(<button class="tab-btn"[^>]*>Menu Items<\/button>)(\s*)<\/nav>/;
+  if (!navRe.test(html)) {
+    console.warn('WARN: could not find Menu Items nav button to inject extra tabs');
+  } else {
+    html = html.replace(
+      navRe,
+      '$1$2  <button class="tab-btn" onclick="switchTab(\'assignment\',this)">📋 Assignment</button>\n  <button class="tab-btn" onclick="switchTab(\'group\',this)">🏢 Group</button>\n  <button class="tab-btn" onclick="switchTab(\'people\',this)">People</button>\n  <button class="tab-btn" onclick="switchTab(\'settings\',this)">⚙️ Settings</button>\n</nav>'
+    );
+  }
+}
 
 // Remove Visual 3 (Load vs Performance) — Breaking Point only on overview
 html = html.replace(
@@ -365,6 +386,41 @@ html = html.replace(
   <p class="note">Food dishes only — spirits, wine, cocktails, and coffee/tea are excluded. Highest fulfillment spread where a <strong>target</strong> exists. Matches exact names and like-to-like prefixes (CL-… / C-… / ACG-…).</p>
   <div id="groupItemVarianceTargetTable" style="overflow-x:auto"></div>
 </div>
+</div>
+</section>
+
+<!-- ========== TAB: PEOPLE (Toast Line Cook / CDP → station) ========== -->
+<section id="tab-people" class="tab-section">
+<div class="section-title">People — Station Assignment</div>
+<div class="card">
+  <h2>Assign Line Cook / CDP / Chef de Partie to a station family</h2>
+  <p class="note">Prep Cook → Prep, Pastry Cook → Pastry, Sushi Cook → Sushi (auto). Only generic Toast titles need a station. Assignments change staff heads per family and items/staff heatmaps after you export + rebuild.</p>
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+    <input id="peopleSearch" type="text" placeholder="Search name or job…" oninput="renderPeople()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;width:220px;outline:none">
+    <select id="peopleFilter" onchange="renderPeople()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;outline:none">
+      <option value="needs">Needs assignment</option>
+      <option value="assigned">Assigned</option>
+      <option value="auto">Auto-mapped (Prep/Pastry/…)</option>
+      <option value="all">All food cooks</option>
+    </select>
+    <button type="button" onclick="exportPeopleAssignments()" style="padding:6px 14px;background:#2d3448;border:1px solid #3d4458;color:#e8eaed;border-radius:8px;font-size:13px;cursor:pointer">Export assignments</button>
+    <span id="peopleCount" style="font-size:12px;color:#9aa0aa"></span>
+    <span id="peopleSaveStatus" style="font-size:12px;color:#22c55e"></span>
+  </div>
+  <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="background:#1e2533;text-align:left">
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Name</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Toast job</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;text-align:right">Hours (YTD)</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">FTE hint</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Station family</th>
+        </tr>
+      </thead>
+      <tbody id="peopleBody"></tbody>
+    </table>
+  </div>
 </div>
 </section>
 
@@ -624,7 +680,9 @@ const allDataJS = `const ALL_DATA = ${JSON.stringify(VENUES, null, 0)};
 const ITEM_TARGETS_DATA = ${JSON.stringify(ITEM_TARGETS, null, 0)};
 const ITEM_STATION_MAP_DATA = ${JSON.stringify(ITEM_STATION_MAP, null, 0)};
 const CHEF_TARGET_OVERRIDES = ${JSON.stringify(CHEF_TARGET_OVERRIDES, null, 0)};
-const PIPELINE_HEALTH_DATA = ${JSON.stringify(PIPELINE_HEALTH, null, 0)};`;
+const PIPELINE_HEALTH_DATA = ${JSON.stringify(PIPELINE_HEALTH, null, 0)};
+const PEOPLE_ASSIGNMENT_PANEL = ${JSON.stringify(PEOPLE_ASSIGNMENT_PANEL, null, 0)};
+const PEOPLE_STATION_ASSIGNMENTS = ${JSON.stringify(PEOPLE_STATION_ASSIGNMENTS, null, 0)};`;
 
 // ── Generate the new <script> block ──────────────────────────────────────────
 const newScript = `
@@ -5059,12 +5117,115 @@ function renderSettings() {
 }
 
 // ============================================================
+// TAB: PEOPLE — Line Cook / CDP → station family
+// ============================================================
+function peopleStorageKey() { return 'boh_people_station_assignments'; }
+function loadPeopleLocal() {
+  try { return JSON.parse(localStorage.getItem(peopleStorageKey()) || '{}'); } catch { return {}; }
+}
+function savePeopleLocal(map) {
+  localStorage.setItem(peopleStorageKey(), JSON.stringify(map));
+}
+function mergedPeopleAssignments() {
+  const base = (typeof PEOPLE_STATION_ASSIGNMENTS !== 'undefined' && PEOPLE_STATION_ASSIGNMENTS.assignments) || {};
+  return { ...base, ...loadPeopleLocal() };
+}
+function renderPeople() {
+  const body = document.getElementById('peopleBody');
+  const countEl = document.getElementById('peopleCount');
+  if (!body) return;
+  const panel = (typeof PEOPLE_ASSIGNMENT_PANEL !== 'undefined' && PEOPLE_ASSIGNMENT_PANEL) || {};
+  const families = panel.families || ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
+  const filter = (document.getElementById('peopleFilter') || {}).value || 'needs';
+  const q = ((document.getElementById('peopleSearch') || {}).value || '').trim().toLowerCase();
+  const assigns = mergedPeopleAssignments();
+
+  let rows = [];
+  if (filter === 'needs' || filter === 'all') rows = rows.concat(panel.needsAssignment || []);
+  if (filter === 'assigned' || filter === 'all') rows = rows.concat(panel.assigned || []);
+  if (filter === 'auto' || filter === 'all') rows = rows.concat(panel.autoAssigned || []);
+  // de-dupe by key
+  const seen = new Set();
+  rows = rows.filter(r => {
+    if (!r || !r.key || seen.has(r.key)) return false;
+    seen.add(r.key);
+    return true;
+  });
+  if (q) {
+    rows = rows.filter(r =>
+      (r.displayName || '').toLowerCase().includes(q) ||
+      (r.payrollName || '').toLowerCase().includes(q) ||
+      (r.primaryJob || '').toLowerCase().includes(q)
+    );
+  }
+  rows.sort((a, b) => (b.hours || 0) - (a.hours || 0));
+
+  if (countEl) {
+    const n = (panel.counts && panel.counts.needsAssignment) || (panel.needsAssignment || []).length;
+    countEl.textContent = rows.length + ' shown · ' + n + ' still need a station';
+  }
+
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="5" style="padding:16px;color:#9aa0aa">No people in this filter. Run <code>node build-people-assignment-panel.cjs</code> then rebuild the dashboard.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = rows.map(r => {
+    const current = assigns[r.key] || r.assignedFamily || '';
+    const opts = ['<option value="">— assign station —</option>']
+      .concat(families.map(f => '<option value="' + f + '"' + (current === f ? ' selected' : '') + '>' + f + '</option>'))
+      .join('');
+    const fte = r.fteFamily ? (r.fteFamily + (r.ftePosition ? ' (' + r.ftePosition + ')' : '')) : '—';
+    const auto = r.autoFamily ? '<span style="color:#86efac">auto: ' + r.autoFamily + '</span>' : '';
+    const job = r.primaryJob || Object.keys(r.jobs || {})[0] || '—';
+    return '<tr style="border-bottom:1px solid #1e2533">' +
+      '<td style="padding:8px 10px;color:#e8eaed">' + (r.displayName || r.payrollName || r.key) +
+        (r.payrollName && r.payrollName !== r.displayName ? '<div style="font-size:11px;color:#9aa0aa">' + r.payrollName + '</div>' : '') +
+      '</td>' +
+      '<td style="padding:8px 10px;color:#c4c8d0">' + job + (auto ? '<div style="font-size:11px">' + auto + '</div>' : '') + '</td>' +
+      '<td style="padding:8px 10px;text-align:right;color:#e8eaed">' + (r.hours != null ? r.hours.toLocaleString() : '—') + '</td>' +
+      '<td style="padding:8px 10px;color:#9aa0aa">' + fte + '</td>' +
+      '<td style="padding:8px 10px"><select data-people-key="' + r.key + '" onchange="updatePeopleAssignment(this)" style="padding:4px 8px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:6px;font-size:12px;font-family:inherit">' + opts + '</select></td>' +
+    '</tr>';
+  }).join('');
+}
+function updatePeopleAssignment(sel) {
+  const key = sel.getAttribute('data-people-key');
+  const fam = sel.value;
+  const map = loadPeopleLocal();
+  if (!fam) delete map[key];
+  else map[key] = fam;
+  savePeopleLocal(map);
+  const st = document.getElementById('peopleSaveStatus');
+  if (st) {
+    st.textContent = 'Saved in browser — Export assignments, replace people-station-assignments.json, then rebuild staffing';
+    setTimeout(() => { st.textContent = ''; }, 6000);
+  }
+}
+function exportPeopleAssignments() {
+  const merged = mergedPeopleAssignments();
+  const out = {
+    note: 'Person → station family for Line Cook / CDP / Chef de Partie. Drop into repo as people-station-assignments.json then: node build-station-staffing.cjs --all <week> (or rebuild all weeks) + node build-unified-v2.cjs',
+    updatedAt: new Date().toISOString(),
+    assignments: merged,
+  };
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'people-station-assignments.json';
+  a.click();
+  const st = document.getElementById('peopleSaveStatus');
+  if (st) st.textContent = 'Exported — replace people-station-assignments.json in repo';
+}
+
+// ============================================================
 // RENDER ALL
 // ============================================================
 function renderAll() {
   // RDG Portfolio is not a real venue week — only render Group aggregator + settings
   if (currentVenue === 'rdg_portfolio') {
     renderGroup();
+    renderPeople();
     renderSettings();
     const pageSum = document.getElementById('pageSummary');
     if (pageSum) pageSum.innerHTML = 'RDG Portfolio compares Claudie, Casa Neos, AVA Coconut Grove, AVA Winter Park, and MILA for the selected week. Pick a location pill to drill into station detail.';
@@ -5100,6 +5261,7 @@ function renderAll() {
   renderMenuItems();
   renderAssignment();
   renderGroup();
+  renderPeople();
   renderSettings();
   renderPageSummary();
   if (typeof runCrossVenueItemSearch === 'function') runCrossVenueItemSearch();
