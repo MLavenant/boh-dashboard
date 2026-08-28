@@ -41,8 +41,6 @@ const FCAST_TO = [
 ];
 const FCAST_CC = [];
 
-const VENUES = ['Casa Neos Beach Club', 'MILA Lounge', 'Casa Neos Lounge'];
-
 function log(msg) {
   console.log(`[forecast-email ${new Date().toISOString()}] ${msg}`);
 }
@@ -114,76 +112,20 @@ function fbGet(fbPath) {
   });
 }
 
-function venueShortFile(v) {
-  if (/Beach Club/i.test(v)) return 'Casa-Neos-BC';
-  if (/Casa Neos Lounge/i.test(v)) return 'Casa-Neos-Lounge';
-  if (/MILA/i.test(v)) return 'MILA-Lounge';
-  return String(v || 'Venue').replace(/\s+/g, '-');
-}
-
-function isoWeekNum(d = new Date()) {
-  const key = (() => {
-    try {
-      /* Match dashboard getISOWeek if available later; fallback ISO. */
-      const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-      const dayNum = t.getUTCDay() || 7;
-      t.setUTCDate(t.getUTCDate() + 4 - dayNum);
-      const yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
-      return Math.ceil((((t - yearStart) / 86400000) + 1) / 7);
-    } catch (_) { return ''; }
-  })();
-  return String(key);
-}
-
-/** Minimal PDF: one JPEG image per page (Letter landscape). */
-function buildPdfFromJpegs(jpegBuffers, pageW, pageH) {
-  const chunks = [];
-  function add(strOrBuf) {
-    if (Buffer.isBuffer(strOrBuf)) chunks.push(strOrBuf);
-    else chunks.push(Buffer.from(String(strOrBuf), 'utf8'));
-  }
-  const objStarts = [];
-  function startObj(n) {
-    objStarts[n] = Buffer.concat(chunks).length;
-  }
-
-  add('%PDF-1.4\n');
-  startObj(1);
-  add('1 0 obj<< /Type /Catalog /Pages 2 0 R >>endobj\n');
-
-  const pageIds = jpegBuffers.map((_, i) => 10 + i * 3);
-  startObj(2);
-  add(`2 0 obj<< /Type /Pages /Kids [ ${pageIds.map(id => id + ' 0 R').join(' ')} ] /Count ${jpegBuffers.length} >>endobj\n`);
-
-  jpegBuffers.forEach((buf, i) => {
-    const pageId = 10 + i * 3;
-    const imgId = pageId + 1;
-    const contentId = pageId + 2;
-    const content = `q ${pageW - 36} 0 0 ${pageH - 36} 18 18 cm /Im${i} Do Q\n`;
-
-    startObj(pageId);
-    add(`${pageId} 0 obj<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /XObject << /Im${i} ${imgId} 0 R >> >> /Contents ${contentId} 0 R >>endobj\n`);
-
-    startObj(imgId);
-    add(`${imgId} 0 obj<< /Type /XObject /Subtype /Image /Width 1600 /Height 1000 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${buf.length} >>stream\n`);
-    add(buf);
-    add('\nendstream\nendobj\n');
-
-    startObj(contentId);
-    add(`${contentId} 0 obj<< /Length ${Buffer.byteLength(content)} >>stream\n${content}endstream\nendobj\n`);
+/** Outlook cannot resolve cid: — embed JPEG data URIs in the HTML body. */
+function htmlWithEmbeddedSnaps(html, results) {
+  let out = String(html || '');
+  (results || []).forEach(r => {
+    if (!r || !r.cid || !r.snapB64) return;
+    out = out.split('cid:' + r.cid).join('data:image/jpeg;base64,' + r.snapB64);
   });
-
-  const xrefAt = Buffer.concat(chunks).length;
-  const maxObj = 10 + jpegBuffers.length * 3 - 1;
-  add(`xref\n0 ${maxObj + 1}\n`);
-  add('0000000000 65535 f \n');
-  for (let n = 1; n <= maxObj; n++) {
-    const off = objStarts[n];
-    if (off == null) add('0000000000 65535 f \n');
-    else add(String(off).padStart(10, '0') + ' 00000 n \n');
+  if (!/TEST send/i.test(out)) {
+    out = out.replace(
+      /<\/div>\s*$/,
+      '<p style="margin-top:8px;font-size:11px;color:#8e8e93">Sent automatically after FourVenues Forecast BS Actual refreshed for today. <b>TEST send — Matthias only.</b></p></div>'
+    );
   }
-  add(`trailer<< /Size ${maxObj + 1} /Root 1 0 R >>\nstartxref\n${xrefAt}\n%%EOF\n`);
-  return Buffer.concat(chunks);
+  return out;
 }
 
 async function passSessionGate(page) {
@@ -214,94 +156,50 @@ async function ensureSessionUnlocked(page) {
   await page.waitForTimeout(1500);
 }
 
-async function captureVenuePack(page, venue, weekNum, vi) {
-  await page.evaluate((v) => {
-    curV = v;
-    if (typeof buildVenTabs === 'function') buildVenTabs();
-    if (typeof updateTopbarLogo === 'function') updateTopbarLogo(curV);
-    if (typeof setView === 'function') setView('forecast');
-    else if (typeof renderForecast === 'function') renderForecast();
-    document.body.classList.add('printing-forecast');
-  }, venue);
-
-  await page.waitForSelector('#view-forecast .fcast-print-page1', { timeout: 30000, state: 'visible' });
-  /* Must not screenshot the name gate / empty shell. */
-  await page.waitForFunction(() => {
-    if (document.body.classList.contains('session-locked')) return false;
-    const gate = document.getElementById('sessionGate');
-    if (gate && !gate.classList.contains('hidden')) return false;
-    const p1 = document.querySelector('#view-forecast .fcast-print-page1');
-    return !!(p1 && p1.offsetHeight > 120);
-  }, { timeout: 30000 });
-  await page.waitForTimeout(800);
-
-  const p1 = page.locator('#view-forecast .fcast-print-page1');
-  const p2 = page.locator('#view-forecast .fcast-print-page2');
-  const snap1 = await p1.screenshot({ type: 'jpeg', quality: 92 });
-  const snap2 = await p2.screenshot({ type: 'jpeg', quality: 92 });
-
-  await page.evaluate(() => document.body.classList.remove('printing-forecast'));
-
-  const short = venueShortFile(venue);
-  const pdfName = `RDG-Booking-Performance-${short}-W${weekNum}.pdf`;
-  const pdfBuf = buildPdfFromJpegs([snap1, snap2], 792, 612);
-  return {
-    venue,
-    short,
-    pdfName,
-    pdfB64: pdfBuf.toString('base64'),
-    snapB64: Buffer.from(snap1).toString('base64'),
-    cid: `snap${vi}@rdg`
-  };
-}
-
+/**
+ * Drive the same path as Forecast → "Send all emails" (prepareForecastFlashEmail /
+ * _buildForecastFlashEmailPack): html2canvas page1+page2, jsPDF PDFs, HTML body.
+ */
 async function captureAllVenues() {
-  const weekNum = isoWeekNum(new Date());
   const browser = await chromium.launch({ headless: true });
   try {
     const page = await browser.newPage({ viewport: { width: 1400, height: 1100 } });
+    page.setDefaultTimeout(300000);
     await passSessionGate(page);
-    log(`Opening ${DASH_URL}`);
-    await page.goto(DASH_URL, { waitUntil: 'domcontentloaded', timeout: 90000 });
+    const sep = DASH_URL.includes('?') ? '&' : '?';
+    const url = `${DASH_URL}${sep}_auto=1&t=${Date.now()}`;
+    log(`Opening ${url}`);
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
     await ensureSessionUnlocked(page);
     await page.waitForFunction(() => {
-      return !!(window._fbReady || window._forecastLive || document.querySelector('#view-forecast .fcast-print-page1'));
-    }, { timeout: 90000 });
+      return typeof window._buildForecastFlashEmailPack === 'function'
+        && !!(window._fbReady || window._forecastLive);
+    }, { timeout: 120000 });
     await page.waitForTimeout(2500);
-
-    await page.evaluate(() => {
-      if (typeof setView === 'function') setView('forecast');
-    });
-    await page.waitForSelector('#view-forecast', { timeout: 30000 });
     await ensureSessionUnlocked(page);
 
-    const results = [];
-    for (let i = 0; i < VENUES.length; i++) {
-      log(`Capture ${VENUES[i]}…`);
-      results.push(await captureVenuePack(page, VENUES[i], weekNum, i));
+    log('Running dashboard Send-all-emails pack (_buildForecastFlashEmailPack)…');
+    const pack = await page.evaluate(async (opts) => {
+      if (typeof window._buildForecastFlashEmailPack !== 'function') {
+        throw new Error('_buildForecastFlashEmailPack missing — deploy dashboard with Send-all API');
+      }
+      return await window._buildForecastFlashEmailPack(opts);
+    }, { to: FCAST_TO, cc: FCAST_CC });
+
+    if (!pack || !Array.isArray(pack.results) || pack.results.length < 3) {
+      const n = pack && pack.results ? pack.results.length : 0;
+      throw new Error(`Incomplete forecast pack from Send-all path (${n} venues)`);
     }
-    return { results, weekNum };
+    for (const r of pack.results) {
+      if (!r.snapB64 || !r.pdfB64) {
+        throw new Error(`Missing snap/PDF for ${r.venue || '?'}`);
+      }
+    }
+    log(`Pack ready: ${pack.results.map(r => r.short || r.venue).join(', ')}`);
+    return pack;
   } finally {
     await browser.close();
   }
-}
-
-function buildHtmlBody(results, todayLabel, { embedDataUri = false } = {}) {
-  let html = '<div style="font-family:Segoe UI,Arial,sans-serif;font-size:14px;color:#1c1c1e;line-height:1.5">';
-  html += '<p>Hi team,</p>';
-  html += `<p>Please find below our booking performance as of <b>${todayLabel}</b>.</p>`;
-  results.forEach(r => {
-    html += `<div style="margin:18px 0 8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#48484a">${r.venue}</div>`;
-    if (embedDataUri) {
-      html += `<img src="data:image/jpeg;base64,${r.snapB64}" alt="${r.venue} booking performance" style="max-width:100%;border:1px solid #e5e5ea;border-radius:8px;display:block"/>`;
-    } else {
-      html += `<img src="cid:${r.cid}" alt="${r.venue} booking performance" style="max-width:100%;border:1px solid #e5e5ea;border-radius:8px;display:block"/>`;
-    }
-  });
-  html += '<p style="margin-top:18px;font-size:12px;color:#8e8e93">PDFs attached for each location (page 1 = Actual vs Target + Details; page 2 = Pick up pace).</p>';
-  html += '<p style="margin-top:8px;font-size:11px;color:#8e8e93">Sent automatically after FourVenues Forecast BS Actual refreshed for today. <b>TEST send — Matthias only.</b></p>';
-  html += '</div>';
-  return html;
 }
 
 function outlookSend({ to, cc, subject, htmlBody, attachmentPaths, alertOnly }) {
@@ -342,15 +240,13 @@ async function sendViaGraph(opts) {
 }
 
 async function sendFlashEmail(pack) {
-  const d = new Date();
-  const todayLabel = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
-  const subject = `DJ Booking Performance Flash : Week ${pack.weekNum}`;
+  const subject = pack.subject || `DJ Booking Performance Flash : Week ${pack.weekNum}`;
+  const baseHtml = pack.htmlBody || '';
 
   if (VIA === 'outlook') {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rdg-fcast-'));
     const htmlPath = path.join(tmp, 'body.html');
-    const htmlBody = buildHtmlBody(pack.results, todayLabel, { embedDataUri: true });
-    fs.writeFileSync(htmlPath, htmlBody, 'utf8');
+    fs.writeFileSync(htmlPath, htmlWithEmbeddedSnaps(baseHtml, pack.results), 'utf8');
     const attachmentPaths = [];
     pack.results.forEach(r => {
       const pdfPath = path.join(tmp, r.pdfName);
@@ -368,7 +264,13 @@ async function sendFlashEmail(pack) {
     return subject;
   }
 
-  const htmlBody = buildHtmlBody(pack.results, todayLabel, { embedDataUri: false });
+  let htmlBody = baseHtml;
+  if (!/TEST send/i.test(htmlBody)) {
+    htmlBody = htmlBody.replace(
+      /<\/div>\s*$/,
+      '<p style="margin-top:8px;font-size:11px;color:#8e8e93">Sent automatically after FourVenues Forecast BS Actual refreshed for today. <b>TEST send — Matthias only.</b></p></div>'
+    );
+  }
   const attachments = [];
   pack.results.forEach(r => {
     attachments.push({
