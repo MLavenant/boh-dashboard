@@ -411,7 +411,11 @@ function resolveAttempt(et) {
       }
     }
   }
-  const fvOkNow = !!(fv && fv.ok === true && fv.miamiDay === day);
+  let fvOkNow = !!(fv && fv.ok === true && fv.miamiDay === day);
+  if (!fvOkNow && String(process.env.FORECAST_EMAIL_FORCE || '').trim() === '1') {
+    log('FORECAST_EMAIL_FORCE=1 — skipping FourVenues gate for test send');
+    fvOkNow = true;
+  }
   log(`FourVenues after wait ok=${fvOkNow}`);
 
   if (!fvOkNow) {
