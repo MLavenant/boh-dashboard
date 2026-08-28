@@ -31,6 +31,16 @@ if (!rollingWeeks.length) {
 }
 if (!rollingWeeks.length) rollingWeeks = [{ label: 'W27', key: '2026-W27' }];
 
+// GitHub Pages cannot host a 100MB+ dashboard.html. Cap embedded weeks
+// (older weeks still load from Firebase when available). Override with BOH_EMBED_MAX_WEEKS.
+{
+  const maxEmbed = Number(process.env.BOH_EMBED_MAX_WEEKS || 8);
+  if (maxEmbed > 0 && rollingWeeks.length > maxEmbed) {
+    rollingWeeks = rollingWeeks.slice(-maxEmbed);
+    console.log(`Embedding last ${rollingWeeks.length} weeks in Pages shell (${rollingWeeks[0].key} → ${rollingWeeks[rollingWeeks.length - 1].key})`);
+  }
+}
+
 const DIR = __dirname;
 
 // ── Load all data files (nested by venue → weekKey) ──────────────────────────
@@ -62,9 +72,16 @@ try {
 
 let PEOPLE_ASSIGNMENT_PANEL = { needsAssignment: [], assigned: [], autoAssigned: [], families: [], counts: {} };
 try {
-  PEOPLE_ASSIGNMENT_PANEL = JSON.parse(
-    fs.readFileSync(path.join(DIR, 'data', 'fte', 'people-assignment-panel.json'), 'utf8')
-  );
+  const panelCandidates = [
+    path.join(DIR, 'people-assignment-panel.json'),
+    path.join(DIR, 'data', 'fte', 'people-assignment-panel.json'),
+  ];
+  for (const p of panelCandidates) {
+    if (fs.existsSync(p)) {
+      PEOPLE_ASSIGNMENT_PANEL = JSON.parse(fs.readFileSync(p, 'utf8'));
+      break;
+    }
+  }
 } catch(e) { /* run build-people-assignment-panel.cjs */ }
 
 let PEOPLE_STATION_ASSIGNMENTS = { assignments: {} };

@@ -1,0 +1,6518 @@
+{
+  "generatedAt": "2026-08-28T16:48:30.682Z",
+  "from": "2026-W01",
+  "to": "2026-W34",
+  "families": [
+    "Saute",
+    "Fry",
+    "Garde Manger",
+    "Raw",
+    "Sushi",
+    "Robata",
+    "Pastry",
+    "Expo",
+    "Pizza",
+    "Prep"
+  ],
+  "staffingVenues": [
+    "casa_neos",
+    "mila",
+    "ava_coconut_grove",
+    "ava_winter_park"
+  ],
+  "needsAssignmentJobs": [
+    "Line Cook",
+    "Temp Line Cook",
+    "CDP",
+    "Sr. CDP",
+    "Chef de Partie",
+    "Cook",
+    "Temp CDP"
+  ],
+  "autoMap": {
+    "Prep Cook": "Prep",
+    "Prep": "Prep",
+    "Pastry Cook": "Pastry",
+    "Pastry": "Pastry",
+    "Sushi Cook": "Sushi",
+    "Sushi Prep": "Sushi",
+    "Sushi": "Sushi",
+    "Butcher": "Prep",
+    "Expo": "Expo",
+    "Food Expeditor": "Expo",
+    "Saute": "Saute",
+    "Fry": "Fry",
+    "Garde Manger": "Garde Manger",
+    "Crudo": "Raw",
+    "Raw": "Raw",
+    "Robata": "Robata",
+    "Pizza": "Pizza",
+    "Temp Pastry": "Pastry",
+    "Temp Prep": "Prep",
+    "Temp Prep Cook": "Prep"
+  },
+  "counts": {
+    "needsAssignment": 127,
+    "assigned": 57,
+    "auto": 137
+  },
+  "needsAssignment": [
+    {
+      "key": "karla mejia",
+      "displayName": "Karla Mejia",
+      "payrollName": "Mejia, Karla",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1859.9449999999997
+      },
+      "hours": 1859.9,
+      "shiftCount": 188,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1859.9449999999997
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "antoni esquivel lopez",
+      "displayName": "Antoni Lopez Esquivel",
+      "payrollName": "Lopez Esquivel, Antoni",
+      "primaryJob": "Sr. CDP",
+      "jobs": {
+        "Sr. CDP": 1632.2489999999993
+      },
+      "hours": 1632.2,
+      "shiftCount": 166,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1632.2489999999993
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "hernandez roberto",
+      "displayName": "Roberto Hernandez",
+      "payrollName": "Hernandez, Roberto",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1618.0870000000011
+      },
+      "hours": 1618.1,
+      "shiftCount": 171,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1618.0870000000011
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "adan herrera jose lopez",
+      "displayName": "jose adan herrera lopez",
+      "payrollName": "herrera lopez, jose adan",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1557.563000000002
+      },
+      "hours": 1557.6,
+      "shiftCount": 170,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1557.563000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "pedro pirela",
+      "displayName": "Pedro Pirela",
+      "payrollName": "Pirela, Pedro",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1453.0249999999992
+      },
+      "hours": 1453,
+      "shiftCount": 150,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1453.0249999999992
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "luis pasten",
+      "displayName": "Luis Pasten",
+      "payrollName": "Pasten, Luis",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1446.9509999999996
+      },
+      "hours": 1447,
+      "shiftCount": 164,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1446.9509999999996
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "bonilla yaniri",
+      "displayName": "Yaniri Bonilla",
+      "payrollName": "Bonilla, Yaniri",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1435.3159999999993
+      },
+      "hours": 1435.3,
+      "shiftCount": 170,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1435.3159999999993
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "maria villarraga",
+      "displayName": "Maria Villarraga",
+      "payrollName": "Villarraga, Maria",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1395.8399999999995
+      },
+      "hours": 1395.8,
+      "shiftCount": 168,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1395.8399999999995
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "de la pablo rosa",
+      "displayName": "Pablo De La Rosa",
+      "payrollName": "De La Rosa, Pablo",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1350.9410000000003
+      },
+      "hours": 1350.9,
+      "shiftCount": 162,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1350.9410000000003
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "foster sherie",
+      "displayName": "Sherie Foster",
+      "payrollName": "Foster, Sherie",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1348.0640000000005
+      },
+      "hours": 1348.1,
+      "shiftCount": 166,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1348.0640000000005
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "erin gonzalez",
+      "displayName": "Erin Gonzalez",
+      "payrollName": "Gonzalez, Erin",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1342.3930000000003
+      },
+      "hours": 1342.4,
+      "shiftCount": 165,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1342.3930000000003
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "elder sanchez toruno",
+      "displayName": "Elder Sanchez Toruno",
+      "payrollName": "Sanchez Toruno, Elder",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1315.2399999999993
+      },
+      "hours": 1315.2,
+      "shiftCount": 150,
+      "weekCount": 32,
+      "venues": {
+        "ava_coconut_grove": 1315.2399999999993
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "fernando flores",
+      "displayName": "Fernando Flores",
+      "payrollName": "Flores, Fernando",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1289.0070000000005
+      },
+      "hours": 1289,
+      "shiftCount": 148,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1289.0070000000005
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "cegarra jessica",
+      "displayName": "Jessica Cegarra",
+      "payrollName": "Cegarra, Jessica",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1266.87
+      },
+      "hours": 1266.9,
+      "shiftCount": 134,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 1266.87
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "juan velasquez",
+      "displayName": "Juan Velasquez",
+      "payrollName": "Velasquez, Juan",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1242.931999999999
+      },
+      "hours": 1242.9,
+      "shiftCount": 145,
+      "weekCount": 31,
+      "venues": {
+        "mila": 1242.931999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "eliezer osorio",
+      "displayName": "Eliezer Osorio",
+      "payrollName": "Osorio, Eliezer",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1158.6490000000003
+      },
+      "hours": 1158.6,
+      "shiftCount": 157,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1158.6490000000003
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "garcia miladys",
+      "displayName": "Miladys Garcia",
+      "payrollName": "Garcia, Miladys",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1115.13
+      },
+      "hours": 1115.1,
+      "shiftCount": 133,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 1115.13
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "fernandez kenny",
+      "displayName": "Kenny Fernandez",
+      "payrollName": "Fernandez, Kenny",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1099.2099999999998
+      },
+      "hours": 1099.2,
+      "shiftCount": 110,
+      "weekCount": 25,
+      "venues": {
+        "casa_neos": 1099.2099999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "alessandro morelli",
+      "displayName": "Alessandro Morelli",
+      "payrollName": "Morelli, Alessandro",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1085.72
+      },
+      "hours": 1085.7,
+      "shiftCount": 126,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 1085.72
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "kevin ruiz yesca",
+      "displayName": "Kevin Ruiz Yesca",
+      "payrollName": "Ruiz Yesca, Kevin",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1074.1019999999999
+      },
+      "hours": 1074.1,
+      "shiftCount": 138,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1074.1019999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "meiklejohn perry",
+      "displayName": "Perry Meiklejohn",
+      "payrollName": "Meiklejohn, Perry",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1064.6599999999999
+      },
+      "hours": 1064.7,
+      "shiftCount": 133,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 1064.6599999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "murcia yonathan",
+      "displayName": "Yonathan Murcia",
+      "payrollName": "Murcia, Yonathan",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 998.4609999999998
+      },
+      "hours": 998.5,
+      "shiftCount": 121,
+      "weekCount": 23,
+      "venues": {
+        "casa_neos": 998.4609999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "foster ignacio",
+      "displayName": "Ignacio Foster",
+      "payrollName": "Foster, Ignacio",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 952.858
+      },
+      "hours": 952.9,
+      "shiftCount": 118,
+      "weekCount": 24,
+      "venues": {
+        "casa_neos": 952.858
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "jordan rojas",
+      "displayName": "Jordan Rojas",
+      "payrollName": "Rojas, Jordan",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 925.0089999999994
+      },
+      "hours": 925,
+      "shiftCount": 114,
+      "weekCount": 22,
+      "venues": {
+        "casa_neos": 925.0089999999994
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "christopher summerset",
+      "displayName": "Christopher Summerset",
+      "payrollName": "Summerset, Christopher",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 585.1300000000001,
+        "Line Cook": 322.2699999999999
+      },
+      "hours": 907.4,
+      "shiftCount": 107,
+      "weekCount": 23,
+      "venues": {
+        "claudie": 907.4
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "kiliddjian patrick",
+      "displayName": "Patrick Kiliddjian",
+      "payrollName": "Kiliddjian, Patrick",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 875.4800000000001
+      },
+      "hours": 875.5,
+      "shiftCount": 94,
+      "weekCount": 22,
+      "venues": {
+        "ava_coconut_grove": 875.4800000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "erick rivera",
+      "displayName": "Erick Rivera",
+      "payrollName": "Rivera, Erick",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 844.5450000000002
+      },
+      "hours": 844.5,
+      "shiftCount": 103,
+      "weekCount": 24,
+      "venues": {
+        "casa_neos": 844.5450000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "barrientos mauricio",
+      "displayName": "Mauricio Barrientos",
+      "payrollName": "Barrientos, Mauricio",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 841.1400000000001
+      },
+      "hours": 841.1,
+      "shiftCount": 98,
+      "weekCount": 22,
+      "venues": {
+        "mila": 841.1400000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "cifuentes sanchez santiago",
+      "displayName": "Santiago Cifuentes Sanchez",
+      "payrollName": "Cifuentes Sanchez, Santiago",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 836.4199999999998
+      },
+      "hours": 836.4,
+      "shiftCount": 112,
+      "weekCount": 25,
+      "venues": {
+        "claudie": 836.4199999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "asik muhammet",
+      "displayName": "Muhammet Asik",
+      "payrollName": "Asik, Muhammet",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 812.9600000000002
+      },
+      "hours": 813,
+      "shiftCount": 101,
+      "weekCount": 23,
+      "venues": {
+        "claudie": 812.9600000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "boyer julice",
+      "displayName": "Julice Boyer",
+      "payrollName": "Boyer, Julice",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 812.0340000000006
+      },
+      "hours": 812,
+      "shiftCount": 97,
+      "weekCount": 21,
+      "venues": {
+        "mila": 812.0340000000006
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "deadwyler dominique",
+      "displayName": "Dominique Deadwyler",
+      "payrollName": "Deadwyler, Dominique",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 513.9399999999998,
+        "Line Cook": 274.11000000000007
+      },
+      "hours": 788,
+      "shiftCount": 105,
+      "weekCount": 24,
+      "venues": {
+        "claudie": 788.05
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "chacon josset",
+      "displayName": "Josset Chacon",
+      "payrollName": "Chacon, Josset",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 773.7419999999997
+      },
+      "hours": 773.7,
+      "shiftCount": 76,
+      "weekCount": 17,
+      "venues": {
+        "casa_neos": 773.7419999999997
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "rodriguez steven",
+      "displayName": "Steven Rodriguez",
+      "payrollName": "Rodriguez, Steven",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 772.1399999999996
+      },
+      "hours": 772.1,
+      "shiftCount": 87,
+      "weekCount": 20,
+      "venues": {
+        "ava_coconut_grove": 772.1399999999996
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "mackey steven",
+      "displayName": "Steven Mackey",
+      "payrollName": "Mackey, Steven",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 745.8799999999998,
+        "Line Cook": 23
+      },
+      "hours": 768.9,
+      "shiftCount": 88,
+      "weekCount": 18,
+      "venues": {
+        "ava_coconut_grove": 745.8799999999998,
+        "claudie": 23
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "hernandez pedro",
+      "displayName": "Pedro Hernandez",
+      "payrollName": "Hernandez, Pedro",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 756.9559999999999
+      },
+      "hours": 757,
+      "shiftCount": 81,
+      "weekCount": 17,
+      "venues": {
+        "casa_neos": 756.9559999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "buitron jose valles",
+      "displayName": "Jose Buitron Valles",
+      "payrollName": "Buitron Valles, Jose",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 739.0210000000001
+      },
+      "hours": 739,
+      "shiftCount": 84,
+      "weekCount": 17,
+      "venues": {
+        "casa_neos": 739.0210000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "forero sebastian",
+      "displayName": "Sebastian Forero",
+      "payrollName": "Forero, Sebastian",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 712.9399999999999
+      },
+      "hours": 712.9,
+      "shiftCount": 78,
+      "weekCount": 17,
+      "venues": {
+        "ava_coconut_grove": 712.9399999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "chavan rutuja",
+      "displayName": "Rutuja Chavan",
+      "payrollName": "Chavan, Rutuja",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 702.0000000000001
+      },
+      "hours": 702,
+      "shiftCount": 75,
+      "weekCount": 15,
+      "venues": {
+        "claudie": 702.0000000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "gustavo rondon",
+      "displayName": "Gustavo Rondon",
+      "payrollName": "Rondon, Gustavo",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 698.49
+      },
+      "hours": 698.5,
+      "shiftCount": 81,
+      "weekCount": 17,
+      "venues": {
+        "claudie": 698.49
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "cass smith",
+      "displayName": "Cass Smith",
+      "payrollName": "Smith, Cass",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 684.2699999999998
+      },
+      "hours": 684.3,
+      "shiftCount": 84,
+      "weekCount": 26,
+      "venues": {
+        "casa_neos": 670.2699999999999,
+        "mila": 14
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "borge seleny",
+      "displayName": "Seleny Borge",
+      "payrollName": "Borge, Seleny",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 682.814
+      },
+      "hours": 682.8,
+      "shiftCount": 85,
+      "weekCount": 18,
+      "venues": {
+        "casa_neos": 682.814
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "jordan maritza vera",
+      "displayName": "Maritza Vera Jordan",
+      "payrollName": "Vera Jordan, Maritza",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 659.7500000000001
+      },
+      "hours": 659.8,
+      "shiftCount": 86,
+      "weekCount": 18,
+      "venues": {
+        "ava_coconut_grove": 659.7500000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "karen osorio",
+      "displayName": "Karen Osorio",
+      "payrollName": "Osorio, Karen",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 641.8899999999999
+      },
+      "hours": 641.9,
+      "shiftCount": 77,
+      "weekCount": 18,
+      "venues": {
+        "mila": 641.8899999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "christian quintana torres",
+      "displayName": "Christian Torres Quintana",
+      "payrollName": "Torres Quintana, Christian",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 623.4719999999996
+      },
+      "hours": 623.5,
+      "shiftCount": 68,
+      "weekCount": 16,
+      "venues": {
+        "casa_neos": 623.4719999999996
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "alexis carmona isabel",
+      "displayName": "Alexis Isabel Carmona",
+      "payrollName": "Carmona, Alexis Isabel",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 610.8000000000002
+      },
+      "hours": 610.8,
+      "shiftCount": 62,
+      "weekCount": 14,
+      "venues": {
+        "claudie": 610.8000000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "lezama naasson",
+      "displayName": "Naasson Lezama",
+      "payrollName": "Lezama, Naasson",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 609.6189999999998
+      },
+      "hours": 609.6,
+      "shiftCount": 67,
+      "weekCount": 14,
+      "venues": {
+        "mila": 609.6189999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "nicholas suarez",
+      "displayName": "Nicholas Suarez",
+      "payrollName": "Suarez, Nicholas",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 573.64
+      },
+      "hours": 573.6,
+      "shiftCount": 75,
+      "weekCount": 18,
+      "venues": {
+        "ava_coconut_grove": 573.64
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "caceres juan",
+      "displayName": "Juan Caceres",
+      "payrollName": "Caceres, Juan",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 546.8770000000002
+      },
+      "hours": 546.9,
+      "shiftCount": 68,
+      "weekCount": 14,
+      "venues": {
+        "mila": 546.8770000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "few travell",
+      "displayName": "Travell Few",
+      "payrollName": "Few, Travell",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 538.2780000000002
+      },
+      "hours": 538.3,
+      "shiftCount": 79,
+      "weekCount": 17,
+      "venues": {
+        "mila": 53.077999999999996,
+        "claudie": 485.2000000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "albert axel emile montfort montfort",
+      "displayName": "Axel Albert Emile Montfort Montfort",
+      "payrollName": "Montfort, Axel Albert Emile Montfort",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 523.4799999999999
+      },
+      "hours": 523.5,
+      "shiftCount": 59,
+      "weekCount": 19,
+      "venues": {
+        "claudie": 523.4799999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "khalid zamani",
+      "displayName": "Khalid Zamani",
+      "payrollName": "Zamani, Khalid",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 502.95
+      },
+      "hours": 502.9,
+      "shiftCount": 67,
+      "weekCount": 15,
+      "venues": {
+        "claudie": 502.95
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "calero jose",
+      "displayName": "Jose Calero",
+      "payrollName": "Calero, Jose",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 486.59000000000003
+      },
+      "hours": 486.6,
+      "shiftCount": 57,
+      "weekCount": 13,
+      "venues": {
+        "casa_neos": 486.59000000000003
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "guzman keiber",
+      "displayName": "Keiber Guzman",
+      "payrollName": "Guzman, Keiber",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 479.8460000000001
+      },
+      "hours": 479.8,
+      "shiftCount": 57,
+      "weekCount": 12,
+      "venues": {
+        "casa_neos": 479.8460000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "cuadra johny lopez",
+      "displayName": "Johny Lopez Cuadra",
+      "payrollName": "Lopez Cuadra, Johny",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 479.0199999999999
+      },
+      "hours": 479,
+      "shiftCount": 54,
+      "weekCount": 12,
+      "venues": {
+        "casa_neos": 479.0199999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "duchyss hunt",
+      "displayName": "Duchyss Hunt",
+      "payrollName": "Hunt, Duchyss",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 458.31999999999994
+      },
+      "hours": 458.3,
+      "shiftCount": 57,
+      "weekCount": 12,
+      "venues": {
+        "ava_coconut_grove": 458.31999999999994
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "ortega rafael ruiloba",
+      "displayName": "Rafael Ortega Ruiloba",
+      "payrollName": "Ortega Ruiloba, Rafael",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 446.81
+      },
+      "hours": 446.8,
+      "shiftCount": 55,
+      "weekCount": 13,
+      "venues": {
+        "ava_coconut_grove": 446.81
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "marco raynell",
+      "displayName": "Raynell Marco",
+      "payrollName": "Marco, Raynell",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 434.70000000000005
+      },
+      "hours": 434.7,
+      "shiftCount": 50,
+      "weekCount": 11,
+      "venues": {
+        "ava_coconut_grove": 434.70000000000005
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "micaela parodi",
+      "displayName": "Micaela Parodi",
+      "payrollName": "Parodi, Micaela",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 432.5699999999998
+      },
+      "hours": 432.6,
+      "shiftCount": 49,
+      "weekCount": 10,
+      "venues": {
+        "ava_coconut_grove": 432.5699999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "mcdonald shaneaka",
+      "displayName": "Shaneaka McDonald",
+      "payrollName": "McDonald, Shaneaka",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 428.22
+      },
+      "hours": 428.2,
+      "shiftCount": 60,
+      "weekCount": 15,
+      "venues": {
+        "claudie": 428.22
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "dogukan kocamangil",
+      "displayName": "Dogukan Kocamangil",
+      "payrollName": "Kocamangil, Dogukan",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 420.45
+      },
+      "hours": 420.4,
+      "shiftCount": 46,
+      "weekCount": 10,
+      "venues": {
+        "claudie": 420.45
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "munoz walter",
+      "displayName": "Walter Munoz",
+      "payrollName": "Munoz, Walter",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 417.12
+      },
+      "hours": 417.1,
+      "shiftCount": 54,
+      "weekCount": 14,
+      "venues": {
+        "claudie": 417.12
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "ocampo vladimir",
+      "displayName": "Vladimir Ocampo",
+      "payrollName": "Ocampo, Vladimir",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 409.8399999999999
+      },
+      "hours": 409.8,
+      "shiftCount": 55,
+      "weekCount": 12,
+      "venues": {
+        "claudie": 409.8399999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "cergio varela",
+      "displayName": "Cergio Varela",
+      "payrollName": "Varela, Cergio",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 405.61600000000004
+      },
+      "hours": 405.6,
+      "shiftCount": 57,
+      "weekCount": 12,
+      "venues": {
+        "mila": 405.61600000000004
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "jarigan origuen",
+      "displayName": "Jarigan Origuen",
+      "payrollName": "Origuen, Jarigan",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 377.757
+      },
+      "hours": 377.8,
+      "shiftCount": 46,
+      "weekCount": 10,
+      "venues": {
+        "mila": 377.757
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "campos mario",
+      "displayName": "Mario Campos",
+      "payrollName": "Campos, Mario",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 369.2699999999999
+      },
+      "hours": 369.3,
+      "shiftCount": 39,
+      "weekCount": 8,
+      "venues": {
+        "ava_coconut_grove": 369.2699999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "courtney gerard",
+      "displayName": "Gerard Courtney",
+      "payrollName": "Courtney, Gerard",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 358.52900000000017
+      },
+      "hours": 358.5,
+      "shiftCount": 51,
+      "weekCount": 16,
+      "venues": {
+        "casa_neos": 358.52900000000017
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "carlos izaguirre",
+      "displayName": "Carlos Izaguirre",
+      "payrollName": "Izaguirre, Carlos",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 355.702
+      },
+      "hours": 355.7,
+      "shiftCount": 42,
+      "weekCount": 10,
+      "venues": {
+        "mila": 355.702
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "aura laguna mendoza",
+      "displayName": "Aura Laguna Mendoza",
+      "payrollName": "Laguna Mendoza, Aura",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 331.42299999999994
+      },
+      "hours": 331.4,
+      "shiftCount": 44,
+      "weekCount": 9,
+      "venues": {
+        "casa_neos": 331.42299999999994
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "felipe gonzalez gutierrez luis",
+      "displayName": "Luis Felipe Gutierrez Gonzalez",
+      "payrollName": "Gutierrez Gonzalez, Luis Felipe",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 319.62999999999994
+      },
+      "hours": 319.6,
+      "shiftCount": 39,
+      "weekCount": 8,
+      "venues": {
+        "ava_coconut_grove": 319.62999999999994
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "jennifer lopez",
+      "displayName": "Jennifer Lopez",
+      "payrollName": "Lopez, Jennifer",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 318.73
+      },
+      "hours": 318.7,
+      "shiftCount": 43,
+      "weekCount": 9,
+      "venues": {
+        "casa_neos": 318.73
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "angelica chiquito lugo",
+      "displayName": "Angelica Chiquito Lugo",
+      "payrollName": "Chiquito Lugo, Angelica",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 307.495
+      },
+      "hours": 307.5,
+      "shiftCount": 34,
+      "weekCount": 7,
+      "venues": {
+        "mila": 307.495
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "ronald silva",
+      "displayName": "Ronald Silva",
+      "payrollName": "Silva, Ronald",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 307.368
+      },
+      "hours": 307.4,
+      "shiftCount": 39,
+      "weekCount": 13,
+      "venues": {
+        "casa_neos": 307.368
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "newkirk shomari",
+      "displayName": "Shomari Newkirk",
+      "payrollName": "Newkirk, Shomari",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 304.99000000000007
+      },
+      "hours": 305,
+      "shiftCount": 41,
+      "weekCount": 9,
+      "venues": {
+        "ava_coconut_grove": 304.99000000000007
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "jacobs qwenton",
+      "displayName": "Qwenton Jacobs",
+      "payrollName": "Jacobs, Qwenton",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 303.25
+      },
+      "hours": 303.3,
+      "shiftCount": 38,
+      "weekCount": 8,
+      "venues": {
+        "mila": 303.25
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "andres carvajal felipe soto",
+      "displayName": "Andres Felipe Soto Carvajal",
+      "payrollName": "Soto Carvajal, Andres Felipe",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 301.6999999999999
+      },
+      "hours": 301.7,
+      "shiftCount": 35,
+      "weekCount": 7,
+      "venues": {
+        "casa_neos": 301.6999999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "jonathan montalva",
+      "displayName": "Jonathan Montalva",
+      "payrollName": "Montalva, Jonathan",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 240.9300000000001,
+        "Temp Pastry": 44.01
+      },
+      "hours": 284.9,
+      "shiftCount": 48,
+      "weekCount": 8,
+      "venues": {
+        "claudie": 284.9400000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "needs_assignment"
+    },
+    {
+      "key": "alberto leon",
+      "displayName": "Alberto Leon",
+      "payrollName": "Leon, Alberto",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 279.14700000000005
+      },
+      "hours": 279.1,
+      "shiftCount": 36,
+      "weekCount": 10,
+      "venues": {
+        "casa_neos": 279.14700000000005
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "bryan perla steve",
+      "displayName": "Bryan Steve Perla",
+      "payrollName": "Perla, Bryan Steve",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 274.93
+      },
+      "hours": 274.9,
+      "shiftCount": 34,
+      "weekCount": 7,
+      "venues": {
+        "claudie": 274.93
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "bergamasco devin",
+      "displayName": "Devin Bergamasco",
+      "payrollName": "Bergamasco, Devin",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 234.42999999999998,
+        "Line Cook": 26.826
+      },
+      "hours": 261.3,
+      "shiftCount": 33,
+      "weekCount": 9,
+      "venues": {
+        "claudie": 234.42999999999998,
+        "casa_neos": 26.826
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "alvaro luis quirama",
+      "displayName": "Alvaro Luis Quirama",
+      "payrollName": "Quirama, Alvaro Luis",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 200.28000000000003
+      },
+      "hours": 200.3,
+      "shiftCount": 27,
+      "weekCount": 6,
+      "venues": {
+        "casa_neos": 200.28000000000003
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "mesley tarnisha",
+      "displayName": "Tarnisha Mesley",
+      "payrollName": "Mesley, Tarnisha",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 192.85999999999999
+      },
+      "hours": 192.9,
+      "shiftCount": 30,
+      "weekCount": 7,
+      "venues": {
+        "claudie": 192.85999999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "ishmael mestril",
+      "displayName": "Ishmael Mestril",
+      "payrollName": "Mestril, Ishmael",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 191.74399999999997
+      },
+      "hours": 191.7,
+      "shiftCount": 30,
+      "weekCount": 8,
+      "venues": {
+        "mila": 73.014,
+        "claudie": 118.73000000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "flores roberth",
+      "displayName": "Roberth Flores",
+      "payrollName": "Flores, Roberth",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 177.861
+      },
+      "hours": 177.9,
+      "shiftCount": 20,
+      "weekCount": 4,
+      "venues": {
+        "mila": 177.861
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "aslanian george",
+      "displayName": "George Aslanian",
+      "payrollName": "Aslanian, George",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 168.29
+      },
+      "hours": 168.3,
+      "shiftCount": 26,
+      "weekCount": 9,
+      "venues": {
+        "ava_coconut_grove": 168.29
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "danil galimov",
+      "displayName": "Danil Galimov",
+      "payrollName": "Galimov, Danil",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 159.409
+      },
+      "hours": 159.4,
+      "shiftCount": 20,
+      "weekCount": 4,
+      "venues": {
+        "casa_neos": 159.409
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "alejandro flores",
+      "displayName": "Alejandro Flores",
+      "payrollName": "Flores, Alejandro",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 151.99999999999997
+      },
+      "hours": 152,
+      "shiftCount": 24,
+      "weekCount": 7,
+      "venues": {
+        "ava_coconut_grove": 151.99999999999997
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "fiorella oyarce",
+      "displayName": "Fiorella Oyarce",
+      "payrollName": "Oyarce, Fiorella",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 144.35999999999999
+      },
+      "hours": 144.4,
+      "shiftCount": 24,
+      "weekCount": 6,
+      "venues": {
+        "claudie": 144.35999999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "lakes vida",
+      "displayName": "Vida Lakes",
+      "payrollName": "Lakes, Vida",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 129.79
+      },
+      "hours": 129.8,
+      "shiftCount": 19,
+      "weekCount": 6,
+      "venues": {
+        "claudie": 129.79
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "marzell mcclain",
+      "displayName": "Marzell Mcclain",
+      "payrollName": "Mcclain, Marzell",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 125.69900000000001
+      },
+      "hours": 125.7,
+      "shiftCount": 16,
+      "weekCount": 5,
+      "venues": {
+        "casa_neos": 125.69900000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "gregoriel taveras taveras",
+      "displayName": "Gregoriel Taveras Taveras",
+      "payrollName": "Taveras Taveras, Gregoriel",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 122.515
+      },
+      "hours": 122.5,
+      "shiftCount": 14,
+      "weekCount": 3,
+      "venues": {
+        "casa_neos": 122.515
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "boyer georges",
+      "displayName": "Georges Boyer",
+      "payrollName": "Boyer, Georges",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 120.84
+      },
+      "hours": 120.8,
+      "shiftCount": 21,
+      "weekCount": 6,
+      "venues": {
+        "claudie": 120.84
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "alex johnson",
+      "displayName": "Alex Johnson",
+      "payrollName": "Johnson, Alex",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 116.12
+      },
+      "hours": 116.1,
+      "shiftCount": 18,
+      "weekCount": 5,
+      "venues": {
+        "claudie": 116.12
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "diaz javier",
+      "displayName": "Javier Diaz",
+      "payrollName": "Diaz, Javier",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 112.16
+      },
+      "hours": 112.2,
+      "shiftCount": 15,
+      "weekCount": 5,
+      "venues": {
+        "ava_coconut_grove": 112.16
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "jonathan rojas",
+      "displayName": "Jonathan Rojas",
+      "payrollName": "Rojas, Jonathan",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 110.685
+      },
+      "hours": 110.7,
+      "shiftCount": 14,
+      "weekCount": 3,
+      "venues": {
+        "casa_neos": 110.685
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "clark rolland",
+      "displayName": "Rolland Clark",
+      "payrollName": "Clark, Rolland",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 101.14000000000001
+      },
+      "hours": 101.1,
+      "shiftCount": 15,
+      "weekCount": 4,
+      "venues": {
+        "claudie": 101.14000000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "martinez perez winkers",
+      "displayName": "Winkers Perez Martinez",
+      "payrollName": "Perez Martinez, Winkers",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 92.279
+      },
+      "hours": 92.3,
+      "shiftCount": 12,
+      "weekCount": 3,
+      "venues": {
+        "casa_neos": 92.279
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "gutierrez olgrin rivas",
+      "displayName": "Olgrin Rivas Gutierrez",
+      "payrollName": "Rivas Gutierrez, Olgrin",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 91.20999999999998
+      },
+      "hours": 91.2,
+      "shiftCount": 11,
+      "weekCount": 3,
+      "venues": {
+        "ava_coconut_grove": 91.20999999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "damaris neira",
+      "displayName": "Damaris Neira",
+      "payrollName": "Neira, Damaris",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 90.789
+      },
+      "hours": 90.8,
+      "shiftCount": 11,
+      "weekCount": 3,
+      "venues": {
+        "mila": 90.789
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "arianna franco",
+      "displayName": "Arianna Franco",
+      "payrollName": "Franco, Arianna",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 85.283
+      },
+      "hours": 85.3,
+      "shiftCount": 10,
+      "weekCount": 2,
+      "venues": {
+        "mila": 85.283
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "anvish chukka",
+      "displayName": "Anvish Chukka",
+      "payrollName": "Chukka, Anvish",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 83.24
+      },
+      "hours": 83.2,
+      "shiftCount": 14,
+      "weekCount": 4,
+      "venues": {
+        "claudie": 83.24
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "julner moise",
+      "displayName": "Julner Moise",
+      "payrollName": "Moise, Julner",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 80.44
+      },
+      "hours": 80.4,
+      "shiftCount": 14,
+      "weekCount": 4,
+      "venues": {
+        "claudie": 80.44
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "pacheco raul",
+      "displayName": "Raul Pacheco",
+      "payrollName": "Pacheco, Raul",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 68.5
+      },
+      "hours": 68.5,
+      "shiftCount": 10,
+      "weekCount": 2,
+      "venues": {
+        "ava_coconut_grove": 68.5
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "adams jean pereira",
+      "displayName": "Jean Pereira Adams",
+      "payrollName": "Pereira Adams, Jean",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 58.858
+      },
+      "hours": 58.9,
+      "shiftCount": 8,
+      "weekCount": 2,
+      "venues": {
+        "casa_neos": 58.858
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "karen valenzuela",
+      "displayName": "Karen Valenzuela",
+      "payrollName": "Valenzuela, Karen",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 56.900000000000006
+      },
+      "hours": 56.9,
+      "shiftCount": 7,
+      "weekCount": 3,
+      "venues": {
+        "mila": 56.900000000000006
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "flanders raynia",
+      "displayName": "Raynia Flanders",
+      "payrollName": "Flanders, Raynia",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 49.382999999999996
+      },
+      "hours": 49.4,
+      "shiftCount": 7,
+      "weekCount": 2,
+      "venues": {
+        "mila": 27.383,
+        "claudie": 22
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "ines serritiello",
+      "displayName": "Ines Serritiello",
+      "payrollName": "Serritiello, Ines",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 46.800000000000004
+      },
+      "hours": 46.8,
+      "shiftCount": 7,
+      "weekCount": 2,
+      "venues": {
+        "claudie": 46.800000000000004
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "aguilera arocha franklyn",
+      "displayName": "Franklyn Aguilera Arocha",
+      "payrollName": "Aguilera Arocha, Franklyn",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 46.64
+      },
+      "hours": 46.6,
+      "shiftCount": 7,
+      "weekCount": 2,
+      "venues": {
+        "ava_coconut_grove": 46.64
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "bacon gregory jr",
+      "displayName": "Gregory Bacon Jr",
+      "payrollName": "Bacon Jr, Gregory",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 45.449999999999996
+      },
+      "hours": 45.4,
+      "shiftCount": 5,
+      "weekCount": 2,
+      "venues": {
+        "ava_coconut_grove": 45.449999999999996
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "robertson william",
+      "displayName": "William Robertson",
+      "payrollName": "Robertson, William",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 30.314
+      },
+      "hours": 30.3,
+      "shiftCount": 4,
+      "weekCount": 2,
+      "venues": {
+        "casa_neos": 30.314
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "grundy jason",
+      "displayName": "Jason Grundy",
+      "payrollName": "Grundy, Jason",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 28.02
+      },
+      "hours": 28,
+      "shiftCount": 3,
+      "weekCount": 2,
+      "venues": {
+        "ava_coconut_grove": 28.02
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "franklin ronald",
+      "displayName": "Ronald Franklin",
+      "payrollName": "Franklin, Ronald",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 25
+      },
+      "hours": 25,
+      "shiftCount": 3,
+      "weekCount": 2,
+      "venues": {
+        "claudie": 25
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "douglas hoffler",
+      "displayName": "Douglas Hoffler",
+      "payrollName": "Hoffler, Douglas",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 22.990000000000002
+      },
+      "hours": 23,
+      "shiftCount": 4,
+      "weekCount": 1,
+      "venues": {
+        "claudie": 22.990000000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "gomez nicole",
+      "displayName": "Nicole Gomez",
+      "payrollName": "Gomez, Nicole",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 18.1
+      },
+      "hours": 18.1,
+      "shiftCount": 2,
+      "weekCount": 1,
+      "venues": {
+        "claudie": 18.1
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "alessandrine domenick",
+      "displayName": "Domenick Alessandrine",
+      "payrollName": "Alessandrine, Domenick",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 18
+      },
+      "hours": 18,
+      "shiftCount": 3,
+      "weekCount": 1,
+      "venues": {
+        "claudie": 18
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "luis viera",
+      "displayName": "Luis Viera",
+      "payrollName": "Viera, Luis",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 16.75
+      },
+      "hours": 16.8,
+      "shiftCount": 2,
+      "weekCount": 1,
+      "venues": {
+        "claudie": 16.75
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "moreno rafael",
+      "displayName": "Rafael Moreno",
+      "payrollName": "Moreno, Rafael",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 16.799999999999997
+      },
+      "hours": 16.8,
+      "shiftCount": 2,
+      "weekCount": 1,
+      "venues": {
+        "casa_neos": 16.799999999999997
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "manuel vera",
+      "displayName": "Manuel Vera",
+      "payrollName": "Vera, Manuel",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 16.29
+      },
+      "hours": 16.3,
+      "shiftCount": 3,
+      "weekCount": 1,
+      "venues": {
+        "ava_coconut_grove": 16.29
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "eduardo gutierrez",
+      "displayName": "Eduardo Gutierrez",
+      "payrollName": "Gutierrez, Eduardo",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 14.643
+      },
+      "hours": 14.6,
+      "shiftCount": 2,
+      "weekCount": 1,
+      "venues": {
+        "casa_neos": 14.643
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "pupo tito",
+      "displayName": "Tito Pupo",
+      "payrollName": "Pupo, Tito",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 12
+      },
+      "hours": 12,
+      "shiftCount": 2,
+      "weekCount": 1,
+      "venues": {
+        "claudie": 12
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "harp menelik",
+      "displayName": "Menelik Harp",
+      "payrollName": "Harp, Menelik",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 11.35
+      },
+      "hours": 11.3,
+      "shiftCount": 2,
+      "weekCount": 1,
+      "venues": {
+        "ava_coconut_grove": 11.35
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "berkley brooks",
+      "displayName": "Berkley Brooks",
+      "payrollName": "Brooks, Berkley",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 11.11
+      },
+      "hours": 11.1,
+      "shiftCount": 2,
+      "weekCount": 1,
+      "venues": {
+        "ava_coconut_grove": 11.11
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "alejandro tezara",
+      "displayName": "Alejandro Tezara",
+      "payrollName": "Tezara, Alejandro",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 9.42
+      },
+      "hours": 9.4,
+      "shiftCount": 2,
+      "weekCount": 1,
+      "venues": {
+        "claudie": 9.42
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "jason mccollum",
+      "displayName": "Jason Mccollum",
+      "payrollName": "Mccollum, Jason",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 9.14
+      },
+      "hours": 9.1,
+      "shiftCount": 1,
+      "weekCount": 1,
+      "venues": {
+        "claudie": 9.14
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "campbell sasha",
+      "displayName": "Sasha Campbell",
+      "payrollName": "Campbell, Sasha",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 8
+      },
+      "hours": 8,
+      "shiftCount": 1,
+      "weekCount": 1,
+      "venues": {
+        "mila": 8
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "celestin mark",
+      "displayName": "Mark Celestin",
+      "payrollName": "Celestin, Mark",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 5.785
+      },
+      "hours": 5.8,
+      "shiftCount": 1,
+      "weekCount": 1,
+      "venues": {
+        "casa_neos": 5.785
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    },
+    {
+      "key": "brian cuella",
+      "displayName": "Brian Cuella",
+      "payrollName": "Cuella, Brian",
+      "primaryJob": "Temp Line Cook",
+      "jobs": {
+        "Temp Line Cook": 1.25
+      },
+      "hours": 1.3,
+      "shiftCount": 1,
+      "weekCount": 1,
+      "venues": {
+        "claudie": 1.25
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": null,
+      "status": "needs_assignment"
+    }
+  ],
+  "assigned": [
+    {
+      "key": "erika gonzalez",
+      "displayName": "Erika Gonzalez",
+      "payrollName": "Gonzalez, Erika",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1895.7090000000003
+      },
+      "hours": 1895.7,
+      "shiftCount": 192,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1895.7090000000003
+      },
+      "assignedFamily": "Sushi",
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "ben sufra",
+      "displayName": "Ben Sufra",
+      "payrollName": "Sufra, Ben",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1784.9580000000012
+      },
+      "hours": 1785,
+      "shiftCount": 167,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1784.9580000000012
+      },
+      "assignedFamily": "Prep",
+      "fteFamily": "Prep",
+      "ftePosition": "Butcher",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "kleiber uban",
+      "displayName": "Kleiber Uban",
+      "payrollName": "Uban, Kleiber",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1674.8640000000003
+      },
+      "hours": 1674.9,
+      "shiftCount": 164,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1674.8640000000003
+      },
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
+      "ftePosition": "Raw",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "frantzlet pierre",
+      "displayName": "Frantzlet Pierre",
+      "payrollName": "Pierre, Frantzlet",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1655.5329999999997
+      },
+      "hours": 1655.5,
+      "shiftCount": 173,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1655.5329999999997
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "escalante henry",
+      "displayName": "Henry Escalante",
+      "payrollName": "Escalante, Henry",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1590.16
+      },
+      "hours": 1590.2,
+      "shiftCount": 167,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1590.16
+      },
+      "assignedFamily": "Sushi",
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "roberto suarez",
+      "displayName": "Roberto Suarez",
+      "payrollName": "Suarez, Roberto",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 957.3279999999999,
+        "Sr. CDP": 594.5229999999998
+      },
+      "hours": 1551.9,
+      "shiftCount": 162,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1551.8510000000008
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "fernandez gabriel perez",
+      "displayName": "Gabriel Fernandez Perez",
+      "payrollName": "Fernandez Perez, Gabriel",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1534.0929999999998
+      },
+      "hours": 1534.1,
+      "shiftCount": 166,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1527.993,
+        "ava_coconut_grove": 6.1
+      },
+      "assignedFamily": "Pizza",
+      "fteFamily": "Pizza",
+      "ftePosition": "Pizza",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "miranda vidal",
+      "displayName": "Vidal Miranda",
+      "payrollName": "Miranda, Vidal",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1528.6270000000009
+      },
+      "hours": 1528.6,
+      "shiftCount": 167,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1528.6270000000009
+      },
+      "assignedFamily": "Prep",
+      "fteFamily": "Prep",
+      "ftePosition": "Butcher",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "gomez jorge pacheco",
+      "displayName": "Jorge Pacheco Gomez",
+      "payrollName": "Pacheco Gomez, Jorge",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1287.1069999999995,
+        "CDP": 218.10599999999997
+      },
+      "hours": 1505.2,
+      "shiftCount": 153,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1505.213
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "franzuly hidalgo",
+      "displayName": "Franzuly Hidalgo",
+      "payrollName": "Hidalgo, Franzuly",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 939.1130000000004,
+        "CDP": 542.3630000000002
+      },
+      "hours": 1481.5,
+      "shiftCount": 157,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1481.476000000001
+      },
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
+      "ftePosition": "Garde Manger",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "de joaquin juan lopez",
+      "displayName": "Joaquin Lopez de Juan",
+      "payrollName": "Lopez de Juan, Joaquin",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1460.3509999999997
+      },
+      "hours": 1460.4,
+      "shiftCount": 164,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1460.3509999999997
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "guillen julian",
+      "displayName": "Julian Guillen",
+      "payrollName": "Guillen, Julian",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1443.711
+      },
+      "hours": 1443.7,
+      "shiftCount": 159,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1443.711
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "alvarez antonio garcia henry",
+      "displayName": "Henry Antonio Garcia Alvarez",
+      "payrollName": "Garcia Alvarez, Henry Antonio",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1431.0320000000004
+      },
+      "hours": 1431,
+      "shiftCount": 164,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1431.0320000000004
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "amalia tinoco",
+      "displayName": "Amalia Tinoco",
+      "payrollName": "Tinoco, Amalia",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1430.753
+      },
+      "hours": 1430.8,
+      "shiftCount": 163,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1430.753
+      },
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
+      "ftePosition": "Garde Manger",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "juan p rodriguez",
+      "displayName": "Juan P. Rodriguez",
+      "payrollName": "Rodriguez, Juan P.",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1419.3690000000004
+      },
+      "hours": 1419.4,
+      "shiftCount": 146,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1419.3690000000004
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "amaya arroyo patricia yerlis",
+      "displayName": "Yerlis Patricia Amaya Arroyo",
+      "payrollName": "Amaya Arroyo, Yerlis Patricia",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1390.88
+      },
+      "hours": 1390.9,
+      "shiftCount": 157,
+      "weekCount": 32,
+      "venues": {
+        "ava_coconut_grove": 1371.21,
+        "claudie": 19.67
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Pasta",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "gonzalez miguel",
+      "displayName": "Miguel Gonzalez",
+      "payrollName": "Gonzalez, Miguel",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1379.481
+      },
+      "hours": 1379.5,
+      "shiftCount": 166,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1379.481
+      },
+      "assignedFamily": "Fry",
+      "fteFamily": "Fry",
+      "ftePosition": "Fry",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "josseline urbina",
+      "displayName": "Josseline Urbina",
+      "payrollName": "Urbina, Josseline",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1377.9130000000002
+      },
+      "hours": 1377.9,
+      "shiftCount": 144,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1377.9130000000002
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "andrea duran",
+      "displayName": "Andrea Duran",
+      "payrollName": "Duran, Andrea",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1349.089999999999
+      },
+      "hours": 1349.1,
+      "shiftCount": 154,
+      "weekCount": 32,
+      "venues": {
+        "ava_coconut_grove": 1349.089999999999
+      },
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
+      "ftePosition": "Raw",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "beatriz calvo",
+      "displayName": "Beatriz Calvo",
+      "payrollName": "Calvo, Beatriz",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1344.2519999999997
+      },
+      "hours": 1344.3,
+      "shiftCount": 161,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1344.2519999999997
+      },
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
+      "ftePosition": "Raw",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "ersoy sinem",
+      "displayName": "Sinem Ersoy",
+      "payrollName": "Ersoy, Sinem",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1335.6400000000003
+      },
+      "hours": 1335.6,
+      "shiftCount": 149,
+      "weekCount": 32,
+      "venues": {
+        "ava_coconut_grove": 1335.6400000000003
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Pasta",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "bobadilla walter",
+      "displayName": "Walter Bobadilla",
+      "payrollName": "Bobadilla, Walter",
+      "primaryJob": "CDP",
+      "jobs": {
+        "Line Cook": 371.12000000000006,
+        "CDP": 957.0900000000004
+      },
+      "hours": 1328.2,
+      "shiftCount": 163,
+      "weekCount": 31,
+      "venues": {
+        "ava_coconut_grove": 1328.209999999999
+      },
+      "assignedFamily": "Pizza",
+      "fteFamily": "Pizza",
+      "ftePosition": "Pizza",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "antonio chaux mendoza",
+      "displayName": "Antonio Mendoza Chaux",
+      "payrollName": "Mendoza Chaux, Antonio",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1301.3179999999995
+      },
+      "hours": 1301.3,
+      "shiftCount": 151,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1301.3179999999995
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "dixa elvir marina romero",
+      "displayName": "Dixa Marina Elvir Romero",
+      "payrollName": "Elvir Romero, Dixa Marina",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1300.6799999999998
+      },
+      "hours": 1300.7,
+      "shiftCount": 164,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1300.6799999999998
+      },
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
+      "ftePosition": "Garde Manger",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "eugene jorane",
+      "displayName": "Jorane Eugene",
+      "payrollName": "Eugene, Jorane",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1288.9179999999992
+      },
+      "hours": 1288.9,
+      "shiftCount": 170,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1288.9179999999992
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "aguilar nicholas",
+      "displayName": "Nicholas Aguilar",
+      "payrollName": "Aguilar, Nicholas",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1279.7000000000003
+      },
+      "hours": 1279.7,
+      "shiftCount": 137,
+      "weekCount": 31,
+      "venues": {
+        "ava_coconut_grove": 1279.7000000000003
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "andrija boskovic",
+      "displayName": "Andrija Boskovic",
+      "payrollName": "Boskovic, Andrija",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1274.5900000000006
+      },
+      "hours": 1274.6,
+      "shiftCount": 138,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 1274.5900000000006
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "aurelio porven",
+      "displayName": "Aurelio Porven",
+      "payrollName": "Porven, Aurelio",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1263.4799999999996
+      },
+      "hours": 1263.5,
+      "shiftCount": 117,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1263.4799999999996
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "anthony sabala",
+      "displayName": "Anthony Sabala",
+      "payrollName": "Sabala, Anthony",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1261.362
+      },
+      "hours": 1261.4,
+      "shiftCount": 165,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1261.362
+      },
+      "assignedFamily": "Fry",
+      "fteFamily": "Fry",
+      "ftePosition": "Fry",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "guarin gustavo",
+      "displayName": "Gustavo Guarin",
+      "payrollName": "Guarin, Gustavo",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1236.5859999999993
+      },
+      "hours": 1236.6,
+      "shiftCount": 153,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1236.5859999999993
+      },
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
+      "ftePosition": "Garde Manger",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "karina ramos",
+      "displayName": "Karina Ramos",
+      "payrollName": "Ramos, Karina",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1213.152000000001
+      },
+      "hours": 1213.2,
+      "shiftCount": 149,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1213.152000000001
+      },
+      "assignedFamily": "Pastry",
+      "fteFamily": "Pastry",
+      "ftePosition": "Pastry",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "daniel jusma",
+      "displayName": "Daniel Jusma",
+      "payrollName": "Jusma, Daniel",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1207.1870000000004
+      },
+      "hours": 1207.2,
+      "shiftCount": 163,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1207.1870000000004
+      },
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
+      "ftePosition": "Garde Manger",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "darren kelly",
+      "displayName": "Darren Kelly",
+      "payrollName": "Kelly, Darren",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1188.0539999999996
+      },
+      "hours": 1188.1,
+      "shiftCount": 151,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1188.0539999999996
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "essenwanger maria",
+      "displayName": "Maria Essenwanger",
+      "payrollName": "Essenwanger, Maria",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 1185.5550000000003
+      },
+      "hours": 1185.6,
+      "shiftCount": 115,
+      "weekCount": 28,
+      "venues": {
+        "casa_neos": 1185.5550000000003
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "jada miller",
+      "displayName": "Jada Miller",
+      "payrollName": "Miller, Jada",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1158.75
+      },
+      "hours": 1158.8,
+      "shiftCount": 140,
+      "weekCount": 32,
+      "venues": {
+        "ava_coconut_grove": 1158.75
+      },
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
+      "ftePosition": "Garde Manger",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "gaete jaime villarroel",
+      "displayName": "Jaime Villarroel Gaete",
+      "payrollName": "Villarroel Gaete, Jaime",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1154.153
+      },
+      "hours": 1154.2,
+      "shiftCount": 134,
+      "weekCount": 26,
+      "venues": {
+        "mila": 1154.153
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "phillips terrin",
+      "displayName": "Terrin Phillips",
+      "payrollName": "Phillips, Terrin",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 718.3299999999999,
+        "CDP": 399
+      },
+      "hours": 1117.3,
+      "shiftCount": 124,
+      "weekCount": 25,
+      "venues": {
+        "claudie": 1117.3300000000004
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "gonzalez ocando vander",
+      "displayName": "Vander Ocando Gonzalez",
+      "payrollName": "Ocando Gonzalez, Vander",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1104.9099999999999
+      },
+      "hours": 1104.9,
+      "shiftCount": 136,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 1104.9099999999999
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Pasta",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "atulus kelly",
+      "displayName": "Kelly Atulus",
+      "payrollName": "Atulus, Kelly",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1089.55
+      },
+      "hours": 1089.5,
+      "shiftCount": 130,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 1089.55
+      },
+      "assignedFamily": "Fry",
+      "fteFamily": "Fry",
+      "ftePosition": "Fry",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "markos ponte",
+      "displayName": "Markos Ponte",
+      "payrollName": "Ponte, Markos",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 1017.7499999999998
+      },
+      "hours": 1017.7,
+      "shiftCount": 124,
+      "weekCount": 25,
+      "venues": {
+        "ava_coconut_grove": 989.3899999999999,
+        "claudie": 28.36
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "paynter terrell",
+      "displayName": "Terrell Paynter",
+      "payrollName": "Paynter, Terrell",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 955.6300000000001
+      },
+      "hours": 955.6,
+      "shiftCount": 119,
+      "weekCount": 25,
+      "venues": {
+        "ava_coconut_grove": 933.13,
+        "claudie": 22.5
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "guerda telfort",
+      "displayName": "Guerda Telfort",
+      "payrollName": "Telfort, Guerda",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 953.702
+      },
+      "hours": 953.7,
+      "shiftCount": 116,
+      "weekCount": 23,
+      "venues": {
+        "mila": 953.702
+      },
+      "assignedFamily": "Fry",
+      "fteFamily": "Fry",
+      "ftePosition": "Fry",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "francesca jean",
+      "displayName": "Francesca Jean",
+      "payrollName": "Jean, Francesca",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 880.6860000000001
+      },
+      "hours": 880.7,
+      "shiftCount": 105,
+      "weekCount": 23,
+      "venues": {
+        "mila": 880.6860000000001
+      },
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
+      "ftePosition": "Garde Manger",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "adrian gonzalez",
+      "displayName": "Adrian Gonzalez",
+      "payrollName": "Gonzalez, Adrian",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 655.4599999999999
+      },
+      "hours": 655.5,
+      "shiftCount": 78,
+      "weekCount": 18,
+      "venues": {
+        "ava_coconut_grove": 655.4599999999999
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "herlinda mamani",
+      "displayName": "Herlinda Mamani",
+      "payrollName": "Mamani, Herlinda",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 645.4399999999997
+      },
+      "hours": 645.4,
+      "shiftCount": 86,
+      "weekCount": 20,
+      "venues": {
+        "claudie": 645.4399999999997
+      },
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
+      "ftePosition": "Crudo",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "gregory youngblood",
+      "displayName": "Gregory Youngblood",
+      "payrollName": "Youngblood, Gregory",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 633.0300000000002
+      },
+      "hours": 633,
+      "shiftCount": 81,
+      "weekCount": 18,
+      "venues": {
+        "claudie": 633.0300000000002
+      },
+      "assignedFamily": "Fry",
+      "fteFamily": "Fry",
+      "ftePosition": "Fry",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "bosch frank jr",
+      "displayName": "Frank Bosch Jr",
+      "payrollName": "Bosch Jr, Frank",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 619.183
+      },
+      "hours": 619.2,
+      "shiftCount": 84,
+      "weekCount": 20,
+      "venues": {
+        "casa_neos": 619.183
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "rodriguez victoria",
+      "displayName": "Victoria Rodriguez",
+      "payrollName": "Rodriguez, Victoria",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 491.0409999999999
+      },
+      "hours": 491,
+      "shiftCount": 65,
+      "weekCount": 15,
+      "venues": {
+        "casa_neos": 491.0409999999999
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "acuna casco eddy rene",
+      "displayName": "Eddy Rene Casco Acuna",
+      "payrollName": "Casco Acuna, Eddy Rene",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 283.31300000000005
+      },
+      "hours": 283.3,
+      "shiftCount": 35,
+      "weekCount": 7,
+      "venues": {
+        "mila": 283.31300000000005
+      },
+      "assignedFamily": "Fry",
+      "fteFamily": "Fry",
+      "ftePosition": "Fry",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "robert saenz",
+      "displayName": "Robert Saenz",
+      "payrollName": "Saenz, Robert",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 208.95100000000002
+      },
+      "hours": 209,
+      "shiftCount": 31,
+      "weekCount": 7,
+      "venues": {
+        "casa_neos": 208.95100000000002
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "daley demetrik",
+      "displayName": "Demetrik Daley",
+      "payrollName": "Daley, Demetrik",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 208.55
+      },
+      "hours": 208.6,
+      "shiftCount": 30,
+      "weekCount": 7,
+      "venues": {
+        "ava_coconut_grove": 33.879999999999995,
+        "claudie": 174.67000000000007
+      },
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
+      "ftePosition": "Crudo",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "justin thumas",
+      "displayName": "Justin Thumas",
+      "payrollName": "Thumas, Justin",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Temp Line Cook": 5.67,
+        "Line Cook": 113.16199999999999
+      },
+      "hours": 118.8,
+      "shiftCount": 14,
+      "weekCount": 4,
+      "venues": {
+        "claudie": 5.67,
+        "casa_neos": 113.16199999999999
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "morin richard",
+      "displayName": "Richard Morin",
+      "payrollName": "Morin, Richard",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 105.57999999999998
+      },
+      "hours": 105.6,
+      "shiftCount": 13,
+      "weekCount": 3,
+      "venues": {
+        "claudie": 105.57999999999998
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "anderson jacob",
+      "displayName": "Jacob Anderson",
+      "payrollName": "Anderson, Jacob",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 84.94999999999999
+      },
+      "hours": 84.9,
+      "shiftCount": 10,
+      "weekCount": 2,
+      "venues": {
+        "claudie": 84.94999999999999
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "fabiana zambrano",
+      "displayName": "Fabiana Zambrano",
+      "payrollName": "Zambrano, Fabiana",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 84.44800000000001
+      },
+      "hours": 84.4,
+      "shiftCount": 11,
+      "weekCount": 5,
+      "venues": {
+        "mila": 84.44800000000001
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "keon thornhill",
+      "displayName": "Keon Thornhill",
+      "payrollName": "Thornhill, Keon",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 78.66
+      },
+      "hours": 78.7,
+      "shiftCount": 12,
+      "weekCount": 3,
+      "venues": {
+        "claudie": 78.66
+      },
+      "assignedFamily": "Fry",
+      "fteFamily": "Fry",
+      "ftePosition": "Fry",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "elton perry",
+      "displayName": "Elton Perry",
+      "payrollName": "Perry, Elton",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 66.887
+      },
+      "hours": 66.9,
+      "shiftCount": 9,
+      "weekCount": 9,
+      "venues": {
+        "mila": 66.887
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "autoFamily": null,
+      "status": "fte_covered"
+    }
+  ],
+  "autoAssigned": [
+    {
+      "key": "garcia medrano silvia",
+      "displayName": "Silvia Garcia Medrano",
+      "payrollName": "Garcia Medrano, Silvia",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 1595.1540000000007
+      },
+      "hours": 1595.2,
+      "shiftCount": 181,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1595.1540000000007
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "castillo walfer",
+      "displayName": "Walfer Castillo",
+      "payrollName": "Castillo, Walfer",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Line Cook": 760.9610000000002,
+        "Pastry Cook": 807.9920000000003
+      },
+      "hours": 1569,
+      "shiftCount": 171,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1568.9530000000004
+      },
+      "assignedFamily": null,
+      "fteFamily": "Pastry",
+      "ftePosition": "Pastry",
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "sheydeguer silva",
+      "displayName": "Sheydeguer Silva",
+      "payrollName": "Silva, Sheydeguer",
+      "primaryJob": "Butcher",
+      "jobs": {
+        "Butcher": 1559.2539999999992
+      },
+      "hours": 1559.3,
+      "shiftCount": 166,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1559.2539999999992
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Butcher",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "louis makinzy pierre",
+      "displayName": "Makinzy Pierre Louis",
+      "payrollName": "Pierre Louis, Makinzy",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1276.8609999999999,
+        "Line Cook": 269.353
+      },
+      "hours": 1546.2,
+      "shiftCount": 173,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1546.214
+      },
+      "assignedFamily": null,
+      "fteFamily": "Fry",
+      "ftePosition": "Fry",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "mondragon suany",
+      "displayName": "Suany Mondragon",
+      "payrollName": "Mondragon, Suany",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1516.0880000000004
+      },
+      "hours": 1516.1,
+      "shiftCount": 149,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1516.0880000000004
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "delva hudson",
+      "displayName": "Hudson Delva",
+      "payrollName": "Delva, Hudson",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1511.0210000000002
+      },
+      "hours": 1511,
+      "shiftCount": 165,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1511.0210000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "justin torres",
+      "displayName": "Justin Torres",
+      "payrollName": "Torres, Justin",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 1488.445999999999
+      },
+      "hours": 1488.4,
+      "shiftCount": 165,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1488.445999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "cesar sosa soto",
+      "displayName": "Cesar Soto Sosa",
+      "payrollName": "Soto Sosa, Cesar",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 1482.2259999999999
+      },
+      "hours": 1482.2,
+      "shiftCount": 159,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1482.2259999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "guerrero linda omaida torres",
+      "displayName": "Linda Omaida Torres Guerrero",
+      "payrollName": "Torres Guerrero, Linda Omaida",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1480.7010000000002
+      },
+      "hours": 1480.7,
+      "shiftCount": 137,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1480.7010000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "alvarez freddy valle",
+      "displayName": "Freddy Alvarez Valle",
+      "payrollName": "Alvarez Valle, Freddy",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 1478.9809999999998
+      },
+      "hours": 1479,
+      "shiftCount": 172,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1478.9809999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "mily morataya",
+      "displayName": "Mily Morataya",
+      "payrollName": "Morataya, Mily",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 1478.935
+      },
+      "hours": 1478.9,
+      "shiftCount": 173,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1478.935
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "aniele seijas",
+      "displayName": "Aniele Seijas",
+      "payrollName": "Seijas, Aniele",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Prep Cook": 597.7939999999999,
+        "Sushi Cook": 877.8439999999999
+      },
+      "hours": 1475.6,
+      "shiftCount": 155,
+      "weekCount": 32,
+      "venues": {
+        "casa_neos": 1475.6380000000008
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "fernando gonzalez",
+      "displayName": "Fernando Gonzalez",
+      "payrollName": "Gonzalez, Fernando",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 1434.981
+      },
+      "hours": 1435,
+      "shiftCount": 166,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1434.981
+      },
+      "assignedFamily": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "cruz randy",
+      "displayName": "Randy Cruz",
+      "payrollName": "Cruz, Randy",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 1421.8710000000008
+      },
+      "hours": 1421.9,
+      "shiftCount": 176,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1421.8710000000008
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "edgar gonzalez",
+      "displayName": "Edgar Gonzalez",
+      "payrollName": "Gonzalez, Edgar",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 1417.3240000000005
+      },
+      "hours": 1417.3,
+      "shiftCount": 167,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1417.3240000000005
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "de garcia icela leon",
+      "displayName": "Icela De Leon Garcia",
+      "payrollName": "De Leon Garcia, Icela",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1392.0540000000005
+      },
+      "hours": 1392.1,
+      "shiftCount": 151,
+      "weekCount": 31,
+      "venues": {
+        "mila": 1392.0540000000005
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "chica tyrone",
+      "displayName": "Tyrone Chica",
+      "payrollName": "Chica, Tyrone",
+      "primaryJob": "Butcher",
+      "jobs": {
+        "Prep Cook": 397.41799999999995,
+        "Butcher": 979.5669999999994
+      },
+      "hours": 1377,
+      "shiftCount": 156,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1376.9850000000006
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Butcher",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "diana garzon",
+      "displayName": "Diana Garzon",
+      "payrollName": "Garzon, Diana",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1373.670000000001
+      },
+      "hours": 1373.7,
+      "shiftCount": 147,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1373.670000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "garcia rangel yamila",
+      "displayName": "Yamila Rangel Garcia",
+      "payrollName": "Rangel Garcia, Yamila",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 1347.8600000000006
+      },
+      "hours": 1347.9,
+      "shiftCount": 152,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1347.8600000000006
+      },
+      "assignedFamily": null,
+      "fteFamily": "Pastry",
+      "ftePosition": "Pastry",
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "aguilar robin",
+      "displayName": "Robin Aguilar",
+      "payrollName": "Aguilar, Robin",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 1324.9260000000004
+      },
+      "hours": 1324.9,
+      "shiftCount": 164,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 1324.9260000000004
+      },
+      "assignedFamily": null,
+      "fteFamily": "Pastry",
+      "ftePosition": "Pastry",
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "campos juan tapia",
+      "displayName": "Juan Campos Tapia",
+      "payrollName": "Campos Tapia, Juan",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1302.782999999999
+      },
+      "hours": 1302.8,
+      "shiftCount": 163,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1302.782999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "anderson belance",
+      "displayName": "Anderson Belance",
+      "payrollName": "Belance, Anderson",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1289.1100000000001
+      },
+      "hours": 1289.1,
+      "shiftCount": 147,
+      "weekCount": 31,
+      "venues": {
+        "ava_coconut_grove": 1289.1100000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "francis ramos sarabia",
+      "displayName": "Francis Sarabia Ramos",
+      "payrollName": "Sarabia Ramos, Francis",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 1287.4530000000002
+      },
+      "hours": 1287.5,
+      "shiftCount": 169,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1239.192,
+        "mila": 48.261
+      },
+      "assignedFamily": null,
+      "fteFamily": "Pastry",
+      "ftePosition": "Pastry",
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "diana garcia",
+      "displayName": "Diana Garcia",
+      "payrollName": "Garcia, Diana",
+      "primaryJob": "Sushi Prep",
+      "jobs": {
+        "Sushi Prep": 1285.0030000000002
+      },
+      "hours": 1285,
+      "shiftCount": 173,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1285.0030000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "crystobal salgado",
+      "displayName": "Crystobal Salgado",
+      "payrollName": "Salgado, Crystobal",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1266.9999999999998
+      },
+      "hours": 1267,
+      "shiftCount": 127,
+      "weekCount": 25,
+      "venues": {
+        "claudie": 1266.9999999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "afuso jose luis zubiate",
+      "displayName": "Jose Luis Zubiate Afuso",
+      "payrollName": "Zubiate Afuso, Jose Luis",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 1247.305
+      },
+      "hours": 1247.3,
+      "shiftCount": 162,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1247.305
+      },
+      "assignedFamily": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "de esquivel lopez mildred ruano",
+      "displayName": "Mildred Esquivel Lopez De Ruano",
+      "payrollName": "Esquivel Lopez De Ruano, Mildred",
+      "primaryJob": "Sushi Prep",
+      "jobs": {
+        "Sushi Prep": 1244.6080000000004
+      },
+      "hours": 1244.6,
+      "shiftCount": 165,
+      "weekCount": 33,
+      "venues": {
+        "mila": 1244.6080000000004
+      },
+      "assignedFamily": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "maricela piedra",
+      "displayName": "Maricela Piedra",
+      "payrollName": "Piedra, Maricela",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1243.5300000000002
+      },
+      "hours": 1243.5,
+      "shiftCount": 145,
+      "weekCount": 31,
+      "venues": {
+        "ava_coconut_grove": 1243.5300000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "joissaint mandorliny",
+      "displayName": "Mandorliny Joissaint",
+      "payrollName": "Joissaint, Mandorliny",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1234.8269999999995
+      },
+      "hours": 1234.8,
+      "shiftCount": 135,
+      "weekCount": 29,
+      "venues": {
+        "casa_neos": 1234.8269999999995
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "adrien gousmann",
+      "displayName": "Gousmann Adrien",
+      "payrollName": "Adrien, Gousmann",
+      "primaryJob": "Butcher",
+      "jobs": {
+        "Butcher": 1228.5409999999995
+      },
+      "hours": 1228.5,
+      "shiftCount": 133,
+      "weekCount": 28,
+      "venues": {
+        "casa_neos": 1228.5409999999995
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Butcher",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "castro leily quintanilla",
+      "displayName": "Leily Quintanilla Castro",
+      "payrollName": "Quintanilla Castro, Leily",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1227.4700000000003
+      },
+      "hours": 1227.5,
+      "shiftCount": 133,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 1227.4700000000003
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "jacqueline quiroga",
+      "displayName": "Jacqueline Quiroga",
+      "payrollName": "Quiroga, Jacqueline",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 1220.74
+      },
+      "hours": 1220.7,
+      "shiftCount": 145,
+      "weekCount": 30,
+      "venues": {
+        "ava_coconut_grove": 1220.74
+      },
+      "assignedFamily": null,
+      "fteFamily": "Pastry",
+      "ftePosition": "Pastry",
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "mailandys rodriguez",
+      "displayName": "Mailandys Rodriguez",
+      "payrollName": "Rodriguez, Mailandys",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1219.2900000000002
+      },
+      "hours": 1219.3,
+      "shiftCount": 132,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 1219.2900000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "barahona garcia mirna",
+      "displayName": "Mirna Garcia Barahona",
+      "payrollName": "Garcia Barahona, Mirna",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1209.3930000000005
+      },
+      "hours": 1209.4,
+      "shiftCount": 138,
+      "weekCount": 34,
+      "venues": {
+        "mila": 1209.3930000000005
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "chantell louis",
+      "displayName": "Chantell Louis",
+      "payrollName": "Louis, Chantell",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1206.0500000000002
+      },
+      "hours": 1206.1,
+      "shiftCount": 128,
+      "weekCount": 27,
+      "venues": {
+        "claudie": 1206.0500000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "nadine suarez",
+      "displayName": "Nadine Suarez",
+      "payrollName": "Suarez, Nadine",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 1198.2539999999997
+      },
+      "hours": 1198.3,
+      "shiftCount": 138,
+      "weekCount": 27,
+      "venues": {
+        "mila": 1198.2539999999997
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "delgado marlom",
+      "displayName": "Marlom Delgado",
+      "payrollName": "Delgado, Marlom",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 1188.79
+      },
+      "hours": 1188.8,
+      "shiftCount": 130,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 1188.79
+      },
+      "assignedFamily": null,
+      "fteFamily": "Pastry",
+      "ftePosition": "Pastry",
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "lissette munoz soler",
+      "displayName": "Lissette Munoz Soler",
+      "payrollName": "Munoz Soler, Lissette",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1175.8100000000002
+      },
+      "hours": 1175.8,
+      "shiftCount": 148,
+      "weekCount": 31,
+      "venues": {
+        "ava_coconut_grove": 1175.8100000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "hernandez steven",
+      "displayName": "Steven Hernandez",
+      "payrollName": "Hernandez, Steven",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Temp Prep": 542.41,
+        "Prep Cook": 632.7099999999999
+      },
+      "hours": 1175.1,
+      "shiftCount": 151,
+      "weekCount": 32,
+      "venues": {
+        "ava_coconut_grove": 1175.1199999999997
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "kensley pierre",
+      "displayName": "Kensley Pierre",
+      "payrollName": "Pierre, Kensley",
+      "primaryJob": "Expo",
+      "jobs": {
+        "Expo": 1148.4900000000005
+      },
+      "hours": 1148.5,
+      "shiftCount": 163,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 1148.4900000000005
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Expo",
+      "status": "auto"
+    },
+    {
+      "key": "elizabeth salgado sinthia solorzano",
+      "displayName": "Sinthia Elizabeth Solorzano Salgado",
+      "payrollName": "Solorzano Salgado, Sinthia Elizabeth",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1126.0099999999995
+      },
+      "hours": 1126,
+      "shiftCount": 124,
+      "weekCount": 25,
+      "venues": {
+        "claudie": 1126.0099999999995
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "cabodevilla claudia moret",
+      "displayName": "Claudia Moret Cabodevilla",
+      "payrollName": "Moret Cabodevilla, Claudia",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1096.4340000000004
+      },
+      "hours": 1096.4,
+      "shiftCount": 136,
+      "weekCount": 30,
+      "venues": {
+        "casa_neos": 1096.4340000000004
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "gerson torres",
+      "displayName": "Gerson Torres",
+      "payrollName": "Torres, Gerson",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 1077.1270000000004
+      },
+      "hours": 1077.1,
+      "shiftCount": 141,
+      "weekCount": 34,
+      "venues": {
+        "casa_neos": 1077.1270000000004
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "guanoluisa quintana rosmery",
+      "displayName": "Rosmery Quintana Guanoluisa",
+      "payrollName": "Quintana Guanoluisa, Rosmery",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1057.14
+      },
+      "hours": 1057.1,
+      "shiftCount": 132,
+      "weekCount": 30,
+      "venues": {
+        "ava_coconut_grove": 1057.14
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "jacques jean",
+      "displayName": "Jacques Jean",
+      "payrollName": "Jean, Jacques",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1043.0900000000001
+      },
+      "hours": 1043.1,
+      "shiftCount": 101,
+      "weekCount": 23,
+      "venues": {
+        "mila": 1043.0900000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "claudia gonzalez morillo",
+      "displayName": "Claudia Morillo Gonzalez",
+      "payrollName": "Morillo Gonzalez, Claudia",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1038.9480000000008
+      },
+      "hours": 1038.9,
+      "shiftCount": 141,
+      "weekCount": 32,
+      "venues": {
+        "casa_neos": 1038.9480000000008
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "jesus valbuena",
+      "displayName": "Jesus Valbuena",
+      "payrollName": "Valbuena, Jesus",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 1033.6200000000001
+      },
+      "hours": 1033.6,
+      "shiftCount": 122,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 1033.6200000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "barahona sindi",
+      "displayName": "Sindi Barahona",
+      "payrollName": "Barahona, Sindi",
+      "primaryJob": "Expo",
+      "jobs": {
+        "Expo": 999.5039999999996
+      },
+      "hours": 999.5,
+      "shiftCount": 122,
+      "weekCount": 33,
+      "venues": {
+        "mila": 999.5039999999996
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Expo",
+      "status": "auto"
+    },
+    {
+      "key": "jobani malianos reyes",
+      "displayName": "Jobani Reyes Malianos",
+      "payrollName": "Reyes Malianos, Jobani",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 975.7020000000002
+      },
+      "hours": 975.7,
+      "shiftCount": 129,
+      "weekCount": 28,
+      "venues": {
+        "casa_neos": 975.7020000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "arrazola diana",
+      "displayName": "Diana Arrazola",
+      "payrollName": "Arrazola, Diana",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 950.0900000000001
+      },
+      "hours": 950.1,
+      "shiftCount": 124,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 950.0900000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "adam junior",
+      "displayName": "Junior Adam",
+      "payrollName": "Adam, Junior",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 506.8899999999999,
+        "Line Cook": 443.1400000000001
+      },
+      "hours": 950,
+      "shiftCount": 124,
+      "weekCount": 26,
+      "venues": {
+        "claudie": 950.0300000000003
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "mena walfrido",
+      "displayName": "Walfrido Mena",
+      "payrollName": "Mena, Walfrido",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 930.1600000000002
+      },
+      "hours": 930.2,
+      "shiftCount": 115,
+      "weekCount": 25,
+      "venues": {
+        "ava_coconut_grove": 930.1600000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "anthony navas",
+      "displayName": "Anthony Navas",
+      "payrollName": "Navas, Anthony",
+      "primaryJob": "Expo",
+      "jobs": {
+        "Expo": 926.9649999999999
+      },
+      "hours": 927,
+      "shiftCount": 116,
+      "weekCount": 34,
+      "venues": {
+        "mila": 926.9649999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Expo",
+      "status": "auto"
+    },
+    {
+      "key": "faik onural",
+      "displayName": "Faik Onural",
+      "payrollName": "Onural, Faik",
+      "primaryJob": "Temp Pastry",
+      "jobs": {
+        "Temp Pastry": 479.55999999999983,
+        "Pastry Cook": 413.37999999999994
+      },
+      "hours": 892.9,
+      "shiftCount": 105,
+      "weekCount": 21,
+      "venues": {
+        "claudie": 892.9399999999995
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "milady rossell",
+      "displayName": "Milady Rossell",
+      "payrollName": "Rossell, Milady",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 864.0399999999997
+      },
+      "hours": 864,
+      "shiftCount": 102,
+      "weekCount": 22,
+      "venues": {
+        "ava_coconut_grove": 864.0399999999997
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "jesulus normila",
+      "displayName": "Normila Jesulus",
+      "payrollName": "Jesulus, Normila",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 828.0819999999998
+      },
+      "hours": 828.1,
+      "shiftCount": 103,
+      "weekCount": 24,
+      "venues": {
+        "mila": 828.0819999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "arletys garcia lopez",
+      "displayName": "Arletys Garcia Lopez",
+      "payrollName": "Garcia Lopez, Arletys",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 827.6199999999998
+      },
+      "hours": 827.6,
+      "shiftCount": 80,
+      "weekCount": 18,
+      "venues": {
+        "mila": 827.6199999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "chavarria kevin mora",
+      "displayName": "Kevin Chavarria Mora",
+      "payrollName": "Chavarria Mora, Kevin",
+      "primaryJob": "Food Expeditor",
+      "jobs": {
+        "Food Expeditor": 815.6439999999994
+      },
+      "hours": 815.6,
+      "shiftCount": 107,
+      "weekCount": 19,
+      "venues": {
+        "casa_neos": 815.6439999999994
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Expo",
+      "status": "auto"
+    },
+    {
+      "key": "obregon rivera zachell",
+      "displayName": "Zachell Rivera Obregon",
+      "payrollName": "Rivera Obregon, Zachell",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 803.226
+      },
+      "hours": 803.2,
+      "shiftCount": 92,
+      "weekCount": 18,
+      "venues": {
+        "casa_neos": 803.226
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "cinthia guitierraz marcela molina",
+      "displayName": "Cinthia Marcela Molina Guitierraz",
+      "payrollName": "Molina Guitierraz, Cinthia Marcela",
+      "primaryJob": "Temp Pastry",
+      "jobs": {
+        "Temp Pastry": 776.7399999999999
+      },
+      "hours": 776.7,
+      "shiftCount": 98,
+      "weekCount": 22,
+      "venues": {
+        "ava_coconut_grove": 776.7399999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "pierre rodry",
+      "displayName": "Rodry Pierre",
+      "payrollName": "Pierre, Rodry",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 761.4400000000002
+      },
+      "hours": 761.4,
+      "shiftCount": 97,
+      "weekCount": 21,
+      "venues": {
+        "ava_coconut_grove": 761.4400000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "jaime jennifer",
+      "displayName": "Jennifer Jaime",
+      "payrollName": "Jaime, Jennifer",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 743.9600000000003
+      },
+      "hours": 744,
+      "shiftCount": 97,
+      "weekCount": 23,
+      "venues": {
+        "ava_coconut_grove": 743.9600000000003
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "michelle rodriguez",
+      "displayName": "Michelle Rodriguez",
+      "payrollName": "Rodriguez, Michelle",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 741.9799999999997
+      },
+      "hours": 742,
+      "shiftCount": 86,
+      "weekCount": 19,
+      "venues": {
+        "ava_coconut_grove": 741.9799999999997
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "monge roxana",
+      "displayName": "Roxana Monge",
+      "payrollName": "Monge, Roxana",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 734.3299999999997
+      },
+      "hours": 734.3,
+      "shiftCount": 86,
+      "weekCount": 19,
+      "venues": {
+        "claudie": 734.3299999999997
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "morillo riveras yirda",
+      "displayName": "Yirda Riveras Morillo",
+      "payrollName": "Riveras Morillo, Yirda",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 718.217
+      },
+      "hours": 718.2,
+      "shiftCount": 80,
+      "weekCount": 17,
+      "venues": {
+        "mila": 718.217
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "munguia santa",
+      "displayName": "Santa Munguia",
+      "payrollName": "Munguia, Santa",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 716.8150000000003
+      },
+      "hours": 716.8,
+      "shiftCount": 84,
+      "weekCount": 18,
+      "venues": {
+        "casa_neos": 716.8150000000003
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "barrera maria",
+      "displayName": "Maria Barrera",
+      "payrollName": "Barrera, Maria",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 714.1900000000004
+      },
+      "hours": 714.2,
+      "shiftCount": 120,
+      "weekCount": 33,
+      "venues": {
+        "casa_neos": 714.1900000000004
+      },
+      "assignedFamily": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "louis pierre sylve",
+      "displayName": "Sylve Pierre Louis",
+      "payrollName": "Pierre Louis, Sylve",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 709.6059999999999
+      },
+      "hours": 709.6,
+      "shiftCount": 78,
+      "weekCount": 18,
+      "venues": {
+        "casa_neos": 709.6059999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "forero hector sabogal",
+      "displayName": "Hector Sabogal Forero",
+      "payrollName": "Sabogal Forero, Hector",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 707.05
+      },
+      "hours": 707,
+      "shiftCount": 89,
+      "weekCount": 19,
+      "venues": {
+        "ava_coconut_grove": 707.05
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "mario pestana",
+      "displayName": "Mario Pestana",
+      "payrollName": "Pestana, Mario",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 678.3900000000003
+      },
+      "hours": 678.4,
+      "shiftCount": 81,
+      "weekCount": 19,
+      "venues": {
+        "claudie": 678.3900000000003
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "fleming tanisha",
+      "displayName": "Tanisha Fleming",
+      "payrollName": "Fleming, Tanisha",
+      "primaryJob": "Food Expeditor",
+      "jobs": {
+        "Food Expeditor": 670.2359999999998
+      },
+      "hours": 670.2,
+      "shiftCount": 89,
+      "weekCount": 17,
+      "venues": {
+        "casa_neos": 670.2359999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Expo",
+      "status": "auto"
+    },
+    {
+      "key": "harris jordan",
+      "displayName": "Jordan Harris",
+      "payrollName": "Harris, Jordan",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 657.3700000000001
+      },
+      "hours": 657.4,
+      "shiftCount": 80,
+      "weekCount": 18,
+      "venues": {
+        "claudie": 657.3700000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "blanca leon",
+      "displayName": "Blanca Leon",
+      "payrollName": "Leon, Blanca",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 648.4629999999999
+      },
+      "hours": 648.5,
+      "shiftCount": 80,
+      "weekCount": 17,
+      "venues": {
+        "casa_neos": 648.4629999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "junior pineda",
+      "displayName": "Junior Pineda",
+      "payrollName": "Pineda, Junior",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 636.2599999999999
+      },
+      "hours": 636.3,
+      "shiftCount": 61,
+      "weekCount": 14,
+      "venues": {
+        "mila": 636.2599999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "caicedo garcia jenny v",
+      "displayName": "Jenny V Garcia Caicedo",
+      "payrollName": "Garcia Caicedo, Jenny V",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 619.1709999999998
+      },
+      "hours": 619.2,
+      "shiftCount": 70,
+      "weekCount": 16,
+      "venues": {
+        "casa_neos": 619.1709999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "leiva raul",
+      "displayName": "Raul Leiva",
+      "payrollName": "Leiva, Raul",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 612.9109999999998
+      },
+      "hours": 612.9,
+      "shiftCount": 63,
+      "weekCount": 15,
+      "venues": {
+        "casa_neos": 612.9109999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "beliard nemlyne",
+      "displayName": "Nemlyne Beliard",
+      "payrollName": "Beliard, Nemlyne",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 605.716
+      },
+      "hours": 605.7,
+      "shiftCount": 70,
+      "weekCount": 14,
+      "venues": {
+        "casa_neos": 605.716
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "castillo denirezt",
+      "displayName": "Denirezt Castillo",
+      "payrollName": "Castillo, Denirezt",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 597.4000000000002
+      },
+      "hours": 597.4,
+      "shiftCount": 87,
+      "weekCount": 17,
+      "venues": {
+        "casa_neos": 597.4000000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "angie buitrago pardo",
+      "displayName": "Angie Pardo Buitrago",
+      "payrollName": "Pardo Buitrago, Angie",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 586.7600000000002
+      },
+      "hours": 586.8,
+      "shiftCount": 72,
+      "weekCount": 15,
+      "venues": {
+        "casa_neos": 586.7600000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "castillo exequiel",
+      "displayName": "Exequiel Castillo",
+      "payrollName": "Castillo, Exequiel",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 564.2859999999998
+      },
+      "hours": 564.3,
+      "shiftCount": 64,
+      "weekCount": 16,
+      "venues": {
+        "mila": 564.2859999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "angelina gamboa",
+      "displayName": "Angelina Gamboa",
+      "payrollName": "Gamboa, Angelina",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 545.4399999999999
+      },
+      "hours": 545.4,
+      "shiftCount": 71,
+      "weekCount": 16,
+      "venues": {
+        "ava_coconut_grove": 545.4399999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "ikeda kaoru",
+      "displayName": "Kaoru Ikeda",
+      "payrollName": "Ikeda, Kaoru",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 524.1800000000002
+      },
+      "hours": 524.2,
+      "shiftCount": 81,
+      "weekCount": 18,
+      "venues": {
+        "ava_coconut_grove": 524.1800000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "jean wilser",
+      "displayName": "Wilser Jean",
+      "payrollName": "Jean, Wilser",
+      "primaryJob": "Temp Prep Cook",
+      "jobs": {
+        "Temp Prep Cook": 502.3599999999999
+      },
+      "hours": 502.4,
+      "shiftCount": 69,
+      "weekCount": 16,
+      "venues": {
+        "claudie": 502.3599999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "dube karadi",
+      "displayName": "Karadi Dube",
+      "payrollName": "Dube, Karadi",
+      "primaryJob": "Temp Pastry",
+      "jobs": {
+        "Temp Pastry": 495.55000000000007
+      },
+      "hours": 495.6,
+      "shiftCount": 71,
+      "weekCount": 17,
+      "venues": {
+        "claudie": 495.55000000000007
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "joshua reliford",
+      "displayName": "Joshua Reliford",
+      "payrollName": "Reliford, Joshua",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 484.72900000000016
+      },
+      "hours": 484.7,
+      "shiftCount": 68,
+      "weekCount": 17,
+      "venues": {
+        "casa_neos": 484.72900000000016
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "antonio moise",
+      "displayName": "Antonio Moise",
+      "payrollName": "Moise, Antonio",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 461.28999999999985
+      },
+      "hours": 461.3,
+      "shiftCount": 57,
+      "weekCount": 14,
+      "venues": {
+        "claudie": 461.28999999999985
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "bautista toledo yeraldin",
+      "displayName": "Yeraldin Bautista Toledo",
+      "payrollName": "Bautista Toledo, Yeraldin",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 440.27299999999997
+      },
+      "hours": 440.3,
+      "shiftCount": 45,
+      "weekCount": 10,
+      "venues": {
+        "mila": 440.27299999999997
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "jarquin jhonnys",
+      "displayName": "Jhonnys Jarquin",
+      "payrollName": "Jarquin, Jhonnys",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 436.63800000000003
+      },
+      "hours": 436.6,
+      "shiftCount": 59,
+      "weekCount": 13,
+      "venues": {
+        "casa_neos": 436.63800000000003
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "vargas victor",
+      "displayName": "Victor Vargas",
+      "payrollName": "Vargas, Victor",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 397.461
+      },
+      "hours": 397.5,
+      "shiftCount": 51,
+      "weekCount": 11,
+      "venues": {
+        "casa_neos": 397.461
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "angel hernandez hidalgo jose",
+      "displayName": "Jose Angel Hidalgo Hernandez",
+      "payrollName": "Hidalgo Hernandez, Jose Angel",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 372.74
+      },
+      "hours": 372.7,
+      "shiftCount": 36,
+      "weekCount": 8,
+      "venues": {
+        "claudie": 372.74
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "corea garcia karen",
+      "displayName": "Karen Garcia Corea",
+      "payrollName": "Garcia Corea, Karen",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 360.3539999999999
+      },
+      "hours": 360.4,
+      "shiftCount": 37,
+      "weekCount": 9,
+      "venues": {
+        "mila": 360.3539999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "claudia nova",
+      "displayName": "Claudia Nova",
+      "payrollName": "Nova, Claudia",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 344.00800000000004
+      },
+      "hours": 344,
+      "shiftCount": 42,
+      "weekCount": 20,
+      "venues": {
+        "casa_neos": 344.00800000000004
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "murad murphy",
+      "displayName": "Murad Murphy",
+      "payrollName": "Murphy, Murad",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 340.70199999999994
+      },
+      "hours": 340.7,
+      "shiftCount": 32,
+      "weekCount": 8,
+      "venues": {
+        "mila": 340.70199999999994
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "jackson phillip",
+      "displayName": "Phillip Jackson",
+      "payrollName": "Jackson, Phillip",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 321.39
+      },
+      "hours": 321.4,
+      "shiftCount": 39,
+      "weekCount": 9,
+      "venues": {
+        "ava_coconut_grove": 321.39
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "johnson montrell",
+      "displayName": "Montrell Johnson",
+      "payrollName": "Johnson, Montrell",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 310.88
+      },
+      "hours": 310.9,
+      "shiftCount": 43,
+      "weekCount": 10,
+      "venues": {
+        "ava_coconut_grove": 310.88
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "gerbenson gonzalez",
+      "displayName": "Gerbenson Gonzalez",
+      "payrollName": "Gonzalez, Gerbenson",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 297.94500000000005
+      },
+      "hours": 297.9,
+      "shiftCount": 35,
+      "weekCount": 7,
+      "venues": {
+        "mila": 297.94500000000005
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "anne choquez",
+      "displayName": "Anne Choquez",
+      "payrollName": "Choquez, Anne",
+      "primaryJob": "Temp Prep",
+      "jobs": {
+        "Temp Prep Cook": 93.67099999999999,
+        "Temp Prep": 175.072
+      },
+      "hours": 268.7,
+      "shiftCount": 29,
+      "weekCount": 6,
+      "venues": {
+        "casa_neos": 93.67099999999999,
+        "mila": 175.072
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "destiny mcrae",
+      "displayName": "Destiny McRae",
+      "payrollName": "McRae, Destiny",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 256.032
+      },
+      "hours": 256,
+      "shiftCount": 37,
+      "weekCount": 9,
+      "venues": {
+        "casa_neos": 256.032
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "clyde dozier",
+      "displayName": "Clyde Dozier",
+      "payrollName": "Dozier, Clyde",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 226.08
+      },
+      "hours": 226.1,
+      "shiftCount": 33,
+      "weekCount": 7,
+      "venues": {
+        "ava_coconut_grove": 226.08
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "loyola samantha vidal",
+      "displayName": "Samantha Loyola Vidal",
+      "payrollName": "Loyola Vidal, Samantha",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 216.27000000000004
+      },
+      "hours": 216.3,
+      "shiftCount": 29,
+      "weekCount": 8,
+      "venues": {
+        "claudie": 216.27000000000004
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "fitzgerald kim",
+      "displayName": "Kim Fitzgerald",
+      "payrollName": "Fitzgerald, Kim",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 205.84
+      },
+      "hours": 205.8,
+      "shiftCount": 26,
+      "weekCount": 6,
+      "venues": {
+        "ava_coconut_grove": 205.84
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "luster shawn",
+      "displayName": "Shawn Luster",
+      "payrollName": "Luster, Shawn",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 202.65
+      },
+      "hours": 202.7,
+      "shiftCount": 24,
+      "weekCount": 5,
+      "venues": {
+        "claudie": 202.65
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "colmenares dalila mabel",
+      "displayName": "Mabel Dalila Colmenares",
+      "payrollName": "Colmenares, Mabel Dalila",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 197.223
+      },
+      "hours": 197.2,
+      "shiftCount": 20,
+      "weekCount": 5,
+      "venues": {
+        "mila": 197.223
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "herrera neil rueda",
+      "displayName": "Neil Rueda Herrera",
+      "payrollName": "Rueda Herrera, Neil",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 195.46200000000005
+      },
+      "hours": 195.5,
+      "shiftCount": 25,
+      "weekCount": 25,
+      "venues": {
+        "mila": 195.46200000000005
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "beau brun wisnel",
+      "displayName": "Wisnel Beau Brun",
+      "payrollName": "Beau Brun, Wisnel",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 190.15800000000002
+      },
+      "hours": 190.2,
+      "shiftCount": 23,
+      "weekCount": 6,
+      "venues": {
+        "casa_neos": 190.15800000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "belakhdar hatem",
+      "displayName": "Hatem Belakhdar",
+      "payrollName": "Belakhdar, Hatem",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 177.43599999999998
+      },
+      "hours": 177.4,
+      "shiftCount": 20,
+      "weekCount": 5,
+      "venues": {
+        "mila": 177.43599999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "gonzalez joey omar",
+      "displayName": "Joey Omar Gonzalez",
+      "payrollName": "Gonzalez, Joey Omar",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 165.28999999999996
+      },
+      "hours": 165.3,
+      "shiftCount": 25,
+      "weekCount": 6,
+      "venues": {
+        "ava_coconut_grove": 165.28999999999996
+      },
+      "assignedFamily": null,
+      "fteFamily": "Pastry",
+      "ftePosition": "Pastry",
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "anonio gomez jose",
+      "displayName": "Jose Anonio Gomez",
+      "payrollName": "Gomez, Jose Anonio",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 150.20100000000002
+      },
+      "hours": 150.2,
+      "shiftCount": 19,
+      "weekCount": 4,
+      "venues": {
+        "casa_neos": 150.20100000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "alejandro lopez",
+      "displayName": "Alejandro Lopez",
+      "payrollName": "Lopez, Alejandro",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 122.46999999999998
+      },
+      "hours": 122.5,
+      "shiftCount": 18,
+      "weekCount": 5,
+      "venues": {
+        "ava_coconut_grove": 122.46999999999998
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "elsa martinez",
+      "displayName": "Elsa Martinez",
+      "payrollName": "Martinez, Elsa",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 115.25600000000001
+      },
+      "hours": 115.3,
+      "shiftCount": 11,
+      "weekCount": 4,
+      "venues": {
+        "mila": 115.25600000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "fornaris sebastian",
+      "displayName": "Sebastian Fornaris",
+      "payrollName": "Fornaris, Sebastian",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 111.76000000000003
+      },
+      "hours": 111.8,
+      "shiftCount": 16,
+      "weekCount": 3,
+      "venues": {
+        "claudie": 111.76000000000003
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "ramirez ronald",
+      "displayName": "Ronald Ramirez",
+      "payrollName": "Ramirez, Ronald",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 102.89999999999999
+      },
+      "hours": 102.9,
+      "shiftCount": 15,
+      "weekCount": 4,
+      "venues": {
+        "ava_coconut_grove": 102.89999999999999
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "arenas cesar nunez",
+      "displayName": "Cesar Nunez Arenas",
+      "payrollName": "Nunez Arenas, Cesar",
+      "primaryJob": "Food Expeditor",
+      "jobs": {
+        "Food Expeditor": 99.374
+      },
+      "hours": 99.4,
+      "shiftCount": 12,
+      "weekCount": 2,
+      "venues": {
+        "casa_neos": 99.374
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Expo",
+      "status": "auto"
+    },
+    {
+      "key": "andy galindo ponce",
+      "displayName": "Andy Ponce Galindo",
+      "payrollName": "Ponce Galindo, Andy",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 88.632
+      },
+      "hours": 88.6,
+      "shiftCount": 9,
+      "weekCount": 3,
+      "venues": {
+        "mila": 88.632
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "castillo cristiam gonzalez",
+      "displayName": "Cristiam Castillo Gonzalez",
+      "payrollName": "Castillo Gonzalez, Cristiam",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 73.023
+      },
+      "hours": 73,
+      "shiftCount": 10,
+      "weekCount": 3,
+      "venues": {
+        "mila": 73.023
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "antonio garner",
+      "displayName": "Antonio Garner",
+      "payrollName": "Garner, Antonio",
+      "primaryJob": "Temp Prep",
+      "jobs": {
+        "Temp Prep": 71.756
+      },
+      "hours": 71.8,
+      "shiftCount": 11,
+      "weekCount": 3,
+      "venues": {
+        "mila": 71.756
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "mariceli nuez",
+      "displayName": "Mariceli Nuez",
+      "payrollName": "Nuez, Mariceli",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 69.26
+      },
+      "hours": 69.3,
+      "shiftCount": 11,
+      "weekCount": 4,
+      "venues": {
+        "claudie": 69.26
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "castellanos rusbely",
+      "displayName": "Rusbely Castellanos",
+      "payrollName": "Castellanos, Rusbely",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 67.877
+      },
+      "hours": 67.9,
+      "shiftCount": 7,
+      "weekCount": 2,
+      "venues": {
+        "mila": 67.877
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "cesar garcia",
+      "displayName": "Cesar Garcia",
+      "payrollName": "Garcia, Cesar",
+      "primaryJob": "Expo",
+      "jobs": {
+        "Expo": 66.94200000000001
+      },
+      "hours": 66.9,
+      "shiftCount": 8,
+      "weekCount": 4,
+      "venues": {
+        "mila": 66.94200000000001
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Expo",
+      "status": "auto"
+    },
+    {
+      "key": "castellanos emiliano zabala",
+      "displayName": "Emiliano Castellanos Zabala",
+      "payrollName": "Castellanos Zabala, Emiliano",
+      "primaryJob": "Expo",
+      "jobs": {
+        "Expo": 61.489999999999995
+      },
+      "hours": 61.5,
+      "shiftCount": 9,
+      "weekCount": 2,
+      "venues": {
+        "claudie": 61.489999999999995
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Expo",
+      "status": "auto"
+    },
+    {
+      "key": "gonzalez nicolas pena",
+      "displayName": "Nicolas Pena Gonzalez",
+      "payrollName": "Pena Gonzalez, Nicolas",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 56.400000000000006
+      },
+      "hours": 56.4,
+      "shiftCount": 6,
+      "weekCount": 1,
+      "venues": {
+        "claudie": 56.400000000000006
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "jose mayorga",
+      "displayName": "Jose Mayorga",
+      "payrollName": "Mayorga, Jose",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 55.181
+      },
+      "hours": 55.2,
+      "shiftCount": 8,
+      "weekCount": 2,
+      "venues": {
+        "casa_neos": 55.181
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "perez ricardo",
+      "displayName": "Ricardo Perez",
+      "payrollName": "Perez, Ricardo",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 53.532999999999994
+      },
+      "hours": 53.5,
+      "shiftCount": 8,
+      "weekCount": 8,
+      "venues": {
+        "mila": 53.532999999999994
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "alfonso gonzalez santiago zambrano",
+      "displayName": "Santiago Alfonso Gonzalez Zambrano",
+      "payrollName": "Gonzalez Zambrano, Santiago Alfonso",
+      "primaryJob": "Sushi Cook",
+      "jobs": {
+        "Sushi Cook": 53.021
+      },
+      "hours": 53,
+      "shiftCount": 7,
+      "weekCount": 7,
+      "venues": {
+        "mila": 53.021
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Sushi",
+      "status": "auto"
+    },
+    {
+      "key": "barahona wendy",
+      "displayName": "Wendy Barahona",
+      "payrollName": "Barahona, Wendy",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 47.629999999999995
+      },
+      "hours": 47.6,
+      "shiftCount": 6,
+      "weekCount": 2,
+      "venues": {
+        "ava_coconut_grove": 47.629999999999995
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "jovan toomer",
+      "displayName": "Jovan Toomer",
+      "payrollName": "Toomer, Jovan",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 35.194
+      },
+      "hours": 35.2,
+      "shiftCount": 4,
+      "weekCount": 1,
+      "venues": {
+        "casa_neos": 35.194
+      },
+      "assignedFamily": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "nicole rodriguez tapia",
+      "displayName": "Nicole Rodriguez Tapia",
+      "payrollName": "Rodriguez Tapia, Nicole",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 25.71
+      },
+      "hours": 25.7,
+      "shiftCount": 3,
+      "weekCount": 1,
+      "venues": {
+        "ava_coconut_grove": 25.71
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "alvaro martinez",
+      "displayName": "Alvaro Martinez",
+      "payrollName": "Martinez, Alvaro",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 19.990000000000002
+      },
+      "hours": 20,
+      "shiftCount": 3,
+      "weekCount": 1,
+      "venues": {
+        "casa_neos": 19.990000000000002
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "hunter jack murray",
+      "displayName": "Jack Hunter Murray",
+      "payrollName": "Murray, Jack Hunter",
+      "primaryJob": "Expo",
+      "jobs": {
+        "Expo": 16.44
+      },
+      "hours": 16.4,
+      "shiftCount": 3,
+      "weekCount": 1,
+      "venues": {
+        "ava_coconut_grove": 16.44
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Expo",
+      "status": "auto"
+    },
+    {
+      "key": "fabian hernandez irma",
+      "displayName": "Irma Hernandez Fabian",
+      "payrollName": "Hernandez Fabian, Irma",
+      "primaryJob": "Pastry Cook",
+      "jobs": {
+        "Pastry Cook": 13.919
+      },
+      "hours": 13.9,
+      "shiftCount": 2,
+      "weekCount": 2,
+      "venues": {
+        "mila": 13.919
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "paul yadira",
+      "displayName": "Yadira Paul",
+      "payrollName": "Paul, Yadira",
+      "primaryJob": "Food Expeditor",
+      "jobs": {
+        "Food Expeditor": 7.163
+      },
+      "hours": 7.2,
+      "shiftCount": 1,
+      "weekCount": 1,
+      "venues": {
+        "casa_neos": 7.163
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Expo",
+      "status": "auto"
+    },
+    {
+      "key": "alexander marcus perez",
+      "displayName": "Marcus Alexander Perez",
+      "payrollName": "Perez, Marcus Alexander",
+      "primaryJob": "Expo",
+      "jobs": {
+        "Expo": 6.42
+      },
+      "hours": 6.4,
+      "shiftCount": 1,
+      "weekCount": 1,
+      "venues": {
+        "ava_coconut_grove": 6.42
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Expo",
+      "status": "auto"
+    },
+    {
+      "key": "lumbi quintero renato",
+      "displayName": "Renato Quintero Lumbi",
+      "payrollName": "Quintero Lumbi, Renato",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 6.1
+      },
+      "hours": 6.1,
+      "shiftCount": 1,
+      "weekCount": 1,
+      "venues": {
+        "claudie": 6.1
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "lackwood leticia",
+      "displayName": "Leticia Lackwood",
+      "payrollName": "Lackwood, Leticia",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 5.767
+      },
+      "hours": 5.8,
+      "shiftCount": 1,
+      "weekCount": 1,
+      "venues": {
+        "mila": 5.767
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "geraldine montiel",
+      "displayName": "Geraldine Montiel",
+      "payrollName": "Montiel, Geraldine",
+      "primaryJob": "Temp Pastry",
+      "jobs": {
+        "Temp Pastry": 5.5
+      },
+      "hours": 5.5,
+      "shiftCount": 1,
+      "weekCount": 1,
+      "venues": {
+        "claudie": 5.5
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Pastry",
+      "status": "auto"
+    },
+    {
+      "key": "jean jefferson louis",
+      "displayName": "Jefferson Jean Louis",
+      "payrollName": "Jean Louis, Jefferson",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 4.33
+      },
+      "hours": 4.3,
+      "shiftCount": 1,
+      "weekCount": 1,
+      "venues": {
+        "claudie": 4.33
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    },
+    {
+      "key": "jorge mendez",
+      "displayName": "Jorge Mendez",
+      "payrollName": "Mendez, Jorge",
+      "primaryJob": "Prep Cook",
+      "jobs": {
+        "Prep Cook": 4.057
+      },
+      "hours": 4.1,
+      "shiftCount": 1,
+      "weekCount": 1,
+      "venues": {
+        "casa_neos": 4.057
+      },
+      "assignedFamily": null,
+      "fteFamily": null,
+      "ftePosition": null,
+      "autoFamily": "Prep",
+      "status": "auto"
+    }
+  ]
+}
