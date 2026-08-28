@@ -36,22 +36,10 @@ const ALERT_TO = (process.env.FORECAST_EMAIL_ALERT_TO || 'matthias@rivieradining
 const VIA = String(process.env.FORECAST_EMAIL_VIA || 'graph').trim().toLowerCase();
 
 const FCAST_TO = [
-  'michael@rivieradininggroup.com',
-  'fabien@rivieradininggroup.com',
-  'greg@rivieradininggroup.com',
-  'marine@rivieradininggroup.com',
-  'sheena@rivieradininggroup.com'
+  /* TEST: only Matthias until Forecast flash capture is verified end-to-end */
+  'matthias@rivieradininggroup.com'
 ];
-const FCAST_CC = [
-  'Salesteam@rivieradininggroup.com',
-  'matthias@rivieradininggroup.com',
-  'takuma@rivieradininggroup.com',
-  'VIP@rivieradininggroup.com',
-  'yulyana@rivieradininggroup.com',
-  'g.moorefield@rivieradininggroup.com',
-  'Perrine@rivieradininggroup.com',
-  'j.costini@rivieradininggroup.com'
-];
+const FCAST_CC = [];
 
 const VENUES = ['Casa Neos Beach Club', 'MILA Lounge', 'Casa Neos Lounge'];
 
@@ -198,6 +186,34 @@ function buildPdfFromJpegs(jpegBuffers, pageW, pageH) {
   return Buffer.concat(chunks);
 }
 
+async function passSessionGate(page) {
+  /* Name gate blocks the dashboard until localStorage/sessionStorage are set. */
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem('rdg_presence_name', 'RDG Automation');
+      sessionStorage.setItem('rdg_session_active', '1');
+      sessionStorage.setItem('rdg_session_activity', String(Date.now()));
+    } catch (_) {}
+  });
+}
+
+async function ensureSessionUnlocked(page) {
+  const locked = await page.evaluate(() => {
+    return document.body.classList.contains('session-locked')
+      || !!(document.getElementById('sessionGate') && !document.getElementById('sessionGate').classList.contains('hidden'));
+  });
+  if (!locked) return;
+  log('Session gate visible — submitting automation name…');
+  await page.fill('#sessionGateName', 'RDG Automation');
+  await page.click('#sessionGate .btn-save');
+  await page.waitForFunction(() => {
+    const gate = document.getElementById('sessionGate');
+    return !document.body.classList.contains('session-locked')
+      && (!gate || gate.classList.contains('hidden'));
+  }, { timeout: 60000 });
+  await page.waitForTimeout(1500);
+}
+
 async function captureVenuePack(page, venue, weekNum, vi) {
   await page.evaluate((v) => {
     curV = v;
@@ -208,7 +224,15 @@ async function captureVenuePack(page, venue, weekNum, vi) {
     document.body.classList.add('printing-forecast');
   }, venue);
 
-  await page.waitForSelector('#view-forecast .fcast-print-page1', { timeout: 30000 });
+  await page.waitForSelector('#view-forecast .fcast-print-page1', { timeout: 30000, state: 'visible' });
+  /* Must not screenshot the name gate / empty shell. */
+  await page.waitForFunction(() => {
+    if (document.body.classList.contains('session-locked')) return false;
+    const gate = document.getElementById('sessionGate');
+    if (gate && !gate.classList.contains('hidden')) return false;
+    const p1 = document.querySelector('#view-forecast .fcast-print-page1');
+    return !!(p1 && p1.offsetHeight > 120);
+  }, { timeout: 30000 });
   await page.waitForTimeout(800);
 
   const p1 = page.locator('#view-forecast .fcast-print-page1');
@@ -236,10 +260,12 @@ async function captureAllVenues() {
   const browser = await chromium.launch({ headless: true });
   try {
     const page = await browser.newPage({ viewport: { width: 1400, height: 1100 } });
+    await passSessionGate(page);
     log(`Opening ${DASH_URL}`);
     await page.goto(DASH_URL, { waitUntil: 'domcontentloaded', timeout: 90000 });
+    await ensureSessionUnlocked(page);
     await page.waitForFunction(() => {
-      return !!(window._fbReady || window._forecastLive || document.querySelector('#view-forecast'));
+      return !!(window._fbReady || window._forecastLive || document.querySelector('#view-forecast .fcast-print-page1'));
     }, { timeout: 90000 });
     await page.waitForTimeout(2500);
 
@@ -247,6 +273,7 @@ async function captureAllVenues() {
       if (typeof setView === 'function') setView('forecast');
     });
     await page.waitForSelector('#view-forecast', { timeout: 30000 });
+    await ensureSessionUnlocked(page);
 
     const results = [];
     for (let i = 0; i < VENUES.length; i++) {
@@ -272,7 +299,7 @@ function buildHtmlBody(results, todayLabel, { embedDataUri = false } = {}) {
     }
   });
   html += '<p style="margin-top:18px;font-size:12px;color:#8e8e93">PDFs attached for each location (page 1 = Actual vs Target + Details; page 2 = Pick up pace).</p>';
-  html += '<p style="margin-top:8px;font-size:11px;color:#8e8e93">Sent automatically after FourVenues Forecast BS Actual refreshed for today.</p>';
+  html += '<p style="margin-top:8px;font-size:11px;color:#8e8e93">Sent automatically after FourVenues Forecast BS Actual refreshed for today. <b>TEST send — Matthias only.</b></p>';
   html += '</div>';
   return html;
 }
@@ -437,8 +464,12 @@ function resolveAttempt(et) {
   catch (e) { log(`Status read warn: ${e.message}`); }
 
   if (prev && prev.miamiDay === day && prev.sent === true) {
-    log('Already sent today — one email max, skip');
-    process.exit(0);
+    if (String(process.env.FORECAST_EMAIL_FORCE || '').trim() === '1') {
+      log('FORECAST_EMAIL_FORCE=1 — re-sending even though already marked sent today');
+    } else {
+      log('Already sent today — one email max, skip');
+      process.exit(0);
+    }
   }
   if (prev && prev.miamiDay === day && prev.failedAlertSent === true && isFinal) {
     log('Failure alert already sent today — skip');
