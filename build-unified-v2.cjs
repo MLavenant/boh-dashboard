@@ -17,10 +17,10 @@ try {
 } catch(e) {
   // fallback
 }
-// Clean CI/Pages worktrees do not include data/rolling.json. Discover immutable
-// week payloads from tracked venue files instead of silently falling back to W27.
-if (!rollingWeeks.length) {
-  const foundWeeks = new Set();
+// Always merge immutable week payloads from tracked venue files so Period/Year
+// can offer the full fiscal index (even when rolling.json is a short window).
+{
+  const foundWeeks = new Set(rollingWeeks.map((w) => w.key));
   for (const file of fs.readdirSync(__dirname)) {
     const m = file.match(/-data-(\d{4}-W\d{2})\.json$/);
     if (m) foundWeeks.add(m[1]);
@@ -30,6 +30,37 @@ if (!rollingWeeks.length) {
     .map((key) => ({ label: 'W' + key.slice(-2), key }));
 }
 if (!rollingWeeks.length) rollingWeeks = [{ label: 'W27', key: '2026-W27' }];
+
+// Full week index for Period/Year/week dropdown (data may load on demand from Firebase).
+// Local disk often only has the recent embed window; still offer W01 → latest so P1–P4 work.
+{
+  const latestKey = rollingWeeks[rollingWeeks.length - 1].key;
+  const m = latestKey && latestKey.match(/^(\d{4})-W(\d{2})$/);
+  if (m) {
+    const year = m[1];
+    const latestNum = parseInt(m[2], 10);
+    const full = [];
+    for (let n = 1; n <= latestNum; n++) {
+      const key = year + '-W' + String(n).padStart(2, '0');
+      full.push({ label: 'W' + String(n).padStart(2, '0'), key });
+    }
+    // Prefer discovered labels when present, but never drop early fiscal weeks.
+    const byKey = new Map(full.map((w) => [w.key, w]));
+    for (const w of rollingWeeks) byKey.set(w.key, w);
+    rollingWeeks = [...byKey.values()].sort((a, b) => String(a.key).localeCompare(String(b.key)));
+  }
+}
+const KNOWN_WEEKS = rollingWeeks.slice();
+
+// GitHub Pages cannot host a 100MB+ dashboard.html. Cap embedded weeks
+// (older weeks still load from Firebase when available). Override with BOH_EMBED_MAX_WEEKS.
+{
+  const maxEmbed = Number(process.env.BOH_EMBED_MAX_WEEKS || 8);
+  if (maxEmbed > 0 && rollingWeeks.length > maxEmbed) {
+    rollingWeeks = rollingWeeks.slice(-maxEmbed);
+    console.log(`Embedding last ${rollingWeeks.length} weeks in Pages shell (${rollingWeeks[0].key} → ${rollingWeeks[rollingWeeks.length - 1].key}); known index ${KNOWN_WEEKS[0].key} → ${KNOWN_WEEKS[KNOWN_WEEKS.length - 1].key}`);
+  }
+}
 
 const DIR = __dirname;
 
@@ -59,6 +90,27 @@ let CHEF_TARGET_OVERRIDES = {};
 try {
   CHEF_TARGET_OVERRIDES = JSON.parse(fs.readFileSync(path.join(DIR, 'chef-target-overrides.json'), 'utf8'));
 } catch(e) { /* file not found, skip */ }
+
+let PEOPLE_ASSIGNMENT_PANEL = { needsAssignment: [], assigned: [], autoAssigned: [], families: [], counts: {} };
+try {
+  const panelCandidates = [
+    path.join(DIR, 'people-assignment-panel.json'),
+    path.join(DIR, 'data', 'fte', 'people-assignment-panel.json'),
+  ];
+  for (const p of panelCandidates) {
+    if (fs.existsSync(p)) {
+      PEOPLE_ASSIGNMENT_PANEL = JSON.parse(fs.readFileSync(p, 'utf8'));
+      break;
+    }
+  }
+} catch(e) { /* run build-people-assignment-panel.cjs */ }
+
+let PEOPLE_STATION_ASSIGNMENTS = { assignments: {} };
+try {
+  PEOPLE_STATION_ASSIGNMENTS = JSON.parse(
+    fs.readFileSync(path.join(DIR, 'people-station-assignments.json'), 'utf8')
+  );
+} catch(e) { /* optional */ }
 
 // Pipeline health / sanity check status
 let PIPELINE_HEALTH = {};
@@ -149,7 +201,7 @@ html = html.replace(
   `<div class="section-title">Items Per Staff</div>
 <div class="card" id="itemsPerStaffCard" style="margin:0 0 18px">
   <h2 style="margin:0 0 4px">ITEMS PER STAFF</h2>
-  <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Stations dashboard — compare locations and drill into hourly load, staffing, and fulfillment. Select week, fiscal period (4-4-5 from 12/29/2025), or full fiscal year. Items/staff requires FTE×labor join.</p>
+  <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Stations dashboard — compare locations and drill into hourly load, staffing, and fulfillment. Use <strong>Week</strong> (W01–W34 in the header dropdown), <strong>Period</strong> (4-4-5 from 12/29/2025, e.g. P4 = W14–W17), or <strong>Year</strong>. Early weeks load from cloud on demand when you select them.</p>
   <p id="itemsPerStaffWeekNote" class="note" style="display:none;margin:8px 0 0;color:#f59e0b"></p>
   <div id="itemsPerStaffBody">
     <div id="ipsScopeBar" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px;padding:12px 14px;background:#13161c;border:1px solid #262a33;border-radius:10px">
@@ -199,11 +251,18 @@ html = html.replace(
 <div class="station-detail" id="stationDetail" style="display:none"></div>$1`
 );
 
-// Add Assignment + Group + Settings tabs to nav
-html = html.replace(
-  '<button class="tab-btn" onclick="switchTab(\'menu\',this)">Menu Items</button>\n</nav>',
-  '<button class="tab-btn" onclick="switchTab(\'menu\',this)">Menu Items</button>\n  <button class="tab-btn" onclick="switchTab(\'assignment\',this)">📋 Assignment</button>\n  <button class="tab-btn" onclick="switchTab(\'group\',this)">🏢 Group</button>\n  <button class="tab-btn" onclick="switchTab(\'settings\',this)">⚙️ Settings</button>\n</nav>'
-);
+// Add Assignment + Group + People + Settings tabs to nav
+{
+  const navRe = /(<button class="tab-btn"[^>]*>Menu Items<\/button>)(\s*)<\/nav>/;
+  if (!navRe.test(html)) {
+    console.warn('WARN: could not find Menu Items nav button to inject extra tabs');
+  } else {
+    html = html.replace(
+      navRe,
+      '$1$2  <button class="tab-btn" onclick="switchTab(\'assignment\',this)">📋 Assignment</button>\n  <button class="tab-btn" onclick="switchTab(\'group\',this)">🏢 Group</button>\n  <button class="tab-btn" onclick="switchTab(\'people\',this)">People</button>\n  <button class="tab-btn" onclick="switchTab(\'settings\',this)">⚙️ Settings</button>\n</nav>'
+    );
+  }
+}
 
 // Remove Visual 3 (Load vs Performance) — Breaking Point only on overview
 html = html.replace(
@@ -365,6 +424,50 @@ html = html.replace(
   <p class="note">Food dishes only — spirits, wine, cocktails, and coffee/tea are excluded. Highest fulfillment spread where a <strong>target</strong> exists. Matches exact names and like-to-like prefixes (CL-… / C-… / ACG-…).</p>
   <div id="groupItemVarianceTargetTable" style="overflow-x:auto"></div>
 </div>
+</div>
+</section>
+
+<!-- ========== TAB: PEOPLE (Toast Line Cook / CDP → station) ========== -->
+<section id="tab-people" class="tab-section">
+<div class="section-title">People — Station Assignment</div>
+<div class="card">
+  <h2>Assign Line Cook / CDP / Chef de Partie to a station family</h2>
+  <p class="note">Global list across <strong>all locations</strong> (not filtered by the venue pill). Prep/Pastry/Sushi auto-map; Line Cook / CDP / Chef de Partie need a station. One row per person even if they worked multiple venues.</p>
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+    <input id="peopleSearch" type="text" placeholder="Search name or job…" oninput="renderPeople()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;width:220px;outline:none">
+    <select id="peopleFilter" onchange="renderPeople()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;outline:none">
+      <option value="needs" selected>Needs assignment (all locations)</option>
+      <option value="all">All cooks — every unique person</option>
+      <option value="assigned">Assigned / FTE-covered</option>
+      <option value="auto">Auto-mapped (Prep/Pastry/…)</option>
+    </select>
+    <select id="peopleLocationFilter" onchange="renderPeople()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;outline:none">
+      <option value="">All locations</option>
+      <option value="casa_neos">Casa Neos</option>
+      <option value="claudie">Claudie</option>
+      <option value="mila">MILA</option>
+      <option value="ava_coconut_grove">AVA Coconut Grove</option>
+      <option value="ava_winter_park">AVA Winter Park</option>
+    </select>
+    <button type="button" onclick="exportPeopleAssignments()" style="padding:6px 14px;background:#2d3448;border:1px solid #3d4458;color:#e8eaed;border-radius:8px;font-size:13px;cursor:pointer">Export assignments</button>
+    <span id="peopleCount" style="font-size:12px;color:#9aa0aa"></span>
+    <span id="peopleSaveStatus" style="font-size:12px;color:#22c55e"></span>
+  </div>
+  <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="background:#1e2533;text-align:left">
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Name</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Toast job</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Locations</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600;text-align:right">Hours (YTD)</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">FTE hint</th>
+          <th style="padding:8px 10px;color:#9aa0aa;font-weight:600">Station family</th>
+        </tr>
+      </thead>
+      <tbody id="peopleBody"></tbody>
+    </table>
+  </div>
 </div>
 </section>
 
@@ -624,7 +727,9 @@ const allDataJS = `const ALL_DATA = ${JSON.stringify(VENUES, null, 0)};
 const ITEM_TARGETS_DATA = ${JSON.stringify(ITEM_TARGETS, null, 0)};
 const ITEM_STATION_MAP_DATA = ${JSON.stringify(ITEM_STATION_MAP, null, 0)};
 const CHEF_TARGET_OVERRIDES = ${JSON.stringify(CHEF_TARGET_OVERRIDES, null, 0)};
-const PIPELINE_HEALTH_DATA = ${JSON.stringify(PIPELINE_HEALTH, null, 0)};`;
+const PIPELINE_HEALTH_DATA = ${JSON.stringify(PIPELINE_HEALTH, null, 0)};
+const PEOPLE_ASSIGNMENT_PANEL = ${JSON.stringify(PEOPLE_ASSIGNMENT_PANEL, null, 0)};
+const PEOPLE_STATION_ASSIGNMENTS = ${JSON.stringify(PEOPLE_STATION_ASSIGNMENTS, null, 0)};`;
 
 // ── Generate the new <script> block ──────────────────────────────────────────
 const newScript = `
@@ -635,9 +740,12 @@ const newScript = `
 ${allDataJS}
 
 const WEEKS = ${JSON.stringify(rollingWeeks)};
+const KNOWN_WEEKS = ${JSON.stringify(KNOWN_WEEKS)};
 const FB_BOH_DB = 'https://rdg-dj-dashboard-default-rtdb.firebaseio.com';
 let BOH_CLOUD_STATUS = null; // /rdg/scrapeStatus/bohWeekly
 let BOH_CLOUD_META = null;   // /rdg/boh/meta
+const BOH_WEEK_LOAD_STATE = {}; // weekKey → 'loading' | 'loaded' | 'missing'
+let BOH_WEEK_LOAD_QUEUE = Promise.resolve();
 // Always open on the chronologically latest week
 let currentWeekIdx = (() => {
   let best = 0;
@@ -647,6 +755,80 @@ let currentWeekIdx = (() => {
   return WEEKS.length ? best : 0;
 })();
 let currentVenue = 'claudie';
+function refreshWeekDropdown() {
+  const dd = document.getElementById('weekDropdown');
+  if (!dd) return;
+  dd.innerHTML = WEEKS.map((w, i) =>
+    '<option value="' + i + '"' + (i === currentWeekIdx ? ' selected' : '') + '>' + w.label + '</option>'
+  ).join('');
+  const wpBtn = document.getElementById('weekPrev');
+  const wnBtn = document.getElementById('weekNext');
+  if (wpBtn) wpBtn.disabled = currentWeekIdx === 0;
+  if (wnBtn) wnBtn.disabled = currentWeekIdx >= WEEKS.length - 1;
+}
+function seedKnownWeeksIntoSelector() {
+  (KNOWN_WEEKS || []).forEach(w => ensureWeekInList(w.key));
+  refreshWeekDropdown();
+}
+function weekPayloadPresent(weekKey) {
+  const venues = (typeof IPS_VENUE_KEYS !== 'undefined' && IPS_VENUE_KEYS) || ['claudie', 'casaneos', 'ava_cg', 'ava_wp', 'mila'];
+  return venues.some(vk => {
+    const d = ALL_DATA[vk] && ALL_DATA[vk][weekKey];
+    return d && (Array.isArray(d.stations) ? d.stations.length > 0 : !!d.stations || !!d.staffing || !!d.stationHourItems);
+  });
+}
+async function fetchBohWeekFromFirebase(weekKey) {
+  const venues = (BOH_CLOUD_META && BOH_CLOUD_META.venues) || ['claudie', 'casaneos', 'ava_cg', 'ava_wp', 'mila'];
+  let got = false;
+  for (const venueKey of venues) {
+    try {
+      const data = await fbGetJson('/rdg/boh/weeks/' + encodeURIComponent(weekKey) + '/' + encodeURIComponent(venueKey));
+      if (!data || typeof data !== 'object') continue;
+      if (!ALL_DATA[venueKey]) ALL_DATA[venueKey] = {};
+      const prev = ALL_DATA[venueKey][weekKey];
+      ALL_DATA[venueKey][weekKey] = mergeBohWeekPayload(prev, data);
+      got = true;
+    } catch (e) { /* week/venue may not exist yet */ }
+  }
+  return got;
+}
+/** Load missing weeks from Firebase on demand (Period / Year / early week picks). */
+async function ensureWeeksLoaded(weekKeys, opts) {
+  const keys = [...new Set((weekKeys || []).filter(Boolean))];
+  if (!keys.length) return { loaded: [], missing: [] };
+  keys.forEach(ensureWeekInList);
+  const need = keys.filter(wk => !weekPayloadPresent(wk) && BOH_WEEK_LOAD_STATE[wk] !== 'missing');
+  if (!need.length) {
+    refreshWeekDropdown();
+    return { loaded: keys.filter(weekPayloadPresent), missing: keys.filter(wk => !weekPayloadPresent(wk)) };
+  }
+  const banner = document.getElementById('ipsMissingBanner');
+  if (banner && !(opts && opts.silent)) {
+    banner.style.display = '';
+    banner.innerHTML = '<strong>Loading weeks from cloud…</strong> ' + need.map(w => w.replace('2026-','')).join(', ');
+  }
+  const run = async () => {
+    const loaded = [];
+    const missing = [];
+    for (const wk of need) {
+      if (weekPayloadPresent(wk)) { BOH_WEEK_LOAD_STATE[wk] = 'loaded'; loaded.push(wk); continue; }
+      BOH_WEEK_LOAD_STATE[wk] = 'loading';
+      const ok = await fetchBohWeekFromFirebase(wk);
+      if (ok || weekPayloadPresent(wk)) {
+        BOH_WEEK_LOAD_STATE[wk] = 'loaded';
+        loaded.push(wk);
+        ensureWeekInList(wk);
+      } else {
+        BOH_WEEK_LOAD_STATE[wk] = 'missing';
+        missing.push(wk);
+      }
+    }
+    refreshWeekDropdown();
+    return { loaded, missing };
+  };
+  BOH_WEEK_LOAD_QUEUE = BOH_WEEK_LOAD_QUEUE.then(run, run);
+  return BOH_WEEK_LOAD_QUEUE;
+}
 function ensureServiceThroughput(data) {
   if (!data || !data.staffing || !data.staffing.byFamily) return data || {};
   const staffing = data.staffing;
@@ -773,13 +955,18 @@ async function loadBohFromFirebase() {
     BOH_CLOUD_META = meta;
     const venues = meta.venues || ['claudie', 'casaneos', 'ava_cg', 'ava_wp', 'mila'];
     const weekKey = meta.latestWeek;
+    seedKnownWeeksIntoSelector();
     ensureWeekInList(weekKey);
+    // Register every known cloud week in the dropdown (do not eagerly download all —
+    // Period/Year/early weeks load on demand via ensureWeeksLoaded).
     (meta.weeks || []).forEach(ensureWeekInList);
 
-    const weekKeys = new Set(meta.weeks || [weekKey]);
-    WEEKS.forEach(w => weekKeys.add(w.key));
+    const eager = new Set([weekKey]);
+    // Prefer a small recent window for first paint; keep embedded weeks as-is.
+    (meta.weeks || []).slice(0, 3).forEach(wk => eager.add(wk));
+    WEEKS.slice(-8).forEach(w => eager.add(w.key));
 
-    for (const wk of weekKeys) {
+    for (const wk of eager) {
       for (const venueKey of venues) {
         try {
           const data = await fbGetJson('/rdg/boh/weeks/' + encodeURIComponent(wk) + '/' + encodeURIComponent(venueKey));
@@ -788,6 +975,7 @@ async function loadBohFromFirebase() {
           const prev = ALL_DATA[venueKey][wk];
           ALL_DATA[venueKey][wk] = mergeBohWeekPayload(prev, data);
           ensureWeekInList(wk);
+          BOH_WEEK_LOAD_STATE[wk] = 'loaded';
         } catch (e) { /* week/venue may not exist yet */ }
       }
     }
@@ -797,12 +985,7 @@ async function loadBohFromFirebase() {
       if (String(WEEKS[i].key) > String(WEEKS[best].key)) best = i;
     }
     currentWeekIdx = best;
-    const dd = document.getElementById('weekDropdown');
-    if (dd) {
-      dd.innerHTML = WEEKS.map((w, i) =>
-        '<option value="' + i + '"' + (i === currentWeekIdx ? ' selected' : '') + '>' + w.label + '</option>'
-      ).join('');
-    }
+    refreshWeekDropdown();
     const badge = document.getElementById('dashBadge');
     if (badge) {
       const latestKey = WEEKS[best]?.key || weekKey;
@@ -2817,12 +3000,34 @@ function onIpsViewModeChange() {
   renderItemsPerStaff();
 }
 
+async function renderItemsPerStaff() {
+  initIpsScopeSelectors();
+  // Resolve expected weeks for Period/Year even before data is loaded, then fetch from cloud.
+  let expectedKeys = [];
+  if (ipsViewMode === 'period') {
+    const pSel = document.getElementById('ipsPeriodSelect');
+    const p = FISCAL_PERIODS.find(x => x.key === (pSel?.value || ipsPeriodKey));
+    expectedKeys = (p && p.weekKeys) || [];
+  } else if (ipsViewMode === 'year') {
+    const ySel = document.getElementById('ipsYearSelect');
+    const fy = parseInt(ySel?.value || ipsFiscalYear, 10) || 2026;
+    expectedKeys = FISCAL_PERIODS.filter(p => p.fy === fy).flatMap(p => p.weekKeys);
+  } else {
+    const wk = WEEKS[currentWeekIdx]?.key;
+    if (wk) expectedKeys = [wk];
+  }
+  if (expectedKeys.length) {
+    await ensureWeeksLoaded(expectedKeys);
+  }
+  _renderItemsPerStaffBody();
+}
+
 function initIpsScopeSelectors() {
   const pSel = document.getElementById('ipsPeriodSelect');
   const ySel = document.getElementById('ipsYearSelect');
   if (pSel && !pSel.options.length) {
     pSel.innerHTML = FISCAL_PERIODS.map(p =>
-      '<option value="'+p.key+'">'+p.label+'</option>'
+      '<option value="'+p.key+'">'+p.label+' ('+(p.weekKeys||[]).map(w => w.replace('2026-','')).join(', ')+')</option>'
     ).join('');
     const cur = WEEKS[currentWeekIdx]?.key;
     const fidx = fiscalWeekIndex(cur);
@@ -2867,15 +3072,26 @@ function renderIpsMissingBanner(scope) {
   const el = document.getElementById('ipsMissingBanner');
   if (!el) return;
   const weekKeys = scope.weekKeys || [];
+  let expected = [];
+  if (ipsViewMode === 'period' && scope.period) expected = scope.period.weekKeys || [];
+  else if (ipsViewMode === 'year' && scope.fy) expected = FISCAL_PERIODS.filter(p => p.fy === scope.fy).flatMap(p => p.weekKeys);
   if (!weekKeys.length) {
     el.style.display = '';
-    el.innerHTML = '<strong>Missing data:</strong> no weekly JSON for this scope. Run the weekly pipeline for these ISO weeks.';
+    const wanted = (expected && expected.length) ? expected : [];
+    const loading = wanted.filter(wk => BOH_WEEK_LOAD_STATE[wk] === 'loading');
+    if (loading.length) {
+      el.innerHTML = '<strong>Loading cloud weeks…</strong> ' + loading.map(wk => wk.replace('2026-','')).join(', ');
+      return;
+    }
+    el.innerHTML = '<strong>No weeks loaded for this scope yet.</strong> '
+      + (wanted.length ? ('Expected ' + wanted.map(wk => wk.replace('2026-','')).join(', ') + '. ') : '')
+      + 'YTD ticket/labor files exist locally — they must be published to Firebase (or embedded) before Period/Year can display. Re-select after publish finishes.';
     return;
   }
   const lines = [];
   const noStaffWeeks = weekKeys.filter(wk => !weekStaffingExists(wk));
   if (noStaffWeeks.length) {
-    lines.push('<strong>Staff / items-per-staff missing</strong> for '+noStaffWeeks.map(wk => wk.replace('2026-','')).join(', ')+' — need FTE×labor join (currently W33 & W34). Items still show where item-details exist.');
+    lines.push('<strong>Staff / items-per-staff missing</strong> for '+noStaffWeeks.map(wk => wk.replace('2026-','')).join(', ')+' — FTE×labor join may be incomplete for those weeks. Items still show where item-details exist.');
   }
   if (currentVenue === 'claudie' && weekKeys.some(wk => !ALL_DATA.claudie?.[wk]?.staffing)) {
     lines.push('<strong>Claudie staffing</strong> not joined yet — Table 1 shows — for Claudie; other venues may still populate.');
@@ -2885,10 +3101,9 @@ function renderIpsMissingBanner(scope) {
     lines.push('Item-details hourly lists missing for some weeks: '+noItemWeeks.map(wk => wk.replace('2026-','')).join(', ')+'.');
   }
   if (ipsViewMode !== 'week') {
-    const expected = scope.period ? scope.period.weekKeys : FISCAL_PERIODS.filter(p => p.fy === scope.fy).flatMap(p => p.weekKeys);
     const missingFiles = (expected || []).filter(wk => !weekDataExists(wk));
     if (missingFiles.length) {
-      lines.push('<strong>Weeks in fiscal calendar without saved data:</strong> '+missingFiles.map(wk => wk.replace('2026-','')).join(', ')+'.');
+      lines.push('<strong>Weeks in fiscal calendar without loaded data:</strong> '+missingFiles.map(wk => wk.replace('2026-','')).join(', ')+'.');
     }
   }
   if (!lines.length) {
@@ -3235,7 +3450,7 @@ function renderIpsTable3Fulfillment(scope, family) {
   el.innerHTML = html;
 }
 
-function renderItemsPerStaff() {
+function _renderItemsPerStaffBody() {
   const card = document.getElementById('itemsPerStaffCard');
   const body = document.getElementById('itemsPerStaffBody');
   const noteEl = document.getElementById('itemsPerStaffNote');
@@ -3256,7 +3471,7 @@ function renderItemsPerStaff() {
   if (!scope.weekKeys.length) {
     ['ipsTable1Summary','ipsTable2Hourly','ipsTable3Fulfillment'].forEach(id => {
       const t = document.getElementById(id);
-      if (t) t.innerHTML = '<p class="note" style="margin:0">No weekly data for this scope.</p>';
+      if (t) t.innerHTML = '<p class="note" style="margin:0">No weekly data for this scope yet — if cloud publish is still catching up, wait a moment and re-select the period.</p>';
     });
     if (noteEl) noteEl.textContent = '';
     return;
@@ -5059,12 +5274,132 @@ function renderSettings() {
 }
 
 // ============================================================
+// TAB: PEOPLE — Line Cook / CDP → station family
+// ============================================================
+function peopleStorageKey() { return 'boh_people_station_assignments'; }
+function loadPeopleLocal() {
+  try { return JSON.parse(localStorage.getItem(peopleStorageKey()) || '{}'); } catch { return {}; }
+}
+function savePeopleLocal(map) {
+  localStorage.setItem(peopleStorageKey(), JSON.stringify(map));
+}
+function mergedPeopleAssignments() {
+  const base = (typeof PEOPLE_STATION_ASSIGNMENTS !== 'undefined' && PEOPLE_STATION_ASSIGNMENTS.assignments) || {};
+  return { ...base, ...loadPeopleLocal() };
+}
+function renderPeople() {
+  const body = document.getElementById('peopleBody');
+  const countEl = document.getElementById('peopleCount');
+  if (!body) return;
+  const panel = (typeof PEOPLE_ASSIGNMENT_PANEL !== 'undefined' && PEOPLE_ASSIGNMENT_PANEL) || {};
+  const families = panel.families || ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
+  const filter = (document.getElementById('peopleFilter') || {}).value || 'needs';
+  const locFilter = (document.getElementById('peopleLocationFilter') || {}).value || '';
+  const q = ((document.getElementById('peopleSearch') || {}).value || '').trim().toLowerCase();
+  const assigns = mergedPeopleAssignments();
+  const venueLabels = {
+    casa_neos: 'Casa Neos', mila: 'MILA', ava_coconut_grove: 'AVA CG',
+    ava_winter_park: 'AVA WP', claudie: 'Claudie', casa_neos_lounge: 'CN Lounge',
+  };
+
+  // Always global — never filtered by the venue pill (currentVenue)
+  let rows = [];
+  if (filter === 'all' && Array.isArray(panel.allPeople) && panel.allPeople.length) {
+    rows = panel.allPeople.slice();
+  } else {
+    if (filter === 'needs' || filter === 'all') rows = rows.concat(panel.needsAssignment || []);
+    if (filter === 'assigned' || filter === 'all') rows = rows.concat(panel.assigned || []);
+    if (filter === 'auto' || filter === 'all') rows = rows.concat(panel.autoAssigned || []);
+  }
+  const seen = new Set();
+  rows = rows.filter(r => {
+    if (!r || !r.key || seen.has(r.key)) return false;
+    seen.add(r.key);
+    return true;
+  });
+  if (locFilter) {
+    rows = rows.filter(r => Object.prototype.hasOwnProperty.call(r.venues || {}, locFilter));
+  }
+  if (q) {
+    rows = rows.filter(r =>
+      (r.displayName || '').toLowerCase().includes(q) ||
+      (r.payrollName || '').toLowerCase().includes(q) ||
+      (r.primaryJob || '').toLowerCase().includes(q) ||
+      Object.keys(r.venues || {}).some(v => (venueLabels[v] || v).toLowerCase().includes(q))
+    );
+  }
+  rows.sort((a, b) => (b.hours || 0) - (a.hours || 0));
+
+  if (countEl) {
+    const total = (panel.counts && panel.counts.totalUnique) || rows.length;
+    const n = (panel.counts && panel.counts.needsAssignment) || (panel.needsAssignment || []).length;
+    const locBit = locFilter ? (' · ' + (venueLabels[locFilter] || locFilter) + ' only') : ' · all locations';
+    countEl.textContent = rows.length + ' shown' + locBit + ' · ' + total + ' unique cooks · ' + n + ' need a station';
+  }
+
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="6" style="padding:16px;color:#9aa0aa">No people in this filter. Run <code>node build-people-assignment-panel.cjs</code> then rebuild the dashboard.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = rows.map(r => {
+    const current = assigns[r.key] || r.assignedFamily || '';
+    const opts = ['<option value="">— assign station —</option>']
+      .concat(families.map(f => '<option value="' + f + '"' + (current === f ? ' selected' : '') + '>' + f + '</option>'))
+      .join('');
+    const fte = r.fteFamily ? (r.fteFamily + (r.ftePosition ? ' (' + r.ftePosition + ')' : '')) : '—';
+    const auto = r.autoFamily ? '<span style="color:#86efac">auto: ' + r.autoFamily + '</span>' : '';
+    const job = r.primaryJob || Object.keys(r.jobs || {})[0] || '—';
+    const locs = Object.keys(r.venues || {}).map(v => venueLabels[v] || v).sort().join(', ') || '—';
+    return '<tr style="border-bottom:1px solid #1e2533">' +
+      '<td style="padding:8px 10px;color:#e8eaed">' + (r.displayName || r.payrollName || r.key) +
+        (r.payrollName && r.payrollName !== r.displayName ? '<div style="font-size:11px;color:#9aa0aa">' + r.payrollName + '</div>' : '') +
+      '</td>' +
+      '<td style="padding:8px 10px;color:#c4c8d0">' + job + (auto ? '<div style="font-size:11px">' + auto + '</div>' : '') + '</td>' +
+      '<td style="padding:8px 10px;color:#9aa0aa;font-size:12px">' + locs + '</td>' +
+      '<td style="padding:8px 10px;text-align:right;color:#e8eaed">' + (r.hours != null ? r.hours.toLocaleString() : '—') + '</td>' +
+      '<td style="padding:8px 10px;color:#9aa0aa">' + fte + '</td>' +
+      '<td style="padding:8px 10px"><select data-people-key="' + r.key + '" onchange="updatePeopleAssignment(this)" style="padding:4px 8px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:6px;font-size:12px;font-family:inherit">' + opts + '</select></td>' +
+    '</tr>';
+  }).join('');
+}
+function updatePeopleAssignment(sel) {
+  const key = sel.getAttribute('data-people-key');
+  const fam = sel.value;
+  const map = loadPeopleLocal();
+  if (!fam) delete map[key];
+  else map[key] = fam;
+  savePeopleLocal(map);
+  const st = document.getElementById('peopleSaveStatus');
+  if (st) {
+    st.textContent = 'Saved in browser — Export assignments, replace people-station-assignments.json, then rebuild staffing';
+    setTimeout(() => { st.textContent = ''; }, 6000);
+  }
+}
+function exportPeopleAssignments() {
+  const merged = mergedPeopleAssignments();
+  const out = {
+    note: 'Person → station family for Line Cook / CDP / Chef de Partie. Drop into repo as people-station-assignments.json then: node build-station-staffing.cjs --all <week> (or rebuild all weeks) + node build-unified-v2.cjs',
+    updatedAt: new Date().toISOString(),
+    assignments: merged,
+  };
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'people-station-assignments.json';
+  a.click();
+  const st = document.getElementById('peopleSaveStatus');
+  if (st) st.textContent = 'Exported — replace people-station-assignments.json in repo';
+}
+
+// ============================================================
 // RENDER ALL
 // ============================================================
 function renderAll() {
   // RDG Portfolio is not a real venue week — only render Group aggregator + settings
   if (currentVenue === 'rdg_portfolio') {
     renderGroup();
+    renderPeople();
     renderSettings();
     const pageSum = document.getElementById('pageSummary');
     if (pageSum) pageSum.innerHTML = 'RDG Portfolio compares Claudie, Casa Neos, AVA Coconut Grove, AVA Winter Park, and MILA for the selected week. Pick a location pill to drill into station detail.';
@@ -5100,6 +5435,7 @@ function renderAll() {
   renderMenuItems();
   renderAssignment();
   renderGroup();
+  renderPeople();
   renderSettings();
   renderPageSummary();
   if (typeof runCrossVenueItemSearch === 'function') runCrossVenueItemSearch();
@@ -5208,18 +5544,23 @@ function initVenuePills() {
 function selectWeek(idx) {
   currentWeekIdx = parseInt(idx);
   _serviceBreakDay = null;
+  const wk = WEEKS[currentWeekIdx]?.key;
+  if (wk) {
+    ensureWeeksLoaded([wk]).then(() => renderAll());
+    return;
+  }
   renderAll();
 }
 function changeWeek(dir) {
   const next = currentWeekIdx + dir;
   if (next < 0 || next >= WEEKS.length) return;
   currentWeekIdx = next;
-  const dd = document.getElementById('weekDropdown');
-  if (dd) dd.value = currentWeekIdx;
-  const wpBtn2 = document.getElementById('weekPrev');
-  const wnBtn2 = document.getElementById('weekNext');
-  if (wpBtn2) wpBtn2.disabled = currentWeekIdx === 0;
-  if (wnBtn2) wnBtn2.disabled = currentWeekIdx === WEEKS.length - 1;
+  refreshWeekDropdown();
+  const wk = WEEKS[currentWeekIdx]?.key;
+  if (wk) {
+    ensureWeeksLoaded([wk]).then(() => renderAll());
+    return;
+  }
   renderAll();
 }
 
@@ -5228,21 +5569,17 @@ function changeWeek(dir) {
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
   initVenuePills();
+  // Seed full YTD week list in the dropdown (payloads load on demand from Firebase).
+  seedKnownWeeksIntoSelector();
   // Embedded fallback first, then prefer Firebase live weeks (DJ-style)
   currentWeekIdx = WEEKS.length - 1;
-  const dd = document.getElementById('weekDropdown');
-  if (dd) dd.value = currentWeekIdx;
-  const wpBtn = document.getElementById('weekPrev');
-  const wnBtn = document.getElementById('weekNext');
-  if (wpBtn) wpBtn.disabled = currentWeekIdx === 0;
-  if (wnBtn) wnBtn.disabled = currentWeekIdx >= WEEKS.length - 1;
+  refreshWeekDropdown();
 
   renderAll();
   try {
     const loaded = await loadBohFromFirebase();
     if (loaded) {
-      if (wpBtn) wpBtn.disabled = currentWeekIdx === 0;
-      if (wnBtn) wnBtn.disabled = currentWeekIdx >= WEEKS.length - 1;
+      refreshWeekDropdown();
       renderAll();
     } else {
       renderSettings();
