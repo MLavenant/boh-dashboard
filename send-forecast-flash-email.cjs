@@ -112,13 +112,9 @@ function fbGet(fbPath) {
   });
 }
 
-/** Outlook cannot resolve cid: — embed JPEG data URIs in the HTML body. */
-function htmlWithEmbeddedSnaps(html, results) {
+/** Keep cid: references (Send-all emails style). Append test footer if needed. */
+function htmlForOutlookCid(html) {
   let out = String(html || '');
-  (results || []).forEach(r => {
-    if (!r || !r.cid || !r.snapB64) return;
-    out = out.split('cid:' + r.cid).join('data:image/jpeg;base64,' + r.snapB64);
-  });
   if (!/TEST send/i.test(out)) {
     out = out.replace(
       /<\/div>\s*$/,
@@ -202,7 +198,7 @@ async function captureAllVenues() {
   }
 }
 
-function outlookSend({ to, cc, subject, htmlBody, attachmentPaths, alertOnly }) {
+function outlookSend({ to, cc, subject, htmlBody, attachmentPaths, inlinePaths, alertOnly }) {
   const ps1 = path.join(__dirname, 'outlook-send-mail.ps1');
   if (!fs.existsSync(ps1)) throw new Error(`Missing ${ps1}`);
   const args = [
@@ -213,6 +209,9 @@ function outlookSend({ to, cc, subject, htmlBody, attachmentPaths, alertOnly }) 
     '-HtmlBodyPath', htmlBody
   ];
   if (cc && cc.length) args.push('-Cc', cc.join(';'));
+  if (inlinePaths && inlinePaths.length) {
+    args.push('-Inlines', inlinePaths.join(';'));
+  }
   if (attachmentPaths && attachmentPaths.length) {
     args.push('-Attachments', attachmentPaths.join('|'));
   }
@@ -246,9 +245,15 @@ async function sendFlashEmail(pack) {
   if (VIA === 'outlook') {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rdg-fcast-'));
     const htmlPath = path.join(tmp, 'body.html');
-    fs.writeFileSync(htmlPath, htmlWithEmbeddedSnaps(baseHtml, pack.results), 'utf8');
+    /* Same as Send all emails: HTML keeps cid:… ; JPEGs attached as true inline CIDs. */
+    fs.writeFileSync(htmlPath, htmlForOutlookCid(baseHtml), 'utf8');
     const attachmentPaths = [];
+    const inlinePaths = [];
     pack.results.forEach(r => {
+      const snapName = `${r.short || 'venue'}-snap.jpg`;
+      const snapPath = path.join(tmp, snapName);
+      fs.writeFileSync(snapPath, Buffer.from(r.snapB64, 'base64'));
+      inlinePaths.push(`${snapPath}|${r.cid}`);
       const pdfPath = path.join(tmp, r.pdfName);
       fs.writeFileSync(pdfPath, Buffer.from(r.pdfB64, 'base64'));
       attachmentPaths.push(pdfPath);
@@ -258,6 +263,7 @@ async function sendFlashEmail(pack) {
       cc: FCAST_CC,
       subject,
       htmlBody: htmlPath,
+      inlinePaths,
       attachmentPaths
     });
     try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (_) {}
