@@ -107,7 +107,7 @@ jobs:
         run: |
           git config user.name "rdg-bot"
           git config user.email "rdg-bot@users.noreply.github.com"
-          git add dashboard.html pipeline-health.json item-station-map.json
+          git add dashboard.html pipeline-health.json item-station-map.json people-assignment-panel.json people-station-assignments.json toast-job-family-map.json build-unified-v2.cjs boh-publish-firebase.cjs build-people-assignment-panel.cjs
           Get-ChildItem -Name "*-data-*.json","*-data.json" -ErrorAction SilentlyContinue | ForEach-Object { git add -- $_ }
           $staged = @(git diff --staged --name-only)
           if ($staged.Count -eq 0) { Write-Host "No dashboard changes"; exit 0 }
