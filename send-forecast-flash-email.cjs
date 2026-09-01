@@ -1,6 +1,12 @@
 /**
  * Auto-send Forecast "Send all emails" flash (Mon–Fri).
  *
+ * LOCKED FORMAT (do not regress):
+ *   - Capture via dashboard `_buildForecastFlashEmailPack` (same as Forecast → Send all emails)
+ *   - Outlook body = HTML with cid: images + true inline JPEG Content-IDs (NOT data: URIs)
+ *   - PDF attachments per venue; no hyperlinks around snaps
+ *   Local path: FORECAST_EMAIL_VIA=outlook via send-forecast-flash-email-local.bat / Task Scheduler
+ *
  * Gates:
  *   - America/New_York weekdays only
  *   - Only at/after 9:00 ET (primary); 9:30 ET is the final attempt
@@ -245,11 +251,16 @@ async function sendFlashEmail(pack) {
   if (VIA === 'outlook') {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rdg-fcast-'));
     const htmlPath = path.join(tmp, 'body.html');
-    /* Same as Send all emails: HTML keeps cid:… ; JPEGs attached as true inline CIDs. */
+    /* Same as Send all emails: HTML keeps cid:… ; JPEGs attached as true inline CIDs.
+       Never rewrite cid: to data:image — that breaks the clickable Outlook picture. */
+    if (/data:image\//i.test(baseHtml)) {
+      throw new Error('Forecast HTML must use cid: inline images (Send-all style), not data URIs');
+    }
     fs.writeFileSync(htmlPath, htmlForOutlookCid(baseHtml), 'utf8');
     const attachmentPaths = [];
     const inlinePaths = [];
     pack.results.forEach(r => {
+      if (!r.cid || !r.snapB64) throw new Error('Missing CID snap for ' + (r.venue || '?'));
       const snapName = `${r.short || 'venue'}-snap.jpg`;
       const snapPath = path.join(tmp, snapName);
       fs.writeFileSync(snapPath, Buffer.from(r.snapB64, 'base64'));
@@ -258,6 +269,7 @@ async function sendFlashEmail(pack) {
       fs.writeFileSync(pdfPath, Buffer.from(r.pdfB64, 'base64'));
       attachmentPaths.push(pdfPath);
     });
+    if (!inlinePaths.length) throw new Error('No inline CID images — refusing send');
     outlookSend({
       to: FCAST_TO,
       cc: FCAST_CC,
