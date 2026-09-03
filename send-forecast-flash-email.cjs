@@ -392,8 +392,12 @@ function resolveAttempt(et) {
     }
   }
   if (prev && prev.miamiDay === day && prev.failedAlertSent === true && isFinal) {
-    log('Failure alert already sent today — skip');
-    process.exit(0);
+    if (String(process.env.FORECAST_EMAIL_FORCE || '').trim() === '1') {
+      log('FORECAST_EMAIL_FORCE=1 — re-sending even though failure alert already marked today');
+    } else {
+      log('Failure alert already sent today — skip');
+      process.exit(0);
+    }
   }
 
   let fv = null;
