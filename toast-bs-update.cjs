@@ -10,6 +10,7 @@
 
 const axios  = require("axios");
 const fs     = require("fs");
+const path   = require("path");
 const https  = require("https");
 const { execSync } = require("child_process");
 
@@ -78,6 +79,76 @@ function isoWeekKey(dateStr) {
 
 function eventKey(venue, date) {
   return (venue + "_" + date).replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
+/** Scheduled DJ nights (bake + Firebase adds/shows) — fetch Toast even off the usual operating days
+ *  (e.g. MILA Labor Day Sunday, Casa Neos Beach Club Labor Day Monday). */
+function loadScheduledShowDates(dates) {
+  const set = new Set();
+  const dateSet = new Set(dates || []);
+  function add(venue, d) {
+    if (!venue || !d || !dateSet.has(d)) return;
+    set.add(venue + "|" + d);
+  }
+  try {
+    const bakedPath = path.join(
+      process.env.DASHBOARD_DIR || "C:\\Users\\MatthiasLavenant\\Documents\\rdg-dj-dashboard",
+      "data",
+      "sched-baked.js"
+    );
+    if (fs.existsSync(bakedPath)) {
+      const code = fs.readFileSync(bakedPath, "utf8");
+      const m = code.match(/var SCHED\s*=\s*(\[[\s\S]*?\]);/);
+      if (m) {
+        const sched = Function("return (" + m[1] + ")")();
+        (sched || []).forEach(r => {
+          if (!r || r._s === "empty") return;
+          add(r.venue || r.v, r.d);
+        });
+      }
+    }
+  } catch (e) {
+    log("  sched-baked show index warn: " + e.message);
+  }
+  return set;
+}
+
+async function loadFirebaseShowDates(dates, seedSet) {
+  const set = seedSet || new Set();
+  const dateSet = new Set(dates || []);
+  function add(venue, d) {
+    if (!venue || !d || !dateSet.has(d)) return;
+    set.add(venue + "|" + d);
+  }
+  try {
+    const ov = await fbGet("/rdg/schedOverrides");
+    if (!ov) return set;
+    const bags = [ov.shows, ov.addsByUid, ov.adds];
+    bags.forEach(bag => {
+      if (!bag) return;
+      const rows = Array.isArray(bag) ? bag : Object.values(bag);
+      rows.forEach(r => {
+        if (!r || r._s === "empty") return;
+        add(r.venue || r.v, r.d);
+      });
+    });
+    const edits = ov.edits || {};
+    Object.keys(edits).forEach(k => {
+      const r = edits[k] || {};
+      const d = r.d || (k.split("|")[1] || "").slice(0, 10);
+      const v = r.venue || r.v || (k.split("|")[0] || "");
+      if (r.dj || r.fee != null || r.bs_m != null) add(v, d);
+    });
+  } catch (e) {
+    log("  Firebase show index warn: " + e.message);
+  }
+  return set;
+}
+
+function shouldFetchToastDay(venueKey, date, showDates) {
+  if (isOperatingDay(venueKey, date)) return true;
+  const label = (BS_CONFIG[venueKey] && BS_CONFIG[venueKey].label) || "";
+  return !!(showDates && showDates.has(label + "|" + date));
 }
 
 function fbPut(fbPath, payload) {
@@ -210,7 +281,7 @@ function buildTierSummary(byTable, tierMap) {
  *   byDate[date] = BS total
  *   nights[date] = { totalRevenue, bookedTables, totalTables, tierSummary, ... }
  */
-async function fetchBsSales(venueKey, dates) {
+async function fetchBsSales(venueKey, dates, showDates) {
   const cfg  = BS_CONFIG[venueKey];
   const guid = VENUES[venueKey];
   const token = await getToken();
@@ -226,10 +297,12 @@ async function fetchBsSales(venueKey, dates) {
   const nights = {};
 
   for (const date of dates) {
-    if (!isOperatingDay(venueKey, date)) {
+    if (!shouldFetchToastDay(venueKey, date, showDates)) {
       byDate[date] = 0;
       continue;
     }
+    const forcedShow = !isOperatingDay(venueKey, date);
+    if (forcedShow) log(`  ${cfg.label} | ${date} · scheduled show off normal operating day — fetching Toast`);
     const { guids: bsGuids, guidToName } = await mapsForDate(date);
     const tierMap = getVipTierMap(venueKey, date);
     const orders = await getAllOrders(token, guid, date);
@@ -248,9 +321,19 @@ async function fetchBsSales(venueKey, dates) {
       const timeFrac  = (localDate.getUTCHours() * 60 + localDate.getUTCMinutes()) / 1440;
       const isSunday  = new Date(date + "T12:00:00Z").getUTCDay() === 0;
       const startFrac = (isSunday && cfg.sundayStartFrac !== undefined) ? cfg.sundayStartFrac : cfg.startFrac;
-      const inWindow  = cfg.crossesMidnight
-        ? (timeFrac >= startFrac || timeFrac <= cfg.endFrac)
-        : (timeFrac >= startFrac && timeFrac <= cfg.endFrac);
+      /* Off-calendar show nights (Labor Day Monday CNBC, MILA Sunday): use lounge-style
+         overnight window so evening BS is not cut off at 8 PM beach hours. */
+      let inWindow;
+      if (forcedShow && !cfg.crossesMidnight) {
+        const nightStart = 0.75; // 6:00 PM
+        const nightEnd = 0.208333; // 5:00 AM
+        inWindow = timeFrac >= nightStart || timeFrac <= nightEnd ||
+          (timeFrac >= cfg.startFrac && timeFrac <= cfg.endFrac);
+      } else {
+        inWindow = cfg.crossesMidnight
+          ? (timeFrac >= startFrac || timeFrac <= cfg.endFrac)
+          : (timeFrac >= startFrac && timeFrac <= cfg.endFrac);
+      }
       if (!inWindow) continue;
 
       const tname = hasTable ? (guidToName[order.table.guid] || "") : "";
@@ -291,8 +374,8 @@ async function fetchBsSales(venueKey, dates) {
       _period: isoWeekKey(date),
     };
 
-    if (total > 0) {
-      log(`  ${cfg.label} | ${date} → $${byDate[date].toLocaleString()} · VIP sold ${vipSold}/${vipInv}`);
+    if (total > 0 || forcedShow) {
+      log(`  ${cfg.label} | ${date} → $${byDate[date].toLocaleString()} · VIP sold ${vipSold}/${vipInv}${forcedShow ? " · show-day" : ""}`);
     }
     await sleep(200);
   }
@@ -452,12 +535,16 @@ function updateSchedInHtml(html, salesByVenueDate) {
   const prevVipEvents = (prevVipNights && prevVipNights.events) || {};
   const prevWeekTiers = await fbGet("/rdg/vipTierActuals") || {};
 
+  let showDates = loadScheduledShowDates(dates);
+  showDates = await loadFirebaseShowDates(dates, showDates);
+  log(`Scheduled show-day overrides: ${[...showDates].filter(k => /2026-09-0[67]/.test(k)).join(", ") || "(none in Labor Day window)"}`);
+
   for (let i = 0; i < venueKeys.length; i++) {
     const vk = venueKeys[i];
     if (i > 0) await sleep(1500);
     log(`\nFetching ${BS_CONFIG[vk].label}...`);
     try {
-      const pack = await fetchBsSales(vk, dates);
+      const pack = await fetchBsSales(vk, dates, showDates);
       allResults[vk] = pack.byDate;
       allNights[vk] = pack.nights;
     } catch (e) {
