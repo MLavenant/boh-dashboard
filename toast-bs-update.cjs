@@ -298,7 +298,8 @@ async function fetchBsSales(venueKey, dates, showDates) {
 
   for (const date of dates) {
     if (!shouldFetchToastDay(venueKey, date, showDates)) {
-      byDate[date] = 0;
+      /* Omit — do NOT write 0. Merging 0 would wipe a prior show-day total
+         (e.g. Labor Day Monday CN BC) when this run skips the night. */
       continue;
     }
     const forcedShow = !isOperatingDay(venueKey, date);
@@ -577,11 +578,20 @@ function updateSchedInHtml(html, salesByVenueDate) {
     log("\nDASHBOARD_PATH missing — Firebase toastActuals only.");
   }
 
-  /* Merge day totals into prior history (don't wipe older nights). */
+  /* Merge day totals into prior history (don't wipe older nights).
+     Never clobber a positive prior with 0 from a partial/skipped day. */
   const byVenueDate = Object.assign({}, prevByVenue);
   for (const vk of venueKeys) {
     const label = BS_CONFIG[vk].label;
-    byVenueDate[label] = Object.assign({}, prevByVenue[label] || {}, allResults[vk] || {});
+    const merged = Object.assign({}, prevByVenue[label] || {});
+    const incoming = allResults[vk] || {};
+    Object.keys(incoming).forEach(date => {
+      const next = +incoming[date];
+      const prev = merged[date];
+      if ((!isFinite(next) || next === 0) && prev != null && +prev > 0) return;
+      merged[date] = incoming[date];
+    });
+    byVenueDate[label] = merged;
   }
 
   const toastLivePayload = {
