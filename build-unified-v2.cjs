@@ -2412,12 +2412,13 @@ function familyDayCell(venueKey, weekKey, family, day) {
 
 function columnRelativeHeat(val, colMin, colMax) {
   // Pressure scale: green = lowest load, red = highest (within the day column)
-  if (val == null || val <= 0) return { bg: '#13161c', fg: '#4b5563' };
-  if (colMax <= colMin) return { bg: '#22c55e', fg: '#0f1218' };
-  const t = (val - colMin) / (colMax - colMin);
+  if (val == null || !(val > 0)) return { bg: '#13161c', fg: '#ffffff' };
+  if (!(colMax > colMin)) return { bg: '#22c55e', fg: '#0f1218' };
+  const t = Math.max(0, Math.min(1, (val - colMin) / (colMax - colMin)));
+  // Brighter greens so fills stay readable on the dark dashboard
   const bg = t <= 0.5
-    ? lerpColor('#166534', '#eab308', t / 0.5)
-    : lerpColor('#eab308', '#dc2626', (t - 0.5) / 0.5);
+    ? lerpColor('#22c55e', '#eab308', t / 0.5)
+    : lerpColor('#eab308', '#ef4444', (t - 0.5) / 0.5);
   return { bg, fg: textFor(bg) };
 }
 
@@ -4042,23 +4043,40 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
   html += '</tr></thead><tbody>';
 
   dayRows.forEach(row => {
-    html += '<tr style="border-top:1px solid #262a33"><td style="padding:6px 10px;color:#e8eaed;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+row.day.slice(0,3)+'</td>';
+    html += '<tr style="border-top:1px solid #262a33"><td style="padding:6px 10px;color:#ffffff;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+row.day.slice(0,3)+'</td>';
     row.cells.forEach(c => {
-      const ipshHeat = c.ipsh != null ? columnRelativeHeat(c.ipsh, ipshMin, ipshMax) : { bg: '#13161c', fg: '#4b5563' };
-      html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:'+(c.ful!=null?avgFulColorByMin(c.ful):'#4b5563')+'">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
-        '<td style="'+metricCell+'background:'+ipshHeat.bg+';color:'+ipshHeat.fg+'">'+(c.ipsh != null ? c.ipsh : '—')+'</td>'+
-        '<td style="'+metricCell+'color:#e8eaed">'+(c.ipp != null ? c.ipp : '—')+'</td>';
+      const ipshHeat = c.ipsh != null && c.ipsh > 0
+        ? columnRelativeHeat(c.ipsh, ipshMin, ipshMax)
+        : null;
+      html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:#ffffff">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
+        (ipshHeat
+          ? '<td style="'+metricCell+'background:'+ipshHeat.bg+';color:'+ipshHeat.fg+'">'+(c.ipsh != null ? c.ipsh : '—')+'</td>'
+          : '<td style="'+metricCell+'color:#ffffff">'+(c.ipsh != null ? c.ipsh : '—')+'</td>')+
+        '<td style="'+metricCell+'color:#ffffff">'+(c.ipp != null ? c.ipp : '—')+'</td>';
     });
     html += '</tr>';
   });
 
-  html += '<tr style="border-top:2px solid #3d4458;background:#0f1218"><td style="padding:6px 10px;color:#d9a441;font-weight:700;position:sticky;left:0;z-index:1;background:#0f1218">Week</td>';
-  venues.forEach(v => {
+  const weekCells = venues.map(v => {
     const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
     const st = sc.familyStats[family] || {};
-    html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:'+(st.fulMin!=null?avgFulColorByMin(st.fulMin):'#9aa0aa')+'">'+(st.fulMin!=null?st.fulMin.toFixed(1):'—')+'</td>'+
-      '<td style="'+metricCell+'color:#d9a441">'+(st.ipsh!=null?st.ipsh:(st.iph!=null?st.iph:'—'))+'</td>'+
-      '<td style="'+metricCell+'color:#e8eaed">'+(st.iph!=null?st.iph:'—')+'</td>';
+    const ipsh = st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
+    return { ful: st.fulMin != null ? st.fulMin : null, ipsh, ipp: st.iph != null ? st.iph : null };
+  });
+  const weekIpshVals = weekCells.map(c => c.ipsh).filter(v => v != null && v > 0);
+  const weekIpshMin = weekIpshVals.length ? Math.min(...weekIpshVals) : 0;
+  const weekIpshMax = weekIpshVals.length ? Math.max(...weekIpshVals) : 0;
+
+  html += '<tr style="border-top:2px solid #3d4458;background:#0f1218"><td style="padding:6px 10px;color:#d9a441;font-weight:700;position:sticky;left:0;z-index:1;background:#0f1218">Week</td>';
+  weekCells.forEach(c => {
+    const ipshHeat = c.ipsh != null && c.ipsh > 0
+      ? columnRelativeHeat(c.ipsh, weekIpshMin, weekIpshMax)
+      : null;
+    html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:#ffffff">'+(c.ful != null ? Number(c.ful).toFixed(1) : '—')+'</td>'+
+      (ipshHeat
+        ? '<td style="'+metricCell+'background:'+ipshHeat.bg+';color:'+ipshHeat.fg+'">'+c.ipsh+'</td>'
+        : '<td style="'+metricCell+'color:#ffffff">'+(c.ipsh != null ? c.ipsh : '—')+'</td>')+
+      '<td style="'+metricCell+'color:#ffffff">'+(c.ipp != null ? c.ipp : '—')+'</td>';
   });
   html += '</tr></tbody></table></div></div>';
   return html;
