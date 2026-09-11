@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-11T16:31:27.662Z",
+  "generatedAt": "2026-09-11T16:39:54.047Z",
   "from": "2026-W29",
   "to": "2026-W36",
   "families": [
@@ -58,32 +58,12 @@
     "Temp Prep Cook": "Prep"
   },
   "counts": {
-    "needsAssignment": 41,
-    "assigned": 82,
+    "needsAssignment": 10,
+    "assigned": 113,
     "auto": 93,
     "totalUnique": 216
   },
   "needsAssignment": [
-    {
-      "key": "ayala jorge",
-      "displayName": "Jorge Ayala",
-      "payrollName": "Ayala, Jorge",
-      "primaryJob": "Cook, Line",
-      "jobs": {
-        "Cook, Line": 351.33
-      },
-      "hours": 351.3,
-      "shiftCount": 39,
-      "weekCount": 8,
-      "venues": {
-        "claudie": 351.33
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
     {
       "key": "cegarra jessica",
       "displayName": "Jessica Cegarra",
@@ -102,68 +82,8 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "christopher summerset",
-      "displayName": "Christopher Summerset",
-      "payrollName": "Summerset, Christopher",
-      "primaryJob": "Cook, Line",
-      "jobs": {
-        "Cook, Line": 282.59
-      },
-      "hours": 282.6,
-      "shiftCount": 31,
-      "weekCount": 8,
-      "venues": {
-        "claudie": 282.59
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "jordan maritza vera",
-      "displayName": "Maritza Vera Jordan",
-      "payrollName": "Jordan, Maritza Vera",
-      "primaryJob": "Cook, Line",
-      "jobs": {
-        "Line Cook": 36.96,
-        "Cook, Line": 242.90000000000003
-      },
-      "hours": 279.9,
-      "shiftCount": 32,
-      "weekCount": 7,
-      "venues": {
-        "ava_coconut_grove": 279.86000000000007
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "karla mejia",
-      "displayName": "Karla Mejia",
-      "payrollName": "Mejia, Karla",
-      "primaryJob": "CDP",
-      "jobs": {
-        "CDP": 272.298
-      },
-      "hours": 272.3,
-      "shiftCount": 29,
-      "weekCount": 5,
-      "venues": {
-        "mila": 272.298
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": null,
       "status": "needs_assignment"
     },
     {
@@ -183,47 +103,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "elder sanchez toruno",
-      "displayName": "Elder Sanchez Toruno",
-      "payrollName": "Toruno, Elder Sanchez",
-      "primaryJob": "Cook, Line",
-      "jobs": {
-        "Line Cook": 43.459999999999994,
-        "Cook, Line": 205.01999999999998
-      },
-      "hours": 248.5,
-      "shiftCount": 27,
-      "weekCount": 6,
-      "venues": {
-        "ava_coconut_grove": 248.47999999999996
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "gloria reyes",
-      "displayName": "Gloria Reyes",
-      "payrollName": "Reyes, Gloria",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 218.61999999999998
-      },
-      "hours": 218.6,
-      "shiftCount": 25,
-      "weekCount": 5,
-      "venues": {
-        "ava_winter_park": 218.61999999999998
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Saute",
       "status": "needs_assignment"
     },
@@ -244,47 +124,8 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "luis pasten",
-      "displayName": "Luis Pasten",
-      "payrollName": "Pasten, Luis",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 208.099
-      },
-      "hours": 208.1,
-      "shiftCount": 25,
-      "weekCount": 5,
-      "venues": {
-        "mila": 208.099
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "guillermina rae",
-      "displayName": "Guillermina Rae",
-      "payrollName": "Rae, Guillermina",
-      "primaryJob": "CDP",
-      "jobs": {
-        "CDP": 205.88
-      },
-      "hours": 205.9,
-      "shiftCount": 26,
-      "weekCount": 5,
-      "venues": {
-        "ava_winter_park": 205.88
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": null,
       "status": "needs_assignment"
     },
     {
@@ -304,427 +145,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "erin gonzalez",
-      "displayName": "Erin Gonzalez",
-      "payrollName": "Gonzalez, Erin",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 203.30499999999998
-      },
-      "hours": 203.3,
-      "shiftCount": 25,
-      "weekCount": 5,
-      "venues": {
-        "mila": 203.30499999999998
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "antoni esquivel lopez",
-      "displayName": "Antoni Lopez Esquivel",
-      "payrollName": "Lopez Esquivel, Antoni",
-      "primaryJob": "Sr. CDP",
-      "jobs": {
-        "Sushi Cook": 73.777,
-        "Sr. CDP": 125.84600000000002
-      },
-      "hours": 199.6,
-      "shiftCount": 21,
-      "weekCount": 5,
-      "venues": {
-        "mila": 199.623
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Sushi",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "caceres juan",
-      "displayName": "Juan Caceres",
-      "payrollName": "Caceres, Juan",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 192.50199999999998
-      },
-      "hours": 192.5,
-      "shiftCount": 24,
-      "weekCount": 5,
-      "venues": {
-        "mila": 192.50199999999998
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "carlos izaguirre",
-      "displayName": "Carlos Izaguirre",
-      "payrollName": "Izaguirre, Carlos",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 178.09400000000002
-      },
-      "hours": 178.1,
-      "shiftCount": 21,
-      "weekCount": 5,
-      "venues": {
-        "mila": 178.09400000000002
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "foster sherie",
-      "displayName": "Sherie Foster",
-      "payrollName": "Foster, Sherie",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 178.09099999999998
-      },
-      "hours": 178.1,
-      "shiftCount": 24,
-      "weekCount": 5,
-      "venues": {
-        "mila": 178.09099999999998
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "adan herrera jose lopez",
-      "displayName": "jose adan herrera lopez",
-      "payrollName": "herrera lopez, jose adan",
-      "primaryJob": "CDP",
-      "jobs": {
-        "CDP": 177.422
-      },
-      "hours": 177.4,
-      "shiftCount": 20,
-      "weekCount": 5,
-      "venues": {
-        "mila": 177.422
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": null,
-      "status": "needs_assignment"
-    },
-    {
-      "key": "juan velasquez",
-      "displayName": "Juan Velasquez",
-      "payrollName": "Velasquez, Juan",
-      "primaryJob": "CDP",
-      "jobs": {
-        "CDP": 165.152
-      },
-      "hours": 165.2,
-      "shiftCount": 20,
-      "weekCount": 4,
-      "venues": {
-        "mila": 165.152
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": null,
-      "status": "needs_assignment"
-    },
-    {
-      "key": "fernando flores",
-      "displayName": "Fernando Flores",
-      "payrollName": "Flores, Fernando",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 164.65500000000003
-      },
-      "hours": 164.7,
-      "shiftCount": 19,
-      "weekCount": 5,
-      "venues": {
-        "mila": 164.65500000000003
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "bonilla yaniri",
-      "displayName": "Yaniri Bonilla",
-      "payrollName": "Bonilla, Yaniri",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 162.21099999999998
-      },
-      "hours": 162.2,
-      "shiftCount": 20,
-      "weekCount": 4,
-      "venues": {
-        "casa_neos": 162.21099999999998
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "pedro pirela",
-      "displayName": "Pedro Pirela",
-      "payrollName": "Pirela, Pedro",
-      "primaryJob": "CDP",
-      "jobs": {
-        "CDP": 160.13400000000001
-      },
-      "hours": 160.1,
-      "shiftCount": 18,
-      "weekCount": 4,
-      "venues": {
-        "mila": 160.13400000000001
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": null,
-      "status": "needs_assignment"
-    },
-    {
-      "key": "maria villarraga",
-      "displayName": "Maria Villarraga",
-      "payrollName": "Villarraga, Maria",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 157.46699999999996
-      },
-      "hours": 157.5,
-      "shiftCount": 20,
-      "weekCount": 4,
-      "venues": {
-        "casa_neos": 157.46699999999996
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "borge seleny",
-      "displayName": "Seleny Borge",
-      "payrollName": "Borge, Seleny",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 150.893
-      },
-      "hours": 150.9,
-      "shiftCount": 20,
-      "weekCount": 4,
-      "venues": {
-        "casa_neos": 150.893
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "aura laguna mendoza",
-      "displayName": "Aura Laguna Mendoza",
-      "payrollName": "Laguna Mendoza, Aura",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 149.64000000000001
-      },
-      "hours": 149.6,
-      "shiftCount": 20,
-      "weekCount": 4,
-      "venues": {
-        "casa_neos": 149.64000000000001
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "jordan rojas",
-      "displayName": "Jordan Rojas",
-      "payrollName": "Rojas, Jordan",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 148.756
-      },
-      "hours": 148.8,
-      "shiftCount": 20,
-      "weekCount": 4,
-      "venues": {
-        "casa_neos": 148.756
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "kevin ruiz yesca",
-      "displayName": "Kevin Ruiz Yesca",
-      "payrollName": "Ruiz Yesca, Kevin",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 135.97500000000002
-      },
-      "hours": 136,
-      "shiftCount": 18,
-      "weekCount": 4,
-      "venues": {
-        "casa_neos": 135.97500000000002
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "jennifer lopez",
-      "displayName": "Jennifer Lopez",
-      "payrollName": "Lopez, Jennifer",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 129.71499999999997
-      },
-      "hours": 129.7,
-      "shiftCount": 18,
-      "weekCount": 4,
-      "venues": {
-        "casa_neos": 129.71499999999997
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "hernandez roberto",
-      "displayName": "Roberto Hernandez",
-      "payrollName": "Hernandez, Roberto",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 129.31199999999998
-      },
-      "hours": 129.3,
-      "shiftCount": 15,
-      "weekCount": 3,
-      "venues": {
-        "casa_neos": 129.31199999999998
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "joseph koziol",
-      "displayName": "Joseph Koziol",
-      "payrollName": "Koziol, Joseph",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 109.94
-      },
-      "hours": 109.9,
-      "shiftCount": 14,
-      "weekCount": 5,
-      "venues": {
-        "ava_winter_park": 109.94
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "martinez perez winkers",
-      "displayName": "Winkers Perez Martinez",
-      "payrollName": "Perez Martinez, Winkers",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 99.29
-      },
-      "hours": 99.3,
-      "shiftCount": 12,
-      "weekCount": 3,
-      "venues": {
-        "casa_neos": 99.29
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "de la pablo rosa",
-      "displayName": "Pablo De La Rosa",
-      "payrollName": "De La Rosa, Pablo",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 95.14699999999999
-      },
-      "hours": 95.1,
-      "shiftCount": 14,
-      "weekCount": 3,
-      "venues": {
-        "casa_neos": 95.14699999999999
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "eliezer osorio",
-      "displayName": "Eliezer Osorio",
-      "payrollName": "Osorio, Eliezer",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 89.006
-      },
-      "hours": 89,
-      "shiftCount": 12,
-      "weekCount": 3,
-      "venues": {
-        "casa_neos": 89.006
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Saute",
       "status": "needs_assignment"
     },
@@ -745,26 +166,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
-      "autoFamily": "Saute",
-      "status": "needs_assignment"
-    },
-    {
-      "key": "adams jean pereira",
-      "displayName": "Jean Pereira Adams",
-      "payrollName": "Pereira Adams, Jean",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 57.233999999999995
-      },
-      "hours": 57.2,
-      "shiftCount": 8,
-      "weekCount": 2,
-      "venues": {
-        "casa_neos": 57.233999999999995
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Saute",
       "status": "needs_assignment"
     },
@@ -785,27 +187,8 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": null,
-      "status": "needs_assignment"
-    },
-    {
-      "key": "chacon josset",
-      "displayName": "Josset Chacon",
-      "payrollName": "Chacon, Josset",
-      "primaryJob": "Line Cook",
-      "jobs": {
-        "Line Cook": 44.682
-      },
-      "hours": 44.7,
-      "shiftCount": 5,
-      "weekCount": 1,
-      "venues": {
-        "casa_neos": 44.682
-      },
-      "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
-      "autoFamily": "Saute",
       "status": "needs_assignment"
     },
     {
@@ -825,6 +208,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": null,
       "status": "needs_assignment"
     },
@@ -845,6 +229,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Saute",
       "status": "needs_assignment"
     },
@@ -865,6 +250,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Saute",
       "status": "needs_assignment"
     },
@@ -885,6 +271,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": null,
       "status": "needs_assignment"
     }
@@ -908,6 +295,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Boskovic, Andrija",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -929,6 +317,28 @@
       "assignedFamily": "Garde Manger",
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Munoz, Walter Manuel",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "ayala jorge",
+      "displayName": "Jorge Ayala",
+      "payrollName": "Ayala, Jorge",
+      "primaryJob": "Cook, Line",
+      "jobs": {
+        "Cook, Line": 351.33
+      },
+      "hours": 351.3,
+      "shiftCount": 39,
+      "weekCount": 8,
+      "venues": {
+        "claudie": 351.33
+      },
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
+      "ftePosition": "Crudo",
+      "fteName": "Ayala Flores, Jorge Dario",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -949,6 +359,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Anderson, Jacob",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -969,6 +380,7 @@
       "assignedFamily": "Fry",
       "fteFamily": "Fry",
       "ftePosition": "Fry",
+      "fteName": "Atulus, Kelly",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -990,6 +402,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Ponte, Markos",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1010,6 +423,7 @@
       "assignedFamily": "Raw",
       "fteFamily": "Raw",
       "ftePosition": "Crudo",
+      "fteName": "Mamani, Herlinda",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1030,6 +444,7 @@
       "assignedFamily": "Raw",
       "fteFamily": "Raw",
       "ftePosition": "Crudo",
+      "fteName": "Garcia Ferrera, Miladys",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1050,6 +465,50 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Phillips, Terrin",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "christopher summerset",
+      "displayName": "Christopher Summerset",
+      "payrollName": "Summerset, Christopher",
+      "primaryJob": "Cook, Line",
+      "jobs": {
+        "Cook, Line": 282.59
+      },
+      "hours": 282.6,
+      "shiftCount": 31,
+      "weekCount": 8,
+      "venues": {
+        "claudie": 282.59
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "fteName": "Summerset, Christopher Lee",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "jordan maritza vera",
+      "displayName": "Maritza Vera Jordan",
+      "payrollName": "Jordan, Maritza Vera",
+      "primaryJob": "Cook, Line",
+      "jobs": {
+        "Line Cook": 36.96,
+        "Cook, Line": 242.90000000000003
+      },
+      "hours": 279.9,
+      "shiftCount": 32,
+      "weekCount": 7,
+      "venues": {
+        "ava_coconut_grove": 279.86000000000007
+      },
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
+      "ftePosition": "Crudo",
+      "fteName": "Vera Jordan, Maritza Graciela",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1070,7 +529,29 @@
       "assignedFamily": "Fry",
       "fteFamily": "Fry",
       "ftePosition": "Fry",
+      "fteName": "Thornhill, Keon",
       "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "karla mejia",
+      "displayName": "Karla Mejia",
+      "payrollName": "Mejia, Karla",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 272.298
+      },
+      "hours": 272.3,
+      "shiftCount": 29,
+      "weekCount": 5,
+      "venues": {
+        "mila": 272.298
+      },
+      "assignedFamily": "Pastry",
+      "fteFamily": "Pastry",
+      "ftePosition": "Pastry",
+      "fteName": "Mejia Vargas, Karla Ximena",
+      "autoFamily": null,
       "status": "fte_covered"
     },
     {
@@ -1090,6 +571,7 @@
       "assignedFamily": "Raw",
       "fteFamily": "Raw",
       "ftePosition": "Crudo",
+      "fteName": "Daley, Demetrik",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1111,6 +593,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Gonzalez, Adrian",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1132,6 +615,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Pasta",
+      "fteName": "Ersoy, Sinem",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1153,6 +637,29 @@
       "assignedFamily": "Pizza",
       "fteFamily": "Pizza",
       "ftePosition": "Pizza",
+      "fteName": "Bobadilla, Walter",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "elder sanchez toruno",
+      "displayName": "Elder Sanchez Toruno",
+      "payrollName": "Toruno, Elder Sanchez",
+      "primaryJob": "Cook, Line",
+      "jobs": {
+        "Line Cook": 43.459999999999994,
+        "Cook, Line": 205.01999999999998
+      },
+      "hours": 248.5,
+      "shiftCount": 27,
+      "weekCount": 6,
+      "venues": {
+        "ava_coconut_grove": 248.47999999999996
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "fteName": "Sanchez Toruno, Elder Jair",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1173,6 +680,7 @@
       "assignedFamily": "Prep",
       "fteFamily": "Prep",
       "ftePosition": "Butcher",
+      "fteName": "Sufra, Ben",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1193,6 +701,7 @@
       "assignedFamily": "Raw",
       "fteFamily": "Raw",
       "ftePosition": "Crudo",
+      "fteName": "Perez, Noel",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1213,6 +722,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Pasta",
+      "fteName": "Ocando Gonzalez, Vander",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1233,6 +743,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Hunt, Quinton",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1253,6 +764,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Rivera, Isaiah",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1274,6 +786,7 @@
       "assignedFamily": "Raw",
       "fteFamily": "Raw",
       "ftePosition": "Raw",
+      "fteName": "Duran, Andrea",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1294,6 +807,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Asik, Muhammet Sait",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1314,7 +828,29 @@
       "assignedFamily": "Prep",
       "fteFamily": "Prep",
       "ftePosition": "Butcher",
+      "fteName": "Miranda, Vidal",
       "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "gloria reyes",
+      "displayName": "Gloria Reyes",
+      "payrollName": "Reyes, Gloria",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 218.61999999999998
+      },
+      "hours": 218.6,
+      "shiftCount": 25,
+      "weekCount": 5,
+      "venues": {
+        "ava_winter_park": 218.61999999999998
+      },
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
+      "ftePosition": "Garde Manger",
+      "fteName": "Reyes, Gloria Elena",
+      "autoFamily": "Saute",
       "status": "fte_covered"
     },
     {
@@ -1335,6 +871,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Paynter, Terrell",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1355,6 +892,7 @@
       "assignedFamily": "Fry",
       "fteFamily": "Fry",
       "ftePosition": "Fry",
+      "fteName": "Telfort, Guerda",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1375,7 +913,29 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Suarez, Roberto",
       "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "luis pasten",
+      "displayName": "Luis Pasten",
+      "payrollName": "Pasten, Luis",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 208.099
+      },
+      "hours": 208.1,
+      "shiftCount": 25,
+      "weekCount": 5,
+      "venues": {
+        "mila": 208.099
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "fteName": "Pasten, Luis Andres",
+      "autoFamily": "Saute",
       "status": "fte_covered"
     },
     {
@@ -1395,7 +955,29 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Aguilar, Nicholas",
       "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "guillermina rae",
+      "displayName": "Guillermina Rae",
+      "payrollName": "Rae, Guillermina",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 205.88
+      },
+      "hours": 205.9,
+      "shiftCount": 26,
+      "weekCount": 5,
+      "venues": {
+        "ava_winter_park": 205.88
+      },
+      "assignedFamily": "Pastry",
+      "fteFamily": "Pastry",
+      "ftePosition": "Pastry",
+      "fteName": "Rae, Guillermina Jezabel",
+      "autoFamily": null,
       "status": "fte_covered"
     },
     {
@@ -1415,6 +997,28 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Villarroel Gaete, Jaime",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "erin gonzalez",
+      "displayName": "Erin Gonzalez",
+      "payrollName": "Gonzalez, Erin",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 203.30499999999998
+      },
+      "hours": 203.3,
+      "shiftCount": 25,
+      "weekCount": 5,
+      "venues": {
+        "mila": 203.30499999999998
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "fteName": "Gonzalez, Erin Bacilio",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1435,6 +1039,7 @@
       "assignedFamily": "Fry",
       "fteFamily": "Fry",
       "ftePosition": "Fry",
+      "fteName": "Casco Acuna, Eddy Rene",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1455,6 +1060,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Rodriguez, Juan P.",
       "autoFamily": null,
       "status": "fte_covered"
     },
@@ -1475,6 +1081,7 @@
       "assignedFamily": "Sushi",
       "fteFamily": "Sushi",
       "ftePosition": "Sushi",
+      "fteName": "Escalante, Henry",
       "autoFamily": null,
       "status": "fte_covered"
     },
@@ -1495,7 +1102,30 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Hernandez, Eduardo",
       "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "antoni esquivel lopez",
+      "displayName": "Antoni Lopez Esquivel",
+      "payrollName": "Lopez Esquivel, Antoni",
+      "primaryJob": "Sr. CDP",
+      "jobs": {
+        "Sushi Cook": 73.777,
+        "Sr. CDP": 125.84600000000002
+      },
+      "hours": 199.6,
+      "shiftCount": 21,
+      "weekCount": 5,
+      "venues": {
+        "mila": 199.623
+      },
+      "assignedFamily": "Sushi",
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "fteName": "Esquivel, Antoni",
+      "autoFamily": "Sushi",
       "status": "fte_covered"
     },
     {
@@ -1515,7 +1145,29 @@
       "assignedFamily": "Garde Manger",
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Hidalgo, Franzuly",
       "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "caceres juan",
+      "displayName": "Juan Caceres",
+      "payrollName": "Caceres, Juan",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 192.50199999999998
+      },
+      "hours": 192.5,
+      "shiftCount": 24,
+      "weekCount": 5,
+      "venues": {
+        "mila": 192.50199999999998
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "fteName": "Caceres, Juan Pablo",
+      "autoFamily": "Saute",
       "status": "fte_covered"
     },
     {
@@ -1535,6 +1187,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Urbina, Josseline",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1556,6 +1209,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Pasta",
+      "fteName": "Amaya Arroyo, Yerlis Patricia",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1577,6 +1231,7 @@
       "assignedFamily": "Pastry",
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Rodriguez, Angela Lissette",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1597,6 +1252,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Pierre, Frantzlet",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1617,7 +1273,71 @@
       "assignedFamily": "Garde Manger",
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Guarin, Gustavo",
       "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "carlos izaguirre",
+      "displayName": "Carlos Izaguirre",
+      "payrollName": "Izaguirre, Carlos",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 178.09400000000002
+      },
+      "hours": 178.1,
+      "shiftCount": 21,
+      "weekCount": 5,
+      "venues": {
+        "mila": 178.09400000000002
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "fteName": "Izaguirre, Carlos Zamir",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "foster sherie",
+      "displayName": "Sherie Foster",
+      "payrollName": "Foster, Sherie",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 178.09099999999998
+      },
+      "hours": 178.1,
+      "shiftCount": 24,
+      "weekCount": 5,
+      "venues": {
+        "mila": 178.09099999999998
+      },
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
+      "ftePosition": "Garde Manger",
+      "fteName": "Foster, Sherie A",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "adan herrera jose lopez",
+      "displayName": "jose adan herrera lopez",
+      "payrollName": "herrera lopez, jose adan",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 177.422
+      },
+      "hours": 177.4,
+      "shiftCount": 20,
+      "weekCount": 5,
+      "venues": {
+        "mila": 177.422
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "fteName": "Herrera Lopez, Jose",
+      "autoFamily": null,
       "status": "fte_covered"
     },
     {
@@ -1637,6 +1357,7 @@
       "assignedFamily": "Garde Manger",
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Jean, Francesca",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1657,6 +1378,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Bryant, Bradley",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1677,6 +1399,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Othman, Naseem",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1697,6 +1420,7 @@
       "assignedFamily": "Pizza",
       "fteFamily": "Pizza",
       "ftePosition": "Pizza",
+      "fteName": "Fernandez Perez, Gabriel",
       "autoFamily": null,
       "status": "fte_covered"
     },
@@ -1717,6 +1441,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Perez, Kristy",
       "autoFamily": null,
       "status": "fte_covered"
     },
@@ -1737,6 +1462,7 @@
       "assignedFamily": "Sushi",
       "fteFamily": "Sushi",
       "ftePosition": "Sushi",
+      "fteName": "Gonzalez, Erika",
       "autoFamily": null,
       "status": "fte_covered"
     },
@@ -1758,6 +1484,49 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Pacheco Gomez, Jorge",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "juan velasquez",
+      "displayName": "Juan Velasquez",
+      "payrollName": "Velasquez, Juan",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 165.152
+      },
+      "hours": 165.2,
+      "shiftCount": 20,
+      "weekCount": 4,
+      "venues": {
+        "mila": 165.152
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "fteName": "Velasquez, Juan David",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "fernando flores",
+      "displayName": "Fernando Flores",
+      "payrollName": "Flores, Fernando",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 164.65500000000003
+      },
+      "hours": 164.7,
+      "shiftCount": 19,
+      "weekCount": 5,
+      "venues": {
+        "mila": 164.65500000000003
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "fteName": "Flores, Fernando Francisco",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1778,6 +1547,28 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Guillen, Julian",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "bonilla yaniri",
+      "displayName": "Yaniri Bonilla",
+      "payrollName": "Bonilla, Yaniri",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 162.21099999999998
+      },
+      "hours": 162.2,
+      "shiftCount": 20,
+      "weekCount": 4,
+      "venues": {
+        "casa_neos": 162.21099999999998
+      },
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
+      "ftePosition": "Garde Manger",
+      "fteName": "Bonilla, Yaniri Loribe",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1798,6 +1589,7 @@
       "assignedFamily": "Garde Manger",
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Sanderson, Jamali",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1818,6 +1610,28 @@
       "assignedFamily": "Raw",
       "fteFamily": "Raw",
       "ftePosition": "Raw",
+      "fteName": "Uban, Kleiber",
+      "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "pedro pirela",
+      "displayName": "Pedro Pirela",
+      "payrollName": "Pirela, Pedro",
+      "primaryJob": "CDP",
+      "jobs": {
+        "CDP": 160.13400000000001
+      },
+      "hours": 160.1,
+      "shiftCount": 18,
+      "weekCount": 4,
+      "venues": {
+        "mila": 160.13400000000001
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "fteName": "Pirela, Pedro Jose",
       "autoFamily": null,
       "status": "fte_covered"
     },
@@ -1838,6 +1652,28 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Bourgeois, Zachary",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "maria villarraga",
+      "displayName": "Maria Villarraga",
+      "payrollName": "Villarraga, Maria",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 157.46699999999996
+      },
+      "hours": 157.5,
+      "shiftCount": 20,
+      "weekCount": 4,
+      "venues": {
+        "casa_neos": 157.46699999999996
+      },
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
+      "ftePosition": "Raw",
+      "fteName": "Villarraga, Maria Alejandra",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1858,6 +1694,7 @@
       "assignedFamily": "Pastry",
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Quiroga, Jacqueline",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1878,6 +1715,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Lopez de Juan, Joaquin",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1898,6 +1736,7 @@
       "assignedFamily": "Fry",
       "fteFamily": "Fry",
       "ftePosition": "Fry",
+      "fteName": "Gonzalez, Miguel",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1918,6 +1757,28 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Eugene, Jorane",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "borge seleny",
+      "displayName": "Seleny Borge",
+      "payrollName": "Borge, Seleny",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 150.893
+      },
+      "hours": 150.9,
+      "shiftCount": 20,
+      "weekCount": 4,
+      "venues": {
+        "casa_neos": 150.893
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "fteName": "Borge, Seleny Desiree",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1938,6 +1799,7 @@
       "assignedFamily": "Fry",
       "fteFamily": "Fry",
       "ftePosition": "Fry",
+      "fteName": "Pierre Louis, Makinzy",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1958,6 +1820,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Ikotun, Oluwatimilehin",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1978,6 +1841,49 @@
       "assignedFamily": "Garde Manger",
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Tinoco, Amalia",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "aura laguna mendoza",
+      "displayName": "Aura Laguna Mendoza",
+      "payrollName": "Laguna Mendoza, Aura",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 149.64000000000001
+      },
+      "hours": 149.6,
+      "shiftCount": 20,
+      "weekCount": 4,
+      "venues": {
+        "casa_neos": 149.64000000000001
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "fteName": "Laguna Mendoza, Aura Del Carmen",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "jordan rojas",
+      "displayName": "Jordan Rojas",
+      "payrollName": "Rojas, Jordan",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 148.756
+      },
+      "hours": 148.8,
+      "shiftCount": 20,
+      "weekCount": 4,
+      "venues": {
+        "casa_neos": 148.756
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "fteName": "Rojas, Jordan Eduardo",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -1998,6 +1904,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Mendoza Chaux, Antonio",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2018,6 +1925,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Kelly, Darren",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2038,6 +1946,7 @@
       "assignedFamily": "Fry",
       "fteFamily": "Fry",
       "ftePosition": "Fry",
+      "fteName": "Youngblood, Gregory",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2058,6 +1967,7 @@
       "assignedFamily": "Fry",
       "fteFamily": "Fry",
       "ftePosition": "Fry",
+      "fteName": "Sabala, Anthony",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2078,6 +1988,7 @@
       "assignedFamily": "Raw",
       "fteFamily": "Raw",
       "ftePosition": "Raw",
+      "fteName": "Calvo, Beatriz",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2099,6 +2010,7 @@
       "assignedFamily": "Garde Manger",
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Miller, Jada",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2119,6 +2031,28 @@
       "assignedFamily": "Prep",
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Petersen, Bryan",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "kevin ruiz yesca",
+      "displayName": "Kevin Ruiz Yesca",
+      "payrollName": "Ruiz Yesca, Kevin",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 135.97500000000002
+      },
+      "hours": 136,
+      "shiftCount": 18,
+      "weekCount": 4,
+      "venues": {
+        "casa_neos": 135.97500000000002
+      },
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
+      "ftePosition": "Raw",
+      "fteName": "Ruiz Yesca, Kevin Antonio",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2139,6 +2073,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Sheput, Juan",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2159,6 +2094,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Bosch Jr, Frank",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2179,6 +2115,7 @@
       "assignedFamily": "Garde Manger",
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Chaparro, Heidy",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2199,6 +2136,49 @@
       "assignedFamily": "Garde Manger",
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Jusma, Daniel",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "jennifer lopez",
+      "displayName": "Jennifer Lopez",
+      "payrollName": "Lopez, Jennifer",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 129.71499999999997
+      },
+      "hours": 129.7,
+      "shiftCount": 18,
+      "weekCount": 4,
+      "venues": {
+        "casa_neos": 129.71499999999997
+      },
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
+      "ftePosition": "Garde Manger",
+      "fteName": "Lopez Cano, Jennifer",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "hernandez roberto",
+      "displayName": "Roberto Hernandez",
+      "payrollName": "Hernandez, Roberto",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 129.31199999999998
+      },
+      "hours": 129.3,
+      "shiftCount": 15,
+      "weekCount": 3,
+      "venues": {
+        "casa_neos": 129.31199999999998
+      },
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
+      "ftePosition": "Saute",
+      "fteName": "Hernandez, Roberto Adderly",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2219,6 +2199,7 @@
       "assignedFamily": "Garde Manger",
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Aulicino, Francesco",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2239,6 +2220,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Rodriguez, Victoria",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2259,6 +2241,7 @@
       "assignedFamily": "Pastry",
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Ramos, Karina",
       "autoFamily": null,
       "status": "fte_covered"
     },
@@ -2279,6 +2262,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Garcia Alvarez, Henry Antonio",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2299,6 +2283,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Saenz, Robert",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2319,6 +2304,7 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Essenwanger, Maria",
       "autoFamily": null,
       "status": "fte_covered"
     },
@@ -2339,6 +2325,28 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Montfort, Axel Albert Emile",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "joseph koziol",
+      "displayName": "Joseph Koziol",
+      "payrollName": "Koziol, Joseph",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 109.94
+      },
+      "hours": 109.9,
+      "shiftCount": 14,
+      "weekCount": 5,
+      "venues": {
+        "ava_winter_park": 109.94
+      },
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
+      "ftePosition": "Garde Manger",
+      "fteName": "Koziol, Joseph Brian",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2359,6 +2367,7 @@
       "assignedFamily": "Garde Manger",
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Elvir Romero, Dixa Marina",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2379,6 +2388,49 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Thumas, Justin",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "martinez perez winkers",
+      "displayName": "Winkers Perez Martinez",
+      "payrollName": "Perez Martinez, Winkers",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 99.29
+      },
+      "hours": 99.3,
+      "shiftCount": 12,
+      "weekCount": 3,
+      "venues": {
+        "casa_neos": 99.29
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "fteName": "Perez Martinez, Winkers Jose",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "de la pablo rosa",
+      "displayName": "Pablo De La Rosa",
+      "payrollName": "De La Rosa, Pablo",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 95.14699999999999
+      },
+      "hours": 95.1,
+      "shiftCount": 14,
+      "weekCount": 3,
+      "venues": {
+        "casa_neos": 95.14699999999999
+      },
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
+      "ftePosition": "Raw",
+      "fteName": "De la Rosa, Pablo Bernardo",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2399,7 +2451,29 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Porven, Aurelio",
       "autoFamily": null,
+      "status": "fte_covered"
+    },
+    {
+      "key": "eliezer osorio",
+      "displayName": "Eliezer Osorio",
+      "payrollName": "Osorio, Eliezer",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 89.006
+      },
+      "hours": 89,
+      "shiftCount": 12,
+      "weekCount": 3,
+      "venues": {
+        "casa_neos": 89.006
+      },
+      "assignedFamily": "Fry",
+      "fteFamily": "Fry",
+      "ftePosition": "Fry",
+      "fteName": "Osorio Olivera, Eliezer",
+      "autoFamily": "Saute",
       "status": "fte_covered"
     },
     {
@@ -2419,6 +2493,7 @@
       "assignedFamily": "Prep",
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Swaby, Omar",
       "autoFamily": null,
       "status": "fte_covered"
     },
@@ -2439,6 +2514,49 @@
       "assignedFamily": "Saute",
       "fteFamily": "Saute",
       "ftePosition": "Saute",
+      "fteName": "Stewart, Kirk",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "adams jean pereira",
+      "displayName": "Jean Pereira Adams",
+      "payrollName": "Pereira Adams, Jean",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 57.233999999999995
+      },
+      "hours": 57.2,
+      "shiftCount": 8,
+      "weekCount": 2,
+      "venues": {
+        "casa_neos": 57.233999999999995
+      },
+      "assignedFamily": "Pizza",
+      "fteFamily": "Pizza",
+      "ftePosition": "Pizza",
+      "fteName": "Pereira Adams, Jean Carlo",
+      "autoFamily": "Saute",
+      "status": "fte_covered"
+    },
+    {
+      "key": "chacon josset",
+      "displayName": "Josset Chacon",
+      "payrollName": "Chacon, Josset",
+      "primaryJob": "Line Cook",
+      "jobs": {
+        "Line Cook": 44.682
+      },
+      "hours": 44.7,
+      "shiftCount": 5,
+      "weekCount": 1,
+      "venues": {
+        "casa_neos": 44.682
+      },
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
+      "ftePosition": "Robata",
+      "fteName": "Monsalve Chacon, Josset Daniel",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2459,6 +2577,7 @@
       "assignedFamily": "Fry",
       "fteFamily": "Fry",
       "ftePosition": "Fry",
+      "fteName": "Vigil, David",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2479,6 +2598,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Smith, Albert",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2499,6 +2619,7 @@
       "assignedFamily": "Robata",
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Perry, Elton",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2519,6 +2640,7 @@
       "assignedFamily": "Pizza",
       "fteFamily": "Pizza",
       "ftePosition": "Pizza",
+      "fteName": "Aslanian, George",
       "autoFamily": "Saute",
       "status": "fte_covered"
     },
@@ -2539,6 +2661,7 @@
       "assignedFamily": "Garde Manger",
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Haughton, Netanya",
       "autoFamily": "Saute",
       "status": "fte_covered"
     }
@@ -2561,6 +2684,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Salgado, Crystobal",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2581,6 +2705,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Monge, Roxana",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2601,6 +2726,7 @@
       "assignedFamily": null,
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Pohler, Clara",
       "autoFamily": "Saute",
       "status": "auto"
     },
@@ -2621,6 +2747,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Quintanilla Castro, Leily Yojana",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2641,6 +2768,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Pestana, Mario",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2661,6 +2789,7 @@
       "assignedFamily": null,
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Delgado, Marlom",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -2681,6 +2810,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Rodriguez, Mailandys",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2701,6 +2831,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2721,6 +2852,7 @@
       "assignedFamily": null,
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Lhotellier, Valentine",
       "autoFamily": "Saute",
       "status": "auto"
     },
@@ -2741,6 +2873,7 @@
       "assignedFamily": null,
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Arrazola, Diana Maria",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -2762,6 +2895,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Belance, Anderson",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2783,6 +2917,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Mena, Walfrido",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2803,6 +2938,7 @@
       "assignedFamily": null,
       "fteFamily": "Garde Manger",
       "ftePosition": "Garde Manger",
+      "fteName": "Rifaldi, Moh",
       "autoFamily": "Saute",
       "status": "auto"
     },
@@ -2822,8 +2958,9 @@
         "ava_coconut_grove": 223.63000000000002
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Jackson, Phillip Edward",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2844,6 +2981,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Butcher",
+      "fteName": "Silva, Sheydeguer",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2864,6 +3002,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Jean, Jacques",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2884,6 +3023,7 @@
       "assignedFamily": null,
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Cavalcante, Casey",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -2904,6 +3044,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Torres Guerrero, Linda Omaida",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2922,8 +3063,9 @@
         "mila": 202.82799999999997
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Mondragon, Suany Yesibel",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2944,6 +3086,7 @@
       "assignedFamily": null,
       "fteFamily": "Sushi",
       "ftePosition": "Sushi",
+      "fteName": "Gonzalez, Fernando",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -2962,8 +3105,9 @@
         "mila": 201.093
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Garcia Corea, Karen Vanessa",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -2984,6 +3128,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Jeanclaude, Jameson",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3002,8 +3147,9 @@
         "mila": 196.05499999999995
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Campos Tapia, Juan Carlos",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3022,8 +3168,9 @@
         "mila": 194.684
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "fteName": "Morataya Garcia, Mily",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3042,8 +3189,9 @@
         "mila": 193.80499999999998
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "fteName": "Gonzalez, Edgar Leonel",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3064,6 +3212,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Marconi, Fernando",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3084,6 +3233,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Garzon, Diana",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3104,6 +3254,7 @@
       "assignedFamily": null,
       "fteFamily": "Sushi",
       "ftePosition": "Sushi",
+      "fteName": "Zubiate Afuso, Jose Luis",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3122,8 +3273,9 @@
         "ava_winter_park": 187.54000000000005
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Lopez, Yasmin E",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3144,6 +3296,7 @@
       "assignedFamily": null,
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Castillo, Walfer",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -3165,6 +3318,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Piedra, Maricela",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3185,6 +3339,7 @@
       "assignedFamily": null,
       "fteFamily": "Sushi",
       "ftePosition": "Sushi",
+      "fteName": "Esquivel Lopez De Ruano, Mildred",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3205,6 +3360,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Castillo, Exequiel",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3225,6 +3381,7 @@
       "assignedFamily": null,
       "fteFamily": "Sushi",
       "ftePosition": "Sushi",
+      "fteName": "Alvarez Valle, Freddy",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3243,8 +3400,9 @@
         "ava_winter_park": 169.37000000000003
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Romero, Judith Julia",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3263,8 +3421,9 @@
         "mila": 168.36
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Garcia Barahona, Mirna Yaneth",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3285,6 +3444,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Baron, Nicson",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3305,6 +3465,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "De Leon Garcia, Icela",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3323,8 +3484,9 @@
         "mila": 160.81799999999998
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "fteName": "Medrano, Silvia Karina",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3343,8 +3505,9 @@
         "casa_neos": 160.013
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Expo",
+      "ftePosition": "Expo",
+      "fteName": "Chavarria Mora, Kevin Alexander",
       "autoFamily": "Expo",
       "status": "auto"
     },
@@ -3363,8 +3526,9 @@
         "casa_neos": 156.137
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Raw",
+      "ftePosition": "Raw",
+      "fteName": "Soto Sosa, Cesar Homero",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3385,6 +3549,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Benn, Kelsi",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3405,6 +3570,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3426,6 +3592,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Pierre, Rodry",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3446,6 +3613,7 @@
       "assignedFamily": null,
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Aguilar, Robin",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -3464,8 +3632,9 @@
         "casa_neos": 150.81599999999997
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Expo",
+      "ftePosition": "Expo",
+      "fteName": "Fleming, Tanisha Nicole",
       "autoFamily": "Expo",
       "status": "auto"
     },
@@ -3484,8 +3653,9 @@
         "mila": 150.07900000000004
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "fteName": "Cruz, Randy James",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3507,6 +3677,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Munoz Soler, Lissette",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3525,8 +3696,9 @@
         "casa_neos": 147.07999999999998
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "fteName": "Seijas, Aniele J",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3545,8 +3717,9 @@
         "casa_neos": 146.90699999999998
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "fteName": "Vargas, Victor Hugo",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3567,6 +3740,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Delva, Hudson",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3585,8 +3759,9 @@
         "mila": 144.92600000000002
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "fteName": "Garcia, Diana Roxana",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3605,8 +3780,9 @@
         "casa_neos": 143.95499999999998
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Garcia Caicedo, Jenny Viviana",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3628,6 +3804,7 @@
       "assignedFamily": null,
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Sarabia Ramos, Francis",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -3648,6 +3825,7 @@
       "assignedFamily": null,
       "fteFamily": "Sushi",
       "ftePosition": "Sushi",
+      "fteName": "Torres, Justin",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3668,6 +3846,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Butcher",
+      "fteName": "Adrien, Gousmann",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3688,6 +3867,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Jesulus, Normila",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3708,6 +3888,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Joissaint, Mandorliny",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3728,6 +3909,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Pierre Louis, Sylve",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3748,6 +3930,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Butcher",
+      "fteName": "Chica, Tyrone",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3768,6 +3951,7 @@
       "assignedFamily": null,
       "fteFamily": "Expo",
       "ftePosition": "Food Expeditor",
+      "fteName": "Navas, Anthony",
       "autoFamily": "Expo",
       "status": "auto"
     },
@@ -3786,8 +3970,9 @@
         "casa_neos": 125.242
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Beaubrun, Wisnel",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3807,8 +3992,9 @@
         "ava_winter_park": 120.85
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Purser, Adrian Donovan",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3829,6 +4015,7 @@
       "assignedFamily": null,
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Rangel Garcia, Yamila",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -3849,6 +4036,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Morillo Gonzalez, Claudia",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3867,8 +4055,9 @@
         "casa_neos": 110.17399999999999
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "fteName": "Torres, Gerson Jose",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3887,8 +4076,9 @@
         "casa_neos": 104.25200000000001
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Reliford, Joshua Austin",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3909,6 +4099,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3929,6 +4120,7 @@
       "assignedFamily": null,
       "fteFamily": "Expo",
       "ftePosition": "Food Expeditor",
+      "fteName": "Barahona, Sindi",
       "autoFamily": "Expo",
       "status": "auto"
     },
@@ -3949,6 +4141,7 @@
       "assignedFamily": null,
       "fteFamily": "Sushi",
       "ftePosition": "Sushi",
+      "fteName": "Barrera, Maria",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -3969,6 +4162,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Nova, Claudia",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -3987,8 +4181,9 @@
         "mila": 79.91900000000001
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Pastry",
+      "ftePosition": "Pastry",
+      "fteName": "Mesia, Dubelys Alejandrina",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -4007,8 +4202,9 @@
         "ava_coconut_grove": 78.58
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Quintana Guanoluisa, Rosmery Alej",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -4027,8 +4223,9 @@
         "mila": 78.05699999999999
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Colmenares Orduz, Mabel Dalila",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -4050,6 +4247,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Hernandez, Steven",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -4070,6 +4268,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Expo",
       "status": "auto"
     },
@@ -4088,8 +4287,9 @@
         "casa_neos": 71.72399999999999
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "fteName": "Mayorga Munoz, Jose Benjamin",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -4108,8 +4308,9 @@
         "ava_coconut_grove": 68.12
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Pastry",
+      "ftePosition": "Pastry",
+      "fteName": "Gonzalez, Joey Omar",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -4130,6 +4331,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Toomer, Jovan",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -4150,6 +4352,7 @@
       "assignedFamily": null,
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Bermudez, Edixon",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -4170,6 +4373,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Jinius, Jacques",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -4190,6 +4394,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -4208,8 +4413,9 @@
         "claudie": 35.17
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Prep",
+      "ftePosition": "Prep",
+      "fteName": "Monge, Elías Ezequiel",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -4230,6 +4436,7 @@
       "assignedFamily": null,
       "fteFamily": "Pastry",
       "ftePosition": "Pastry",
+      "fteName": "Gonzalez, Joey Omar",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -4250,6 +4457,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Cesaire, Lony",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -4270,6 +4478,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Munguia, Santa",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -4290,6 +4499,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Ochoa, Lesly Maritza",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -4308,8 +4518,9 @@
         "mila": 23.9
       },
       "assignedFamily": null,
-      "fteFamily": null,
-      "ftePosition": null,
+      "fteFamily": "Sushi",
+      "ftePosition": "Sushi",
+      "fteName": "Rueda Herrera, Neil Edwin",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -4330,6 +4541,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Garde Manger",
       "status": "auto"
     },
@@ -4350,6 +4562,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -4370,6 +4583,7 @@
       "assignedFamily": null,
       "fteFamily": "Robata",
       "ftePosition": "Robata",
+      "fteName": "Leslie, Teyh",
       "autoFamily": "Saute",
       "status": "auto"
     },
@@ -4390,6 +4604,7 @@
       "assignedFamily": null,
       "fteFamily": "Prep",
       "ftePosition": "Prep",
+      "fteName": "Flores, Flor",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -4410,6 +4625,7 @@
       "assignedFamily": null,
       "fteFamily": null,
       "ftePosition": null,
+      "fteName": null,
       "autoFamily": "Expo",
       "status": "auto"
     }
@@ -4494,10 +4710,10 @@
       "venues": {
         "claudie": 351.33
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "castro leily quintanilla yojana",
@@ -4662,10 +4878,10 @@
       "venues": {
         "claudie": 282.59
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "jordan maritza vera",
@@ -4676,10 +4892,10 @@
       "venues": {
         "ava_coconut_grove": 279.86000000000007
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "keon thornhill",
@@ -4718,10 +4934,10 @@
       "venues": {
         "mila": 272.298
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Pastry",
+      "fteFamily": "Pastry",
       "autoFamily": null,
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "daley demetrik",
@@ -4830,10 +5046,10 @@
       "venues": {
         "ava_coconut_grove": 248.47999999999996
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "ben sufra",
@@ -4985,7 +5201,7 @@
         "ava_coconut_grove": 223.63000000000002
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -5012,10 +5228,10 @@
       "venues": {
         "ava_winter_park": 218.61999999999998
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "sheydeguer silva",
@@ -5110,10 +5326,10 @@
       "venues": {
         "mila": 208.099
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "aguilar nicholas",
@@ -5152,10 +5368,10 @@
       "venues": {
         "ava_winter_park": 205.88
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Pastry",
+      "fteFamily": "Pastry",
       "autoFamily": null,
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "gustavo rondon",
@@ -5208,10 +5424,10 @@
       "venues": {
         "mila": 203.30499999999998
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "mondragon suany",
@@ -5223,7 +5439,7 @@
         "mila": 202.82799999999997
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -5265,7 +5481,7 @@
         "mila": 201.093
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -5320,10 +5536,10 @@
       "venues": {
         "mila": 199.623
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Sushi",
+      "fteFamily": "Sushi",
       "autoFamily": "Sushi",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "jameson jeanclaude",
@@ -5349,7 +5565,7 @@
         "mila": 196.05499999999995
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -5363,7 +5579,7 @@
         "mila": 194.684
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Sushi",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -5377,7 +5593,7 @@
         "mila": 193.80499999999998
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Sushi",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -5432,10 +5648,10 @@
       "venues": {
         "mila": 192.50199999999998
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "josseline urbina",
@@ -5475,7 +5691,7 @@
         "ava_winter_park": 187.54000000000005
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -5572,10 +5788,10 @@
       "venues": {
         "mila": 178.09400000000002
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "foster sherie",
@@ -5586,10 +5802,10 @@
       "venues": {
         "mila": 178.09099999999998
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "adan herrera jose lopez",
@@ -5600,10 +5816,10 @@
       "venues": {
         "mila": 177.422
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
       "autoFamily": null,
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "francesca jean",
@@ -5699,7 +5915,7 @@
         "ava_winter_park": 169.37000000000003
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -5713,7 +5929,7 @@
         "mila": 168.36
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -5810,10 +6026,10 @@
       "venues": {
         "mila": 165.152
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
       "autoFamily": null,
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "fernando flores",
@@ -5824,10 +6040,10 @@
       "venues": {
         "mila": 164.65500000000003
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "guillen julian",
@@ -5852,10 +6068,10 @@
       "venues": {
         "casa_neos": 162.21099999999998
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "jamali sanderson",
@@ -5895,7 +6111,7 @@
         "mila": 160.81799999999998
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Sushi",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -5908,10 +6124,10 @@
       "venues": {
         "mila": 160.13400000000001
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
       "autoFamily": null,
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "chavarria kevin mora",
@@ -5923,7 +6139,7 @@
         "casa_neos": 160.013
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Expo",
       "autoFamily": "Expo",
       "status": "auto"
     },
@@ -5950,10 +6166,10 @@
       "venues": {
         "casa_neos": 157.46699999999996
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "jacqueline quiroga",
@@ -5979,7 +6195,7 @@
         "casa_neos": 156.137
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Raw",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -6090,10 +6306,10 @@
       "venues": {
         "casa_neos": 150.893
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "louis makinzy pierre",
@@ -6119,7 +6335,7 @@
         "casa_neos": 150.81599999999997
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Expo",
       "autoFamily": "Expo",
       "status": "auto"
     },
@@ -6147,7 +6363,7 @@
         "mila": 150.07900000000004
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Sushi",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -6174,10 +6390,10 @@
       "venues": {
         "casa_neos": 149.64000000000001
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "jordan rojas",
@@ -6188,10 +6404,10 @@
       "venues": {
         "casa_neos": 148.756
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "lissette munoz soler",
@@ -6245,7 +6461,7 @@
         "casa_neos": 147.07999999999998
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Sushi",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -6259,7 +6475,7 @@
         "casa_neos": 146.90699999999998
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Sushi",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -6287,7 +6503,7 @@
         "mila": 144.92600000000002
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Sushi",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -6301,7 +6517,7 @@
         "casa_neos": 143.95499999999998
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -6427,10 +6643,10 @@
       "venues": {
         "casa_neos": 135.97500000000002
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "jesulus normila",
@@ -6539,10 +6755,10 @@
       "venues": {
         "casa_neos": 129.71499999999997
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "hernandez roberto",
@@ -6553,10 +6769,10 @@
       "venues": {
         "casa_neos": 129.31199999999998
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Saute",
+      "fteFamily": "Saute",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "aulicino francesco",
@@ -6624,7 +6840,7 @@
         "casa_neos": 125.242
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -6652,7 +6868,7 @@
         "ava_winter_park": 120.85
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -6750,7 +6966,7 @@
         "casa_neos": 110.17399999999999
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Sushi",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -6763,10 +6979,10 @@
       "venues": {
         "ava_winter_park": 109.94
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Garde Manger",
+      "fteFamily": "Garde Manger",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "dixa elvir marina romero",
@@ -6792,7 +7008,7 @@
         "casa_neos": 104.25200000000001
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -6833,10 +7049,10 @@
       "venues": {
         "casa_neos": 99.29
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "barahona sindi",
@@ -6861,10 +7077,10 @@
       "venues": {
         "casa_neos": 95.14699999999999
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Raw",
+      "fteFamily": "Raw",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "barrera maria",
@@ -6903,10 +7119,10 @@
       "venues": {
         "casa_neos": 89.006
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Fry",
+      "fteFamily": "Fry",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "omar swaby",
@@ -6946,7 +7162,7 @@
         "mila": 79.91900000000001
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Pastry",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -6960,7 +7176,7 @@
         "ava_coconut_grove": 78.58
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -6974,7 +7190,7 @@
         "mila": 78.05699999999999
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -7030,7 +7246,7 @@
         "casa_neos": 71.72399999999999
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Sushi",
       "autoFamily": "Sushi",
       "status": "auto"
     },
@@ -7058,7 +7274,7 @@
         "ava_coconut_grove": 68.12
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Pastry",
       "autoFamily": "Pastry",
       "status": "auto"
     },
@@ -7099,10 +7315,10 @@
       "venues": {
         "casa_neos": 57.233999999999995
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Pizza",
+      "fteFamily": "Pizza",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "cass smith",
@@ -7141,10 +7357,10 @@
       "venues": {
         "casa_neos": 44.682
       },
-      "assignedFamily": null,
-      "fteFamily": null,
+      "assignedFamily": "Robata",
+      "fteFamily": "Robata",
       "autoFamily": "Saute",
-      "status": "needs_assignment"
+      "status": "fte_covered"
     },
     {
       "key": "david vigil",
@@ -7212,7 +7428,7 @@
         "claudie": 35.17
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Prep",
       "autoFamily": "Prep",
       "status": "auto"
     },
@@ -7282,7 +7498,7 @@
         "mila": 23.9
       },
       "assignedFamily": null,
-      "fteFamily": null,
+      "fteFamily": "Sushi",
       "autoFamily": "Sushi",
       "status": "auto"
     },

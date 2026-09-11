@@ -217,8 +217,10 @@ function setsOverlapFuzzy(setA, setB) {
 }
 
 /**
- * Score 0–100 for Toast↔FTE name similarity. Threshold ≥72 is a confident match.
- * Handles: order swaps, diacritics, compound surnames, 1–3 char spelling mistakes.
+ * Score 0–100 for Toast/Harri↔FTE name similarity. Threshold ≥72 is a confident match.
+ * Handles: "Last, First" order, diacritics, middle names, multi-part surnames
+ * (Jorge Ayala ↔ Ayala Flores, Jorge Dario; Summerset, Christopher ↔ Summerset, Christopher Lee),
+ * compound surnames, 1–3 char spelling mistakes.
  * Always requires a plausible first-name match to avoid middle-name collisions (Alec/Alej).
  */
 function scoreNameMatch(a, b) {
@@ -236,29 +238,39 @@ function scoreNameMatch(a, b) {
 
   const expA = expandTokenSet(a.tokens);
   const expB = expandTokenSet(b.tokens);
-  // Compact equality still needs first-name agreement when both have ≥2 tokens
   const firstA = a.tokens[0];
   const firstB = b.tokens[0];
-  const lastA = a.tokens[a.tokens.length - 1];
-  const lastB = b.tokens[b.tokens.length - 1];
   const firstOk = firstNameClose(firstA, firstB);
 
   if (!firstOk) {
-    // Allow compound-surname-only rescue when compact forms match (Beaubrun already handled above)
     return 0;
   }
 
   if (a.compact && expB.has(a.compact)) return 96;
   if (b.compact && expA.has(b.compact)) return 96;
 
-  // Surname: last tokens, or joins that end with the last token (beau+brun, zambrano+gonzalez order)
+  // Shorter formal core ⊂ longer full legal name (first + surname tokens all found)
+  const shorter = a.tokens.length <= b.tokens.length ? a : b;
+  const longer = a.tokens.length <= b.tokens.length ? b : a;
+  const longerPool = expandTokenSet(longer.tokens);
+  const tokenInPool = (tok, pool) =>
+    [...pool].some((p) => tokenClose(tok, p) || firstNameClose(tok, p));
+  if (shorter.tokens.length >= 2) {
+    const coreOk = shorter.tokens.every((t) => tokenInPool(t, longerPool));
+    if (coreOk) return 95;
+    // First + any surname token from the shorter name appears in the longer
+    const shortSur = shorter.tokens.slice(1);
+    if (shortSur.some((t) => tokenInPool(t, longerPool))) return 93;
+  }
+
+  // Surname: last tokens, or joins that end with the last token (beau+brun, ayala+flores)
   const surnameForms = (tokens, exp) => {
     const last = tokens[tokens.length - 1];
     const set = new Set([last]);
+    for (const t of tokens.slice(1)) set.add(t); // any non-first token can be a surname part
     for (const t of exp) {
       if (t.length >= 5 && (t.endsWith(last) || last.endsWith(t) || t === last)) set.add(t);
     }
-    // also adjacent pairs among trailing tokens
     if (tokens.length >= 2) {
       set.add(tokens[tokens.length - 2] + last);
     }

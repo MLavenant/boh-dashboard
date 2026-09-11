@@ -502,9 +502,13 @@ function buildVenue(venueRaw, weekLabel) {
       continue;
     }
 
-    const rawName = shift.payrollName || shift.employeeName;
-    const nk = nameKey(applyAlias(rawName, aliases));
-    const hit = bestRosterMatch(nk, rosterByKey);
+    // Try payroll + display names — Harri short form vs FTE full legal name
+    let hit = null;
+    for (const raw of [shift.payrollName, shift.employeeName].filter(Boolean)) {
+      const nk = nameKey(applyAlias(raw, aliases));
+      const cand = bestRosterMatch(nk, rosterByKey);
+      if (cand && (!hit || cand.score > hit.score)) hit = cand;
+    }
     if (!hit) {
       unmatchedLabor.push({
         date: shift.date,
