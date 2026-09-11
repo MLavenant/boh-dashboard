@@ -1779,7 +1779,7 @@ function renderLoadPerf() {
 // VISUAL 4: 3D Station View
 // ============================================================
 function render3D() {
-  const STATIONS = getD().stations.filter(s => !/cold[\s_-]?expo|^pass$/i.test(s.station));
+  const STATIONS = getD().stations.filter(s => !/cold[\\s_-]?expo|^pass$/i.test(s.station));
   const host = document.getElementById('kitchen');
   if (!window.THREE) {
     host.innerHTML='<div style="padding:40px;color:#9aa0aa;text-align:center">Three.js failed to load.<br><small>CDN: cdnjs.cloudflare.com</small></div>';
@@ -1794,7 +1794,7 @@ function render3D() {
   // ── Claudie floor plan (physical positions) ──────────────────────────────
   const FLOOR_PLANS = {
     claudie: [
-      { match: /garde.manger|^gm$|^gm\b/i,  x:  7,  z: -7,  w: 3.5, d: 2   },
+      { match: /garde.manger|^gm$|^gm\\b/i,  x:  7,  z: -7,  w: 3.5, d: 2   },
       { match: /fry/i,                       x:  7,  z: -4.5,w: 3.5, d: 2   },
       { match: /saut/i,                      x:  7,  z: -2,  w: 3.5, d: 2   },
       { match: /fish(?!.*market)|fish.market/i, x: 4, z: 1,  w: 3,   d: 2.5 },
@@ -2443,9 +2443,19 @@ function renderStaffPlayersPanel(staffing, tableEl, heatEl, varEl, noteEl) {
 function stationsForFamily(family, staffing, stationDetails) {
   const map = (staffing && staffing.toastStationFamily) || {};
   const fromMap = Object.entries(map).filter(([, f]) => f === family).map(([st]) => st);
-  if (fromMap.length) return fromMap;
-  const token = family.toLowerCase().split(/\s+/)[0];
-  return Object.keys(stationDetails || {}).filter(st => st.toLowerCase().includes(token));
+  if (fromMap.length) {
+    // Keep only stations that exist on THIS venue (timing or map). Claudie ≠ MILA.
+    const present = fromMap.filter((st) => !stationDetails || Object.keys(stationDetails).length === 0 || stationDetails[st]);
+    return present.length ? present : fromMap;
+  }
+  // Family has FTE heads but no Toast station here (e.g. MILA Sushi) — return none.
+  // Never treat an empty token as matching every station name.
+  const token = String(family || '').toLowerCase().trim().split(/\\s+/)[0];
+  if (!token) return [];
+  return Object.keys(stationDetails || {}).filter((st) => {
+    const n = st.toLowerCase();
+    return n === token || n.startsWith(token + ' ') || n.startsWith(token + '-') || n.includes(token);
+  });
 }
 
 function hourBandLabel(hourKey) {
@@ -2669,11 +2679,12 @@ function renderHourlyThroughput() {
     qcEl.innerHTML = buildTicketQcHtml(d, staffing);
   }
 
-  const availableFamilies = HOURLY_FAMILIES.filter(f => {
-    if (staffing && staffing.byFamily && staffing.byFamily[f]) return true;
-    return stationsForFamily(f, staffing, stationDetails).some(st => stationDetails[st]);
-  });
-  const families = ['STAFF'].concat(availableFamilies.length ? availableFamilies : HOURLY_FAMILIES);
+  const availableFamilies = HOURLY_FAMILIES.filter(f =>
+    stationsForFamily(f, staffing, stationDetails).some(st => stationDetails[st] || (d.stationHourItems && d.stationHourItems[st]))
+  );
+  const families = ['STAFF'].concat(availableFamilies.length ? availableFamilies : HOURLY_FAMILIES.filter(f =>
+    staffing && staffing.byFamily && staffing.byFamily[f]
+  ));
   if (famSel && (!famSel.options.length || famSel.dataset.venue !== currentVenue)) {
     famSel.innerHTML = families.map(f => '<option value="'+f+'">'+f+'</option>').join('');
     famSel.dataset.venue = currentVenue;
@@ -2955,7 +2966,7 @@ let ipsPeriodKey = null;
 let ipsFiscalYear = 2026;
 
 function isoWeekMonday(weekKey) {
-  const m = String(weekKey || '').match(/(\d{4})-W(\d{2})/);
+  const m = String(weekKey || '').match(/(\\d{4})-W(\\d{2})/);
   if (!m) return null;
   const y = +m[1], w = +m[2];
   const jan4 = new Date(Date.UTC(y, 0, 4));
@@ -3245,20 +3256,38 @@ function populateIpsFamilySelect(sel, weekKeys, preferred) {
   if (!sel) return;
   const keys = Array.isArray(weekKeys) ? weekKeys : (weekKeys ? [weekKeys] : []);
   const found = new Set();
-  IPS_VENUE_KEYS.forEach(vk => {
-    keys.forEach(wk => {
-      const st = ALL_DATA[vk]?.[wk]?.staffing?.byFamily || {};
-      Object.keys(st).forEach(f => { if (HOURLY_FAMILIES.includes(f)) found.add(f); });
+  // Prefer families that have Toast stations on THIS venue (Claudie Sushi ≠ MILA).
+  keys.forEach(wk => {
+    const d = ALL_DATA[currentVenue]?.[wk];
+    if (!d) return;
+    const map = d.staffing?.toastStationFamily || {};
+    Object.values(map).forEach(f => { if (HOURLY_FAMILIES.includes(f)) found.add(f); });
+    Object.keys(d.stationDetails || {}).forEach(st => {
+      const fam = map[st];
+      if (fam && HOURLY_FAMILIES.includes(fam)) found.add(fam);
     });
   });
+  // Fall back to staffing byFamily only for families that also have a station mapping here
+  if (!found.size) {
+    keys.forEach(wk => {
+      const st = ALL_DATA[currentVenue]?.[wk]?.staffing?.byFamily || {};
+      Object.keys(st).forEach(f => { if (HOURLY_FAMILIES.includes(f)) found.add(f); });
+    });
+  }
   const families = HOURLY_FAMILIES.filter(f => found.has(f));
-  const list = families.length ? families : HOURLY_FAMILIES;
+  const list = families.length ? families : HOURLY_FAMILIES.filter(f => {
+    // Last resort: only families with stationsForFamily hits on latest week
+    const wk = keys[keys.length - 1];
+    const d = ALL_DATA[currentVenue]?.[wk];
+    return d && stationsForFamily(f, d.staffing, d.stationDetails || {}).length > 0;
+  });
+  const finalList = list.length ? list : HOURLY_FAMILIES;
   const prev = sel.value;
-  sel.innerHTML = list.map(f => '<option value="'+f+'">'+f+'</option>').join('');
-  if (prev && list.includes(prev)) sel.value = prev;
-  else if (preferred && list.includes(preferred)) sel.value = preferred;
-  else if (list.includes('Pastry')) sel.value = 'Pastry';
-  else if (list[0]) sel.value = list[0];
+  sel.innerHTML = finalList.map(f => '<option value="'+f+'">'+f+'</option>').join('');
+  if (prev && finalList.includes(prev)) sel.value = prev;
+  else if (preferred && finalList.includes(preferred)) sel.value = preferred;
+  else if (finalList.includes('Pastry')) sel.value = 'Pastry';
+  else if (finalList[0]) sel.value = finalList[0];
 }
 
 function getIpsFamily() {
@@ -5539,7 +5568,7 @@ function showWeekWelcomePopup(weekKey) {
   const modal = document.createElement('div');
   modal.style.cssText = 'background:#181b22;border:1px solid #2d3448;border-radius:14px;padding:28px 32px;max-width:580px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.6)';
 
-  const weekLabel = weekKey.replace(/^(\d{4})-W(\d+)$/, 'W$2');
+  const weekLabel = weekKey.replace(/^(\\d{4})-W(\\d+)$/, 'W$2');
   let html = '<div style="font-size:20px;font-weight:700;color:#e8eaed;margin-bottom:6px">Good Morning — Week ' + weekLabel + ' Kitchen Health</div>';
   html += '<div style="font-size:12px;color:#9aa0aa;margin-bottom:20px;border-bottom:1px solid #262a33;padding-bottom:14px">Snapshot of this week BOH performance across all venues.</div>';
 
