@@ -18,7 +18,7 @@ const {
   resolveVenueSlug,
   normalizeFoodFamily,
   nameKey,
-  bestRosterMatch,
+  bestMatchFromNames,
 } = require('./boh-staffing-shared.cjs');
 
 const ROOT = process.env.BOH_ROOT || __dirname;
@@ -503,12 +503,10 @@ function buildVenue(venueRaw, weekLabel) {
     }
 
     // Try payroll + display names — Harri short form vs FTE full legal name
-    let hit = null;
-    for (const raw of [shift.payrollName, shift.employeeName].filter(Boolean)) {
-      const nk = nameKey(applyAlias(raw, aliases));
-      const cand = bestRosterMatch(nk, rosterByKey);
-      if (cand && (!hit || cand.score > hit.score)) hit = cand;
-    }
+    const hit = bestMatchFromNames(
+      [shift.payrollName, shift.employeeName].map((n) => applyAlias(n, aliases)),
+      rosterByKey
+    );
     if (!hit) {
       unmatchedLabor.push({
         date: shift.date,

@@ -5400,7 +5400,10 @@ function renderPeople() {
     const opts = ['<option value="">— no station —</option>']
       .concat(families.map(f => '<option value="' + f + '"' + (current === f ? ' selected' : '') + '>' + f + '</option>'))
       .join('');
-    const fte = r.fteFamily ? (r.fteFamily + (r.ftePosition ? ' (' + r.ftePosition + ')' : '')) : '—';
+    const fte = r.fteFamily
+      ? (r.fteFamily + (r.ftePosition ? ' (' + r.ftePosition + ')' : '') +
+        (r.fteName ? '<div style="font-size:11px;color:#86efac">' + String(r.fteName).replace(/</g,'&lt;') + '</div>' : ''))
+      : '—';
     const auto = r.autoFamily ? '<span style="color:#86efac">auto: ' + r.autoFamily + '</span>' : '';
     const job = r.primaryJob || Object.keys(r.jobs || {})[0] || '—';
     const locs = Object.keys(r.venues || {}).map(v => venueLabels[v] || v).sort().join(', ') || '—';

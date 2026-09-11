@@ -79,7 +79,9 @@ function combineDateTime(dateStr, timeStr) {
 function payrollNameFromDisplay(name) {
   const s = String(name || '').trim();
   if (!s) return '';
-  const parts = s.split(/\s+/);
+  // Already "Last, First Middle" (or multi-part last) — keep as-is
+  if (s.includes(',')) return s;
+  const parts = s.split(/\s+/).filter(Boolean);
   if (parts.length === 1) return s;
   const last = parts[parts.length - 1];
   const first = parts.slice(0, -1).join(' ');

@@ -325,6 +325,41 @@ function bestRosterMatch(laborNameKey, rosterByKey, threshold = NAME_MATCH_THRES
   return { index: bestIdx, score: bestScore, row: rosterByKey[bestIdx] };
 }
 
+/**
+ * Try several name spellings (payroll + display) against a roster; keep best hit.
+ * Used by staffing join and People-tab FTE hints.
+ */
+function bestMatchFromNames(rawNames, rosterByKey, threshold = NAME_MATCH_THRESHOLD) {
+  let best = null;
+  const seen = new Set();
+  for (const raw of rawNames || []) {
+    const s = String(raw || '').trim();
+    if (!s) continue;
+    const low = s.toLowerCase();
+    if (seen.has(low)) continue;
+    seen.add(low);
+    const hit = bestRosterMatch(nameKey(s), rosterByKey, threshold);
+    if (hit && (!best || hit.score > best.score)) {
+      best = { ...hit, matchedAs: s };
+    }
+  }
+  return best;
+}
+
+/**
+ * Fuzzy-find a value in a map keyed by person name / nameKey.
+ * Handles Jorge Ayala vs Ayala Flores, Jorge Dario assignment keys.
+ */
+function lookupByFuzzyName(map, rawNames, threshold = NAME_MATCH_THRESHOLD) {
+  if (!map || typeof map !== 'object') return null;
+  const entries = Object.entries(map);
+  if (!entries.length) return null;
+  const rosterLike = entries.map(([k, v]) => ({ ...nameKey(k), _key: k, _value: v }));
+  const hit = bestMatchFromNames(rawNames, rosterLike, threshold);
+  if (!hit) return null;
+  return { key: hit.row._key, value: hit.row._value, score: hit.score, matchedAs: hit.matchedAs };
+}
+
 /** Inclusive ISO week range: [{ weekKey: '2026-W29' }, ...] */
 function listIsoWeeks(fromKey, toKey) {
   const re = /^(\d{4})-W(\d{2})$/;
@@ -366,6 +401,8 @@ module.exports = {
   scoreNameMatch,
   namesMatch,
   bestRosterMatch,
+  bestMatchFromNames,
+  lookupByFuzzyName,
   NAME_MATCH_THRESHOLD,
   listIsoWeeks,
 };

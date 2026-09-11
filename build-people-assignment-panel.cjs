@@ -19,7 +19,8 @@ const {
   normalizeFoodFamily,
   listIsoWeeks,
   STAFFING_VENUES,
-  bestRosterMatch,
+  bestMatchFromNames,
+  lookupByFuzzyName,
 } = require('./boh-staffing-shared.cjs');
 
 const ROOT = process.env.BOH_ROOT || __dirname;
@@ -144,22 +145,34 @@ function main() {
   function resolveFteHint(person) {
     const exact = fteExact.get(person.key);
     if (exact) return exact;
-    const candidates = [person.payrollName, person.displayName].filter(Boolean);
-    let best = null;
-    for (const raw of candidates) {
-      const hit = bestRosterMatch(nameKey(raw), fteRosterByKey);
-      if (hit && (!best || hit.score > best.score)) {
-        best = {
-          matrix: hit.row.matrix,
-          position: hit.row.position,
-          venue: hit.row.venue,
-          week: hit.row.week,
-          name: hit.row.name,
-          score: hit.score,
-        };
-      }
-    }
-    return best;
+    const hit = bestMatchFromNames(
+      [person.payrollName, person.displayName],
+      fteRosterByKey
+    );
+    if (!hit) return null;
+    return {
+      matrix: hit.row.matrix,
+      position: hit.row.position,
+      venue: hit.row.venue,
+      week: hit.row.week,
+      name: hit.row.name,
+      score: hit.score,
+    };
+  }
+
+  function resolveAssignedFamily(person) {
+    const direct =
+      normalizeFoodFamily(assignments[person.key]) ||
+      normalizeFoodFamily(assignments[person.payrollName]) ||
+      normalizeFoodFamily(assignments[person.displayName]) ||
+      null;
+    if (direct) return direct;
+    const fuzzy = lookupByFuzzyName(assignments, [
+      person.key,
+      person.payrollName,
+      person.displayName,
+    ]);
+    return fuzzy ? normalizeFoodFamily(fuzzy.value) || fuzzy.value : null;
   }
 
   const needsAssignment = [];
@@ -167,11 +180,7 @@ function main() {
   const alreadyAssigned = [];
 
   for (const p of byPerson.values()) {
-    const assignedFamily =
-      normalizeFoodFamily(assignments[p.key]) ||
-      normalizeFoodFamily(assignments[p.payrollName]) ||
-      normalizeFoodFamily(assignments[p.displayName]) ||
-      null;
+    const assignedFamily = resolveAssignedFamily(p);
     const fte = resolveFteHint(p);
     const primaryJob = Object.entries(p.jobs).sort((a, b) => b[1] - a[1])[0]?.[0] || '';
     const primaryJobLow = primaryJob.toLowerCase();
@@ -249,6 +258,8 @@ function main() {
         venues: r.venues,
         assignedFamily: r.assignedFamily,
         fteFamily: r.fteFamily,
+        ftePosition: r.ftePosition,
+        fteName: r.fteName,
         autoFamily: r.autoFamily,
         status: r.status,
       })),

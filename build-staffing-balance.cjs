@@ -18,6 +18,8 @@ const {
   FOOD_FAMILIES,
   normalizeFoodFamily,
   resolveVenueSlug,
+  nameKey,
+  namesMatch,
 } = require('./boh-staffing-shared.cjs');
 
 const ROOT = process.env.BOH_ROOT || __dirname;
@@ -119,28 +121,27 @@ function buildVenueBalance(venue, weekLabel) {
     }
   }
 
-  // Attach raw time punches for matched people (by toast/fte name + day)
-  const punchesByKey = new Map();
+  // Attach raw time punches for matched people (fuzzy name: Jorge Ayala ↔ Ayala Flores, Jorge Dario)
+  const punchesByDay = new Map();
   for (const e of labor.entries || []) {
     const day = e.day;
-    const names = [e.employeeName, e.payrollName].filter(Boolean);
-    for (const nm of names) {
-      const k = `${day}|${nm.toLowerCase()}`;
-      if (!punchesByKey.has(k)) punchesByKey.set(k, []);
-      punchesByKey.get(k).push({
+    if (!punchesByDay.has(day)) punchesByDay.set(day, []);
+    punchesByDay.get(day).push(e);
+  }
+  for (const m of matched) {
+    const targets = [m.toastName, m.fteName].filter(Boolean).map((n) => nameKey(n));
+    const punches = [];
+    for (const e of punchesByDay.get(m.day) || []) {
+      const cands = [e.employeeName, e.payrollName].filter(Boolean).map((n) => nameKey(n));
+      const hit = targets.some((t) => cands.some((c) => namesMatch(t, c)));
+      if (!hit) continue;
+      punches.push({
         inDate: e.inDate,
         outDate: e.outDate,
         hours: e.hours,
         jobName: e.jobName,
         date: e.date,
       });
-    }
-  }
-  for (const m of matched) {
-    const keys = [`${m.day}|${(m.toastName || '').toLowerCase()}`, `${m.day}|${(m.fteName || '').toLowerCase()}`];
-    const punches = [];
-    for (const k of keys) {
-      for (const p of punchesByKey.get(k) || []) punches.push(p);
     }
     m.timeEntries = punches.slice(0, 12);
   }
