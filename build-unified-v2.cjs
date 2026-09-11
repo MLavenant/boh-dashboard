@@ -245,7 +245,7 @@ html = html.replace(
   <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:4px 0 16px;font-size:11px;color:#9aa0aa">
     <span><strong style="color:#e8eaed">Bars</strong> = items / staff-hour</span>
     <span>Alternating bands = station families</span>
-    <span>PDF = one page · chart + all station tables</span>
+    <span>PDF = intro chart page · then one page per station family</span>
   </div>
   <p class="note" style="margin:0 0 12px">Mon→Sun tables for each station family · only locations with items/staff. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> (green→red heat) · <strong>Items/person</strong>.</p>
   <div id="portfolioStationsDayTable"></div>
@@ -705,43 +705,50 @@ body.printing-stations-pdf #portfolioStationsPrintRoot {
   padding:0 !important;
   color:#e8eaed;
   background:#0d1117;
-}
-body.printing-stations-pdf #portfolioStationsPrintRoot {
-  zoom:var(--print-zoom, 1);
+  zoom:1 !important;
 }
 body.printing-stations-pdf .ps-print-page {
-  padding:6px 10px 8px;
-  page-break-after:avoid;
-  break-after:avoid;
+  padding:8px 12px 10px;
+  box-sizing:border-box;
+  page-break-after:always;
+  break-after:page;
+  page-break-inside:avoid;
+  break-inside:avoid;
+  overflow:hidden;
+  background:#0d1117;
+}
+body.printing-stations-pdf .ps-print-page:last-child {
+  page-break-after:auto;
+  break-after:auto;
 }
 body.printing-stations-pdf .ps-print-page h1 {
   margin:0 0 2px;
-  font-size:14px;
+  font-size:16px;
   color:#d9a441;
 }
 body.printing-stations-pdf .ps-print-page h2,
 body.printing-stations-pdf .ps-print-page h3 {
-  margin:8px 0 3px;
-  font-size:11px;
+  margin:6px 0 4px;
+  font-size:13px;
   color:#d9a441;
 }
 body.printing-stations-pdf .ps-print-page .ps-sub,
 body.printing-stations-pdf .ps-print-page .note {
   margin:0 0 6px;
-  font-size:8px;
+  font-size:9px;
   color:#9aa0aa;
 }
 body.printing-stations-pdf .ps-print-page table {
   width:100%;
   border-collapse:collapse;
-  font-size:7px;
+  font-size:9px;
 }
 body.printing-stations-pdf .ps-print-page th,
 body.printing-stations-pdf .ps-print-page td {
-  padding:2px 3px;
+  padding:3px 4px;
   border-bottom:1px solid #262a33;
   text-align:right;
-  line-height:1.15;
+  line-height:1.2;
 }
 body.printing-stations-pdf .ps-print-page th:first-child,
 body.printing-stations-pdf .ps-print-page td:first-child {
@@ -749,16 +756,15 @@ body.printing-stations-pdf .ps-print-page td:first-child {
 }
 body.printing-stations-pdf .ps-print-page img.ps-chart {
   width:100%;
-  max-height:220px;
+  max-height:420px;
   object-fit:contain;
   background:#13161c;
   border:1px solid #262a33;
   border-radius:6px;
   margin:4px 0 8px;
 }
-body.printing-stations-pdf .ps-family-block {
-  margin-bottom:6px;
-}
+body.printing-stations-pdf .ps-family-block { margin-bottom:0; }
+body.printing-stations-pdf .ps-print-page [style*="overflow"] { overflow:visible !important; }
 body.printing-portfolio,
 body.printing-portfolio html {
   background:#0d1117 !important;
@@ -836,11 +842,18 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
   }
   body.printing-stations-pdf #portfolioStationsPrintRoot {
     display:block !important;
-    zoom:var(--print-zoom, 1);
+    zoom:1 !important;
   }
   body.printing-stations-pdf .ps-print-page {
-    page-break-after:avoid !important;
-    break-after:avoid !important;
+    page-break-after:always !important;
+    break-after:page !important;
+    page-break-inside:avoid !important;
+    break-inside:avoid !important;
+    overflow:hidden !important;
+  }
+  body.printing-stations-pdf .ps-print-page:last-child {
+    page-break-after:auto !important;
+    break-after:auto !important;
   }
 }
 </style>`);
@@ -5530,13 +5543,10 @@ function exportPortfolioPdf() {
   }
 
   const root = document.getElementById('portfolioPrintRoot') || document.getElementById('tab-group');
-  // Hide empty variance cards so print doesn't leave blank blocks
+  // Only Scoreboard + Stations Comparison (through Table 2) — hide variance cards
   ['portfolioCardAlike', 'portfolioCardTarget'].forEach(id => {
     const card = document.getElementById(id);
-    if (!card) return;
-    const tbl = card.querySelector('[id$="Table"]');
-    const hasRows = tbl && tbl.querySelectorAll('tbody tr').length > 0;
-    card.classList.toggle('portfolio-print-empty', !hasRows);
+    if (card) card.classList.add('portfolio-print-empty');
   });
 
   const cleanup = () => {
@@ -5560,17 +5570,33 @@ function exportPortfolioPdf() {
         // Letter landscape printable ~ 10.6" × 7.6" at 96dpi after 5mm margins
         const maxW = 1020;
         const maxH = 730;
-        // Measure at zoom=1
         root.style.setProperty('--print-zoom', '1');
         const w = Math.max(root.scrollWidth, root.offsetWidth, 1);
         const h = Math.max(root.scrollHeight, root.offsetHeight, 1);
-        // Uniform zoom only — fill page as much as possible without overflow or axis stretch
-        let zoom = Math.min(maxW / w, maxH / h);
-        zoom = Math.min(1.45, Math.max(0.55, zoom));
-        root.style.setProperty('--print-zoom', String(Number(zoom.toFixed(3))));
+        // Fit fully on one page — never clip
+        let zoom = Math.min(maxW / w, maxH / h, 1);
+        zoom = Math.max(0.28, Number(zoom.toFixed(3)));
+        root.style.setProperty('--print-zoom', String(zoom));
       }
       setTimeout(() => window.print(), 180);
     });
+  });
+}
+
+function fitPrintPagesToSheet(pages, maxW, maxH) {
+  pages.forEach(page => {
+    page.style.zoom = '1';
+    page.style.transform = '';
+    page.style.width = '';
+    page.style.height = '';
+  });
+  // Force layout, then scale each page independently so nothing is cut
+  pages.forEach(page => {
+    const w = Math.max(page.scrollWidth, page.offsetWidth, 1);
+    const h = Math.max(page.scrollHeight, page.offsetHeight, 1);
+    let zoom = Math.min(maxW / w, maxH / h, 1);
+    zoom = Math.max(0.28, Number(zoom.toFixed(3)));
+    page.style.zoom = String(zoom);
   });
 }
 
@@ -5589,7 +5615,11 @@ function exportPortfolioStationsPdf() {
   else if (typeof switchTab === 'function') switchTab('stations');
   renderAll();
 
-  const weekLabel = WEEKS[currentWeekIdx]?.label || WEEKS[currentWeekIdx]?.key || '';
+  const weekKey = WEEKS[currentWeekIdx]?.key;
+  const weekLabel = WEEKS[currentWeekIdx]?.label || weekKey || '';
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
+  const families = HOURLY_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
   const printRoot = document.getElementById('portfolioStationsPrintRoot');
   if (!printRoot) {
     alert('Stations PDF root missing — rebuild dashboard.');
@@ -5605,19 +5635,43 @@ function exportPortfolioStationsPdf() {
       if (canvas && canvas.toDataURL) chartImg = canvas.toDataURL('image/png');
     } catch (e) { chartImg = ''; }
 
-    const tablesHtml = (document.getElementById('portfolioStationsDayTable') || {}).innerHTML || '';
-    printRoot.innerHTML = '<div class="ps-print-page">'+
+    // Page 1 — intro: chart + week matrix (items/staff-hr)
+    let intro = '<div class="ps-print-page ps-intro">'+
       '<h1>RDG Stations Compare</h1>'+
-      '<p class="ps-sub">'+weekLabel+' · items / staff-hour · chart + all station families</p>'+
-      (chartImg ? '<img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart">' : '')+
-      tablesHtml+
-      '</div>';
+      '<p class="ps-sub">'+weekLabel+' · intro · items / staff-hour across all locations · then one page per station family</p>';
+    if (chartImg) intro += '<img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart">';
+    intro += '<h2>Week matrix — items / staff-hour</h2><table><thead><tr><th>Station family</th>';
+    venueRows.forEach(v => { intro += '<th>'+(v.label || v.key)+'</th>'; });
+    intro += '</tr></thead><tbody>';
+    families.forEach(f => {
+      intro += '<tr><td>'+f+'</td>';
+      venueRows.forEach(v => {
+        const st = v.familyStats[f] || {};
+        const ipsh = st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
+        intro += '<td>'+(ipsh != null ? ipsh : '—')+'</td>';
+      });
+      intro += '</tr>';
+    });
+    intro += '</tbody></table></div>';
+
+    // Pages 2+ — one family per page, all locations that have that family
+    const familyPages = families.map(f => {
+      const tableHtml = buildPortfolioStationsFamilyTableHtml(f, weekKey);
+      if (!tableHtml) return '';
+      return '<div class="ps-print-page ps-family">'+
+        '<h1>'+f.toUpperCase()+'</h1>'+
+        '<p class="ps-sub">'+weekLabel+' · all locations with items/staff for this station family · Ful · Items/staff-hr · Items/person</p>'+
+        tableHtml+
+        '</div>';
+    }).join('');
+
+    printRoot.innerHTML = intro + familyPages;
 
     const cleanup = () => {
       document.body.classList.remove('printing-stations-pdf');
       printRoot.style.display = 'none';
-      printRoot.style.removeProperty('--print-zoom');
       printRoot.setAttribute('aria-hidden', 'true');
+      printRoot.querySelectorAll('.ps-print-page').forEach(pg => { pg.style.zoom = ''; });
       window.removeEventListener('afterprint', cleanup);
     };
     window.removeEventListener('afterprint', cleanup);
@@ -5626,18 +5680,12 @@ function exportPortfolioStationsPdf() {
     document.body.classList.add('printing-stations-pdf');
     printRoot.style.display = 'block';
     printRoot.setAttribute('aria-hidden', 'false');
-    printRoot.style.setProperty('--print-zoom', '1');
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        const maxW = 1020;
-        const maxH = 730;
-        const w = Math.max(printRoot.scrollWidth, printRoot.offsetWidth, 1);
-        const h = Math.max(printRoot.scrollHeight, printRoot.offsetHeight, 1);
-        let zoom = Math.min(maxW / w, maxH / h, 1);
-        zoom = Math.max(0.35, Number(zoom.toFixed(3)));
-        printRoot.style.setProperty('--print-zoom', String(zoom));
-        setTimeout(() => window.print(), 180);
+        const pages = Array.from(printRoot.querySelectorAll('.ps-print-page'));
+        fitPrintPagesToSheet(pages, 1020, 730);
+        setTimeout(() => window.print(), 200);
       });
     });
   };
