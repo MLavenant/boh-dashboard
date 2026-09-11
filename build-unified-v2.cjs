@@ -247,7 +247,7 @@ html = html.replace(
     <span>Alternating bands = station families</span>
     <span>PDF = one page · chart + all station tables</span>
   </div>
-  <p class="note" style="margin:0 0 12px">Mon→Sun tables for each station family · only locations with items/staff. Green = lowest pressure, red = highest.</p>
+  <p class="note" style="margin:0 0 12px">Mon→Sun tables for each station family · only locations with items/staff. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> · <strong>Items/person</strong>. Green = lowest pressure, red = highest.</p>
   <div id="portfolioStationsDayTable"></div>
 </div>
 <div id="stationKpiBar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
@@ -4008,51 +4008,62 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
   if (!venues.length) return '';
 
   const ipshVals = [];
+  const fulVals = [];
   const dayRows = HOURLY_DAYS.map(day => {
     const cells = venues.map(v => {
       const m = getFamilyDayMetrics(v.key, weekKey, family, day) || {};
       const cell = familyDayCell(v.key, weekKey, family, day);
+      const ful = cell && cell.avgFulSec != null ? +(cell.avgFulSec / 60).toFixed(1) : null;
       const ipsh = cell && cell.itemsPerStaffHour != null ? cell.itemsPerStaffHour
         : (m.items > 0 && cell && cell.hours > 0 ? +((m.items / cell.hours).toFixed(2)) : null);
       const ipp = m.itemsPerHead != null ? m.itemsPerHead : (m.heads > 0 && m.items > 0 ? +(m.items / m.heads).toFixed(1) : null);
       if (ipsh != null) ipshVals.push(ipsh);
-      return { ipsh, ipp, items: m.items || 0, heads: m.heads || 0 };
+      if (ful != null) fulVals.push(ful);
+      return { ful, ipsh, ipp, items: m.items || 0, heads: m.heads || 0 };
     });
     return { day, cells };
   });
   const ipshMin = ipshVals.length ? Math.min(...ipshVals) : 0;
   const ipshMax = ipshVals.length ? Math.max(...ipshVals) : 0;
+  const fulMin = fulVals.length ? Math.min(...fulVals) : 0;
+  const fulMax = fulVals.length ? Math.max(...fulVals) : 0;
+  const metricCell = 'padding:5px 6px;text-align:right;font-size:11px;font-weight:600;width:72px;min-width:72px;max-width:72px;box-sizing:border-box';
+  const metricHead = 'padding:4px 6px;text-align:right;background:#13161c;font-size:10px;font-weight:600;width:72px;min-width:72px;max-width:72px;box-sizing:border-box;white-space:nowrap';
 
   let html = '<div class="ps-family-block" style="margin:0 0 22px">'+
     '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">'+family+' · Mon→Sun · '+venues.length+' location'+(venues.length===1?'':'s')+'</h3>'+
-    '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:'+(200+venues.length*150)+'px"><thead>'+
-    '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Day</th>';
+    '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px;min-width:'+(90+venues.length*216)+'px"><thead>'+
+    '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1;width:56px">Day</th>';
   venues.forEach(v => {
-    html += '<th colspan="2" style="text-align:center;padding:8px 6px;background:#1e2533;border-left:1px solid #262a33">'+v.label+'</th>';
+    html += '<th colspan="3" style="text-align:center;padding:8px 6px;background:#1e2533;border-left:1px solid #262a33">'+v.label+'</th>';
   });
   html += '</tr><tr style="color:#6b7280;border-bottom:1px solid #262a33"><th style="padding:4px 10px;background:#13161c;position:sticky;left:0;z-index:1"></th>';
   venues.forEach(() => {
-    html += '<th style="padding:4px 6px;text-align:right;background:#13161c;border-left:1px solid #262a33">Items/staff-hr</th>'+
-      '<th style="padding:4px 6px;text-align:right;background:#13161c">Items/person</th>';
+    html += '<th style="'+metricHead+'border-left:1px solid #262a33">Ful</th>'+
+      '<th style="'+metricHead+'">Items/staff-hr</th>'+
+      '<th style="'+metricHead+'">Items/person</th>';
   });
   html += '</tr></thead><tbody>';
 
   dayRows.forEach(row => {
-    html += '<tr style="border-top:1px solid #262a33"><td style="padding:8px 10px;color:#e8eaed;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+row.day.slice(0,3)+'</td>';
+    html += '<tr style="border-top:1px solid #262a33"><td style="padding:6px 10px;color:#e8eaed;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+row.day.slice(0,3)+'</td>';
     row.cells.forEach(c => {
+      const fulHeat = c.ful != null ? columnRelativeHeat(c.ful, fulMin, fulMax) : { bg: '#13161c', fg: '#4b5563' };
       const ipshHeat = c.ipsh != null ? columnRelativeHeat(c.ipsh, ipshMin, ipshMax) : { bg: '#13161c', fg: '#4b5563' };
-      html += '<td style="padding:6px;text-align:right;font-weight:700;border-left:1px solid #262a33;background:'+ipshHeat.bg+';color:'+ipshHeat.fg+'">'+(c.ipsh != null ? c.ipsh : '—')+'</td>'+
-        '<td style="padding:6px;text-align:right;color:#e8eaed">'+(c.ipp != null ? c.ipp : '—')+'</td>';
+      html += '<td style="'+metricCell+'border-left:1px solid #262a33;background:'+fulHeat.bg+';color:'+fulHeat.fg+'">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
+        '<td style="'+metricCell+'background:'+ipshHeat.bg+';color:'+ipshHeat.fg+'">'+(c.ipsh != null ? c.ipsh : '—')+'</td>'+
+        '<td style="'+metricCell+'color:#e8eaed">'+(c.ipp != null ? c.ipp : '—')+'</td>';
     });
     html += '</tr>';
   });
 
-  html += '<tr style="border-top:2px solid #3d4458;background:#0f1218"><td style="padding:8px 10px;color:#d9a441;font-weight:700;position:sticky;left:0;z-index:1;background:#0f1218">Week</td>';
+  html += '<tr style="border-top:2px solid #3d4458;background:#0f1218"><td style="padding:6px 10px;color:#d9a441;font-weight:700;position:sticky;left:0;z-index:1;background:#0f1218">Week</td>';
   venues.forEach(v => {
     const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
     const st = sc.familyStats[family] || {};
-    html += '<td style="padding:6px;text-align:right;font-weight:700;border-left:1px solid #262a33;color:#d9a441">'+(st.ipsh!=null?st.ipsh:(st.iph!=null?st.iph:'—'))+'</td>'+
-      '<td style="padding:6px;text-align:right;color:#e8eaed">'+(st.iph!=null?st.iph:'—')+'</td>';
+    html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:'+(st.fulMin!=null?avgFulColorByMin(st.fulMin):'#9aa0aa')+'">'+(st.fulMin!=null?st.fulMin.toFixed(1):'—')+'</td>'+
+      '<td style="'+metricCell+'color:#d9a441">'+(st.ipsh!=null?st.ipsh:(st.iph!=null?st.iph:'—'))+'</td>'+
+      '<td style="'+metricCell+'color:#e8eaed">'+(st.iph!=null?st.iph:'—')+'</td>';
   });
   html += '</tr></tbody></table></div></div>';
   return html;
