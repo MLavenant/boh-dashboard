@@ -235,23 +235,19 @@ html = html.replace(
   <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;margin:0 0 4px">
     <div>
       <h2 style="margin:0 0 4px">RDG STATIONS COMPARE</h2>
-      <p class="note" style="margin:0">All locations · selected week. Bars = <strong>items / staff-hour</strong> by station family. Alternating bands separate each family.</p>
+      <p class="note" style="margin:0">All locations · selected week. Bars = <strong>items / staff-hour</strong> (numbers on bars). Tables below = every station family Mon→Sun.</p>
     </div>
     <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Export Stations PDF</button>
   </div>
-  <div style="position:relative;height:420px;margin:12px 0 8px">
+  <div style="position:relative;height:440px;margin:12px 0 8px">
     <canvas id="cPortfolioStations"></canvas>
   </div>
   <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:4px 0 16px;font-size:11px;color:#9aa0aa">
     <span><strong style="color:#e8eaed">Bars</strong> = items / staff-hour</span>
     <span>Alternating bands = station families</span>
+    <span>PDF = one page · chart + all station tables</span>
   </div>
-  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px;padding:12px 14px;background:#13161c;border:1px solid #262a33;border-radius:10px">
-    <label style="font-size:12px;color:#9aa0aa">Station family
-      <select id="portfolioStationsFamily" onchange="renderPortfolioStationsDayTable()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
-    </label>
-    <span class="note" style="margin:0;font-size:12px">Full day · only locations with items/staff for this family</span>
-  </div>
+  <p class="note" style="margin:0 0 12px">Mon→Sun tables for each station family · only locations with items/staff. Green = lowest pressure, red = highest.</p>
   <div id="portfolioStationsDayTable"></div>
 </div>
 <div id="stationKpiBar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
@@ -710,40 +706,42 @@ body.printing-stations-pdf #portfolioStationsPrintRoot {
   color:#e8eaed;
   background:#0d1117;
 }
-body.printing-stations-pdf .ps-print-page {
-  padding:12px 16px 20px;
-  page-break-after:always;
-  break-after:page;
+body.printing-stations-pdf #portfolioStationsPrintRoot {
+  zoom:var(--print-zoom, 1);
 }
-body.printing-stations-pdf .ps-print-page:last-child {
-  page-break-after:auto;
-  break-after:auto;
+body.printing-stations-pdf .ps-print-page {
+  padding:6px 10px 8px;
+  page-break-after:avoid;
+  break-after:avoid;
 }
 body.printing-stations-pdf .ps-print-page h1 {
-  margin:0 0 4px;
-  font-size:20px;
+  margin:0 0 2px;
+  font-size:14px;
   color:#d9a441;
 }
-body.printing-stations-pdf .ps-print-page h2 {
-  margin:14px 0 6px;
-  font-size:14px;
-  color:#e8eaed;
+body.printing-stations-pdf .ps-print-page h2,
+body.printing-stations-pdf .ps-print-page h3 {
+  margin:8px 0 3px;
+  font-size:11px;
+  color:#d9a441;
 }
-body.printing-stations-pdf .ps-print-page .ps-sub {
-  margin:0 0 12px;
-  font-size:12px;
+body.printing-stations-pdf .ps-print-page .ps-sub,
+body.printing-stations-pdf .ps-print-page .note {
+  margin:0 0 6px;
+  font-size:8px;
   color:#9aa0aa;
 }
 body.printing-stations-pdf .ps-print-page table {
   width:100%;
   border-collapse:collapse;
-  font-size:11px;
+  font-size:7px;
 }
 body.printing-stations-pdf .ps-print-page th,
 body.printing-stations-pdf .ps-print-page td {
-  padding:5px 7px;
+  padding:2px 3px;
   border-bottom:1px solid #262a33;
   text-align:right;
+  line-height:1.15;
 }
 body.printing-stations-pdf .ps-print-page th:first-child,
 body.printing-stations-pdf .ps-print-page td:first-child {
@@ -751,12 +749,15 @@ body.printing-stations-pdf .ps-print-page td:first-child {
 }
 body.printing-stations-pdf .ps-print-page img.ps-chart {
   width:100%;
-  max-height:380px;
+  max-height:220px;
   object-fit:contain;
   background:#13161c;
   border:1px solid #262a33;
-  border-radius:8px;
-  margin:8px 0 14px;
+  border-radius:6px;
+  margin:4px 0 8px;
+}
+body.printing-stations-pdf .ps-family-block {
+  margin-bottom:6px;
 }
 body.printing-portfolio,
 body.printing-portfolio html {
@@ -835,14 +836,11 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
   }
   body.printing-stations-pdf #portfolioStationsPrintRoot {
     display:block !important;
+    zoom:var(--print-zoom, 1);
   }
   body.printing-stations-pdf .ps-print-page {
-    page-break-after:always;
-    break-after:page;
-  }
-  body.printing-stations-pdf .ps-print-page:last-child {
-    page-break-after:auto;
-    break-after:auto;
+    page-break-after:avoid !important;
+    break-after:avoid !important;
   }
 }
 </style>`);
@@ -3868,17 +3866,7 @@ function renderPortfolioStations() {
   const weekKey = WEEKS[currentWeekIdx]?.key;
   const labels = ${JSON.stringify(VENUE_LABELS)};
   const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
-  // Chart + dropdown: only families with items/staff somewhere
   const families = HOURLY_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
-
-  const famSel = document.getElementById('portfolioStationsFamily');
-  if (famSel) {
-    const prev = famSel.value;
-    famSel.innerHTML = families.map(f => '<option value="'+f+'">'+f+'</option>').join('');
-    if (prev && families.includes(prev)) famSel.value = prev;
-    else if (families.includes('Pastry')) famSel.value = 'Pastry';
-    else if (families[0]) famSel.value = families[0];
-  }
 
   const canvas = document.getElementById('cPortfolioStations');
   if (canvas && typeof Chart !== 'undefined') {
@@ -3914,6 +3902,33 @@ function renderPortfolioStations() {
       },
     };
 
+    const barValueLabelsPlugin = {
+      id: 'portfolioBarValueLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets.forEach((ds, di) => {
+          const meta = chart.getDatasetMeta(di);
+          if (!meta || meta.hidden) return;
+          meta.data.forEach((el, i) => {
+            const raw = ds.data[i];
+            if (raw == null || !(Number(raw) > 0)) return;
+            const props = el.getProps(['x', 'y'], true);
+            const label = Number(raw).toFixed(1);
+            ctx.save();
+            ctx.font = '700 9px ui-sans-serif, system-ui, sans-serif';
+            ctx.fillStyle = '#f3f4f6';
+            ctx.strokeStyle = 'rgba(13,17,23,0.85)';
+            ctx.lineWidth = 3;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.strokeText(label, props.x, props.y - 2);
+            ctx.fillText(label, props.x, props.y - 2);
+            ctx.restore();
+          });
+        });
+      },
+    };
+
     const ipshBars = venueRows.map(v => ({
       type: 'bar',
       label: (v.label || v.key),
@@ -3937,7 +3952,7 @@ function renderPortfolioStations() {
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
-        layout: { padding: { top: 8, bottom: 4 } },
+        layout: { padding: { top: 22, bottom: 4 } },
         plugins: {
           legend: {
             position: 'bottom',
@@ -3977,30 +3992,20 @@ function renderPortfolioStations() {
             grid: { color: 'rgba(38,42,51,0.9)' },
             beginAtZero: true,
             ticks: { font: { size: 11 } },
+            grace: '8%',
           },
         },
       },
-      plugins: [familyBandPlugin],
+      plugins: [familyBandPlugin, barValueLabelsPlugin],
     });
   }
 
   renderPortfolioStationsDayTable();
 }
 
-function renderPortfolioStationsDayTable() {
-  const el = document.getElementById('portfolioStationsDayTable');
-  if (!el) return;
-  if (currentVenue !== 'rdg_portfolio') { el.innerHTML = ''; return; }
-
-  const weekKey = WEEKS[currentWeekIdx]?.key;
-  const famSel = document.getElementById('portfolioStationsFamily');
-  const family = (famSel && famSel.value) || 'Pastry';
+function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
   const venues = portfolioVenuesForFamily(family, weekKey);
-
-  if (!venues.length) {
-    el.innerHTML = '<p class="note" style="margin:0">No locations with items/staff for <strong>'+family+'</strong> this week.</p>';
-    return;
-  }
+  if (!venues.length) return '';
 
   const ipshVals = [];
   const dayRows = HOURLY_DAYS.map(day => {
@@ -4018,9 +4023,9 @@ function renderPortfolioStationsDayTable() {
   const ipshMin = ipshVals.length ? Math.min(...ipshVals) : 0;
   const ipshMax = ipshVals.length ? Math.max(...ipshVals) : 0;
 
-  let html = '<h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">'+family+' · Mon→Sun · '+venues.length+' location'+(venues.length===1?'':'s')+' with items/staff</h3>'+
-    '<p class="note" style="margin:0 0 10px">Locations without items/staff for this family are hidden. <strong>Items/staff-hr</strong> = items ÷ staff hours · <strong>Items/person</strong> = items ÷ heads. Green = lowest pressure, red = highest.</p>'+
-    '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:'+(240+venues.length*160)+'px"><thead>'+
+  let html = '<div class="ps-family-block" style="margin:0 0 22px">'+
+    '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">'+family+' · Mon→Sun · '+venues.length+' location'+(venues.length===1?'':'s')+'</h3>'+
+    '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:'+(200+venues.length*150)+'px"><thead>'+
     '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Day</th>';
   venues.forEach(v => {
     html += '<th colspan="2" style="text-align:center;padding:8px 6px;background:#1e2533;border-left:1px solid #262a33">'+v.label+'</th>';
@@ -4049,8 +4054,26 @@ function renderPortfolioStationsDayTable() {
     html += '<td style="padding:6px;text-align:right;font-weight:700;border-left:1px solid #262a33;color:#d9a441">'+(st.ipsh!=null?st.ipsh:(st.iph!=null?st.iph:'—'))+'</td>'+
       '<td style="padding:6px;text-align:right;color:#e8eaed">'+(st.iph!=null?st.iph:'—')+'</td>';
   });
-  html += '</tr></tbody></table></div>';
-  el.innerHTML = html;
+  html += '</tr></tbody></table></div></div>';
+  return html;
+}
+
+function renderPortfolioStationsDayTable() {
+  const el = document.getElementById('portfolioStationsDayTable');
+  if (!el) return;
+  if (currentVenue !== 'rdg_portfolio') { el.innerHTML = ''; return; }
+
+  const weekKey = WEEKS[currentWeekIdx]?.key;
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
+  const families = HOURLY_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
+
+  if (!families.length) {
+    el.innerHTML = '<p class="note" style="margin:0">No station families with items/staff this week.</p>';
+    return;
+  }
+
+  el.innerHTML = families.map(f => buildPortfolioStationsFamilyTableHtml(f, weekKey)).join('');
 }
 
 function renderStations() {
@@ -5527,48 +5550,6 @@ function exportPortfolioPdf() {
   });
 }
 
-function buildPortfolioStationsFamilyPrintPage(family, weekKey, weekLabel) {
-  const venues = portfolioVenuesForFamily(family, weekKey);
-  if (!venues.length) return '';
-  let html = '<div class="ps-print-page">'+
-    '<h1>'+family+'</h1>'+
-    '<p class="ps-sub">RDG Portfolio · '+weekLabel+' · locations with items/staff for this family</p>'+
-    '<h2>Week summary — items / staff-hour</h2>'+
-    '<table><thead><tr><th>Location</th><th>Items/staff-hr</th><th>Items/person</th><th>Volume</th><th>Staff hours</th></tr></thead><tbody>';
-  venues.forEach(v => {
-    const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
-    const st = sc.familyStats[family] || {};
-    const ipsh = st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
-    html += '<tr><td>'+v.label+'</td>'+
-      '<td>'+(ipsh != null ? ipsh : '—')+'</td>'+
-      '<td>'+(st.iph != null ? st.iph : '—')+'</td>'+
-      '<td>'+(st.volume != null ? st.volume : '—')+'</td>'+
-      '<td>'+(st.hours != null ? (+st.hours).toFixed(1) : '—')+'</td></tr>';
-  });
-  html += '</tbody></table>';
-
-  html += '<h2>Mon → Sun by location</h2><table><thead><tr><th>Day</th>';
-  venues.forEach(v => { html += '<th colspan="2">'+v.label+'</th>'; });
-  html += '</tr><tr><th></th>';
-  venues.forEach(() => { html += '<th>Items/staff-hr</th><th>Items/person</th>'; });
-  html += '</tr></thead><tbody>';
-
-  HOURLY_DAYS.forEach(day => {
-    html += '<tr><td>'+day.slice(0,3)+'</td>';
-    venues.forEach(v => {
-      const m = getFamilyDayMetrics(v.key, weekKey, family, day) || {};
-      const cell = familyDayCell(v.key, weekKey, family, day);
-      const ipsh = cell && cell.itemsPerStaffHour != null ? cell.itemsPerStaffHour
-        : (m.items > 0 && cell && cell.hours > 0 ? +((m.items / cell.hours).toFixed(2)) : null);
-      const ipp = m.itemsPerHead != null ? m.itemsPerHead : (m.heads > 0 && m.items > 0 ? +(m.items / m.heads).toFixed(1) : null);
-      html += '<td>'+(ipsh != null ? ipsh : '—')+'</td><td>'+(ipp != null ? ipp : '—')+'</td>';
-    });
-    html += '</tr>';
-  });
-  html += '</tbody></table></div>';
-  return html;
-}
-
 function exportPortfolioStationsPdf() {
   // RDG Portfolio + Stations tab
   if (currentVenue !== 'rdg_portfolio') {
@@ -5584,11 +5565,7 @@ function exportPortfolioStationsPdf() {
   else if (typeof switchTab === 'function') switchTab('stations');
   renderAll();
 
-  const weekKey = WEEKS[currentWeekIdx]?.key;
-  const weekLabel = WEEKS[currentWeekIdx]?.label || weekKey || '';
-  const labels = ${JSON.stringify(VENUE_LABELS)};
-  const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
-  const families = HOURLY_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
+  const weekLabel = WEEKS[currentWeekIdx]?.label || WEEKS[currentWeekIdx]?.key || '';
   const printRoot = document.getElementById('portfolioStationsPrintRoot');
   if (!printRoot) {
     alert('Stations PDF root missing — rebuild dashboard.');
@@ -5604,30 +5581,18 @@ function exportPortfolioStationsPdf() {
       if (canvas && canvas.toDataURL) chartImg = canvas.toDataURL('image/png');
     } catch (e) { chartImg = ''; }
 
-    let overview = '<div class="ps-print-page">'+
+    const tablesHtml = (document.getElementById('portfolioStationsDayTable') || {}).innerHTML || '';
+    printRoot.innerHTML = '<div class="ps-print-page">'+
       '<h1>RDG Stations Compare</h1>'+
-      '<p class="ps-sub">'+weekLabel+' · items / staff-hour by station family across all locations</p>';
-    if (chartImg) overview += '<img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart">';
-    overview += '<h2>Week matrix — items / staff-hour</h2><table><thead><tr><th>Station family</th>';
-    venueRows.forEach(v => { overview += '<th>'+(v.label || v.key)+'</th>'; });
-    overview += '</tr></thead><tbody>';
-    families.forEach(f => {
-      overview += '<tr><td>'+f+'</td>';
-      venueRows.forEach(v => {
-        const st = v.familyStats[f] || {};
-        const ipsh = st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
-        overview += '<td>'+(ipsh != null ? ipsh : '—')+'</td>';
-      });
-      overview += '</tr>';
-    });
-    overview += '</tbody></table></div>';
-
-    const familyPages = families.map(f => buildPortfolioStationsFamilyPrintPage(f, weekKey, weekLabel)).join('');
-    printRoot.innerHTML = overview + familyPages;
+      '<p class="ps-sub">'+weekLabel+' · items / staff-hour · chart + all station families</p>'+
+      (chartImg ? '<img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart">' : '')+
+      tablesHtml+
+      '</div>';
 
     const cleanup = () => {
       document.body.classList.remove('printing-stations-pdf');
       printRoot.style.display = 'none';
+      printRoot.style.removeProperty('--print-zoom');
       printRoot.setAttribute('aria-hidden', 'true');
       window.removeEventListener('afterprint', cleanup);
     };
@@ -5637,17 +5602,25 @@ function exportPortfolioStationsPdf() {
     document.body.classList.add('printing-stations-pdf');
     printRoot.style.display = 'block';
     printRoot.setAttribute('aria-hidden', 'false');
+    printRoot.style.setProperty('--print-zoom', '1');
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
+        const maxW = 1020;
+        const maxH = 730;
+        const w = Math.max(printRoot.scrollWidth, printRoot.offsetWidth, 1);
+        const h = Math.max(printRoot.scrollHeight, printRoot.offsetHeight, 1);
+        let zoom = Math.min(maxW / w, maxH / h, 1);
+        zoom = Math.max(0.35, Number(zoom.toFixed(3)));
+        printRoot.style.setProperty('--print-zoom', String(zoom));
         setTimeout(() => window.print(), 180);
       });
     });
   };
 
-  // Chart needs a paint cycle before canvas snapshot
+  // Chart needs a paint cycle before canvas snapshot (labels included)
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => setTimeout(finish, 280));
+    requestAnimationFrame(() => setTimeout(finish, 320));
   });
 }
 
