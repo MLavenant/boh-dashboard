@@ -1,7 +1,8 @@
 {
-  "generatedAt": "2026-08-31T13:37:14.621Z",
-  "latestWeek": "2026-W35",
+  "generatedAt": "2026-09-08T13:24:05.508Z",
+  "latestWeek": "2026-W36",
   "availableWeeks": [
+    "2026-W36",
     "2026-W35",
     "2026-W34",
     "2026-W33",
@@ -11,8 +12,8 @@
   "schedule": {
     "exists": true,
     "status": "Running",
-    "nextRun": "9/7/2026 8:30:00 AM",
-    "lastRun": "8/31/2026 9:25:31 AM",
+    "nextRun": "9/14/2026 8:30:00 AM",
+    "lastRun": "9/8/2026 9:07:00 AM",
     "lastResult": "267009",
     "startTime": "8:30:00 AM",
     "days": "MON",
@@ -28,9 +29,9 @@
   "monthlyPrepSchedule": {
     "exists": true,
     "status": "Ready",
-    "nextRun": "9/1/2026 9:00:00 AM",
-    "lastRun": "8/1/2026 1:44:18 PM",
-    "lastResult": "-2147020576",
+    "nextRun": "10/1/2026 9:00:00 AM",
+    "lastRun": "9/1/2026 9:00:00 AM",
+    "lastResult": "0",
     "startTime": "9:00:00 AM",
     "days": "01",
     "months": "Every month",
@@ -76,32 +77,32 @@
   "files": {
     "dashboardHtml": {
       "path": "C:\\Cursor\\boh-rdg-publish\\dashboard.html",
-      "mtime": "2026-08-31T13:34:44.507Z",
-      "size": 10684022,
+      "mtime": "2026-09-08T13:20:53.408Z",
+      "size": 11001716,
       "rows": null
     },
     "rolling": {
       "path": "C:\\Cursor\\boh-rdg-publish\\data\\rolling.json",
-      "mtime": "2026-08-31T13:34:18.302Z",
-      "size": 3505,
+      "mtime": "2026-09-08T13:19:56.110Z",
+      "size": 3635,
       "rows": 1
     },
     "sessionToast": {
       "path": "C:\\Cursor\\boh-rdg-publish\\toast-session.json",
-      "mtime": "2026-08-31T13:26:49.994Z",
-      "size": 56751,
+      "mtime": "2026-09-08T13:11:52.817Z",
+      "size": 47249,
       "rows": 2
     },
     "sessionOT": {
       "path": "C:\\Cursor\\boh-rdg-publish\\ot-session.json",
-      "mtime": "2026-08-31T13:34:07.329Z",
-      "size": 8596,
+      "mtime": "2026-09-08T13:19:34.840Z",
+      "size": 8255,
       "rows": 3
     },
     "itemStationMap": {
       "path": "C:\\Cursor\\boh-rdg-publish\\item-station-map.json",
-      "mtime": "2026-08-26T19:48:00.871Z",
-      "size": 260578,
+      "mtime": "2026-09-01T13:00:34.765Z",
+      "size": 247950,
       "rows": 5
     }
   },
@@ -115,12 +116,12 @@
           "source": "Toast",
           "label": "Kitchen Timing",
           "status": "pass",
-          "message": "21,559 tickets",
+          "message": "22,126 tickets",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\kitchen-timing-claudie.json",
-            "mtime": "2026-08-31T13:27:29.563Z",
-            "size": 9495504,
-            "rows": 21559
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\kitchen-timing-claudie.json",
+            "mtime": "2026-09-08T13:13:48.636Z",
+            "size": 9681783,
+            "rows": 22126
           }
         },
         {
@@ -128,12 +129,12 @@
           "source": "Toast",
           "label": "Item Details",
           "status": "pass",
-          "message": "9,678 item rows",
+          "message": "9,808 item rows",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\item-details-claudie.json",
-            "mtime": "2026-08-31T13:30:18.976Z",
-            "size": 3209346,
-            "rows": 9678
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\item-details-claudie.json",
+            "mtime": "2026-09-08T13:16:44.162Z",
+            "size": 3236607,
+            "rows": 9808
           }
         },
         {
@@ -141,12 +142,12 @@
           "source": "Toast",
           "label": "Item Fulfillment Report",
           "status": "pass",
-          "message": "362 items",
+          "message": "379 items",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\item-fulfillment-claudie.json",
-            "mtime": "2026-08-31T13:33:08.038Z",
-            "size": 33790,
-            "rows": 362
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\item-fulfillment-claudie.json",
+            "mtime": "2026-09-08T13:19:03.874Z",
+            "size": 35377,
+            "rows": 379
           }
         },
         {
@@ -154,12 +155,12 @@
           "source": "OpenTable",
           "label": "Covers Export",
           "status": "pass",
-          "message": "633 covers",
+          "message": "650 covers",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\covers-claudie.json",
-            "mtime": "2026-08-31T13:34:49.601Z",
-            "size": 114183,
-            "rows": 633
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\covers-claudie.json",
+            "mtime": "2026-09-08T13:21:03.635Z",
+            "size": 117176,
+            "rows": 650
           }
         },
         {
@@ -167,11 +168,11 @@
           "source": "Pipeline",
           "label": "Processed Venue JSON",
           "status": "pass",
-          "message": "11 stations, curve=45, BP=none",
+          "message": "11 stations, curve=44, BP=none",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\claudie-data-2026-W35.json",
-            "mtime": "2026-08-31T13:37:10.376Z",
-            "size": 602569,
+            "path": "C:\\Cursor\\boh-rdg-publish\\claudie-data-2026-W36.json",
+            "mtime": "2026-09-08T13:23:51.067Z",
+            "size": 603837,
             "rows": 11
           }
         }
@@ -192,12 +193,12 @@
           "source": "Toast",
           "label": "Kitchen Timing",
           "status": "pass",
-          "message": "13,972 tickets",
+          "message": "14,002 tickets",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\kitchen-timing-casa_neos.json",
-            "mtime": "2026-08-31T13:28:50.006Z",
-            "size": 5972368,
-            "rows": 13972
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\kitchen-timing-casa_neos.json",
+            "mtime": "2026-09-08T13:15:06.684Z",
+            "size": 5956200,
+            "rows": 14002
           }
         },
         {
@@ -205,12 +206,12 @@
           "source": "Toast",
           "label": "Item Details",
           "status": "pass",
-          "message": "11,390 item rows",
+          "message": "11,063 item rows",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\item-details-casa_neos.json",
-            "mtime": "2026-08-31T13:31:01.094Z",
-            "size": 3803504,
-            "rows": 11390
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\item-details-casa_neos.json",
+            "mtime": "2026-09-08T13:17:08.506Z",
+            "size": 3687808,
+            "rows": 11063
           }
         },
         {
@@ -218,12 +219,12 @@
           "source": "Toast",
           "label": "Item Fulfillment Report",
           "status": "pass",
-          "message": "393 items",
+          "message": "400 items",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\item-fulfillment-casa_neos.json",
-            "mtime": "2026-08-31T13:33:10.278Z",
-            "size": 36673,
-            "rows": 393
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\item-fulfillment-casa_neos.json",
+            "mtime": "2026-09-08T13:19:17.030Z",
+            "size": 37346,
+            "rows": 400
           }
         },
         {
@@ -231,12 +232,12 @@
           "source": "OpenTable",
           "label": "Covers Export",
           "status": "pass",
-          "message": "710 covers",
+          "message": "732 covers",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\covers-casa_neos.json",
-            "mtime": "2026-08-31T13:34:51.187Z",
-            "size": 128987,
-            "rows": 710
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\covers-casa_neos.json",
+            "mtime": "2026-09-08T13:21:05.310Z",
+            "size": 132822,
+            "rows": 732
           }
         },
         {
@@ -244,11 +245,11 @@
           "source": "Pipeline",
           "label": "Processed Venue JSON",
           "status": "pass",
-          "message": "30 stations, curve=27, BP=none",
+          "message": "30 stations, curve=26, BP=none",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\casa_neos-data-2026-W35.json",
-            "mtime": "2026-08-31T13:37:11.514Z",
-            "size": 646505,
+            "path": "C:\\Cursor\\boh-rdg-publish\\casa_neos-data-2026-W36.json",
+            "mtime": "2026-09-08T13:23:51.837Z",
+            "size": 589777,
             "rows": 30
           }
         },
@@ -270,12 +271,12 @@
           "source": "Staffing",
           "label": "Toast Labor Week",
           "status": "pass",
-          "message": "862 entries",
+          "message": "148 entries",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\labor-casa_neos.json",
-            "mtime": "2026-08-31T13:36:57.078Z",
-            "size": 388197,
-            "rows": 862
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\labor-casa_neos.json",
+            "mtime": "2026-09-08T13:23:37.737Z",
+            "size": 66542,
+            "rows": 148
           }
         },
         {
@@ -283,11 +284,11 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "10 food families · matched 242 · BOH match 97%",
+          "message": "10 food families · matched 0 · BOH match 0%",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\staffing-casa_neos.json",
-            "mtime": "2026-08-31T13:37:07.497Z",
-            "size": 257012,
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\staffing-casa_neos.json",
+            "mtime": "2026-09-08T13:23:47.734Z",
+            "size": 93851,
             "rows": 11
           }
         },
@@ -295,22 +296,22 @@
           "id": "staffing_balance",
           "source": "Staffing",
           "label": "Match Balance",
-          "status": "pass",
-          "message": "BOH match 96.8% · coverage 88% · conflicts 0",
+          "status": "warn",
+          "message": "BOH match 0.0% < 85% · conflicts 0 · unused roster 64",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\staffing-balance-casa_neos.json",
-            "mtime": "2026-08-31T13:37:08.417Z",
-            "size": 196757,
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\staffing-balance-casa_neos.json",
+            "mtime": "2026-09-08T13:23:50.015Z",
+            "size": 34900,
             "rows": 12
           }
         }
       ],
       "summary": {
-        "pass": 9,
-        "warn": 0,
+        "pass": 8,
+        "warn": 1,
         "fail": 0
       },
-      "overall": "pass"
+      "overall": "warn"
     },
     {
       "slug": "ava_coconut_grove",
@@ -321,12 +322,12 @@
           "source": "Toast",
           "label": "Kitchen Timing",
           "status": "pass",
-          "message": "10,436 tickets",
+          "message": "10,334 tickets",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\kitchen-timing-ava_coconut_grove.json",
-            "mtime": "2026-08-31T13:27:55.986Z",
-            "size": 4854985,
-            "rows": 10436
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\kitchen-timing-ava_coconut_grove.json",
+            "mtime": "2026-09-08T13:14:14.169Z",
+            "size": 4762179,
+            "rows": 10334
           }
         },
         {
@@ -334,12 +335,12 @@
           "source": "Toast",
           "label": "Item Details",
           "status": "pass",
-          "message": "8,459 item rows",
+          "message": "8,190 item rows",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\item-details-ava_coconut_grove.json",
-            "mtime": "2026-08-31T13:31:34.414Z",
-            "size": 2782177,
-            "rows": 8459
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\item-details-ava_coconut_grove.json",
+            "mtime": "2026-09-08T13:17:38.391Z",
+            "size": 2682609,
+            "rows": 8190
           }
         },
         {
@@ -347,12 +348,12 @@
           "source": "Toast",
           "label": "Item Fulfillment Report",
           "status": "pass",
-          "message": "348 items",
+          "message": "341 items",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\item-fulfillment-ava_coconut_grove.json",
-            "mtime": "2026-08-31T13:33:11.961Z",
-            "size": 32746,
-            "rows": 348
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\item-fulfillment-ava_coconut_grove.json",
+            "mtime": "2026-09-08T13:19:18.470Z",
+            "size": 32246,
+            "rows": 341
           }
         },
         {
@@ -360,12 +361,12 @@
           "source": "OpenTable",
           "label": "Covers Export",
           "status": "pass",
-          "message": "468 covers",
+          "message": "474 covers",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\covers-ava_coconut_grove.json",
-            "mtime": "2026-08-31T13:34:52.335Z",
-            "size": 85179,
-            "rows": 468
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\covers-ava_coconut_grove.json",
+            "mtime": "2026-09-08T13:21:07.551Z",
+            "size": 86083,
+            "rows": 474
           }
         },
         {
@@ -373,11 +374,11 @@
           "source": "Pipeline",
           "label": "Processed Venue JSON",
           "status": "pass",
-          "message": "13 stations, curve=37, BP=30",
+          "message": "13 stations, curve=42, BP=none",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\ava_coconut_grove-data-2026-W35.json",
-            "mtime": "2026-08-31T13:37:12.022Z",
-            "size": 617938,
+            "path": "C:\\Cursor\\boh-rdg-publish\\ava_coconut_grove-data-2026-W36.json",
+            "mtime": "2026-09-08T13:23:52.578Z",
+            "size": 609185,
             "rows": 13
           }
         },
@@ -399,12 +400,12 @@
           "source": "Staffing",
           "label": "Toast Labor Week",
           "status": "pass",
-          "message": "99 entries",
+          "message": "91 entries",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\labor-ava_coconut_grove.json",
-            "mtime": "2026-08-31T13:37:03.624Z",
-            "size": 44404,
-            "rows": 99
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\labor-ava_coconut_grove.json",
+            "mtime": "2026-09-08T13:23:43.418Z",
+            "size": 40784,
+            "rows": 91
           }
         },
         {
@@ -414,9 +415,9 @@
           "status": "pass",
           "message": "9 food families · matched 0 · BOH match 0%",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\staffing-ava_coconut_grove.json",
-            "mtime": "2026-08-31T13:37:07.833Z",
-            "size": 72419,
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\staffing-ava_coconut_grove.json",
+            "mtime": "2026-09-08T13:23:48.513Z",
+            "size": 69173,
             "rows": 11
           }
         },
@@ -427,9 +428,9 @@
           "status": "warn",
           "message": "AVA CG: Toast has 0 BOH time entries (Viktor roster present; heads=0 until BOH clocks CG)",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\staffing-balance-ava_coconut_grove.json",
-            "mtime": "2026-08-31T13:37:08.482Z",
-            "size": 25919,
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\staffing-balance-ava_coconut_grove.json",
+            "mtime": "2026-09-08T13:23:50.088Z",
+            "size": 22321,
             "rows": 12
           }
         }
@@ -450,12 +451,12 @@
           "source": "Toast",
           "label": "Kitchen Timing",
           "status": "pass",
-          "message": "11,445 tickets",
+          "message": "11,110 tickets",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\kitchen-timing-ava_winter_park.json",
-            "mtime": "2026-08-31T13:28:18.927Z",
-            "size": 4961506,
-            "rows": 11445
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\kitchen-timing-ava_winter_park.json",
+            "mtime": "2026-09-08T13:14:33.243Z",
+            "size": 4790207,
+            "rows": 11110
           }
         },
         {
@@ -463,12 +464,12 @@
           "source": "Toast",
           "label": "Item Details",
           "status": "pass",
-          "message": "10,165 item rows",
+          "message": "10,184 item rows",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\item-details-ava_winter_park.json",
-            "mtime": "2026-08-31T13:32:10.063Z",
-            "size": 3301689,
-            "rows": 10165
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\item-details-ava_winter_park.json",
+            "mtime": "2026-09-08T13:18:02.151Z",
+            "size": 3302701,
+            "rows": 10184
           }
         },
         {
@@ -476,12 +477,12 @@
           "source": "Toast",
           "label": "Item Fulfillment Report",
           "status": "pass",
-          "message": "160 items",
+          "message": "151 items",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\item-fulfillment-ava_winter_park.json",
-            "mtime": "2026-08-31T13:33:09.596Z",
-            "size": 15095,
-            "rows": 160
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\item-fulfillment-ava_winter_park.json",
+            "mtime": "2026-09-08T13:19:07.222Z",
+            "size": 14172,
+            "rows": 151
           }
         },
         {
@@ -489,12 +490,12 @@
           "source": "OpenTable",
           "label": "Covers Export",
           "status": "pass",
-          "message": "542 covers",
+          "message": "634 covers",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\covers-ava_winter_park.json",
-            "mtime": "2026-08-31T13:34:57.791Z",
-            "size": 98289,
-            "rows": 542
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\covers-ava_winter_park.json",
+            "mtime": "2026-09-08T13:21:12.181Z",
+            "size": 114975,
+            "rows": 634
           }
         },
         {
@@ -502,11 +503,11 @@
           "source": "Pipeline",
           "label": "Processed Venue JSON",
           "status": "pass",
-          "message": "8 stations, curve=27, BP=13",
+          "message": "8 stations, curve=31, BP=11",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\ava_winter_park-data-2026-W35.json",
-            "mtime": "2026-08-31T13:37:12.710Z",
-            "size": 574999,
+            "path": "C:\\Cursor\\boh-rdg-publish\\ava_winter_park-data-2026-W36.json",
+            "mtime": "2026-09-08T13:23:53.675Z",
+            "size": 560452,
             "rows": 8
           }
         },
@@ -528,12 +529,12 @@
           "source": "Staffing",
           "label": "Toast Labor Week",
           "status": "pass",
-          "message": "477 entries",
+          "message": "475 entries",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\labor-ava_winter_park.json",
-            "mtime": "2026-08-31T13:37:06.452Z",
-            "size": 213022,
-            "rows": 477
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\labor-ava_winter_park.json",
+            "mtime": "2026-09-08T13:23:45.483Z",
+            "size": 212115,
+            "rows": 475
           }
         },
         {
@@ -541,11 +542,11 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "7 food families · matched 107 · BOH match 100%",
+          "message": "7 food families · matched 116 · BOH match 100%",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\staffing-ava_winter_park.json",
-            "mtime": "2026-08-31T13:37:07.944Z",
-            "size": 141749,
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\staffing-ava_winter_park.json",
+            "mtime": "2026-09-08T13:23:49.102Z",
+            "size": 142018,
             "rows": 11
           }
         },
@@ -554,11 +555,11 @@
           "source": "Staffing",
           "label": "Match Balance",
           "status": "pass",
-          "message": "BOH match 100.0% · coverage 79% · conflicts 0",
+          "message": "BOH match 100.0% · coverage 83% · conflicts 0",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\staffing-balance-ava_winter_park.json",
-            "mtime": "2026-08-31T13:37:08.506Z",
-            "size": 103930,
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\staffing-balance-ava_winter_park.json",
+            "mtime": "2026-09-08T13:23:50.108Z",
+            "size": 108440,
             "rows": 12
           }
         }
@@ -579,12 +580,12 @@
           "source": "Toast",
           "label": "Kitchen Timing",
           "status": "pass",
-          "message": "19,136 tickets",
+          "message": "19,379 tickets",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\kitchen-timing-mila.json",
-            "mtime": "2026-08-31T13:29:36.882Z",
-            "size": 8232604,
-            "rows": 19136
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\kitchen-timing-mila.json",
+            "mtime": "2026-09-08T13:15:57.204Z",
+            "size": 8285858,
+            "rows": 19379
           }
         },
         {
@@ -592,12 +593,12 @@
           "source": "Toast",
           "label": "Item Details",
           "status": "pass",
-          "message": "15,966 item rows",
+          "message": "16,264 item rows",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\item-details-mila.json",
-            "mtime": "2026-08-31T13:33:06.971Z",
-            "size": 5234128,
-            "rows": 15966
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\item-details-mila.json",
+            "mtime": "2026-09-08T13:19:01.053Z",
+            "size": 5323287,
+            "rows": 16264
           }
         },
         {
@@ -605,12 +606,12 @@
           "source": "Toast",
           "label": "Item Fulfillment Report",
           "status": "pass",
-          "message": "480 items",
+          "message": "460 items",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\item-fulfillment-mila.json",
-            "mtime": "2026-08-31T13:33:08.928Z",
-            "size": 44998,
-            "rows": 480
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\item-fulfillment-mila.json",
+            "mtime": "2026-09-08T13:19:04.638Z",
+            "size": 43195,
+            "rows": 460
           }
         },
         {
@@ -618,12 +619,12 @@
           "source": "OpenTable",
           "label": "Covers Export",
           "status": "pass",
-          "message": "1,105 covers",
+          "message": "1,112 covers",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\covers-mila.json",
-            "mtime": "2026-08-31T13:35:04.335Z",
-            "size": 200455,
-            "rows": 1105
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\covers-mila.json",
+            "mtime": "2026-09-08T13:21:17.523Z",
+            "size": 201653,
+            "rows": 1112
           }
         },
         {
@@ -631,11 +632,11 @@
           "source": "Pipeline",
           "label": "Processed Venue JSON",
           "status": "pass",
-          "message": "11 stations, curve=38, BP=none",
+          "message": "11 stations, curve=49, BP=none",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\mila-data-2026-W35.json",
-            "mtime": "2026-08-31T13:37:13.495Z",
-            "size": 1063509,
+            "path": "C:\\Cursor\\boh-rdg-publish\\mila-data-2026-W36.json",
+            "mtime": "2026-09-08T13:23:55.415Z",
+            "size": 1086138,
             "rows": 11
           }
         },
@@ -657,12 +658,12 @@
           "source": "Staffing",
           "label": "Toast Labor Week",
           "status": "pass",
-          "message": "840 entries",
+          "message": "817 entries",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\labor-mila.json",
-            "mtime": "2026-08-31T13:37:02.339Z",
-            "size": 376547,
-            "rows": 840
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\labor-mila.json",
+            "mtime": "2026-09-08T13:23:42.517Z",
+            "size": 366399,
+            "rows": 817
           }
         },
         {
@@ -670,11 +671,11 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "9 food families · matched 202 · BOH match 97%",
+          "message": "9 food families · matched 194 · BOH match 94%",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\staffing-mila.json",
-            "mtime": "2026-08-31T13:37:07.702Z",
-            "size": 242767,
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\staffing-mila.json",
+            "mtime": "2026-09-08T13:23:48.061Z",
+            "size": 238024,
             "rows": 11
           }
         },
@@ -683,11 +684,11 @@
           "source": "Staffing",
           "label": "Match Balance",
           "status": "pass",
-          "message": "BOH match 97.1% · coverage 71% · conflicts 0",
+          "message": "BOH match 93.7% · coverage 69% · conflicts 0",
           "meta": {
-            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W35\\staffing-balance-mila.json",
-            "mtime": "2026-08-31T13:37:08.481Z",
-            "size": 167278,
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W36\\staffing-balance-mila.json",
+            "mtime": "2026-09-08T13:23:50.072Z",
+            "size": 164057,
             "rows": 12
           }
         }
@@ -701,8 +702,8 @@
     }
   ],
   "totals": {
-    "pass": 40,
-    "warn": 1,
+    "pass": 39,
+    "warn": 2,
     "fail": 0
   },
   "overall": "warn",
