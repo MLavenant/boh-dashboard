@@ -247,7 +247,7 @@ html = html.replace(
     <span>Alternating bands = station families</span>
     <span>PDF = one page · chart + all station tables</span>
   </div>
-  <p class="note" style="margin:0 0 12px">Mon→Sun tables for each station family · only locations with items/staff. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> · <strong>Items/person</strong>. Green = lowest pressure, red = highest.</p>
+  <p class="note" style="margin:0 0 12px">Mon→Sun tables for each station family · only locations with items/staff. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> (green→red heat) · <strong>Items/person</strong>.</p>
   <div id="portfolioStationsDayTable"></div>
 </div>
 <div id="stationKpiBar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
@@ -4008,7 +4008,6 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
   if (!venues.length) return '';
 
   const ipshVals = [];
-  const fulVals = [];
   const dayRows = HOURLY_DAYS.map(day => {
     const cells = venues.map(v => {
       const m = getFamilyDayMetrics(v.key, weekKey, family, day) || {};
@@ -4018,15 +4017,12 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
         : (m.items > 0 && cell && cell.hours > 0 ? +((m.items / cell.hours).toFixed(2)) : null);
       const ipp = m.itemsPerHead != null ? m.itemsPerHead : (m.heads > 0 && m.items > 0 ? +(m.items / m.heads).toFixed(1) : null);
       if (ipsh != null) ipshVals.push(ipsh);
-      if (ful != null) fulVals.push(ful);
       return { ful, ipsh, ipp, items: m.items || 0, heads: m.heads || 0 };
     });
     return { day, cells };
   });
   const ipshMin = ipshVals.length ? Math.min(...ipshVals) : 0;
   const ipshMax = ipshVals.length ? Math.max(...ipshVals) : 0;
-  const fulMin = fulVals.length ? Math.min(...fulVals) : 0;
-  const fulMax = fulVals.length ? Math.max(...fulVals) : 0;
   const metricCell = 'padding:5px 6px;text-align:right;font-size:11px;font-weight:600;width:72px;min-width:72px;max-width:72px;box-sizing:border-box';
   const metricHead = 'padding:4px 6px;text-align:right;background:#13161c;font-size:10px;font-weight:600;width:72px;min-width:72px;max-width:72px;box-sizing:border-box;white-space:nowrap';
 
@@ -4048,9 +4044,8 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
   dayRows.forEach(row => {
     html += '<tr style="border-top:1px solid #262a33"><td style="padding:6px 10px;color:#e8eaed;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+row.day.slice(0,3)+'</td>';
     row.cells.forEach(c => {
-      const fulHeat = c.ful != null ? columnRelativeHeat(c.ful, fulMin, fulMax) : { bg: '#13161c', fg: '#4b5563' };
       const ipshHeat = c.ipsh != null ? columnRelativeHeat(c.ipsh, ipshMin, ipshMax) : { bg: '#13161c', fg: '#4b5563' };
-      html += '<td style="'+metricCell+'border-left:1px solid #262a33;background:'+fulHeat.bg+';color:'+fulHeat.fg+'">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
+      html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:'+(c.ful!=null?avgFulColorByMin(c.ful):'#4b5563')+'">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
         '<td style="'+metricCell+'background:'+ipshHeat.bg+';color:'+ipshHeat.fg+'">'+(c.ipsh != null ? c.ipsh : '—')+'</td>'+
         '<td style="'+metricCell+'color:#e8eaed">'+(c.ipp != null ? c.ipp : '—')+'</td>';
     });
