@@ -30,7 +30,7 @@ function loadJson(p, fallback = null) {
 }
 
 function parseArgs(argv) {
-  const out = { from: '2026-W01', to: '2026-W34' };
+  const out = { from: '2026-W01', to: '2026-W36' };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--from') out.from = argv[++i];
     else if (argv[i] === '--to') out.to = argv[++i];
@@ -238,8 +238,12 @@ function main() {
 
   fs.mkdirSync(FTE_DIR, { recursive: true });
   const outPath = path.join(FTE_DIR, 'people-assignment-panel.json');
-  fs.writeFileSync(outPath, JSON.stringify(panel, null, 2));
+  const rootPath = path.join(ROOT, 'people-assignment-panel.json');
+  const payload = JSON.stringify(panel, null, 2);
+  fs.writeFileSync(outPath, payload);
+  fs.writeFileSync(rootPath, payload);
   console.log(`Wrote ${outPath}`);
+  console.log(`Wrote ${rootPath}`);
   console.log(
     `Needs assignment: ${needsAssignment.length} · Assigned: ${alreadyAssigned.length} · Auto-mapped: ${autoAssigned.length}`
   );

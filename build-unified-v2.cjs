@@ -94,15 +94,16 @@ try {
 let PEOPLE_ASSIGNMENT_PANEL = { needsAssignment: [], assigned: [], autoAssigned: [], families: [], counts: {} };
 try {
   const panelCandidates = [
-    path.join(DIR, 'people-assignment-panel.json'),
     path.join(DIR, 'data', 'fte', 'people-assignment-panel.json'),
+    path.join(DIR, 'people-assignment-panel.json'),
   ];
+  let best = null;
   for (const p of panelCandidates) {
-    if (fs.existsSync(p)) {
-      PEOPLE_ASSIGNMENT_PANEL = JSON.parse(fs.readFileSync(p, 'utf8'));
-      break;
-    }
+    if (!fs.existsSync(p)) continue;
+    const panel = JSON.parse(fs.readFileSync(p, 'utf8'));
+    if (!best || String(panel.generatedAt || '') > String(best.generatedAt || '')) best = panel;
   }
+  if (best) PEOPLE_ASSIGNMENT_PANEL = best;
 } catch(e) { /* run build-people-assignment-panel.cjs */ }
 
 let PEOPLE_STATION_ASSIGNMENTS = { assignments: {} };
@@ -432,11 +433,12 @@ html = html.replace(
 <div class="section-title">People — Station Assignment</div>
 <div class="card">
   <h2>Assign Line Cook / CDP / Chef de Partie to a station family</h2>
-  <p class="note">Global list across <strong>all locations</strong> (not filtered by the venue pill). Prep/Pastry/Sushi auto-map; Line Cook / CDP / Chef de Partie need a station. One row per person even if they worked multiple venues.</p>
+  <p class="note">Global list across <strong>all locations</strong> (not filtered by the venue pill). Prep/Pastry/Sushi auto-map; Line Cook / CDP / Chef de Partie / Cook, Line need a station. One row per person even if they worked multiple venues. For this week’s punches missing FTE entirely, see <strong>No station attached</strong> under Stations → ITEMS PER STAFF.</p>
+  <div id="peopleNeedsBanner" style="display:none;margin:0 0 12px;padding:12px 14px;background:#1a140c;border:1px solid #5b3a12;border-radius:10px"></div>
   <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
     <input id="peopleSearch" type="text" placeholder="Search name or job…" oninput="renderPeople()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;width:220px;outline:none">
     <select id="peopleFilter" onchange="renderPeople()" style="padding:6px 12px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit;outline:none">
-      <option value="needs" selected>Needs assignment (all locations)</option>
+      <option value="needs" selected>Needs assignment — no station</option>
       <option value="all">All cooks — every unique person</option>
       <option value="assigned">Assigned / FTE-covered</option>
       <option value="auto">Auto-mapped (Prep/Pastry/…)</option>
@@ -2270,6 +2272,40 @@ function columnRelativeHeat(val, colMin, colMax) {
   return { bg, fg: textFor(bg) };
 }
 
+function buildNoStationPeopleHtml(staffing) {
+  const people = (staffing && Array.isArray(staffing.noStationPeople)) ? staffing.noStationPeople : [];
+  const ms = staffing && staffing.matchStats;
+  const bohMatch = ms && ms.bohMatchRate != null ? Math.round(ms.bohMatchRate * 100) : null;
+  const unmatchedDays = ms && ms.bohLaborShiftsUnmatched != null ? ms.bohLaborShiftsUnmatched : people.reduce((s, p) => s + (p.days || 0), 0);
+  if (!people.length) {
+    return '<div style="margin-top:14px;padding:12px 14px;background:#132018;border:1px solid #1e3a2f;border-radius:10px">'+
+      '<div style="font-size:13px;font-weight:700;color:#86efac;margin-bottom:4px">No station missing</div>'+
+      '<p class="note" style="margin:0">All kitchen punches this week matched Viktor FTE and have a station family'+(bohMatch != null ? ' · BOH match '+bohMatch+'%' : '')+'.</p></div>';
+  }
+  const rows = people.map(p => {
+    const name = String(p.name || p.payrollName || p.employeeName || '—').replace(/</g, '&lt;');
+    const jobs = (p.jobs || []).join(', ').replace(/</g, '&lt;') || '—';
+    return '<tr style="border-top:1px solid #3d2a14">'+
+      '<td style="padding:8px 10px;color:#fde68a;font-weight:700">'+name+'</td>'+
+      '<td style="padding:8px 10px;color:#e8eaed">'+jobs+'</td>'+
+      '<td style="padding:8px 10px;text-align:right;color:#9aa0aa">'+(p.days || 0)+'</td>'+
+      '<td style="padding:8px 10px;text-align:right;color:#e8eaed">'+(p.hours != null ? p.hours : '—')+'</td>'+
+      '<td style="padding:8px 10px;color:#f59e0b;font-size:11px">'+(p.reason || 'No station attached')+'</td></tr>';
+  }).join('');
+  return '<div style="margin-top:14px;padding:12px 14px;background:#1a140c;border:1px solid #5b3a12;border-radius:10px">'+
+    '<div style="display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;margin-bottom:8px">'+
+    '<div style="font-size:14px;font-weight:700;color:#f59e0b">⚠ No station attached — ' + people.length + ' people</div>'+
+    '<div style="font-size:12px;color:#9aa0aa">' + unmatchedDays + ' kitchen day(s) · BOH match ' + (bohMatch != null ? bohMatch + '%' : '—') + '</div></div>'+
+    '<p class="note" style="margin:0 0 10px">These names punched BOH jobs but are <strong>not on Viktor FTE</strong>, so they get no station family and stay out of items/person. Add them to FTE (or fix the name spelling) to attach a station.</p>'+
+    '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="color:#9aa0aa;background:#22180e">'+
+    '<th style="text-align:left;padding:8px 10px">Name</th>'+
+    '<th style="text-align:left;padding:8px 10px">Job</th>'+
+    '<th style="text-align:right;padding:8px 10px">Days</th>'+
+    '<th style="text-align:right;padding:8px 10px">Hours</th>'+
+    '<th style="text-align:left;padding:8px 10px">Why</th></tr></thead><tbody>'+
+    rows+'</tbody></table></div>';
+}
+
 function buildTicketQcHtml(d, staffing) {
   const ts = d.ticketSummary || {};
   const stations = d.stations || [];
@@ -2295,7 +2331,7 @@ function buildTicketQcHtml(d, staffing) {
   }
   let warn = '';
   if (bohMatch != null && bohMatch < 50) {
-    warn = '<p style="margin:8px 0 0;color:#f59e0b;font-size:12px">⚠ BOH labor match '+bohMatch+'% — staff / items-per-person stay empty until Toast kitchen punches link to Viktor FTE roster.</p>';
+    warn = '<p style="margin:8px 0 0;color:#f59e0b;font-size:12px">⚠ BOH labor match '+bohMatch+'% — staff / items-per-person stay empty until kitchen punches link to Viktor FTE roster.</p>';
   }
   return '<div style="font-size:13px;color:#e8eaed;font-weight:600;margin-bottom:6px">Ticket &amp; fulfillment QC (this week)</div>'+
     '<p class="note" style="margin:0 0 10px">Verify counts against Toast kitchen-timing + item-details exports. Fulfillment = fired→fulfilled on food-station tickets (−'+adj+'s adjust).</p>'+
@@ -2310,7 +2346,8 @@ function buildTicketQcHtml(d, staffing) {
     '<th style="text-align:left;padding:4px 8px">Family</th><th style="text-align:right;padding:4px 8px">Tickets</th>'+
     '<th style="text-align:right;padding:4px 8px">Items</th><th style="text-align:right;padding:4px 8px">Week ful</th></tr></thead><tbody>'+
     famRows+'</tbody></table>' : '')+
-    warn;
+    warn +
+    buildNoStationPeopleHtml(staffing);
 }
 
 function getStaffPlayers(staffing) {
@@ -5290,6 +5327,7 @@ function mergedPeopleAssignments() {
 function renderPeople() {
   const body = document.getElementById('peopleBody');
   const countEl = document.getElementById('peopleCount');
+  const banner = document.getElementById('peopleNeedsBanner');
   if (!body) return;
   const panel = (typeof PEOPLE_ASSIGNMENT_PANEL !== 'undefined' && PEOPLE_ASSIGNMENT_PANEL) || {};
   const families = panel.families || ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
@@ -5330,9 +5368,23 @@ function renderPeople() {
   }
   rows.sort((a, b) => (b.hours || 0) - (a.hours || 0));
 
+  const needsAll = panel.needsAssignment || [];
+  if (banner) {
+    if (filter === 'needs' && needsAll.length) {
+      const names = needsAll.slice(0, 40).map(r => r.displayName || r.payrollName || r.key).filter(Boolean);
+      const more = needsAll.length > names.length ? ' · +' + (needsAll.length - names.length) + ' more' : '';
+      banner.style.display = '';
+      banner.innerHTML = '<div style="font-size:13px;font-weight:700;color:#f59e0b;margin-bottom:6px">No station — ' + needsAll.length + ' people</div>' +
+        '<div style="font-size:13px;color:#fde68a;line-height:1.55">' + names.map(n => String(n).replace(/</g,'&lt;')).join(' · ') + more + '</div>';
+    } else {
+      banner.style.display = 'none';
+      banner.innerHTML = '';
+    }
+  }
+
   if (countEl) {
     const total = (panel.counts && panel.counts.totalUnique) || rows.length;
-    const n = (panel.counts && panel.counts.needsAssignment) || (panel.needsAssignment || []).length;
+    const n = (panel.counts && panel.counts.needsAssignment) || needsAll.length;
     const locBit = locFilter ? (' · ' + (venueLabels[locFilter] || locFilter) + ' only') : ' · all locations';
     countEl.textContent = rows.length + ' shown' + locBit + ' · ' + total + ' unique cooks · ' + n + ' need a station';
   }
@@ -5344,22 +5396,28 @@ function renderPeople() {
 
   body.innerHTML = rows.map(r => {
     const current = assigns[r.key] || r.assignedFamily || '';
-    const opts = ['<option value="">— assign station —</option>']
+    const needsStation = !current && !(r.fteFamily) && !(r.autoFamily && filter === 'auto');
+    const opts = ['<option value="">— no station —</option>']
       .concat(families.map(f => '<option value="' + f + '"' + (current === f ? ' selected' : '') + '>' + f + '</option>'))
       .join('');
     const fte = r.fteFamily ? (r.fteFamily + (r.ftePosition ? ' (' + r.ftePosition + ')' : '')) : '—';
     const auto = r.autoFamily ? '<span style="color:#86efac">auto: ' + r.autoFamily + '</span>' : '';
     const job = r.primaryJob || Object.keys(r.jobs || {})[0] || '—';
     const locs = Object.keys(r.venues || {}).map(v => venueLabels[v] || v).sort().join(', ') || '—';
-    return '<tr style="border-bottom:1px solid #1e2533">' +
-      '<td style="padding:8px 10px;color:#e8eaed">' + (r.displayName || r.payrollName || r.key) +
+    const rowBg = (!current && filter === 'needs') ? 'background:#1a140c;' : '';
+    const stationCell = current
+      ? '<select data-people-key="' + r.key + '" onchange="updatePeopleAssignment(this)" style="padding:4px 8px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:6px;font-size:12px;font-family:inherit">' + opts + '</select>'
+      : '<div style="margin-bottom:4px;font-size:11px;font-weight:700;color:#f59e0b">⚠ No station</div>' +
+        '<select data-people-key="' + r.key + '" onchange="updatePeopleAssignment(this)" style="padding:4px 8px;background:#1e2533;border:1px solid #5b3a12;color:#e8eaed;border-radius:6px;font-size:12px;font-family:inherit">' + opts + '</select>';
+    return '<tr style="border-bottom:1px solid #1e2533;' + rowBg + '">' +
+      '<td style="padding:8px 10px;color:' + ((!current && filter === 'needs') ? '#fde68a' : '#e8eaed') + ';font-weight:' + ((!current && filter === 'needs') ? '700' : '400') + '">' + (r.displayName || r.payrollName || r.key) +
         (r.payrollName && r.payrollName !== r.displayName ? '<div style="font-size:11px;color:#9aa0aa">' + r.payrollName + '</div>' : '') +
       '</td>' +
       '<td style="padding:8px 10px;color:#c4c8d0">' + job + (auto ? '<div style="font-size:11px">' + auto + '</div>' : '') + '</td>' +
       '<td style="padding:8px 10px;color:#9aa0aa;font-size:12px">' + locs + '</td>' +
       '<td style="padding:8px 10px;text-align:right;color:#e8eaed">' + (r.hours != null ? r.hours.toLocaleString() : '—') + '</td>' +
       '<td style="padding:8px 10px;color:#9aa0aa">' + fte + '</td>' +
-      '<td style="padding:8px 10px"><select data-people-key="' + r.key + '" onchange="updatePeopleAssignment(this)" style="padding:4px 8px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:6px;font-size:12px;font-family:inherit">' + opts + '</select></td>' +
+      '<td style="padding:8px 10px">' + stationCell + '</td>' +
     '</tr>';
   }).join('');
 }

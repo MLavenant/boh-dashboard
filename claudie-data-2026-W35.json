@@ -68440,7 +68440,7 @@
   "staffing": {
     "venue": "claudie",
     "weekLabel": "2026-W35",
-    "builtAt": "2026-09-11T16:20:05.686Z",
+    "builtAt": "2026-09-11T16:30:48.250Z",
     "matchStats": {
       "laborShiftsMatched": 119,
       "laborShiftsUnmatched": 301,
@@ -68449,7 +68449,8 @@
       "matchRate": 0.283,
       "bohLaborShiftsUnmatched": 12,
       "bohMatchRate": 0.908,
-      "rosterCoverage": 0.771
+      "rosterCoverage": 0.771,
+      "noStationPeopleCount": 3
     },
     "guestsSeated": {
       "total": 2022,
@@ -72085,6 +72086,41 @@
             ]
           }
         }
+      }
+    ],
+    "noStationPeople": [
+      {
+        "name": "Linke, Alessandro Luigi Morelli",
+        "employeeName": "Alessandro Luigi Morelli Linke",
+        "payrollName": "Linke, Alessandro Luigi Morelli",
+        "jobs": [
+          "Cook, Line"
+        ],
+        "days": 5,
+        "hours": 43,
+        "reason": "Not on FTE roster — no station attached"
+      },
+      {
+        "name": "Valbuena, Jesus Eduardo",
+        "employeeName": "Jesus Eduardo Valbuena",
+        "payrollName": "Valbuena, Jesus Eduardo",
+        "jobs": [
+          "Cook, Prep"
+        ],
+        "days": 4,
+        "hours": 34,
+        "reason": "Not on FTE roster — no station attached"
+      },
+      {
+        "name": "Meiklejohn, Perry Stephen",
+        "employeeName": "Perry Stephen Meiklejohn",
+        "payrollName": "Meiklejohn, Perry Stephen",
+        "jobs": [
+          "Cook, Line"
+        ],
+        "days": 3,
+        "hours": 20.8,
+        "reason": "Not on FTE roster — no station attached"
       }
     ],
     "foodFamiliesOnly": true

@@ -102075,7 +102075,7 @@
   "staffing": {
     "venue": "mila",
     "weekLabel": "2026-W35",
-    "builtAt": "2026-09-11T16:20:05.534Z",
+    "builtAt": "2026-09-11T16:30:48.013Z",
     "matchStats": {
       "laborShiftsMatched": 215,
       "laborShiftsUnmatched": 617,
@@ -102084,7 +102084,8 @@
       "matchRate": 0.258,
       "bohLaborShiftsUnmatched": 11,
       "bohMatchRate": 0.951,
-      "rosterCoverage": 0.79
+      "rosterCoverage": 0.79,
+      "noStationPeopleCount": 4
     },
     "guestsSeated": {
       "total": 3686,
@@ -107420,6 +107421,52 @@
             ]
           }
         }
+      }
+    ],
+    "noStationPeople": [
+      {
+        "name": "Jesulus, Normila",
+        "employeeName": "Normila Jesulus",
+        "payrollName": "Jesulus, Normila",
+        "jobs": [
+          "Prep Cook"
+        ],
+        "days": 5,
+        "hours": 39.4,
+        "reason": "Not on FTE roster — no station attached"
+      },
+      {
+        "name": "Navas, Anthony",
+        "employeeName": "Anthony Navas",
+        "payrollName": "Navas, Anthony",
+        "jobs": [
+          "Expo"
+        ],
+        "days": 3,
+        "hours": 24.4,
+        "reason": "Not on FTE roster — no station attached"
+      },
+      {
+        "name": "Garcia, Cesar",
+        "employeeName": "Cesar Garcia",
+        "payrollName": "Garcia, Cesar",
+        "jobs": [
+          "Expo"
+        ],
+        "days": 2,
+        "hours": 16.6,
+        "reason": "Not on FTE roster — no station attached"
+      },
+      {
+        "name": "Barahona, Sindi",
+        "employeeName": "Sindi Barahona",
+        "payrollName": "Barahona, Sindi",
+        "jobs": [
+          "Expo"
+        ],
+        "days": 1,
+        "hours": 7.4,
+        "reason": "Not on FTE roster — no station attached"
       }
     ],
     "foodFamiliesOnly": true

@@ -313,6 +313,31 @@ function bestRosterMatch(laborNameKey, rosterByKey, threshold = NAME_MATCH_THRES
   return { index: bestIdx, score: bestScore, row: rosterByKey[bestIdx] };
 }
 
+/** Inclusive ISO week range: [{ weekKey: '2026-W29' }, ...] */
+function listIsoWeeks(fromKey, toKey) {
+  const re = /^(\d{4})-W(\d{2})$/;
+  const fm = String(fromKey || '').match(re);
+  const tm = String(toKey || '').match(re);
+  if (!fm || !tm) return [];
+  let y = +fm[1];
+  let w = +fm[2];
+  const endY = +tm[1];
+  const endW = +tm[2];
+  const out = [];
+  for (let guard = 0; guard < 400; guard++) {
+    const weekKey = `${y}-W${String(w).padStart(2, '0')}`;
+    out.push({ weekKey, year: y, week: w });
+    if (y === endY && w === endW) break;
+    w += 1;
+    if (w > 53) {
+      w = 1;
+      y += 1;
+    }
+    if (y > endY || (y === endY && w > endW)) break;
+  }
+  return out;
+}
+
 module.exports = {
   FOOD_FAMILIES,
   FOOD_FAMILY_SET,
@@ -330,4 +355,5 @@ module.exports = {
   namesMatch,
   bestRosterMatch,
   NAME_MATCH_THRESHOLD,
+  listIsoWeeks,
 };

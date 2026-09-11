@@ -58037,7 +58037,7 @@
   "staffing": {
     "venue": "ava_winter_park",
     "weekLabel": "2026-W35",
-    "builtAt": "2026-09-11T16:20:05.637Z",
+    "builtAt": "2026-09-11T16:30:48.183Z",
     "matchStats": {
       "laborShiftsMatched": 121,
       "laborShiftsUnmatched": 319,
@@ -58046,7 +58046,8 @@
       "matchRate": 0.275,
       "bohLaborShiftsUnmatched": 2,
       "bohMatchRate": 0.984,
-      "rosterCoverage": 0.903
+      "rosterCoverage": 0.903,
+      "noStationPeopleCount": 1
     },
     "guestsSeated": {
       "total": 1585,
@@ -61494,6 +61495,19 @@
             ]
           }
         }
+      }
+    ],
+    "noStationPeople": [
+      {
+        "name": "Chaparro, Heidy",
+        "employeeName": "Heidy Chaparro",
+        "payrollName": "Chaparro, Heidy",
+        "jobs": [
+          "Line Cook"
+        ],
+        "days": 2,
+        "hours": 15.7,
+        "reason": "Not on FTE roster — no station attached"
       }
     ],
     "foodFamiliesOnly": true

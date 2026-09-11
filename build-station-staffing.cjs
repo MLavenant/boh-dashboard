@@ -672,6 +672,39 @@ function buildVenue(venueRaw, weekLabel) {
   const rosterCoverage =
     roster.length > 0 ? (roster.length - unmatchedRoster.length) / roster.length : 0;
 
+  /** Unique kitchen people punched but not joined to FTE → no station family. */
+  const noStationPeopleMap = new Map();
+  for (const u of unmatchedBohLabor) {
+    const name = String(u.payrollName || u.employeeName || '').trim() || 'Unknown';
+    const key = nameKey(name).key || name.toLowerCase();
+    if (!noStationPeopleMap.has(key)) {
+      noStationPeopleMap.set(key, {
+        name,
+        employeeName: u.employeeName || name,
+        payrollName: u.payrollName || '',
+        jobs: new Set(),
+        days: 0,
+        hours: 0,
+        reason: 'Not on FTE roster — no station attached',
+      });
+    }
+    const row = noStationPeopleMap.get(key);
+    row.days += 1;
+    row.hours += u.hours || 0;
+    for (const j of u.jobs || []) if (j) row.jobs.add(j);
+  }
+  const noStationPeople = [...noStationPeopleMap.values()]
+    .map((r) => ({
+      name: r.name,
+      employeeName: r.employeeName,
+      payrollName: r.payrollName,
+      jobs: [...r.jobs].sort(),
+      days: r.days,
+      hours: +r.hours.toFixed(1),
+      reason: r.reason,
+    }))
+    .sort((a, b) => b.hours - a.hours || a.name.localeCompare(b.name));
+
   const staffing = {
     venue,
     weekLabel,
@@ -690,6 +723,7 @@ function buildVenue(venueRaw, weekLabel) {
       bohLaborShiftsUnmatched: unmatchedBohLabor.length,
       bohMatchRate: +bohMatchRate.toFixed(3),
       rosterCoverage: +rosterCoverage.toFixed(3),
+      noStationPeopleCount: noStationPeople.length,
     },
     guestsSeated: venueData.guestsSeated || null,
     toastStationFamily,
@@ -697,6 +731,7 @@ function buildVenue(venueRaw, weekLabel) {
     unmatchedLabor,
     unmatchedRoster,
     unmatchedBohLabor,
+    noStationPeople,
   };
 
   writePanelRows(weekLabel, venue, byFamily);
@@ -757,7 +792,7 @@ function buildVenue(venueRaw, weekLabel) {
     }
   }
 
-  // Strip any legacy FOH families from prior embeds
+  // Public embed: food families + named list of kitchen punches with no station
   venueData.staffing = {
     venue,
     weekLabel,
@@ -767,9 +802,9 @@ function buildVenue(venueRaw, weekLabel) {
     toastStationFamily,
     byFamily: publicByFamily,
     players: buildPublicPlayers(byFamily),
+    noStationPeople,
     foodFamiliesOnly: true,
   };
-  // Keep BOH-only rates on public payload (no names) for pipeline / dashboard notes
   fs.writeFileSync(venueDataPath, JSON.stringify(venueData, null, 2));
 
   // Also refresh plain {venue}-data.json if present

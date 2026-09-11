@@ -61413,7 +61413,7 @@
   "staffing": {
     "venue": "casa_neos",
     "weekLabel": "2026-W35",
-    "builtAt": "2026-09-11T16:20:05.458Z",
+    "builtAt": "2026-09-11T16:30:47.916Z",
     "matchStats": {
       "laborShiftsMatched": 273,
       "laborShiftsUnmatched": 591,
@@ -61422,7 +61422,8 @@
       "matchRate": 0.316,
       "bohLaborShiftsUnmatched": 5,
       "bohMatchRate": 0.982,
-      "rosterCoverage": 0.968
+      "rosterCoverage": 0.968,
+      "noStationPeopleCount": 1
     },
     "guestsSeated": {
       "total": 2533,
@@ -67886,6 +67887,19 @@
             ]
           }
         }
+      }
+    ],
+    "noStationPeople": [
+      {
+        "name": "Sarabia Ramos, Francis",
+        "employeeName": "Francis Sarabia Ramos",
+        "payrollName": "Sarabia Ramos, Francis",
+        "jobs": [
+          "Pastry Cook"
+        ],
+        "days": 5,
+        "hours": 31.7,
+        "reason": "Not on FTE roster — no station attached"
       }
     ],
     "foodFamiliesOnly": true

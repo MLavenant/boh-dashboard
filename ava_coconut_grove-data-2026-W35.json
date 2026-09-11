@@ -63420,7 +63420,7 @@
   "staffing": {
     "venue": "ava_coconut_grove",
     "weekLabel": "2026-W35",
-    "builtAt": "2026-09-11T16:20:05.591Z",
+    "builtAt": "2026-09-11T16:30:48.090Z",
     "matchStats": {
       "laborShiftsMatched": 101,
       "laborShiftsUnmatched": 281,
@@ -63429,7 +63429,8 @@
       "matchRate": 0.264,
       "bohLaborShiftsUnmatched": 2,
       "bohMatchRate": 0.981,
-      "rosterCoverage": 0.92
+      "rosterCoverage": 0.92,
+      "noStationPeopleCount": 1
     },
     "guestsSeated": {
       "total": 1835,
@@ -66997,6 +66998,19 @@
             ]
           }
         }
+      }
+    ],
+    "noStationPeople": [
+      {
+        "name": "Miller, Jada",
+        "employeeName": "Jada Miller",
+        "payrollName": "Miller, Jada",
+        "jobs": [
+          "Cook, Line"
+        ],
+        "days": 2,
+        "hours": 9,
+        "reason": "Not on FTE roster — no station attached"
       }
     ],
     "foodFamiliesOnly": true
