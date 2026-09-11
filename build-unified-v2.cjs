@@ -2443,18 +2443,18 @@ function renderStaffPlayersPanel(staffing, tableEl, heatEl, varEl, noteEl) {
 function stationsForFamily(family, staffing, stationDetails) {
   const map = (staffing && staffing.toastStationFamily) || {};
   const fromMap = Object.entries(map).filter(([, f]) => f === family).map(([st]) => st);
-  if (fromMap.length) {
-    // Keep only stations that exist on THIS venue (timing or map). Claudie ≠ MILA.
-    const present = fromMap.filter((st) => !stationDetails || Object.keys(stationDetails).length === 0 || stationDetails[st]);
+  if (Object.keys(map).length) {
+    // Venue has an explicit Toast→family map — use it only (Claudie ≠ MILA; no cross-family leak).
+    if (!stationDetails || !Object.keys(stationDetails).length) return fromMap;
+    const present = fromMap.filter((st) => stationDetails[st]);
     return present.length ? present : fromMap;
   }
-  // Family has FTE heads but no Toast station here (e.g. MILA Sushi) — return none.
-  // Never treat an empty token as matching every station name.
+  // Legacy weeks with no map: token match, but never match on an empty token.
   const token = String(family || '').toLowerCase().trim().split(/\\s+/)[0];
   if (!token) return [];
   return Object.keys(stationDetails || {}).filter((st) => {
     const n = st.toLowerCase();
-    return n === token || n.startsWith(token + ' ') || n.startsWith(token + '-') || n.includes(token);
+    return n === token || n.startsWith(token + ' ') || n.startsWith(token + '-');
   });
 }
 
