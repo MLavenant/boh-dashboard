@@ -231,6 +231,20 @@ html = html.replace(
     <p id="itemsPerStaffNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
   </div>
 </div>
+<div class="card" id="portfolioStationsPanel" style="display:none;margin:0 0 18px">
+  <h2 style="margin:0 0 4px">RDG STATIONS COMPARE</h2>
+  <p class="note" style="margin-top:0">All locations · selected week. Chart = station-family <strong>avg fulfillment</strong> (lines) and <strong>items / staff-hour</strong> (bars). Table = Mon→Sun full-day compare for the family you pick.</p>
+  <div style="position:relative;height:360px;margin:12px 0 20px">
+    <canvas id="cPortfolioStations"></canvas>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px;padding:12px 14px;background:#13161c;border:1px solid #262a33;border-radius:10px">
+    <label style="font-size:12px;color:#9aa0aa">Station family
+      <select id="portfolioStationsFamily" onchange="renderPortfolioStationsDayTable()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
+    </label>
+    <span class="note" style="margin:0;font-size:12px">Full day · avg fulfillment + items / staff-hour by location</span>
+  </div>
+  <div id="portfolioStationsDayTable"></div>
+</div>
 <div id="stationKpiBar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
   <div class="card" style="margin:0;text-align:center">
     <div style="font-size:11px;color:#9aa0aa;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">Overall Avg Fulfillment</div>
@@ -2253,9 +2267,12 @@ function renderStaffingGrid() {
     if (ovCard) ovCard.style.display = 'none';
     const ips = document.getElementById('itemsPerStaffCard');
     if (ips) ips.style.display = 'none';
+    renderPortfolioStations();
     return;
   }
   if (ovCard) ovCard.style.display = 'none';
+  const port = document.getElementById('portfolioStationsPanel');
+  if (port) port.style.display = 'none';
   renderItemsPerStaff();
 }
 
@@ -2287,10 +2304,13 @@ function familyDayCell(venueKey, weekKey, family, day) {
 }
 
 function columnRelativeHeat(val, colMin, colMax) {
+  // Pressure scale: green = lowest load, red = highest (within the day column)
   if (val == null || val <= 0) return { bg: '#13161c', fg: '#4b5563' };
-  if (colMax <= colMin) return { bg: '#d9a441', fg: '#0f1218' };
+  if (colMax <= colMin) return { bg: '#22c55e', fg: '#0f1218' };
   const t = (val - colMin) / (colMax - colMin);
-  const bg = lerpColor('#1a2840', '#d9a441', t);
+  const bg = t <= 0.5
+    ? lerpColor('#166534', '#eab308', t / 0.5)
+    : lerpColor('#eab308', '#dc2626', (t - 0.5) / 0.5);
   return { bg, fg: textFor(bg) };
 }
 
@@ -2788,7 +2808,7 @@ function renderHourlyThroughput() {
     '</tr></tbody></table>';
 
   html += '<h3 style="margin:16px 0 8px;font-size:14px;color:#e8eaed">Items · hour × day</h3>' +
-    '<p class="note" style="margin:0 0 10px">Rows = hours (10:00→02:00) · columns = <strong>Mon→Sun</strong> (full width). Color = busiest→quietest <em>within each day column</em>. Click a cell for the sold list.</p>' +
+    '<p class="note" style="margin:0 0 10px">Rows = hours (10:00→02:00) · columns = <strong>Mon→Sun</strong> (full width). Color: <strong>green = lowest</strong> pressure that day, <strong>red = highest</strong>. Click a cell for the sold list.</p>' +
     '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
     '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
   HOURLY_DAYS.forEach(day => {
@@ -2839,7 +2859,7 @@ function renderHourlyThroughput() {
   if (hasStaff) {
     html += '<h3 style="margin:0 0 8px;font-size:14px;color:#d9a441">Staff (heads) · hour × day</h3>' +
       '<p class="note" style="margin:0 0 10px">'+(hasHourlyStaff
-        ? 'People whose punch <strong>in→out</strong> overlaps that hour (true concurrent). Click a cell for who + clock times.'
+        ? 'People whose punch <strong>in→out</strong> overlaps that hour (true concurrent). Click a cell for who + clock times. Color: green = lowest heads that day, red = highest.'
         : 'Legacy week — daily headcount only (rebuild staffing for punch-overlap hours).')+'</p>' +
       '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
       '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
@@ -2882,7 +2902,7 @@ function renderHourlyThroughput() {
     html += '<h3 style="margin:0 0 8px;font-size:14px;color:#d9a441">Items / staff · hour × day</h3>' +
       '<p class="note" style="margin:0 0 10px">'+(hasHourlyStaff
         ? 'Items in that hour ÷ people clocked in during that hour.'
-        : 'Items ÷ day headcount for each hour (legacy).')+' Color = highest→lowest per day column.</p>' +
+        : 'Items ÷ day headcount for each hour (legacy).')+' Color: green = lowest pressure that day, red = highest.</p>' +
       '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
       '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
     HOURLY_DAYS.forEach(day => {
@@ -3334,10 +3354,13 @@ function venueHasStationDetails(weekKeys, venueKey) {
 }
 
 function globalRelativeHeat(val, min, max) {
+  // Same pressure scale as hour tables: green low → red high
   if (val == null || val <= 0) return { bg: '#13161c', fg: '#4b5563' };
-  if (max <= min) return { bg: '#d9a441', fg: '#0f1218' };
+  if (max <= min) return { bg: '#22c55e', fg: '#0f1218' };
   const t = (val - min) / (max - min);
-  const bg = lerpColor('#1a2840', '#d9a441', t);
+  const bg = t <= 0.5
+    ? lerpColor('#166534', '#eab308', t / 0.5)
+    : lerpColor('#eab308', '#dc2626', (t - 0.5) / 0.5);
   return { bg, fg: textFor(bg) };
 }
 
@@ -3649,8 +3672,11 @@ function _renderItemsPerStaffBody() {
 
   if (currentVenue === 'rdg_portfolio') {
     if (card) card.style.display = 'none';
+    renderPortfolioStations();
     return;
   }
+  const port = document.getElementById('portfolioStationsPanel');
+  if (port) port.style.display = 'none';
   if (card) card.style.display = '';
   if (weekNote) weekNote.style.display = 'none';
   if (body) body.style.display = '';
@@ -3682,12 +3708,204 @@ function _renderItemsPerStaffBody() {
   if (noteEl) {
     noteEl.textContent = scope.label+' · '+family+
       (stList.length ? ' · Stations: '+stList.join(', ')+'.' : '.')+
-      ' Table 1 compares all RDG locations; Tables 2–3 follow the location pill above.';
+      ' Hour tables: green = lowest pressure in that day column, red = highest.';
   }
+}
+
+const PORTFOLIO_STATION_COLORS = {
+  claudie: '#60a5fa',
+  casaneos: '#f472b6',
+  ava_cg: '#fbbf24',
+  ava_wp: '#34d399',
+  mila: '#c084fc',
+};
+
+function renderPortfolioStations() {
+  const panel = document.getElementById('portfolioStationsPanel');
+  const ips = document.getElementById('itemsPerStaffCard');
+  if (currentVenue !== 'rdg_portfolio') {
+    if (panel) panel.style.display = 'none';
+    return;
+  }
+  if (ips) ips.style.display = 'none';
+  if (panel) panel.style.display = '';
+
+  const weekKey = WEEKS[currentWeekIdx]?.key;
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
+  const families = HOURLY_FAMILIES.filter(f =>
+    venueRows.some(v => {
+      const st = v.familyStats[f];
+      return st && (st.ipsh != null || st.iph != null || st.fulMin != null);
+    })
+  );
+
+  const famSel = document.getElementById('portfolioStationsFamily');
+  if (famSel) {
+    const prev = famSel.value;
+    famSel.innerHTML = families.map(f => '<option value="'+f+'">'+f+'</option>').join('');
+    if (prev && families.includes(prev)) famSel.value = prev;
+    else if (families.includes('Pastry')) famSel.value = 'Pastry';
+    else if (families[0]) famSel.value = families[0];
+  }
+
+  const canvas = document.getElementById('cPortfolioStations');
+  if (canvas && typeof Chart !== 'undefined') {
+    const existing = Chart.getChart('cPortfolioStations');
+    if (existing) existing.destroy();
+    const barSets = venueRows.map(v => ({
+      type: 'bar',
+      label: (v.label || v.key) + ' · items/staff-hr',
+      data: families.map(f => {
+        const st = v.familyStats[f] || {};
+        return st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
+      }),
+      backgroundColor: (PORTFOLIO_STATION_COLORS[v.key] || '#d9a441') + 'cc',
+      borderColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
+      borderWidth: 1,
+      yAxisID: 'y',
+      order: 2,
+    }));
+    const lineSets = venueRows.map(v => ({
+      type: 'line',
+      label: (v.label || v.key) + ' · ful min',
+      data: families.map(f => (v.familyStats[f] && v.familyStats[f].fulMin != null) ? v.familyStats[f].fulMin : null),
+      borderColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
+      backgroundColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
+      borderWidth: 2,
+      pointRadius: 3,
+      tension: 0.2,
+      yAxisID: 'y1',
+      order: 1,
+    }));
+    new Chart(canvas, {
+      data: { labels: families, datasets: barSets.concat(lineSets) },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } },
+          tooltip: {
+            callbacks: {
+              label(ctx) {
+                const v = ctx.parsed.y;
+                if (v == null) return ctx.dataset.label + ': —';
+                return ctx.dataset.label + ': ' + (ctx.dataset.yAxisID === 'y1' ? v.toFixed(1) + ' min' : v.toFixed(2));
+              },
+            },
+          },
+        },
+        scales: {
+          x: { stacked: false, ticks: { maxRotation: 40, minRotation: 0 }, grid: { display: false } },
+          y: {
+            type: 'linear',
+            position: 'left',
+            title: { display: true, text: 'Items / staff-hour' },
+            grid: { color: gc },
+            beginAtZero: true,
+          },
+          y1: {
+            type: 'linear',
+            position: 'right',
+            title: { display: true, text: 'Avg fulfillment (min)' },
+            grid: { drawOnChartArea: false },
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  }
+
+  renderPortfolioStationsDayTable();
+}
+
+function renderPortfolioStationsDayTable() {
+  const el = document.getElementById('portfolioStationsDayTable');
+  if (!el) return;
+  if (currentVenue !== 'rdg_portfolio') { el.innerHTML = ''; return; }
+
+  const weekKey = WEEKS[currentWeekIdx]?.key;
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const famSel = document.getElementById('portfolioStationsFamily');
+  const family = (famSel && famSel.value) || 'Pastry';
+  const venues = PORTFOLIO_VENUE_KEYS.map(k => ({ key: k, label: labels[k] || k }));
+
+  // Collect values for pressure coloring within each metric across the table
+  const fulVals = [];
+  const ipshVals = [];
+  const dayRows = HOURLY_DAYS.map(day => {
+    const cells = venues.map(v => {
+      const m = getFamilyDayMetrics(v.key, weekKey, family, day) || {};
+      const cell = familyDayCell(v.key, weekKey, family, day);
+      const ful = cell && cell.avgFulSec != null ? +(cell.avgFulSec / 60).toFixed(1) : null;
+      const ipsh = cell && cell.itemsPerStaffHour != null ? cell.itemsPerStaffHour
+        : (m.items > 0 && cell && cell.hours > 0 ? +((m.items / cell.hours).toFixed(2)) : null);
+      const ipp = m.itemsPerHead != null ? m.itemsPerHead : (m.heads > 0 && m.items > 0 ? +(m.items / m.heads).toFixed(1) : null);
+      if (ful != null) fulVals.push(ful);
+      if (ipsh != null) ipshVals.push(ipsh);
+      return { ful, ipsh, ipp, items: m.items || 0, heads: m.heads || 0 };
+    });
+    return { day, cells };
+  });
+  const fulMin = fulVals.length ? Math.min(...fulVals) : 0;
+  const fulMax = fulVals.length ? Math.max(...fulVals) : 0;
+  const ipshMin = ipshVals.length ? Math.min(...ipshVals) : 0;
+  const ipshMax = ipshVals.length ? Math.max(...ipshVals) : 0;
+
+  let html = '<h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">'+family+' · Mon→Sun by location</h3>'+
+    '<p class="note" style="margin:0 0 10px">Full day · <strong>Ful</strong> = avg fulfillment (min) · <strong>Items/staff-hr</strong> = items ÷ staff hours that day · <strong>Items/person</strong> = items ÷ heads. Green = lowest pressure in this table, red = highest.</p>'+
+    '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:900px"><thead>'+
+    '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Day</th>';
+  venues.forEach(v => {
+    html += '<th colspan="3" style="text-align:center;padding:8px 6px;background:#1e2533;border-left:1px solid #262a33">'+v.label+'</th>';
+  });
+  html += '</tr><tr style="color:#6b7280;border-bottom:1px solid #262a33"><th style="padding:4px 10px;background:#13161c;position:sticky;left:0;z-index:1"></th>';
+  venues.forEach(() => {
+    html += '<th style="padding:4px 6px;text-align:right;background:#13161c;border-left:1px solid #262a33">Ful</th>'+
+      '<th style="padding:4px 6px;text-align:right;background:#13161c">Items/staff-hr</th>'+
+      '<th style="padding:4px 6px;text-align:right;background:#13161c">Items/person</th>';
+  });
+  html += '</tr></thead><tbody>';
+
+  dayRows.forEach(row => {
+    html += '<tr style="border-top:1px solid #262a33"><td style="padding:8px 10px;color:#e8eaed;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+row.day.slice(0,3)+'</td>';
+    row.cells.forEach(c => {
+      const fulHeat = c.ful != null ? columnRelativeHeat(c.ful, fulMin, fulMax) : { bg: '#13161c', fg: '#4b5563' };
+      const ipshHeat = c.ipsh != null ? columnRelativeHeat(c.ipsh, ipshMin, ipshMax) : { bg: '#13161c', fg: '#4b5563' };
+      html += '<td style="padding:6px;text-align:right;font-weight:700;border-left:1px solid #262a33;background:'+fulHeat.bg+';color:'+fulHeat.fg+'">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
+        '<td style="padding:6px;text-align:right;font-weight:700;background:'+ipshHeat.bg+';color:'+ipshHeat.fg+'">'+(c.ipsh != null ? c.ipsh : '—')+'</td>'+
+        '<td style="padding:6px;text-align:right;color:#e8eaed">'+(c.ipp != null ? c.ipp : '—')+'</td>';
+    });
+    html += '</tr>';
+  });
+
+  // Week totals row
+  html += '<tr style="border-top:2px solid #3d4458;background:#0f1218"><td style="padding:8px 10px;color:#d9a441;font-weight:700;position:sticky;left:0;z-index:1;background:#0f1218">Week</td>';
+  venues.forEach(v => {
+    const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
+    const st = sc.familyStats[family] || {};
+    html += '<td style="padding:6px;text-align:right;font-weight:700;border-left:1px solid #262a33;color:'+(st.fulMin!=null?avgFulColorByMin(st.fulMin):'#9aa0aa')+'">'+(st.fulMin!=null?st.fulMin.toFixed(1):'—')+'</td>'+
+      '<td style="padding:6px;text-align:right;font-weight:700;color:#d9a441">'+(st.ipsh!=null?st.ipsh:(st.iph!=null?st.iph:'—'))+'</td>'+
+      '<td style="padding:6px;text-align:right;color:#e8eaed">'+(st.iph!=null?st.iph:'—')+'</td>';
+  });
+  html += '</tr></tbody></table></div>';
+  el.innerHTML = html;
 }
 
 function renderStations() {
   renderStaffingGrid();
+  const portfolio = currentVenue === 'rdg_portfolio';
+  const kpi = document.getElementById('stationKpiBar');
+  const wow = document.getElementById('stationWowTable');
+  const wowCard = wow && wow.closest ? wow.closest('.card') : null;
+  const stCanvas = document.getElementById('cStations');
+  const stCard = stCanvas && stCanvas.closest ? stCanvas.closest('.card') : null;
+  if (kpi) kpi.style.display = portfolio ? 'none' : '';
+  if (wowCard) wowCard.style.display = portfolio ? 'none' : '';
+  else if (wow) wow.style.display = portfolio ? 'none' : '';
+  if (stCard) stCard.style.display = portfolio ? 'none' : '';
+  if (portfolio) return;
   const STATIONS = getD().stations;
   const STATION_ITEMS = getD().stationItemsArr;
   const STATION_DETAILS = getD().stationDetails;
@@ -4817,6 +5035,7 @@ function buildVenueWeekScorecard(key, label, weekKey) {
         .reduce((s, d) => s + ((fam.days && fam.days[d] && fam.days[d].heads) || 0), 0);
       familyStats[f] = {
         iph: fam.weekItemsPerHeadDay,
+        ipsh: fam.weekItemsPerStaffHour != null ? fam.weekItemsPerStaffHour : null,
         fulMin: fam.weekAvgFulSec != null ? +(fam.weekAvgFulSec / 60).toFixed(1) : null,
         volume: fam.weekItemCount,
         hours: fam.weekHours,
@@ -5616,8 +5835,9 @@ function renderAll() {
     renderGroup();
     renderPeople();
     renderSettings();
+    renderPortfolioStations();
     const pageSum = document.getElementById('pageSummary');
-    if (pageSum) pageSum.innerHTML = 'RDG Portfolio compares Claudie, Casa Neos, AVA Coconut Grove, AVA Winter Park, and MILA for the selected week. Pick a location pill to drill into station detail.';
+    if (pageSum) pageSum.innerHTML = 'RDG Portfolio compares Claudie, Casa Neos, AVA Coconut Grove, AVA Winter Park, and MILA for the selected week. Use <strong>Stations</strong> for family compare across locations.';
     const sbc = document.getElementById('serviceBreakCard');
     if (sbc) sbc.style.display = 'none';
     const ov = document.getElementById('overviewStaffingCard');
@@ -5626,6 +5846,8 @@ function renderAll() {
     if (oh) oh.style.display = 'none';
     const ips = document.getElementById('itemsPerStaffCard');
     if (ips) ips.style.display = 'none';
+    const kpi = document.getElementById('stationKpiBar');
+    if (kpi) kpi.style.display = 'none';
     return;
   }
   applyDerivedStationTargets();
