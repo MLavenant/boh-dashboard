@@ -154,7 +154,7 @@ function checkVenueWeek(slug, week) {
   }
 
   // Station-family staffing (food venues only; Claudie uses different labor system)
-  const STAFFING_SLUGS = new Set(['casa_neos', 'mila', 'ava_coconut_grove', 'ava_winter_park']);
+  const STAFFING_SLUGS = new Set(['casa_neos', 'mila', 'ava_coconut_grove', 'ava_winter_park', 'claudie']);
   const FOOD_FAMILIES = new Set(['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep']);
   if (STAFFING_SLUGS.has(slug)) {
     const labor = fileMeta(path.join(weekDir, `labor-${slug}.json`), 'entries');

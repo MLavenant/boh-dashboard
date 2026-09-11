@@ -38,6 +38,8 @@ const LOCATION_TO_VENUE = {
   'MILA 3F': 'mila',
   'MILA 2F': 'mila',
   MILA: 'mila',
+  CLAUDIE: 'claudie',
+  Claudie: 'claudie',
 };
 
 /** Short alias → long slug used by venue week JSON filenames. */
@@ -48,9 +50,13 @@ const VENUE_SLUG_ALIASES = {
   ava_winter_park: 'ava_winter_park',
   ava_cg: 'ava_coconut_grove',
   ava_coconut_grove: 'ava_coconut_grove',
+  claudie: 'claudie',
 };
 
-const STAFFING_VENUES = ['casa_neos', 'mila', 'ava_coconut_grove', 'ava_winter_park'];
+/** Food-station staffing venues. Claudie + AVA CG use Harri time entries; others Toast. */
+const STAFFING_VENUES = ['casa_neos', 'mila', 'ava_coconut_grove', 'ava_winter_park', 'claudie'];
+/** Venues whose labor-{venue}.json comes from Harri CSV (not Toast Partner API). */
+const HARRI_LABOR_VENUES = ['ava_coconut_grove', 'claudie'];
 
 /**
  * Normalize FTE Matrix / alias → canonical food family, or null if non-food.
@@ -67,9 +73,14 @@ function normalizeFoodFamily(raw) {
     sautee: 'Saute',
     sauteed: 'Saute',
     pasta: 'Saute',
+    'cook, line': 'Saute',
+    'line cook': 'Saute',
+    'chef de partie': 'Saute',
+    'j1 chef de partie': 'Saute',
     fry: 'Fry',
     tempura: 'Fry',
     'garde manger': 'Garde Manger',
+    'cook, garde manger': 'Garde Manger',
     salad: 'Garde Manger',
     mezze: 'Garde Manger',
     sushi: 'Sushi',
@@ -78,13 +89,18 @@ function normalizeFoodFamily(raw) {
     grill: 'Robata',
     grilll: 'Robata',
     plancha: 'Robata',
+    roast: 'Robata',
     pastry: 'Pastry',
+    'cook, pastry': 'Pastry',
+    'temp pastry': 'Pastry',
     expo: 'Expo',
+    'food expeditor': 'Expo',
     pizza: 'Pizza',
     prep: 'Prep',
+    'cook, prep': 'Prep',
+    'prep cook': 'Prep',
     butcher: 'Prep',
     oven: 'Robata',
-    roast: 'Robata',
   };
 
   if (aliases[low]) return aliases[low];
@@ -304,6 +320,7 @@ module.exports = {
   LOCATION_TO_VENUE,
   VENUE_SLUG_ALIASES,
   STAFFING_VENUES,
+  HARRI_LABOR_VENUES,
   normalizeFoodFamily,
   isFoodFamily,
   resolveVenueSlug,

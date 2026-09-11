@@ -1,0 +1,31 @@
+{
+  "venue": "claudie",
+  "description": "Maps Toast prep-station names → FTE Matrix station families for staffing join (Harri labor).",
+  "families": {
+    "Saute": {
+      "match": ["saute", "sauté", "pasta"]
+    },
+    "Fry": {
+      "match": ["fryer", "fry"]
+    },
+    "Garde Manger": {
+      "match": ["garde manger", "salad"]
+    },
+    "Raw": {
+      "match": ["crudo", "raw"]
+    },
+    "Robata": {
+      "match": ["grill meat", "grill fish", "grill", "robata"]
+    },
+    "Pastry": {
+      "match": ["pastry"]
+    },
+    "Expo": {
+      "match": ["expo", "hot expo", "cold expo"]
+    },
+    "Prep": {
+      "match": ["back kitchen", "prep", "butcher"]
+    }
+  },
+  "ignore": ["no print", "event", "btl", "food"]
+}

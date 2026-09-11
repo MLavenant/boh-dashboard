@@ -14,7 +14,7 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 require('dotenv').config({ path: path.join(__dirname, '.env'), override: true });
-const { STAFFING_VENUES, resolveVenueSlug } = require('./boh-staffing-shared.cjs');
+const { STAFFING_VENUES, HARRI_LABOR_VENUES, resolveVenueSlug } = require('./boh-staffing-shared.cjs');
 
 const ROOT = process.env.BOH_ROOT || __dirname;
 const TOAST_BASE = 'https://ws-api.toasttab.com';
@@ -170,6 +170,10 @@ async function main() {
 
   if (arg1 === '--all') {
     for (const v of STAFFING_VENUES) {
+      if (HARRI_LABOR_VENUES.includes(v)) {
+        console.log(`Skip Toast labor for ${v} (Harri source of truth)`);
+        continue;
+      }
       await fetchVenue(v, weekLabel, token);
     }
     return;
