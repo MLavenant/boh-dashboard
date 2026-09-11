@@ -1,0 +1,13 @@
+---
+description: Always commit and push dashboard work to origin (branch + main for Pages)
+alwaysApply: true
+---
+
+# Always commit and push
+
+After meaningful app changes in this repo, **commit and push without waiting to be asked**.
+
+1. Commit relevant code/data (never `toast-session*.bak`, secrets, or credential dumps).
+2. Push the current branch to `origin`.
+3. Also update GitHub Pages: `git push origin HEAD:main` (Pages serves from `main`).
+4. Tell the user the commit hash and that live Pages will refresh shortly.
