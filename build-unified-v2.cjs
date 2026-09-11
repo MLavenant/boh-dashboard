@@ -233,15 +233,20 @@ html = html.replace(
 </div>
 <div class="card" id="portfolioStationsPanel" style="display:none;margin:0 0 18px">
   <h2 style="margin:0 0 4px">RDG STATIONS COMPARE</h2>
-  <p class="note" style="margin-top:0">All locations · selected week. Chart = station-family <strong>avg fulfillment</strong> (lines) and <strong>items / staff-hour</strong> (bars). Table = Mon→Sun full-day compare for the family you pick.</p>
-  <div style="position:relative;height:360px;margin:12px 0 20px">
+  <p class="note" style="margin-top:0">All locations · selected week. Bars only: <strong>items / staff-hour</strong> (left) and <strong>avg fulfillment time</strong> (right). Alternating bands separate each station family.</p>
+  <div style="position:relative;height:420px;margin:12px 0 8px">
     <canvas id="cPortfolioStations"></canvas>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:4px 0 16px;font-size:11px;color:#9aa0aa">
+    <span><strong style="color:#e8eaed">Solid bars</strong> = items / staff-hour (left axis)</span>
+    <span><strong style="color:#e8eaed">Light bars</strong> = avg fulfillment min (right axis)</span>
+    <span>Alternating bands = station families</span>
   </div>
   <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px;padding:12px 14px;background:#13161c;border:1px solid #262a33;border-radius:10px">
     <label style="font-size:12px;color:#9aa0aa">Station family
       <select id="portfolioStationsFamily" onchange="renderPortfolioStationsDayTable()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
     </label>
-    <span class="note" style="margin:0;font-size:12px">Full day · avg fulfillment + items / staff-hour by location</span>
+    <span class="note" style="margin:0;font-size:12px">Full day · only locations with items/staff for this family</span>
   </div>
   <div id="portfolioStationsDayTable"></div>
 </div>
@@ -3720,6 +3725,17 @@ const PORTFOLIO_STATION_COLORS = {
   mila: '#c084fc',
 };
 
+function portfolioFamilyHasItemsStaff(venueRows, family) {
+  return venueRows.some(v => {
+    const st = v.familyStats[family];
+    if (!st) return false;
+    if (st.ipsh != null && st.ipsh > 0) return true;
+    if (st.iph != null && st.iph > 0) return true;
+    if (st.volume > 0 && st.hours > 0) return true;
+    return false;
+  });
+}
+
 function renderPortfolioStations() {
   const panel = document.getElementById('portfolioStationsPanel');
   const ips = document.getElementById('itemsPerStaffCard');
@@ -3733,12 +3749,8 @@ function renderPortfolioStations() {
   const weekKey = WEEKS[currentWeekIdx]?.key;
   const labels = ${JSON.stringify(VENUE_LABELS)};
   const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
-  const families = HOURLY_FAMILIES.filter(f =>
-    venueRows.some(v => {
-      const st = v.familyStats[f];
-      return st && (st.ipsh != null || st.iph != null || st.fulMin != null);
-    })
-  );
+  // Chart + dropdown: only families with items/staff somewhere
+  const families = HOURLY_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
 
   const famSel = document.getElementById('portfolioStationsFamily');
   if (famSel) {
@@ -3753,41 +3765,83 @@ function renderPortfolioStations() {
   if (canvas && typeof Chart !== 'undefined') {
     const existing = Chart.getChart('cPortfolioStations');
     if (existing) existing.destroy();
-    const barSets = venueRows.map(v => ({
+
+    const familyBandPlugin = {
+      id: 'portfolioFamilyBands',
+      beforeDraw(chart) {
+        const xAxis = chart.scales.x;
+        const area = chart.chartArea;
+        if (!xAxis || !area) return;
+        const ctx = chart.ctx;
+        const n = families.length;
+        if (!n) return;
+        for (let i = 0; i < n; i++) {
+          const x = xAxis.getPixelForTick(i);
+          const left = i === 0 ? area.left : (xAxis.getPixelForTick(i - 1) + x) / 2;
+          const right = i === n - 1 ? area.right : (x + xAxis.getPixelForTick(i + 1)) / 2;
+          ctx.save();
+          ctx.fillStyle = i % 2 === 0 ? 'rgba(30, 37, 51, 0.55)' : 'rgba(19, 22, 28, 0.35)';
+          ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+          if (i > 0) {
+            ctx.strokeStyle = 'rgba(217, 164, 65, 0.22)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(left, area.top);
+            ctx.lineTo(left, area.bottom);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+      },
+    };
+
+    const ipshBars = venueRows.map(v => ({
       type: 'bar',
       label: (v.label || v.key) + ' · items/staff-hr',
       data: families.map(f => {
         const st = v.familyStats[f] || {};
         return st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
       }),
-      backgroundColor: (PORTFOLIO_STATION_COLORS[v.key] || '#d9a441') + 'cc',
+      backgroundColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
       borderColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
-      borderWidth: 1,
+      borderWidth: 0,
+      borderRadius: 3,
       yAxisID: 'y',
+      barPercentage: 0.85,
+      categoryPercentage: 0.62,
       order: 2,
     }));
-    const lineSets = venueRows.map(v => ({
-      type: 'line',
+    const fulBars = venueRows.map(v => ({
+      type: 'bar',
       label: (v.label || v.key) + ' · ful min',
       data: families.map(f => (v.familyStats[f] && v.familyStats[f].fulMin != null) ? v.familyStats[f].fulMin : null),
+      backgroundColor: (PORTFOLIO_STATION_COLORS[v.key] || '#d9a441') + '55',
       borderColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
-      backgroundColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
-      borderWidth: 2,
-      pointRadius: 3,
-      tension: 0.2,
+      borderWidth: 1,
+      borderRadius: 3,
       yAxisID: 'y1',
+      barPercentage: 0.85,
+      categoryPercentage: 0.62,
       order: 1,
     }));
+
     new Chart(canvas, {
-      data: { labels: families, datasets: barSets.concat(lineSets) },
+      data: { labels: families, datasets: ipshBars.concat(fulBars) },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
+        layout: { padding: { top: 8, bottom: 4 } },
         plugins: {
-          legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } },
+          legend: {
+            position: 'bottom',
+            labels: { boxWidth: 12, boxHeight: 10, font: { size: 11 }, padding: 12 },
+          },
           tooltip: {
             callbacks: {
+              title(items) {
+                return items[0] ? String(items[0].label) : '';
+              },
               label(ctx) {
                 const v = ctx.parsed.y;
                 if (v == null) return ctx.dataset.label + ': —';
@@ -3797,23 +3851,38 @@ function renderPortfolioStations() {
           },
         },
         scales: {
-          x: { stacked: false, ticks: { maxRotation: 40, minRotation: 0 }, grid: { display: false } },
+          x: {
+            stacked: false,
+            offset: true,
+            ticks: {
+              maxRotation: 0,
+              minRotation: 0,
+              autoSkip: false,
+              font: { size: 15, weight: '700' },
+              color: '#e8eaed',
+              padding: 10,
+            },
+            grid: { display: false },
+          },
           y: {
             type: 'linear',
             position: 'left',
-            title: { display: true, text: 'Items / staff-hour' },
-            grid: { color: gc },
+            title: { display: true, text: 'Items / staff-hour', font: { size: 12, weight: '600' }, color: '#d9a441' },
+            grid: { color: 'rgba(38,42,51,0.9)' },
             beginAtZero: true,
+            ticks: { font: { size: 11 } },
           },
           y1: {
             type: 'linear',
             position: 'right',
-            title: { display: true, text: 'Avg fulfillment (min)' },
+            title: { display: true, text: 'Avg fulfillment (min)', font: { size: 12, weight: '600' }, color: '#9aa0aa' },
             grid: { drawOnChartArea: false },
             beginAtZero: true,
+            ticks: { font: { size: 11 } },
           },
         },
       },
+      plugins: [familyBandPlugin],
     });
   }
 
@@ -3829,9 +3898,27 @@ function renderPortfolioStationsDayTable() {
   const labels = ${JSON.stringify(VENUE_LABELS)};
   const famSel = document.getElementById('portfolioStationsFamily');
   const family = (famSel && famSel.value) || 'Pastry';
-  const venues = PORTFOLIO_VENUE_KEYS.map(k => ({ key: k, label: labels[k] || k }));
+  const allVenues = PORTFOLIO_VENUE_KEYS.map(k => ({ key: k, label: labels[k] || k }));
 
-  // Collect values for pressure coloring within each metric across the table
+  // Only locations with items/staff for this family this week
+  const venues = allVenues.filter(v => {
+    const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
+    const st = sc.familyStats[family] || {};
+    if (st.ipsh != null && st.ipsh > 0) return true;
+    if (st.iph != null && st.iph > 0) return true;
+    if (st.volume > 0 && (st.hours > 0 || st.iph != null)) return true;
+    // Also check any day has heads + items
+    return HOURLY_DAYS.some(day => {
+      const m = getFamilyDayMetrics(v.key, weekKey, family, day);
+      return m && m.heads > 0 && m.items > 0;
+    });
+  });
+
+  if (!venues.length) {
+    el.innerHTML = '<p class="note" style="margin:0">No locations with items/staff for <strong>'+family+'</strong> this week.</p>';
+    return;
+  }
+
   const fulVals = [];
   const ipshVals = [];
   const dayRows = HOURLY_DAYS.map(day => {
@@ -3853,9 +3940,9 @@ function renderPortfolioStationsDayTable() {
   const ipshMin = ipshVals.length ? Math.min(...ipshVals) : 0;
   const ipshMax = ipshVals.length ? Math.max(...ipshVals) : 0;
 
-  let html = '<h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">'+family+' · Mon→Sun by location</h3>'+
-    '<p class="note" style="margin:0 0 10px">Full day · <strong>Ful</strong> = avg fulfillment (min) · <strong>Items/staff-hr</strong> = items ÷ staff hours that day · <strong>Items/person</strong> = items ÷ heads. Green = lowest pressure in this table, red = highest.</p>'+
-    '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:900px"><thead>'+
+  let html = '<h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">'+family+' · Mon→Sun · '+venues.length+' location'+(venues.length===1?'':'s')+' with items/staff</h3>'+
+    '<p class="note" style="margin:0 0 10px">Locations without items/staff for this family are hidden. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> = items ÷ staff hours · <strong>Items/person</strong> = items ÷ heads. Green = lowest pressure, red = highest.</p>'+
+    '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:'+(240+venues.length*210)+'px"><thead>'+
     '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Day</th>';
   venues.forEach(v => {
     html += '<th colspan="3" style="text-align:center;padding:8px 6px;background:#1e2533;border-left:1px solid #262a33">'+v.label+'</th>';
@@ -3880,7 +3967,6 @@ function renderPortfolioStationsDayTable() {
     html += '</tr>';
   });
 
-  // Week totals row
   html += '<tr style="border-top:2px solid #3d4458;background:#0f1218"><td style="padding:8px 10px;color:#d9a441;font-weight:700;position:sticky;left:0;z-index:1;background:#0f1218">Week</td>';
   venues.forEach(v => {
     const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
