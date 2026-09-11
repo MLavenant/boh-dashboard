@@ -765,6 +765,12 @@ body.printing-stations-pdf .ps-print-page img.ps-chart {
 }
 body.printing-stations-pdf .ps-family-block { margin-bottom:0; }
 body.printing-stations-pdf .ps-print-page [style*="overflow"] { overflow:visible !important; }
+.ps-ipsh-heat {
+  -webkit-print-color-adjust:exact !important;
+  print-color-adjust:exact !important;
+  color:#ffffff !important;
+  font-weight:700 !important;
+}
 body.printing-portfolio,
 body.printing-portfolio html {
   background:#0d1117 !important;
@@ -2426,13 +2432,30 @@ function familyDayCell(venueKey, weekKey, family, day) {
 function columnRelativeHeat(val, colMin, colMax) {
   // Pressure scale: green = lowest load, red = highest (within the day column)
   if (val == null || !(val > 0)) return { bg: '#13161c', fg: '#ffffff' };
-  if (!(colMax > colMin)) return { bg: '#22c55e', fg: '#0f1218' };
+  if (!(colMax > colMin)) return { bg: '#22c55e', fg: '#ffffff' };
   const t = Math.max(0, Math.min(1, (val - colMin) / (colMax - colMin)));
   // Brighter greens so fills stay readable on the dark dashboard
   const bg = t <= 0.5
     ? lerpColor('#22c55e', '#eab308', t / 0.5)
     : lerpColor('#eab308', '#ef4444', (t - 0.5) / 0.5);
   return { bg, fg: textFor(bg) };
+}
+
+/** Portfolio Items/staff-hr only — vivid fill + white text (survives dark UI / forced colors). */
+function portfolioIpshHeat(val, colMin, colMax) {
+  const n = Number(val);
+  if (!Number.isFinite(n) || !(n > 0)) return null;
+  let t = 0.5;
+  if (Number.isFinite(colMin) && Number.isFinite(colMax) && colMax > colMin) {
+    t = Math.max(0, Math.min(1, (n - colMin) / (colMax - colMin)));
+  }
+  const bg = t <= 0.5
+    ? lerpColor('#16a34a', '#eab308', t / 0.5)
+    : lerpColor('#eab308', '#dc2626', (t - 0.5) / 0.5);
+  // White text + inset fill so conditional formatting stays visible even if bg is stripped
+  return {
+    style: 'background-color:' + bg + ' !important;color:#ffffff !important;box-shadow:inset 0 0 0 999px ' + bg + ';text-shadow:0 1px 1px rgba(0,0,0,0.45);',
+  };
 }
 
 function buildNoStationPeopleHtml(staffing) {
@@ -4027,25 +4050,32 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
       const m = getFamilyDayMetrics(v.key, weekKey, family, day) || {};
       const cell = familyDayCell(v.key, weekKey, family, day);
       const ful = cell && cell.avgFulSec != null ? +(cell.avgFulSec / 60).toFixed(1) : null;
-      const ipsh = cell && cell.itemsPerStaffHour != null ? cell.itemsPerStaffHour
-        : (m.items > 0 && cell && cell.hours > 0 ? +((m.items / cell.hours).toFixed(2)) : null);
+      let ipsh = null;
+      if (cell && cell.itemsPerStaffHour != null && Number(cell.itemsPerStaffHour) > 0) {
+        ipsh = Number(cell.itemsPerStaffHour);
+      } else if (m.items > 0 && cell && cell.hours > 0) {
+        ipsh = +((m.items / cell.hours).toFixed(2));
+      } else if (m.items > 0 && m.heads > 0 && cell && cell.hours == null) {
+        // fallback: if hours missing, still show a staff-rate proxy from volume/heads (not used for heat scale alone)
+        ipsh = null;
+      }
       const ipp = m.itemsPerHead != null ? m.itemsPerHead : (m.heads > 0 && m.items > 0 ? +(m.items / m.heads).toFixed(1) : null);
-      if (ipsh != null) ipshVals.push(ipsh);
+      if (ipsh != null && ipsh > 0) ipshVals.push(ipsh);
       return { ful, ipsh, ipp, items: m.items || 0, heads: m.heads || 0 };
     });
     return { day, cells };
   });
   const ipshMin = ipshVals.length ? Math.min(...ipshVals) : 0;
   const ipshMax = ipshVals.length ? Math.max(...ipshVals) : 0;
-  const metricCell = 'padding:5px 6px;text-align:right;font-size:11px;font-weight:600;width:72px;min-width:72px;max-width:72px;box-sizing:border-box';
-  const metricHead = 'padding:4px 6px;text-align:right;background:#13161c;font-size:10px;font-weight:600;width:72px;min-width:72px;max-width:72px;box-sizing:border-box;white-space:nowrap';
+  const metricCell = 'padding:5px 6px;text-align:right;font-size:11px;font-weight:600;min-width:70px;box-sizing:border-box;';
+  const metricHead = 'padding:4px 6px;text-align:right;background:#1e2533;font-size:10px;font-weight:600;min-width:70px;box-sizing:border-box;white-space:nowrap;color:#9aa0aa;';
 
   let html = '<div class="ps-family-block" style="margin:0 0 22px">'+
     '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">'+family+' · Mon→Sun · '+venues.length+' location'+(venues.length===1?'':'s')+'</h3>'+
-    '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px;min-width:'+(90+venues.length*216)+'px"><thead>'+
+    '<div style="overflow:auto"><table class="ps-family-table" style="width:100%;border-collapse:collapse;font-size:11px;min-width:'+(90+venues.length*220)+'px"><thead>'+
     '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1;width:56px">Day</th>';
   venues.forEach(v => {
-    html += '<th colspan="3" style="text-align:center;padding:8px 6px;background:#1e2533;border-left:1px solid #262a33">'+v.label+'</th>';
+    html += '<th colspan="3" style="text-align:center;padding:8px 6px;background:#1e2533;border-left:1px solid #262a33;color:#e8eaed">'+v.label+'</th>';
   });
   html += '</tr><tr style="color:#6b7280;border-bottom:1px solid #262a33"><th style="padding:4px 10px;background:#13161c;position:sticky;left:0;z-index:1"></th>';
   venues.forEach(() => {
@@ -4058,14 +4088,12 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
   dayRows.forEach(row => {
     html += '<tr style="border-top:1px solid #262a33"><td style="padding:6px 10px;color:#ffffff;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+row.day.slice(0,3)+'</td>';
     row.cells.forEach(c => {
-      const ipshHeat = c.ipsh != null && c.ipsh > 0
-        ? columnRelativeHeat(c.ipsh, ipshMin, ipshMax)
-        : null;
-      html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:#ffffff">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
-        (ipshHeat
-          ? '<td style="'+metricCell+'background:'+ipshHeat.bg+';color:'+ipshHeat.fg+'">'+(c.ipsh != null ? c.ipsh : '—')+'</td>'
-          : '<td style="'+metricCell+'color:#ffffff">'+(c.ipsh != null ? c.ipsh : '—')+'</td>')+
-        '<td style="'+metricCell+'color:#ffffff">'+(c.ipp != null ? c.ipp : '—')+'</td>';
+      const heat = portfolioIpshHeat(c.ipsh, ipshMin, ipshMax);
+      html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:#ffffff;background:transparent">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
+        (heat
+          ? '<td class="ps-ipsh-heat" style="'+metricCell+heat.style+'">'+(Number(c.ipsh).toFixed(2))+'</td>'
+          : '<td style="'+metricCell+'color:#ffffff;background:transparent">'+(c.ipsh != null ? Number(c.ipsh).toFixed(2) : '—')+'</td>')+
+        '<td style="'+metricCell+'color:#ffffff;background:transparent">'+(c.ipp != null ? c.ipp : '—')+'</td>';
     });
     html += '</tr>';
   });
@@ -4073,7 +4101,7 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
   const weekCells = venues.map(v => {
     const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
     const st = sc.familyStats[family] || {};
-    const ipsh = st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
+    const ipsh = st.ipsh != null ? Number(st.ipsh) : (st.iph != null ? Number(st.iph) : null);
     return { ful: st.fulMin != null ? st.fulMin : null, ipsh, ipp: st.iph != null ? st.iph : null };
   });
   const weekIpshVals = weekCells.map(c => c.ipsh).filter(v => v != null && v > 0);
@@ -4082,14 +4110,12 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
 
   html += '<tr style="border-top:2px solid #3d4458;background:#0f1218"><td style="padding:6px 10px;color:#d9a441;font-weight:700;position:sticky;left:0;z-index:1;background:#0f1218">Week</td>';
   weekCells.forEach(c => {
-    const ipshHeat = c.ipsh != null && c.ipsh > 0
-      ? columnRelativeHeat(c.ipsh, weekIpshMin, weekIpshMax)
-      : null;
-    html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:#ffffff">'+(c.ful != null ? Number(c.ful).toFixed(1) : '—')+'</td>'+
-      (ipshHeat
-        ? '<td style="'+metricCell+'background:'+ipshHeat.bg+';color:'+ipshHeat.fg+'">'+c.ipsh+'</td>'
-        : '<td style="'+metricCell+'color:#ffffff">'+(c.ipsh != null ? c.ipsh : '—')+'</td>')+
-      '<td style="'+metricCell+'color:#ffffff">'+(c.ipp != null ? c.ipp : '—')+'</td>';
+    const heat = portfolioIpshHeat(c.ipsh, weekIpshMin, weekIpshMax);
+    html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:#ffffff;background:transparent">'+(c.ful != null ? Number(c.ful).toFixed(1) : '—')+'</td>'+
+      (heat
+        ? '<td class="ps-ipsh-heat" style="'+metricCell+heat.style+'">'+Number(c.ipsh).toFixed(2)+'</td>'
+        : '<td style="'+metricCell+'color:#ffffff;background:transparent">'+(c.ipsh != null ? Number(c.ipsh).toFixed(2) : '—')+'</td>')+
+      '<td style="'+metricCell+'color:#ffffff;background:transparent">'+(c.ipp != null ? c.ipp : '—')+'</td>';
   });
   html += '</tr></tbody></table></div></div>';
   return html;
