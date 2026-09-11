@@ -232,14 +232,18 @@ html = html.replace(
   </div>
 </div>
 <div class="card" id="portfolioStationsPanel" style="display:none;margin:0 0 18px">
-  <h2 style="margin:0 0 4px">RDG STATIONS COMPARE</h2>
-  <p class="note" style="margin-top:0">All locations · selected week. Bars only: <strong>items / staff-hour</strong> (left) and <strong>avg fulfillment time</strong> (right). Alternating bands separate each station family.</p>
+  <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;margin:0 0 4px">
+    <div>
+      <h2 style="margin:0 0 4px">RDG STATIONS COMPARE</h2>
+      <p class="note" style="margin:0">All locations · selected week. Bars = <strong>items / staff-hour</strong> by station family. Alternating bands separate each family.</p>
+    </div>
+    <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Export Stations PDF</button>
+  </div>
   <div style="position:relative;height:420px;margin:12px 0 8px">
     <canvas id="cPortfolioStations"></canvas>
   </div>
   <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:4px 0 16px;font-size:11px;color:#9aa0aa">
-    <span><strong style="color:#e8eaed">Solid bars</strong> = items / staff-hour (left axis)</span>
-    <span><strong style="color:#e8eaed">Light bars</strong> = avg fulfillment min (right axis)</span>
+    <span><strong style="color:#e8eaed">Bars</strong> = items / staff-hour</span>
     <span>Alternating bands = station families</span>
   </div>
   <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px;padding:12px 14px;background:#13161c;border:1px solid #262a33;border-radius:10px">
@@ -498,6 +502,8 @@ html = html.replace(
 <div id="settingsHealthRoot"></div>
 </section>
 
+<div id="portfolioStationsPrintRoot" aria-hidden="true" style="display:none"></div>
+
 <footer>`
 );
 
@@ -670,8 +676,87 @@ body.printing-portfolio footer,
 body.printing-portfolio #weekWelcomePopup,
 body.printing-portfolio #assignmentHelperBanner,
 body.printing-portfolio .coming-note,
-body.printing-portfolio #portfolioPdfBtn {
+body.printing-portfolio #portfolioPdfBtn,
+body.printing-stations-pdf #portfolioStationsPdfBtn {
   display:none !important;
+}
+/* Stations PDF: overview + one page per family */
+body.printing-stations-pdf header,
+body.printing-stations-pdf .tab-nav,
+body.printing-stations-pdf #venuePills,
+body.printing-stations-pdf #weekSelector,
+body.printing-stations-pdf footer,
+body.printing-stations-pdf #weekWelcomePopup,
+body.printing-stations-pdf #assignmentHelperBanner,
+body.printing-stations-pdf .coming-note,
+body.printing-stations-pdf .tab-section {
+  display:none !important;
+}
+body.printing-stations-pdf,
+body.printing-stations-pdf html {
+  background:#0d1117 !important;
+}
+body.printing-stations-pdf .wrap {
+  max-width:none !important;
+  padding:0 !important;
+  margin:0 !important;
+  width:100% !important;
+}
+body.printing-stations-pdf #portfolioStationsPrintRoot {
+  display:block !important;
+  width:100% !important;
+  margin:0 !important;
+  padding:0 !important;
+  color:#e8eaed;
+  background:#0d1117;
+}
+body.printing-stations-pdf .ps-print-page {
+  padding:12px 16px 20px;
+  page-break-after:always;
+  break-after:page;
+}
+body.printing-stations-pdf .ps-print-page:last-child {
+  page-break-after:auto;
+  break-after:auto;
+}
+body.printing-stations-pdf .ps-print-page h1 {
+  margin:0 0 4px;
+  font-size:20px;
+  color:#d9a441;
+}
+body.printing-stations-pdf .ps-print-page h2 {
+  margin:14px 0 6px;
+  font-size:14px;
+  color:#e8eaed;
+}
+body.printing-stations-pdf .ps-print-page .ps-sub {
+  margin:0 0 12px;
+  font-size:12px;
+  color:#9aa0aa;
+}
+body.printing-stations-pdf .ps-print-page table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:11px;
+}
+body.printing-stations-pdf .ps-print-page th,
+body.printing-stations-pdf .ps-print-page td {
+  padding:5px 7px;
+  border-bottom:1px solid #262a33;
+  text-align:right;
+}
+body.printing-stations-pdf .ps-print-page th:first-child,
+body.printing-stations-pdf .ps-print-page td:first-child {
+  text-align:left;
+}
+body.printing-stations-pdf .ps-print-page img.ps-chart {
+  width:100%;
+  max-height:380px;
+  object-fit:contain;
+  background:#13161c;
+  border:1px solid #262a33;
+  border-radius:8px;
+  margin:8px 0 14px;
 }
 body.printing-portfolio,
 body.printing-portfolio html {
@@ -739,6 +824,25 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
   body.printing-portfolio #portfolioPrintRoot .card {
     break-inside: avoid;
     page-break-inside: avoid;
+  }
+  body.printing-stations-pdf header,
+  body.printing-stations-pdf .tab-nav,
+  body.printing-stations-pdf #venuePills,
+  body.printing-stations-pdf #weekSelector,
+  body.printing-stations-pdf footer,
+  body.printing-stations-pdf .tab-section {
+    display:none !important;
+  }
+  body.printing-stations-pdf #portfolioStationsPrintRoot {
+    display:block !important;
+  }
+  body.printing-stations-pdf .ps-print-page {
+    page-break-after:always;
+    break-after:page;
+  }
+  body.printing-stations-pdf .ps-print-page:last-child {
+    page-break-after:auto;
+    break-after:auto;
   }
 }
 </style>`);
@@ -3736,6 +3840,21 @@ function portfolioFamilyHasItemsStaff(venueRows, family) {
   });
 }
 
+function portfolioVenuesForFamily(family, weekKey) {
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  return PORTFOLIO_VENUE_KEYS.map(k => ({ key: k, label: labels[k] || k })).filter(v => {
+    const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
+    const st = sc.familyStats[family] || {};
+    if (st.ipsh != null && st.ipsh > 0) return true;
+    if (st.iph != null && st.iph > 0) return true;
+    if (st.volume > 0 && (st.hours > 0 || st.iph != null)) return true;
+    return HOURLY_DAYS.some(day => {
+      const m = getFamilyDayMetrics(v.key, weekKey, family, day);
+      return m && m.heads > 0 && m.items > 0;
+    });
+  });
+}
+
 function renderPortfolioStations() {
   const panel = document.getElementById('portfolioStationsPanel');
   const ips = document.getElementById('itemsPerStaffCard');
@@ -3797,7 +3916,7 @@ function renderPortfolioStations() {
 
     const ipshBars = venueRows.map(v => ({
       type: 'bar',
-      label: (v.label || v.key) + ' · items/staff-hr',
+      label: (v.label || v.key),
       data: families.map(f => {
         const st = v.familyStats[f] || {};
         return st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
@@ -3809,24 +3928,11 @@ function renderPortfolioStations() {
       yAxisID: 'y',
       barPercentage: 0.85,
       categoryPercentage: 0.62,
-      order: 2,
-    }));
-    const fulBars = venueRows.map(v => ({
-      type: 'bar',
-      label: (v.label || v.key) + ' · ful min',
-      data: families.map(f => (v.familyStats[f] && v.familyStats[f].fulMin != null) ? v.familyStats[f].fulMin : null),
-      backgroundColor: (PORTFOLIO_STATION_COLORS[v.key] || '#d9a441') + '55',
-      borderColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
-      borderWidth: 1,
-      borderRadius: 3,
-      yAxisID: 'y1',
-      barPercentage: 0.85,
-      categoryPercentage: 0.62,
       order: 1,
     }));
 
     new Chart(canvas, {
-      data: { labels: families, datasets: ipshBars.concat(fulBars) },
+      data: { labels: families, datasets: ipshBars },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -3845,7 +3951,7 @@ function renderPortfolioStations() {
               label(ctx) {
                 const v = ctx.parsed.y;
                 if (v == null) return ctx.dataset.label + ': —';
-                return ctx.dataset.label + ': ' + (ctx.dataset.yAxisID === 'y1' ? v.toFixed(1) + ' min' : v.toFixed(2));
+                return ctx.dataset.label + ': ' + v.toFixed(2) + ' items/staff-hr';
               },
             },
           },
@@ -3872,14 +3978,6 @@ function renderPortfolioStations() {
             beginAtZero: true,
             ticks: { font: { size: 11 } },
           },
-          y1: {
-            type: 'linear',
-            position: 'right',
-            title: { display: true, text: 'Avg fulfillment (min)', font: { size: 12, weight: '600' }, color: '#9aa0aa' },
-            grid: { drawOnChartArea: false },
-            beginAtZero: true,
-            ticks: { font: { size: 11 } },
-          },
         },
       },
       plugins: [familyBandPlugin],
@@ -3895,62 +3993,41 @@ function renderPortfolioStationsDayTable() {
   if (currentVenue !== 'rdg_portfolio') { el.innerHTML = ''; return; }
 
   const weekKey = WEEKS[currentWeekIdx]?.key;
-  const labels = ${JSON.stringify(VENUE_LABELS)};
   const famSel = document.getElementById('portfolioStationsFamily');
   const family = (famSel && famSel.value) || 'Pastry';
-  const allVenues = PORTFOLIO_VENUE_KEYS.map(k => ({ key: k, label: labels[k] || k }));
-
-  // Only locations with items/staff for this family this week
-  const venues = allVenues.filter(v => {
-    const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
-    const st = sc.familyStats[family] || {};
-    if (st.ipsh != null && st.ipsh > 0) return true;
-    if (st.iph != null && st.iph > 0) return true;
-    if (st.volume > 0 && (st.hours > 0 || st.iph != null)) return true;
-    // Also check any day has heads + items
-    return HOURLY_DAYS.some(day => {
-      const m = getFamilyDayMetrics(v.key, weekKey, family, day);
-      return m && m.heads > 0 && m.items > 0;
-    });
-  });
+  const venues = portfolioVenuesForFamily(family, weekKey);
 
   if (!venues.length) {
     el.innerHTML = '<p class="note" style="margin:0">No locations with items/staff for <strong>'+family+'</strong> this week.</p>';
     return;
   }
 
-  const fulVals = [];
   const ipshVals = [];
   const dayRows = HOURLY_DAYS.map(day => {
     const cells = venues.map(v => {
       const m = getFamilyDayMetrics(v.key, weekKey, family, day) || {};
       const cell = familyDayCell(v.key, weekKey, family, day);
-      const ful = cell && cell.avgFulSec != null ? +(cell.avgFulSec / 60).toFixed(1) : null;
       const ipsh = cell && cell.itemsPerStaffHour != null ? cell.itemsPerStaffHour
         : (m.items > 0 && cell && cell.hours > 0 ? +((m.items / cell.hours).toFixed(2)) : null);
       const ipp = m.itemsPerHead != null ? m.itemsPerHead : (m.heads > 0 && m.items > 0 ? +(m.items / m.heads).toFixed(1) : null);
-      if (ful != null) fulVals.push(ful);
       if (ipsh != null) ipshVals.push(ipsh);
-      return { ful, ipsh, ipp, items: m.items || 0, heads: m.heads || 0 };
+      return { ipsh, ipp, items: m.items || 0, heads: m.heads || 0 };
     });
     return { day, cells };
   });
-  const fulMin = fulVals.length ? Math.min(...fulVals) : 0;
-  const fulMax = fulVals.length ? Math.max(...fulVals) : 0;
   const ipshMin = ipshVals.length ? Math.min(...ipshVals) : 0;
   const ipshMax = ipshVals.length ? Math.max(...ipshVals) : 0;
 
   let html = '<h3 style="margin:0 0 8px;font-size:15px;color:#d9a441">'+family+' · Mon→Sun · '+venues.length+' location'+(venues.length===1?'':'s')+' with items/staff</h3>'+
-    '<p class="note" style="margin:0 0 10px">Locations without items/staff for this family are hidden. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> = items ÷ staff hours · <strong>Items/person</strong> = items ÷ heads. Green = lowest pressure, red = highest.</p>'+
-    '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:'+(240+venues.length*210)+'px"><thead>'+
+    '<p class="note" style="margin:0 0 10px">Locations without items/staff for this family are hidden. <strong>Items/staff-hr</strong> = items ÷ staff hours · <strong>Items/person</strong> = items ÷ heads. Green = lowest pressure, red = highest.</p>'+
+    '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;min-width:'+(240+venues.length*160)+'px"><thead>'+
     '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Day</th>';
   venues.forEach(v => {
-    html += '<th colspan="3" style="text-align:center;padding:8px 6px;background:#1e2533;border-left:1px solid #262a33">'+v.label+'</th>';
+    html += '<th colspan="2" style="text-align:center;padding:8px 6px;background:#1e2533;border-left:1px solid #262a33">'+v.label+'</th>';
   });
   html += '</tr><tr style="color:#6b7280;border-bottom:1px solid #262a33"><th style="padding:4px 10px;background:#13161c;position:sticky;left:0;z-index:1"></th>';
   venues.forEach(() => {
-    html += '<th style="padding:4px 6px;text-align:right;background:#13161c;border-left:1px solid #262a33">Ful</th>'+
-      '<th style="padding:4px 6px;text-align:right;background:#13161c">Items/staff-hr</th>'+
+    html += '<th style="padding:4px 6px;text-align:right;background:#13161c;border-left:1px solid #262a33">Items/staff-hr</th>'+
       '<th style="padding:4px 6px;text-align:right;background:#13161c">Items/person</th>';
   });
   html += '</tr></thead><tbody>';
@@ -3958,10 +4035,8 @@ function renderPortfolioStationsDayTable() {
   dayRows.forEach(row => {
     html += '<tr style="border-top:1px solid #262a33"><td style="padding:8px 10px;color:#e8eaed;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+row.day.slice(0,3)+'</td>';
     row.cells.forEach(c => {
-      const fulHeat = c.ful != null ? columnRelativeHeat(c.ful, fulMin, fulMax) : { bg: '#13161c', fg: '#4b5563' };
       const ipshHeat = c.ipsh != null ? columnRelativeHeat(c.ipsh, ipshMin, ipshMax) : { bg: '#13161c', fg: '#4b5563' };
-      html += '<td style="padding:6px;text-align:right;font-weight:700;border-left:1px solid #262a33;background:'+fulHeat.bg+';color:'+fulHeat.fg+'">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
-        '<td style="padding:6px;text-align:right;font-weight:700;background:'+ipshHeat.bg+';color:'+ipshHeat.fg+'">'+(c.ipsh != null ? c.ipsh : '—')+'</td>'+
+      html += '<td style="padding:6px;text-align:right;font-weight:700;border-left:1px solid #262a33;background:'+ipshHeat.bg+';color:'+ipshHeat.fg+'">'+(c.ipsh != null ? c.ipsh : '—')+'</td>'+
         '<td style="padding:6px;text-align:right;color:#e8eaed">'+(c.ipp != null ? c.ipp : '—')+'</td>';
     });
     html += '</tr>';
@@ -3971,8 +4046,7 @@ function renderPortfolioStationsDayTable() {
   venues.forEach(v => {
     const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
     const st = sc.familyStats[family] || {};
-    html += '<td style="padding:6px;text-align:right;font-weight:700;border-left:1px solid #262a33;color:'+(st.fulMin!=null?avgFulColorByMin(st.fulMin):'#9aa0aa')+'">'+(st.fulMin!=null?st.fulMin.toFixed(1):'—')+'</td>'+
-      '<td style="padding:6px;text-align:right;font-weight:700;color:#d9a441">'+(st.ipsh!=null?st.ipsh:(st.iph!=null?st.iph:'—'))+'</td>'+
+    html += '<td style="padding:6px;text-align:right;font-weight:700;border-left:1px solid #262a33;color:#d9a441">'+(st.ipsh!=null?st.ipsh:(st.iph!=null?st.iph:'—'))+'</td>'+
       '<td style="padding:6px;text-align:right;color:#e8eaed">'+(st.iph!=null?st.iph:'—')+'</td>';
   });
   html += '</tr></tbody></table></div>';
@@ -5450,6 +5524,130 @@ function exportPortfolioPdf() {
       }
       setTimeout(() => window.print(), 180);
     });
+  });
+}
+
+function buildPortfolioStationsFamilyPrintPage(family, weekKey, weekLabel) {
+  const venues = portfolioVenuesForFamily(family, weekKey);
+  if (!venues.length) return '';
+  let html = '<div class="ps-print-page">'+
+    '<h1>'+family+'</h1>'+
+    '<p class="ps-sub">RDG Portfolio · '+weekLabel+' · locations with items/staff for this family</p>'+
+    '<h2>Week summary — items / staff-hour</h2>'+
+    '<table><thead><tr><th>Location</th><th>Items/staff-hr</th><th>Items/person</th><th>Volume</th><th>Staff hours</th></tr></thead><tbody>';
+  venues.forEach(v => {
+    const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
+    const st = sc.familyStats[family] || {};
+    const ipsh = st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
+    html += '<tr><td>'+v.label+'</td>'+
+      '<td>'+(ipsh != null ? ipsh : '—')+'</td>'+
+      '<td>'+(st.iph != null ? st.iph : '—')+'</td>'+
+      '<td>'+(st.volume != null ? st.volume : '—')+'</td>'+
+      '<td>'+(st.hours != null ? (+st.hours).toFixed(1) : '—')+'</td></tr>';
+  });
+  html += '</tbody></table>';
+
+  html += '<h2>Mon → Sun by location</h2><table><thead><tr><th>Day</th>';
+  venues.forEach(v => { html += '<th colspan="2">'+v.label+'</th>'; });
+  html += '</tr><tr><th></th>';
+  venues.forEach(() => { html += '<th>Items/staff-hr</th><th>Items/person</th>'; });
+  html += '</tr></thead><tbody>';
+
+  HOURLY_DAYS.forEach(day => {
+    html += '<tr><td>'+day.slice(0,3)+'</td>';
+    venues.forEach(v => {
+      const m = getFamilyDayMetrics(v.key, weekKey, family, day) || {};
+      const cell = familyDayCell(v.key, weekKey, family, day);
+      const ipsh = cell && cell.itemsPerStaffHour != null ? cell.itemsPerStaffHour
+        : (m.items > 0 && cell && cell.hours > 0 ? +((m.items / cell.hours).toFixed(2)) : null);
+      const ipp = m.itemsPerHead != null ? m.itemsPerHead : (m.heads > 0 && m.items > 0 ? +(m.items / m.heads).toFixed(1) : null);
+      html += '<td>'+(ipsh != null ? ipsh : '—')+'</td><td>'+(ipp != null ? ipp : '—')+'</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function exportPortfolioStationsPdf() {
+  // RDG Portfolio + Stations tab
+  if (currentVenue !== 'rdg_portfolio') {
+    currentVenue = 'rdg_portfolio';
+    document.querySelectorAll('.venue-pill').forEach(b => {
+      b.classList.toggle('active', b.dataset.venue === 'rdg_portfolio');
+    });
+    const title = document.getElementById('dashTitle');
+    if (title) title.textContent = 'RDG Portfolio · BOH Dashboard';
+  }
+  const stationsBtn = document.querySelector('.tab-btn[onclick*="stations"]');
+  if (stationsBtn) switchTab('stations', stationsBtn);
+  else if (typeof switchTab === 'function') switchTab('stations');
+  renderAll();
+
+  const weekKey = WEEKS[currentWeekIdx]?.key;
+  const weekLabel = WEEKS[currentWeekIdx]?.label || weekKey || '';
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
+  const families = HOURLY_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
+  const printRoot = document.getElementById('portfolioStationsPrintRoot');
+  if (!printRoot) {
+    alert('Stations PDF root missing — rebuild dashboard.');
+    return;
+  }
+
+  renderPortfolioStations();
+
+  const finish = () => {
+    const canvas = document.getElementById('cPortfolioStations');
+    let chartImg = '';
+    try {
+      if (canvas && canvas.toDataURL) chartImg = canvas.toDataURL('image/png');
+    } catch (e) { chartImg = ''; }
+
+    let overview = '<div class="ps-print-page">'+
+      '<h1>RDG Stations Compare</h1>'+
+      '<p class="ps-sub">'+weekLabel+' · items / staff-hour by station family across all locations</p>';
+    if (chartImg) overview += '<img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart">';
+    overview += '<h2>Week matrix — items / staff-hour</h2><table><thead><tr><th>Station family</th>';
+    venueRows.forEach(v => { overview += '<th>'+(v.label || v.key)+'</th>'; });
+    overview += '</tr></thead><tbody>';
+    families.forEach(f => {
+      overview += '<tr><td>'+f+'</td>';
+      venueRows.forEach(v => {
+        const st = v.familyStats[f] || {};
+        const ipsh = st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
+        overview += '<td>'+(ipsh != null ? ipsh : '—')+'</td>';
+      });
+      overview += '</tr>';
+    });
+    overview += '</tbody></table></div>';
+
+    const familyPages = families.map(f => buildPortfolioStationsFamilyPrintPage(f, weekKey, weekLabel)).join('');
+    printRoot.innerHTML = overview + familyPages;
+
+    const cleanup = () => {
+      document.body.classList.remove('printing-stations-pdf');
+      printRoot.style.display = 'none';
+      printRoot.setAttribute('aria-hidden', 'true');
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.removeEventListener('afterprint', cleanup);
+    window.addEventListener('afterprint', cleanup);
+
+    document.body.classList.add('printing-stations-pdf');
+    printRoot.style.display = 'block';
+    printRoot.setAttribute('aria-hidden', 'false');
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(() => window.print(), 180);
+      });
+    });
+  };
+
+  // Chart needs a paint cycle before canvas snapshot
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => setTimeout(finish, 280));
   });
 }
 
