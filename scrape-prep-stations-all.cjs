@@ -74,14 +74,14 @@ const VENUE_CONFIGS = {
   },
 };
 
+const { isFoodStationName, cleanStationName } = require('./food-station.cjs');
+
 function clean(s) {
-  return String(s || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+  return cleanStationName(s);
 }
 
 function isFoodStation(name) {
-  const n = clean(name).toLowerCase();
-  if (!n) return false;
-  return !['bar', 'champagne', 'wine', 'btg', 'pos', 'barista', 'somm', 'water', 'service', 'beach', 'btl', 'drink expo', 'drinks'].some(p => n.includes(p));
+  return isFoodStationName(name);
 }
 
 function parsePrepStationMap(html) {

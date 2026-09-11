@@ -1009,10 +1009,13 @@ async function loadBohFromFirebase() {
 // ============================================================
 // FOOD STATION FILTER
 // ============================================================
-const FOOD_EXCL_PATTERNS = ['bar','champagne','wine','btg','pos','barista','somm','water','service','beach','btl inside','btl outside'];
+// Keep Sushi Bar / Raw Bar; drop FOH beverage bars (mirrors food-station.cjs)
 function isFoodStation(name) {
-  const n = name.toLowerCase();
-  return !FOOD_EXCL_PATTERNS.some(p => n.includes(p));
+  const n = String(name || '').toLowerCase().trim();
+  if (!n) return false;
+  if (/\\bsushi\\s*bar\\b/.test(n) || /\\braw\\s*bar\\b/.test(n)) return true;
+  if (/(^|[^a-z])bar([^a-z]|$)/i.test(n)) return false;
+  return !['champagne','wine','btg','pos','barista','somm','water','service','beach','btl','drink','no print','lounge'].some(p => n.includes(p));
 }
 /** Strip venue menu prefixes so C-Tomahawk / CL-Tomahawk / ACG-Tomahawk share one base. */
 const VENUE_ITEM_PREFIX_RE = /^(AVACGPFMS|AVACGPF|AVACG|ACG|CLPFL|CLIN|CLEV|CLEL|CLPF|CLR|CLK|CLE|CLL|CL|CNSM|CMS|CSM|CIN|CE|CN|C|AVAWP|AWP|AOB|AEV|AMO|AM0|A|MEV|MG|MP|MILA|MM|M)[-_\\s]+/i;
@@ -5540,10 +5543,7 @@ function showWeekWelcomePopup(weekKey) {
   const venueRows = Object.entries(VENUE_LABELS_WP).map(([key, label]) => {
     const d = ALL_DATA[key]?.[weekKey] || ALL_DATA[key]?.['latest'];
     if (!d) return null;
-    const stations = (d.stations || []).filter(s => {
-      const n = s.station.toLowerCase();
-      return !['bar','champagne','wine','btg','pos','barista','somm','water','service','beach','btl inside','btl outside'].some(p => n.includes(p));
-    });
+    const stations = (d.stations || []).filter(s => isFoodStation(s.station));
     if (!stations.length) return null;
     let totalCount = 0, totalSec = 0;
     stations.forEach(s => { totalCount += s.count; totalSec += s.avg_sec * s.count; });

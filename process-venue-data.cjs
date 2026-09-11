@@ -57,16 +57,10 @@ if (fs.existsSync(itemDetailsPath)) {
   console.log(`No item-details-${venueArg}.json found, skipping menu item volumes`);
 }
 
-// ---- Station filter ----
-const EXCLUDE_WORDS = [
-  'bar', 'champagne', 'wine', 'btg', 'pos', 'barista', 'somm', 'water', 'service', 'beach', 'drink',
-  'no print', 'noprint', 'all in', 'package', 'deposit', 'beo', 'gift card', 'gratuity',
-  'host', 'runner', 'server', 'captain', 'busser', 'bartender', 'sommelier',
-];
+// ---- Station filter (shared; keeps Sushi Bar, drops FOH bars) ----
+const { isFoodStationName } = require('./food-station.cjs');
 function isFood(name) {
-  if (!name) return false;
-  const low = name.toLowerCase();
-  return !EXCLUDE_WORDS.some(w => low.includes(w));
+  return isFoodStationName(name);
 }
 
 // ---- Parse fulfillment time ----

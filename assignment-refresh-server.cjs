@@ -78,14 +78,30 @@ async function refreshAssignment({ venue, week }) {
   console.log('\n=== Assignment refresh ===');
   console.log('venue=', venue, 'scrape=', scrapeKey, 'process=', processKey, 'week=', weekKey);
 
-  // 1) Scrape Toast Bulk Editor prep stations / menu items for this venue
-  await run('node', ['scrape-prep-stations-all.cjs', scrapeKey]);
+  // 1) Refresh prep stations
+  // MILA: Toast API menus (reliable). Others: Bulk Editor scrape (named stations).
+  if (scrapeKey === 'mila') {
+    await run('node', ['refresh-prep-from-api.cjs', 'mila']);
+  } else {
+    try {
+      await run('node', ['scrape-prep-stations-all.cjs', scrapeKey]);
+    } catch (e) {
+      console.warn('Bulk Editor scrape failed — continuing with last prep file if present:', e.message.slice(0, 200));
+    }
+  }
 
   // 2) Merge REF targets + Toast stations (preserves targets)
   await run('node', ['extract-item-stations.cjs']);
 
   // 3) Reprocess kitchen timing week (hour profile + station metrics)
   await run('node', ['process-venue-data.cjs', processKey, weekKey]);
+
+  // 3b) Rebuild staffing so FTE heads join the refreshed Toast stations
+  try {
+    await run('node', ['build-station-staffing.cjs', processKey, weekKey]);
+  } catch (e) {
+    console.warn('Staffing rebuild skipped:', e.message.slice(0, 200));
+  }
 
   // 4) Rebuild dashboard
   await run('node', ['build-unified-v2.cjs']);

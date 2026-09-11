@@ -30,11 +30,7 @@ const VENUE_MAP_KEY = {
 };
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const EXCLUDE_WORDS = [
-  'bar', 'champagne', 'wine', 'btg', 'pos', 'barista', 'somm', 'water', 'service', 'beach', 'drink',
-  'no print', 'noprint', 'all in', 'package', 'deposit', 'beo', 'gift card', 'gratuity',
-  'host', 'runner', 'server', 'captain', 'busser', 'bartender', 'sommelier',
-];
+const { isFoodStationName } = require('./food-station.cjs');
 const BEVERAGE_KEYWORDS = [
   'evian', 'pellegrino', 'perrier', 'water', 'coke', 'coca', 'diet', 'sprite', 'soda', 'juice',
   'lemonade', 'iced tea', 'ginger ale', 'still', 'sparkling', 'beer', 'wine', 'champagne',
@@ -43,9 +39,7 @@ const BEVERAGE_KEYWORDS = [
 ];
 
 function isFood(name) {
-  if (!name) return false;
-  const low = name.toLowerCase();
-  return !EXCLUDE_WORDS.some((w) => low.includes(w));
+  return isFoodStationName(name);
 }
 function isExcludedMenuItem(name) {
   if (!name) return true;

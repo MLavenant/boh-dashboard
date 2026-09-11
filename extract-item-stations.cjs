@@ -6,22 +6,16 @@
 const fs = require('fs');
 const path = require('path');
 const xlsx = require('xlsx');
+const { isFoodStationName, cleanStationName } = require('./food-station.cjs');
 
 const OUT = path.join(__dirname, 'item-station-map.json');
 
 function clean(s) {
-  return String(s || '')
-    .replace(/^\r\n/, '')
-    .replace(/\r\n/g, ' ')
-    .replace(/\u00a0/g, ' ')
-    .trim();
-}
-
-function isFoodStationName(name) {
-  const n = clean(name).toLowerCase();
-  if (!n) return false;
-  if (/^station\s*\d+$/i.test(n)) return false;
-  return !['bar', 'champagne', 'wine', 'btg', 'pos', 'barista', 'somm', 'water', 'service', 'beach', 'btl', 'drink'].some(p => n.includes(p));
+  return cleanStationName(
+    String(s || '')
+      .replace(/^\r\n/, '')
+      .replace(/\r\n/g, ' ')
+  );
 }
 
 function firstExisting(paths) {
