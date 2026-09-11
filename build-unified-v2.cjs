@@ -2267,6 +2267,25 @@ const HOURLY_BAND = [
 const HOURLY_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const HOURLY_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
 
+/** Prefer punch-overlap headsByHour; fall back to daily heads only when hourly map missing (legacy weeks). */
+function hourHeadsFromCell(dayCell, hk) {
+  if (!dayCell) return 0;
+  const map = dayCell.headsByHour;
+  if (map && typeof map === 'object' && Object.keys(map).length) {
+    const n = map[hk];
+    return n > 0 ? n : 0;
+  }
+  return dayCell.heads > 0 ? dayCell.heads : 0;
+}
+function hourStaffFromCell(dayCell, hk) {
+  if (!dayCell) return [];
+  if (dayCell.staffByHour && Array.isArray(dayCell.staffByHour[hk])) return dayCell.staffByHour[hk];
+  return Array.isArray(dayCell.staff) ? dayCell.staff : (Array.isArray(dayCell.names) ? dayCell.names : []);
+}
+function familyDayCell(venueKey, weekKey, family, day) {
+  return ALL_DATA[venueKey]?.[weekKey]?.staffing?.byFamily?.[family]?.days?.[day] || null;
+}
+
 function columnRelativeHeat(val, colMin, colMax) {
   if (val == null || val <= 0) return { bg: '#13161c', fg: '#4b5563' };
   if (colMax <= colMin) return { bg: '#d9a441', fg: '#0f1218' };
@@ -2707,6 +2726,7 @@ function renderHourlyThroughput() {
   window._hourlyDayEvents = {};
   window._hourlyDayStaff = {};
   window._hourlyBucketEvents = {};
+  window._hourlyBucketStaff = {};
 
   const thStyle = 'color:#9aa0aa;border-bottom:1px solid #262a33';
   const cellR = 'padding:8px 10px;text-align:right';
@@ -2812,9 +2832,57 @@ function renderHourlyThroughput() {
     const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
     return cell && cell.heads > 0;
   });
+  const hasHourlyStaff = HOURLY_DAYS.some(day => {
+    const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
+    return cell && cell.headsByHour && Object.keys(cell.headsByHour).length > 0;
+  });
   if (hasStaff) {
+    html += '<h3 style="margin:0 0 8px;font-size:14px;color:#d9a441">Staff (heads) · hour × day</h3>' +
+      '<p class="note" style="margin:0 0 10px">'+(hasHourlyStaff
+        ? 'People whose punch <strong>in→out</strong> overlaps that hour (true concurrent). Click a cell for who + clock times.'
+        : 'Legacy week — daily headcount only (rebuild staffing for punch-overlap hours).')+'</p>' +
+      '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
+      '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
+    HOURLY_DAYS.forEach(day => {
+      html += '<th style="text-align:center;padding:6px 10px;background:#1e2533;min-width:52px">'+day.slice(0,3)+'</th>';
+    });
+    html += '</tr></thead><tbody>';
+
+    const gridStaff = {};
+    const colStaffScale = {};
+    HOURLY_DAYS.forEach(day => {
+      gridStaff[day] = {};
+      const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
+      HOURLY_BAND.forEach(hk => {
+        const heads = hourHeadsFromCell(cell, hk);
+        const bucketKey = hourBucketKey(day, hk);
+        window._hourlyBucketStaff[bucketKey] = hourStaffFromCell(cell, hk);
+        gridStaff[day][hk] = heads > 0 ? heads : null;
+      });
+      const vals = HOURLY_BAND.map(hk => gridStaff[day][hk]).filter(v => v != null && v > 0);
+      colStaffScale[day] = { min: vals.length ? Math.min(...vals) : 0, max: vals.length ? Math.max(...vals) : 0 };
+    });
+
+    HOURLY_BAND.forEach(hk => {
+      html += '<tr style="border-top:1px solid #262a33"><td style="padding:5px 10px;color:#9aa0aa;white-space:nowrap;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">'+hourBandLabel(hk)+'</td>';
+      HOURLY_DAYS.forEach(day => {
+        const heads = gridStaff[day][hk];
+        const scale = colStaffScale[day];
+        const heat = heads != null ? columnRelativeHeat(heads, scale.min, scale.max) : { bg: '#13161c', fg: '#4b5563' };
+        const bucketKey = hourBucketKey(day, hk);
+        const inner = heads != null && heads > 0
+          ? '<button type="button" data-bucket="'+bucketKey+'" onclick="openHourlyStaffList(this.dataset.bucket)" style="background:none;border:none;color:inherit;cursor:pointer;font:inherit;font-weight:700;padding:0;width:100%;height:100%">'+heads+'</button>'
+          : '—';
+        html += '<td style="padding:5px 8px;text-align:center;font-weight:700;background:'+heat.bg+';color:'+heat.fg+'">'+inner+'</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+
     html += '<h3 style="margin:0 0 8px;font-size:14px;color:#d9a441">Items / staff · hour × day</h3>' +
-      '<p class="note" style="margin:0 0 10px">Items ÷ day headcount for each hour. Color = highest→lowest per day column.</p>' +
+      '<p class="note" style="margin:0 0 10px">'+(hasHourlyStaff
+        ? 'Items in that hour ÷ people clocked in during that hour.'
+        : 'Items ÷ day headcount for each hour (legacy).')+' Color = highest→lowest per day column.</p>' +
       '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
       '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
     HOURLY_DAYS.forEach(day => {
@@ -2827,9 +2895,9 @@ function renderHourlyThroughput() {
     HOURLY_DAYS.forEach(day => {
       gridIps[day] = {};
       const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
-      const heads = cell && cell.heads > 0 ? cell.heads : 0;
       HOURLY_BAND.forEach(hk => {
         const items = gridItems[day][hk];
+        const heads = hourHeadsFromCell(cell, hk);
         gridIps[day][hk] = heads > 0 && items > 0 ? +(items / heads).toFixed(1) : null;
       });
       const vals = HOURLY_BAND.map(hk => gridIps[day][hk]).filter(v => v != null && v > 0);
@@ -2861,29 +2929,47 @@ function renderHourlyThroughput() {
         ? 'Items = menu item qty (includes items with no target). Click a count for the sold list. '
         : 'Items = kitchen ticket fires (no item listing yet). ') +
       (famStaff
-        ? 'Staff = family headcount that day (same for all hours in that day) — click daily total to see who.'
+        ? (hasHourlyStaff
+          ? 'Hourly staff = people whose punch in→out overlaps that hour. Daily staff row = unique people that day.'
+          : 'Staff = family headcount that day (same for all hours) — rebuild staffing for punch-overlap hours.')
         : 'No staffing join for this venue/family — items shown without staff divisor.');
   }
 }
 
-function openHourlyStaffList(day) {
+function openHourlyStaffList(dayKey) {
   closeHourlyItemList();
-  const staff = (window._hourlyDayStaff && window._hourlyDayStaff[day]) || [];
+  let day = dayKey;
+  let hourKey = null;
+  if (String(dayKey || '').includes('|')) {
+    const parts = String(dayKey).split('|');
+    day = parts[0];
+    hourKey = parts[1] || null;
+  }
+  const staff = hourKey
+    ? ((window._hourlyBucketStaff && window._hourlyBucketStaff[dayKey]) || [])
+    : ((window._hourlyDayStaff && window._hourlyDayStaff[day]) || []);
   const family = getIpsFamily();
+  const title = hourKey ? (day + ' · ' + hourBandLabel(hourKey)) : day;
+  const subtitle = hourKey
+    ? (family + ' · clocked in during this hour · ' + staff.length + ' people')
+    : (family + ' family · ' + staff.length + ' people (full day)');
   let body = '';
   if (!staff.length) {
-    body = '<p class="note">No named staff on file for this day (headcount only, or no one matched).</p>';
+    body = '<p class="note">No named staff on file for this slot (headcount only, or no one matched).</p>';
   } else {
+    const hasPunch = staff.some(n => n.in || n.out);
     body = '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
       '<th style="text-align:left;padding:8px 6px">Staff</th>'+
-      '<th style="text-align:right;padding:8px 6px">Hours</th>'+
+      (hasPunch ? '<th style="text-align:left;padding:8px 6px">In</th><th style="text-align:left;padding:8px 6px">Out</th>' : '<th style="text-align:right;padding:8px 6px">Hours</th>')+
       '<th style="text-align:left;padding:8px 6px">Position</th>'+
       '</tr></thead><tbody>';
     staff.forEach(n => {
       const label = (n.label || n.name || '').replace(/</g,'&lt;');
       body += '<tr style="border-top:1px solid #262a33">' +
         '<td style="padding:6px;color:#e8eaed;font-weight:600">'+label+'</td>' +
-        '<td style="padding:6px;text-align:right;color:#9aa0aa">'+(n.hours != null ? n.hours : '—')+'</td>' +
+        (hasPunch
+          ? ('<td style="padding:6px;color:#9aa0aa">'+(n.in || '—')+'</td><td style="padding:6px;color:#9aa0aa">'+(n.out || '—')+'</td>')
+          : ('<td style="padding:6px;text-align:right;color:#9aa0aa">'+(n.hours != null ? n.hours : '—')+'</td>')) +
         '<td style="padding:6px;color:#9aa0aa">'+(n.position || '')+'</td>' +
         '</tr>';
     });
@@ -2895,8 +2981,8 @@ function openHourlyStaffList(day) {
   modal.onclick = (e) => { if (e.target === modal) closeHourlyItemList(); };
   modal.innerHTML = '<div style="background:#12151c;border:1px solid #2d3448;border-radius:12px;max-width:560px;width:100%;max-height:80vh;overflow:hidden;display:flex;flex-direction:column" onclick="event.stopPropagation()">'+
     '<div style="padding:16px 18px;border-bottom:1px solid #262a33;display:flex;justify-content:space-between;gap:12px;align-items:flex-start">'+
-      '<div><div style="font-size:16px;font-weight:700;color:#e8eaed">Staff on · '+day+'</div>'+
-      '<div style="font-size:12px;color:#9aa0aa;margin-top:4px">'+family+' family · '+staff.length+' people</div></div>'+
+      '<div><div style="font-size:16px;font-weight:700;color:#e8eaed">Staff on · '+title+'</div>'+
+      '<div style="font-size:12px;color:#9aa0aa;margin-top:4px">'+subtitle+'</div></div>'+
       '<button type="button" onclick="closeHourlyItemList()" style="background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;padding:6px 12px;cursor:pointer">Close</button>'+
     '</div><div style="padding:8px 14px 18px;overflow:auto">'+body+'</div></div>';
   document.body.appendChild(modal);
@@ -3366,11 +3452,22 @@ function renderIpsTable2Hourly(scope, family) {
   window._hourlyDayEvents = {};
   window._hourlyDayStaff = {};
   window._hourlyBucketEvents = {};
+  window._hourlyBucketStaff = {};
 
   const hasItemListings = venueHasItemListings(weekKeys, currentVenue);
+  const hasHourlyStaff = weekKeys.some(wk => {
+    const fam = ALL_DATA[currentVenue]?.[wk]?.staffing?.byFamily?.[family];
+    return HOURLY_DAYS.some(day => {
+      const cell = fam?.days?.[day];
+      return cell && cell.headsByHour && Object.keys(cell.headsByHour).length > 0;
+    });
+  });
   const aggNote = weekKeys.length > 1 ? ' · '+weekKeys.length+' weeks aggregated' : '';
   let html = '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">Table 2 — '+(labels[currentVenue]||currentVenue)+' · items, items/staff &amp; staff by hour</h3>' +
-    '<p class="note" style="margin:0 0 12px">'+scopeLabel+' · '+family+aggNote+' · daily totals then hour×day (10:00→02:00). Staff = daily headcount (same across hours). Click item counts for sold lists; click staff for roster.</p>';
+    '<p class="note" style="margin:0 0 12px">'+scopeLabel+' · '+family+aggNote+' · daily totals then hour×day (10:00→02:00). '+(hasHourlyStaff
+      ? 'Hourly staff = people whose punch <strong>in→out</strong> overlaps that hour. '
+      : 'Staff = daily headcount (same across hours) until staffing is rebuilt. ')+
+    'Click item counts for sold lists; click staff for roster / clock times.</p>';
 
   html += '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:18px;min-width:640px"><thead><tr style="'+thStyle+'">'+
     '<th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Metric</th>';
@@ -3425,10 +3522,33 @@ function renderIpsTable2Hourly(scope, family) {
             return sumFamilyHourItems(family, day, hk, d?.staffing, d?.stationDetails || {}, null, d?.stationHourItems || {});
           })()
         : sumFamilyHourItemsAgg(weekKeys, family, day, hk, currentVenue);
-      window._hourlyBucketEvents[hourBucketKey(day, hk)] = bucket.events || [];
+      const bucketKey = hourBucketKey(day, hk);
+      window._hourlyBucketEvents[bucketKey] = bucket.events || [];
+      let hourHeads = 0;
+      let hourStaff = [];
+      if (weekKeys.length === 1) {
+        const cell = familyDayCell(currentVenue, weekKeys[0], family, day);
+        hourHeads = hourHeadsFromCell(cell, hk);
+        hourStaff = hourStaffFromCell(cell, hk);
+      } else {
+        let sum = 0, n = 0;
+        const seen = new Map();
+        weekKeys.forEach(wk => {
+          const cell = familyDayCell(currentVenue, wk, family, day);
+          const h = hourHeadsFromCell(cell, hk);
+          if (h > 0) { sum += h; n++; }
+          hourStaffFromCell(cell, hk).forEach(s => {
+            const k = (s.label || '') + '|' + (s.in || '');
+            if (!seen.has(k)) seen.set(k, s);
+          });
+        });
+        hourHeads = n > 0 ? Math.round(sum / n) : 0;
+        hourStaff = [...seen.values()];
+      }
+      window._hourlyBucketStaff[bucketKey] = hourStaff;
       gridItems[day][hk] = bucket.items || 0;
-      gridStaff[day][hk] = heads > 0 ? heads : null;
-      gridIps[day][hk] = heads > 0 && gridItems[day][hk] > 0 ? +(gridItems[day][hk] / heads).toFixed(1) : null;
+      gridStaff[day][hk] = hourHeads > 0 ? hourHeads : null;
+      gridIps[day][hk] = hourHeads > 0 && gridItems[day][hk] > 0 ? +(gridItems[day][hk] / hourHeads).toFixed(1) : null;
     });
     const itemVals = HOURLY_BAND.map(hk => gridItems[day][hk]).filter(v => v > 0);
     colItemScale[day] = { min: itemVals.length ? Math.min(...itemVals) : 0, max: itemVals.length ? Math.max(...itemVals) : 0 };
@@ -3439,7 +3559,7 @@ function renderIpsTable2Hourly(scope, family) {
   });
   html += rowStaff.join('')+'</tr>'+rowIps.join('')+'</tr>'+rowItems.join('')+'</tr></tbody></table>';
 
-  function hourHeatTable(title, grid, scaleMap, fmt, allowClick) {
+  function hourHeatTable(title, grid, scaleMap, fmt, clickMode) {
     let t = '<h4 style="margin:16px 0 8px;font-size:14px;color:#e8eaed">'+title+'</h4>' +
       '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
       '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
@@ -3455,8 +3575,10 @@ function renderIpsTable2Hourly(scope, family) {
         const heat = val != null && val > 0 ? columnRelativeHeat(val, scale.min, scale.max) : { bg: '#13161c', fg: '#4b5563' };
         const bucketKey = hourBucketKey(day, hk);
         let inner = fmt(val);
-        if (allowClick && val > 0 && hasItemListings) {
+        if (clickMode === 'items' && val > 0 && hasItemListings) {
           inner = '<button type="button" data-bucket="'+bucketKey+'" onclick="openHourlyItemList(this.dataset.bucket)" style="background:none;border:none;color:inherit;cursor:pointer;font:inherit;font-weight:700;padding:0;width:100%;height:100%">'+inner+'</button>';
+        } else if (clickMode === 'staff' && val != null && val > 0) {
+          inner = '<button type="button" data-bucket="'+bucketKey+'" onclick="openHourlyStaffList(this.dataset.bucket)" style="background:none;border:none;color:inherit;cursor:pointer;font:inherit;font-weight:700;padding:0;width:100%;height:100%">'+inner+'</button>';
         }
         t += '<td style="padding:5px 8px;text-align:center;font-weight:700;background:'+heat.bg+';color:'+heat.fg+'">'+inner+'</td>';
       });
@@ -3466,9 +3588,9 @@ function renderIpsTable2Hourly(scope, family) {
     return t;
   }
 
-  html += hourHeatTable('Total items · hour × day', gridItems, colItemScale, v => (v > 0 ? String(v) : '—'), true);
-  html += hourHeatTable('Staff (heads) · hour × day', gridStaff, colStaffScale, v => (v != null && v > 0 ? String(v) : '—'), false);
-  html += hourHeatTable('Items / staff · hour × day', gridIps, colIpsScale, v => (v != null ? String(v) : '—'), false);
+  html += hourHeatTable('Total items · hour × day', gridItems, colItemScale, v => (v > 0 ? String(v) : '—'), 'items');
+  html += hourHeatTable('Staff (heads) · hour × day', gridStaff, colStaffScale, v => (v != null && v > 0 ? String(v) : '—'), 'staff');
+  html += hourHeatTable('Items / staff · hour × day', gridIps, colIpsScale, v => (v != null ? String(v) : '—'), null);
 
   el.innerHTML = html;
 }

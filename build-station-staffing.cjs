@@ -101,6 +101,105 @@ function shortStaffLabel(fullName) {
   return initial ? `${first} ${initial}.` : first;
 }
 
+/** Match Items Per Staff hour grid (10:00 → 02:00 overnight). */
+const STAFF_HOUR_BAND = [
+  '10-11', '11-12', '12-13', '13-14', '14-15', '15-16', '16-17', '17-18',
+  '18-19', '19-20', '20-21', '21-22', '22-23', '23-24', '0-1', '1-2',
+];
+const VENUE_TZ = 'America/New_York';
+
+function pad2(n) {
+  return String(n).padStart(2, '0');
+}
+
+function parseLaborInstant(s) {
+  if (!s) return null;
+  const str = String(s).trim();
+  if (!str) return null;
+  // Toast often uses +0000 without a colon
+  const normalized = str.replace(/([+-]\d{2})(\d{2})$/, '$1:$2');
+  const d = new Date(normalized);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function nyParts(date) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: VENUE_TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date);
+  const get = (t) => parts.find((p) => p.type === t)?.value;
+  let hour = parseInt(get('hour'), 10);
+  if (hour === 24) hour = 0;
+  return {
+    y: parseInt(get('year'), 10),
+    m: parseInt(get('month'), 10),
+    d: parseInt(get('day'), 10),
+    h: hour,
+    min: parseInt(get('minute'), 10),
+  };
+}
+
+function formatNyShort(date) {
+  const p = nyParts(date);
+  let h12 = p.h % 12;
+  if (h12 === 0) h12 = 12;
+  const ap = p.h >= 12 ? 'p' : 'a';
+  return `${h12}:${pad2(p.min)}${ap}`;
+}
+
+function addCalendarDays(y, m, d, delta) {
+  const dt = new Date(Date.UTC(y, m - 1, d + delta));
+  return { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate() };
+}
+
+/** America/New_York wall clock → UTC Date (handles EDT/EST via round-trip). */
+function nyWallToUtc(y, m, d, h, mi = 0) {
+  const isoDate = `${y}-${pad2(m)}-${pad2(d)}`;
+  for (const off of ['-04:00', '-05:00']) {
+    const dt = new Date(`${isoDate}T${pad2(h)}:${pad2(mi)}:00${off}`);
+    if (Number.isNaN(dt.getTime())) continue;
+    const back = nyParts(dt);
+    if (back.y === y && back.m === m && back.d === d && back.h === h) return dt;
+  }
+  return new Date(`${isoDate}T${pad2(h)}:${pad2(mi)}:00-04:00`);
+}
+
+/** Hour band bounds for a business date (overnight 0-1 / 1-2 = next calendar day). */
+function hourBandBounds(businessDate, hourKey) {
+  const [y0, m0, d0] = String(businessDate).split('-').map(Number);
+  if (hourKey === '23-24') {
+    const start = nyWallToUtc(y0, m0, d0, 23, 0);
+    const nd = addCalendarDays(y0, m0, d0, 1);
+    const end = nyWallToUtc(nd.y, nd.m, nd.d, 0, 0);
+    return { start, end };
+  }
+  const [a, b] = hourKey.split('-').map(Number);
+  let y = y0;
+  let m = m0;
+  let d = d0;
+  if (a < 4) {
+    ({ y, m, d } = addCalendarDays(y0, m0, d0, 1));
+  }
+  const start = nyWallToUtc(y, m, d, a, 0);
+  const end = nyWallToUtc(y, m, d, b, 0);
+  return { start, end };
+}
+
+function emptyHourMaps() {
+  const headsByHour = {};
+  const staffByHour = {};
+  for (const hk of STAFF_HOUR_BAND) {
+    headsByHour[hk] = 0;
+    staffByHour[hk] = [];
+  }
+  return { headsByHour, staffByHour };
+}
+
 /** Per-person rollup for public STAFF view (short labels, no full names). */
 function buildPublicPlayers(byFamily) {
   const players = new Map();
@@ -473,6 +572,7 @@ function buildVenue(venueRaw, weekLabel) {
         payrollName: e.payrollName,
         hours: 0,
         jobs: new Set(),
+        punches: [],
       });
     }
     const row = laborByEmpDay.get(k);
@@ -480,6 +580,12 @@ function buildVenue(venueRaw, weekLabel) {
     if (e.jobName) row.jobs.add(e.jobName);
     if (!row.employeeName && e.employeeName) row.employeeName = e.employeeName;
     if (!row.payrollName && e.payrollName) row.payrollName = e.payrollName;
+    row.punches.push({
+      inDate: e.inDate || null,
+      outDate: e.outDate || null,
+      hours: e.hours || 0,
+      jobName: e.jobName || '',
+    });
   }
 
   const matched = [];
@@ -529,6 +635,7 @@ function buildVenue(venueRaw, weekLabel) {
       position: best.position,
       hours: +shift.hours.toFixed(2),
       jobs,
+      punches: shift.punches || [],
       nameMatchScore: hit.score,
     });
   }
@@ -548,10 +655,13 @@ function buildVenue(venueRaw, weekLabel) {
       };
       for (const day of DAYS) {
         const vol = volumeByFamily[canon]?.[day] || {};
+        const hourMaps = emptyHourMaps();
         byFamily[canon].days[day] = {
           heads: 0,
           hours: 0,
           names: [],
+          headsByHour: hourMaps.headsByHour,
+          staffByHour: hourMaps.staffByHour,
           ticketCount: vol.ticketCount || 0,
           itemQty: vol.itemQty || 0,
           volume: vol.volume || 0,
@@ -593,6 +703,53 @@ function buildVenue(venueRaw, weekLabel) {
     });
     cell.heads = cell.names.length;
     cell.hours = +cell.names.reduce((s, n) => s + (n.hours || 0), 0).toFixed(2);
+  }
+
+  // Concurrent heads by hour: punch in/out overlap each hour band (venue local time)
+  for (const m of matched) {
+    const fam = ensureFamily(m.matrix);
+    if (!fam) continue;
+    const cell = fam.days[m.day];
+    if (!cell) continue;
+    const label = shortStaffLabel(m.employeeName || m.rosterName);
+    const personKey = m.rosterName || m.employeeName;
+    for (const punch of m.punches || []) {
+      const inD = parseLaborInstant(punch.inDate);
+      const outD = parseLaborInstant(punch.outDate);
+      if (!inD || !outD || !(outD > inD)) continue;
+      const inMs = inD.getTime();
+      const outMs = outD.getTime();
+      for (const hk of STAFF_HOUR_BAND) {
+        const { start, end } = hourBandBounds(m.date, hk);
+        if (!(inMs < end.getTime() && outMs > start.getTime())) continue;
+        if (!cell.staffByHour[hk]) cell.staffByHour[hk] = [];
+        if (cell.staffByHour[hk].some((s) => s._key === personKey)) continue;
+        cell.staffByHour[hk].push({
+          _key: personKey,
+          label,
+          position: m.position || '',
+          in: formatNyShort(inD),
+          out: formatNyShort(outD),
+        });
+      }
+    }
+  }
+  for (const fam of Object.values(byFamily)) {
+    for (const day of DAYS) {
+      const cell = fam.days[day];
+      if (!cell.headsByHour) cell.headsByHour = {};
+      if (!cell.staffByHour) cell.staffByHour = {};
+      for (const hk of STAFF_HOUR_BAND) {
+        const list = cell.staffByHour[hk] || [];
+        cell.headsByHour[hk] = list.length;
+        cell.staffByHour[hk] = list.map(({ label, position, in: inn, out }) => ({
+          label,
+          position,
+          in: inn,
+          out,
+        }));
+      }
+    }
   }
 
   for (const fam of Object.values(byFamily)) {
@@ -768,6 +925,8 @@ function buildVenue(venueRaw, weekLabel) {
         heads: cell.heads,
         hours: cell.hours,
         staff,
+        headsByHour: cell.headsByHour || {},
+        staffByHour: cell.staffByHour || {},
         ticketCount: cell.ticketCount,
         itemQty: cell.itemQty,
         volume: cell.volume,
