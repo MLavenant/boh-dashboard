@@ -22,6 +22,9 @@ const BRAND_TO_VENUE = {
   AVA: 'ava_coconut_grove',
   CLAUDIE: 'claudie',
   Claudie: 'claudie',
+  'CASA NEOS': 'casa_neos',
+  'Casa Neos': 'casa_neos',
+  'Casa Neos Beach Club': 'casa_neos',
 };
 
 function parseCsv(filePath) {
