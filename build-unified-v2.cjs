@@ -2,15 +2,17 @@
 const fs = require('fs');
 const path = require('path');
 
-// Brand mark for Stations PDF title pages (white / navy dividers)
-let RDG_LOGO_DATA_URL = '';
+// Brand mark for Stations PDF (processed from official RDG logo — transparent PNG)
+let RDG_LOGO_LIGHT_DATA_URL = '';
+let RDG_LOGO_DARK_DATA_URL = '';
 try {
-  const logoPath = path.join(__dirname, 'assets', 'rdg-logo.png');
-  if (fs.existsSync(logoPath)) {
-    const buf = fs.readFileSync(logoPath);
-    const isJpeg = buf[0] === 0xff && buf[1] === 0xd8;
-    const mime = isJpeg ? 'image/jpeg' : 'image/png';
-    RDG_LOGO_DATA_URL = 'data:' + mime + ';base64,' + buf.toString('base64');
+  const lightPath = path.join(__dirname, 'assets', 'rdg-logo-light.png');
+  const darkPath = path.join(__dirname, 'assets', 'rdg-logo-dark.png');
+  if (fs.existsSync(lightPath)) {
+    RDG_LOGO_LIGHT_DATA_URL = 'data:image/png;base64,' + fs.readFileSync(lightPath).toString('base64');
+  }
+  if (fs.existsSync(darkPath)) {
+    RDG_LOGO_DARK_DATA_URL = 'data:image/png;base64,' + fs.readFileSync(darkPath).toString('base64');
   }
 } catch (_) { /* optional */ }
 
@@ -250,8 +252,7 @@ html = html.replace(
       <p class="note" style="margin:0">All locations · selected week. Bars = <strong>items / staff-hour</strong> (numbers on bars). Tables below = every station family Mon→Sun.</p>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-      <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf('v1')" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Stations PDF V1</button>
-      <button type="button" id="portfolioStationsPdfBtnV2" onclick="exportPortfolioStationsPdf('v2')" style="padding:8px 14px;border-radius:8px;border:1px solid #6b7280;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Stations PDF V2</button>
+      <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Export Stations PDF</button>
     </div>
   </div>
   <div style="position:relative;height:440px;margin:12px 0 8px">
@@ -260,7 +261,7 @@ html = html.replace(
   <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:4px 0 16px;font-size:11px;color:#9aa0aa">
     <span><strong style="color:#e8eaed">Bars</strong> = items / staff-hour</span>
     <span>Alternating bands = station families</span>
-    <span>V1 = one hour×day table per location · V2 = one table, all locations side by side</span>
+    <span>PDF = portfolio (3/page) then station title + one hour×day table (days across, locations under each day)</span>
   </div>
   <p class="note" style="margin:0 0 12px">One table per station family · locations side by side. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> (green→red heat) · <strong>Items/person</strong>.</p>
   <div id="portfolioStationsDayTable"></div>
@@ -779,8 +780,14 @@ body.printing-stations-pdf .ps-print-page.ps-intro .ps-sub {
 }
 body.printing-stations-pdf .ps-print-page.ps-intro .ps-rdg-logo {
   position:static;
-  width:110px;
+  width:120px;
   flex:0 0 auto;
+}
+body.printing-stations-pdf .ps-print-page.ps-intro .ps-rdg-logo img {
+  width:110px;
+  height:auto;
+  display:block;
+  margin:0 auto;
 }
 body.printing-stations-pdf .ps-print-page.ps-intro .ps-rdg-logo svg {
   width:64px;
@@ -880,11 +887,17 @@ body.printing-stations-pdf .ps-print-page.ps-divider {
 }
 body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo {
   position:absolute;
-  top:24px;
-  right:36px;
-  width:120px;
+  top:20px;
+  right:32px;
+  width:130px;
   text-align:center;
   color:#0a1628;
+}
+body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo img {
+  width:120px;
+  height:auto;
+  display:block;
+  margin:0 auto;
 }
 body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo svg {
   width:70px;
@@ -990,8 +1003,7 @@ body.printing-stations-pdf .ps-print-page.ps-hourly th:first-child,
 body.printing-stations-pdf .ps-print-page.ps-hourly td:first-child {
   text-align:left;
 }
-body.printing-stations-pdf #portfolioStationsPdfBtn,
-body.printing-stations-pdf #portfolioStationsPdfBtnV2 {
+body.printing-stations-pdf #portfolioStationsPdfBtn {
   display:none !important;
 }
 .ps-ipsh-heat {
@@ -1111,7 +1123,8 @@ const newScript = `
 ${allDataJS}
 
 const WEEKS = ${JSON.stringify(rollingWeeks)};
-const RDG_LOGO_DATA_URL = ${JSON.stringify(RDG_LOGO_DATA_URL)};
+const RDG_LOGO_LIGHT_DATA_URL = ${JSON.stringify(RDG_LOGO_LIGHT_DATA_URL)};
+const RDG_LOGO_DARK_DATA_URL = ${JSON.stringify(RDG_LOGO_DARK_DATA_URL)};
 const KNOWN_WEEKS = ${JSON.stringify(KNOWN_WEEKS)};
 const FB_BOH_DB = 'https://rdg-dj-dashboard-default-rtdb.firebaseio.com';
 let BOH_CLOUD_STATUS = null; // /rdg/scrapeStatus/bohWeekly
@@ -5928,17 +5941,20 @@ function chunkArray(arr, size) {
 }
 
 function rdgLogoHtml(tone) {
-  // High-contrast SVG — never use the dark-on-black JPEG (reads as a blank box).
+  // Official RDG mark (processed PNGs). light = white on dark pages; dark = navy on white dividers.
+  const src = (tone === 'light')
+    ? (RDG_LOGO_LIGHT_DATA_URL || RDG_LOGO_DARK_DATA_URL)
+    : (RDG_LOGO_DARK_DATA_URL || RDG_LOGO_LIGHT_DATA_URL);
+  if (src) {
+    return '<div class="ps-rdg-logo" aria-hidden="true"><img src="'+src+'" alt="RDG riviera dining group"></div>';
+  }
   const stroke = tone === 'light' ? '#ffffff' : '#0a1628';
   const sub = tone === 'light' ? '#d1d5db' : '#374151';
   return '<div class="ps-rdg-logo" aria-hidden="true">'+
     '<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">'+
       '<circle cx="40" cy="40" r="36" fill="none" stroke="'+stroke+'" stroke-width="2.2"/>'+
-      '<path d="M16 26c7 4 13-4 20 0s14-4 28 0" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round"/>'+
-      '<path d="M16 32c7 4 13-4 20 0s14-4 28 0" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round"/>'+
-      '<path d="M16 38c7 4 13-4 20 0s14-4 28 0" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round"/>'+
-      '<path d="M18 58 L28 44 L33 52 L40 40 L47 52 L52 44 L62 58" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+
-      '<path d="M24 58 L31 48 L36 54 L40 48 L44 54 L49 48 L56 58" fill="none" stroke="'+stroke+'" stroke-width="1.4" stroke-linejoin="round" opacity="0.85"/>'+
+      '<path d="M16 26c7 4 13-4 20 0s14-4 28 0M16 32c7 4 13-4 20 0s14-4 28 0M16 38c7 4 13-4 20 0s14-4 28 0" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round"/>'+
+      '<path d="M18 58 L28 44 L33 52 L40 40 L47 52 L52 44 L62 58" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linejoin="round"/>'+
     '</svg>'+
     '<div class="ps-rdg-letters" style="color:'+stroke+'">RDG</div>'+
     '<div class="ps-rdg-sub" style="color:'+sub+'">riviera dining group</div>'+
@@ -6151,8 +6167,7 @@ function ensurePortfolioStationsContext() {
   renderAll();
 }
 
-function exportPortfolioStationsPdf(version) {
-  const ver = (version === 'v2') ? 'v2' : 'v1';
+function exportPortfolioStationsPdf() {
   ensurePortfolioStationsContext();
 
   const weekKey = WEEKS[currentWeekIdx]?.key;
@@ -6175,35 +6190,20 @@ function exportPortfolioStationsPdf(version) {
       if (canvas && canvas.toDataURL) chartImg = canvas.toDataURL('image/png');
     } catch (e) { chartImg = ''; }
 
-    const versionTag = ver === 'v2'
-      ? 'V2 | overview + 3 stations/page + one all-locations hour x day table per station'
-      : 'V1 | overview + 3 stations/page + one hour x day table per location';
-
+    const versionTag = 'overview + 3 stations/page + one all-locations hour x day table per station';
     const intro = buildStationsPdfIntroHtml(weekLabel, chartImg, families, venueRows, versionTag);
     const portfolioPages = buildStationsPdfPortfolioPagesHtml(families, weekKey, weekLabel);
 
     const detailPages = families.map(f => {
       const venues = portfolioVenuesForFamily(f, weekKey);
       if (!venues.length) return '';
-      if (ver === 'v2') {
-        const combined = buildFamilyAllLocationsIpshCompareHtml(f, weekKey, venues);
-        if (!combined) return '';
-        return buildStationDividerPageHtml(f)+
-          '<div class="ps-print-page ps-hourly">'+
-            '<h1>'+String(f).toUpperCase()+'</h1>'+
-            combined+
-          '</div>';
-      }
-      const heatPages = venues.map(v => {
-        const heat = buildVenueFamilyIpshHourHeatHtml(v.key, f, weekKey);
-        if (!heat) return '';
-        return '<div class="ps-print-page ps-hourly">'+
+      const combined = buildFamilyAllLocationsIpshCompareHtml(f, weekKey, venues);
+      if (!combined) return '';
+      return buildStationDividerPageHtml(f)+
+        '<div class="ps-print-page ps-hourly">'+
           '<h1>'+String(f).toUpperCase()+'</h1>'+
-          heat+
-          '</div>';
-      }).join('');
-      if (!heatPages) return '';
-      return buildStationDividerPageHtml(f) + heatPages;
+          combined+
+        '</div>';
     }).join('');
 
     runStationsPdfPrint(printRoot, intro + portfolioPages + detailPages);

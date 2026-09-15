@@ -1,32 +1,28 @@
 ---
-description: RDG Stations PDF export versions (V1 vs V2) — keep both behaviors
+description: RDG Stations PDF export structure and branding
 alwaysApply: true
 ---
 
-# Stations PDF — V1 vs V2
+# Stations PDF (current = former V2)
 
-Single export entry points on Portfolio → Stations. Do not collapse these into one ambiguous PDF without labeling.
+Single button: **Export Stations PDF** on Portfolio → Stations (`exportPortfolioStationsPdf` in `build-unified-v2.cjs`).
 
-## V1 (current baseline — preserve)
+## Structure
 
-Built in `build-unified-v2.cjs` → `exportPortfolioStationsPdf('v1')`.
+1. **Front / overview** — official RDG logo (light PNG on dark), chart, week matrix; full landscape page.
+2. **Portfolio compare** — up to **3 station families per page**, locations side by side (Ful · Items/staff-hr · Items/person).
+3. **Per station** — white **title divider** (dark RDG logo top-right, navy pill with station name, navy footer).
+4. **One compare table per station**:
+   - **Rows (Y)** = hours once
+   - **Columns (X)** = days (Mon…Sun), each with **location sub-columns** (CL / CN / ACG / AWP / MILA)
 
-1. **Front / overview** — RDG logo (high-contrast), chart, week matrix; use full landscape page (not cramped top strip).
-2. **Portfolio compare** — up to **3 station families per page**, locations side by side (Ful · Items/staff-hr · Items/person). Clear station titles; spacing between blocks.
-3. **Per station** — white **title divider** (RDG logo top-right, navy rounded pill with station name e.g. SAUTE, navy footer bar).
-4. **Then one hour×day heatmap per location** that has the station (Casa Neos → Claudie → …): Items / staff-hour · Hour × Mon–Sun (Table 2 style).
+## Logo assets
 
-## V2 (compare locations in one table)
+- Source: official RDG mark (waves + mountains, RDG, riviera dining group).
+- Processed: `assets/rdg-logo-light.png` (white on transparent) and `assets/rdg-logo-dark.png` (navy on transparent).
+- Never embed the raw dark-on-black JPEG alone — it reads as a blank black box.
+- Rebuild embeds base64 via `RDG_LOGO_LIGHT_DATA_URL` / `RDG_LOGO_DARK_DATA_URL`.
 
-`exportPortfolioStationsPdf('v2')`.
+## History
 
-1. Same overview + portfolio 3-per-page + station title dividers as V1.
-2. Instead of one heatmap per location: **one table per station** where:
-   - **Rows (Y)** = hours once (10:00–11:00 …)
-   - **Columns (X)** = days (Mon…Sun), each with **location sub-columns underneath** (CL / CN / ACG / AWP / MILA)
-   - So you compare all locations for the same hour and day without repeating the hour list.
-
-## Branding
-
-- Use a **visible** RDG mark (waves + mountains in circle, “RDG”, “riviera dining group”). Never embed the low-contrast dark-on-black JPEG without inversion/recolor — it reads as a blank black box.
-- Logo on dark pages: light/white. Logo on white divider pages: navy/dark.
+- Former **V1** (one hour×day table per location) was removed; do not bring it back unless the user asks.
