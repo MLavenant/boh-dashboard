@@ -180,6 +180,10 @@ const template = fs
   .readFileSync(path.join(DIR, 'dashboard-claudie.html'), 'utf8')
   .replace(/\r\n/g, '\n');
 const buildStamp = new Date().toISOString();
+const buildStampUs = new Date().toLocaleString('en-US', {
+  month: 'numeric', day: 'numeric', year: 'numeric',
+  hour: 'numeric', minute: '2-digit', hour12: true,
+});
 const latestWeekKey = rollingWeeks.length ? rollingWeeks[rollingWeeks.length - 1].key : 'unknown';
 
 // ── Split at <script> ─────────────────────────────────────────────────────────
@@ -197,7 +201,7 @@ let html = htmlPart
     '<header>\n  <h1>Claudie · BOH Dashboard</h1>\n  <span class="badge">Week of Jun 29 – Jul 5, 2026 · Updated Jul 6, 2026</span>\n</header>',
     `<header>
   <h1 id="dashTitle">BOH Dashboard</h1>
-  <span class="badge" id="dashBadge">Latest ${latestWeekKey} · Built ${buildStamp.slice(0, 16).replace('T', ' ')} UTC</span>
+  <span class="badge" id="dashBadge">Latest ${latestWeekKey} · Built ${buildStampUs}</span>
 </header>
 <div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
 <div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
@@ -1404,7 +1408,10 @@ async function loadBohFromFirebase() {
     if (badge) {
       const latestKey = WEEKS[best]?.key || weekKey;
       const cloudBit = meta.updatedAt
-        ? (' · Cloud ' + new Date(meta.updatedAt).toISOString().slice(0, 16).replace('T', ' ') + ' UTC')
+        ? (' · Cloud ' + new Date(meta.updatedAt).toLocaleString('en-US', {
+            month: 'numeric', day: 'numeric', year: 'numeric',
+            hour: 'numeric', minute: '2-digit', hour12: true,
+          }))
         : '';
       // Prefer newest week present in the app (embedded + cloud), not only Firebase meta.latestWeek
       badge.textContent = 'Latest ' + latestKey + cloudBit;
@@ -2684,15 +2691,27 @@ const HOURLY_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pa
 // Portfolio Stations (exec): production families only — Expo is pass-through / not comparable staffing.
 const PORTFOLIO_STATION_FAMILIES = HOURLY_FAMILIES.filter(f => f !== 'Expo');
 
-/** Prefer punch-overlap headsByHour; fall back to daily heads only when hourly map missing (legacy weeks). */
-function hourHeadsFromCell(dayCell, hk) {
-  if (!dayCell) return 0;
+/** Prefer punch-overlap headsByHour; fall back to daily heads only when hourly map missing (legacy weeks).
+ *  Exec rule: if this hour/day has sold items but no written staff, count 1 person (not 0). */
+function hourHeadsFromCell(dayCell, hk, itemCount) {
+  if (!dayCell) return (itemCount > 0) ? 1 : 0;
   const map = dayCell.headsByHour;
+  let n = 0;
   if (map && typeof map === 'object' && Object.keys(map).length) {
-    const n = map[hk];
-    return n > 0 ? n : 0;
+    n = map[hk] > 0 ? map[hk] : 0;
+  } else {
+    n = dayCell.heads > 0 ? dayCell.heads : 0;
   }
-  return dayCell.heads > 0 ? dayCell.heads : 0;
+  if (!(n > 0) && itemCount > 0) return 1;
+  return n > 0 ? n : 0;
+}
+function effectiveHeads(heads, items) {
+  if (heads > 0) return heads;
+  return items > 0 ? 1 : 0;
+}
+function effectiveHours(hours, items) {
+  if (hours > 0) return hours;
+  return items > 0 ? 1 : 0;
 }
 function hourStaffFromCell(dayCell, hk) {
   if (!dayCell) return [];
@@ -3183,16 +3202,18 @@ function renderHourlyThroughput() {
   HOURLY_DAYS.forEach(day => {
     const hit = dayItemTotals(family, day, staffing, stationDetails, stationHourItems);
     const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
-    const heads = cell && cell.heads > 0 ? cell.heads : 0;
+    const heads = effectiveHeads(cell && cell.heads > 0 ? cell.heads : 0, hit.items);
     const staffList = (cell && Array.isArray(cell.staff) ? cell.staff : (cell && Array.isArray(cell.names) ? cell.names : [])) || [];
     window._hourlyDayEvents[day] = hit.events || [];
     window._hourlyDayStaff[day] = staffList;
     totalItems += hit.items;
     if (heads > 0) staffSamples.push(heads);
-    const ips = heads > 0 ? +(hit.items / heads).toFixed(1) : null;
+    const ips = heads > 0 && hit.items > 0 ? +(hit.items / heads).toFixed(1) : null;
     const dayCell = famStaff && famStaff.days ? famStaff.days[day] : null;
-    const ipsh = dayCell && dayCell.itemsPerStaffHour != null ? dayCell.itemsPerStaffHour
-      : (dayCell && dayCell.hours > 0 && hit.items > 0 ? +(hit.items / dayCell.hours).toFixed(2) : null);
+    const hoursEff = effectiveHours(dayCell && dayCell.hours > 0 ? dayCell.hours : 0, hit.items);
+    const ipsh = dayCell && dayCell.itemsPerStaffHour != null && Number(dayCell.itemsPerStaffHour) > 0
+      ? dayCell.itemsPerStaffHour
+      : (hoursEff > 0 && hit.items > 0 ? +(hit.items / hoursEff).toFixed(2) : null);
     const itemsCell = (hit.items && hasItemListings)
       ? '<button type="button" data-day="'+day+'" onclick="openHourlyItemList(this.dataset.day)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+hit.items+'</button>'
       : (hit.items || '—');
@@ -3268,7 +3289,9 @@ function renderHourlyThroughput() {
 
   const hasStaff = HOURLY_DAYS.some(day => {
     const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
-    return cell && cell.heads > 0;
+    if (cell && cell.heads > 0) return true;
+    // Items with no written staff still show as 1 imputed head in the staff grid
+    return HOURLY_BAND.some(hk => (gridItems[day] && gridItems[day][hk] > 0));
   });
   const hasHourlyStaff = HOURLY_DAYS.some(day => {
     const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
@@ -3292,7 +3315,7 @@ function renderHourlyThroughput() {
       gridStaff[day] = {};
       const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
       HOURLY_BAND.forEach(hk => {
-        const heads = hourHeadsFromCell(cell, hk);
+        const heads = hourHeadsFromCell(cell, hk, gridItems[day] && gridItems[day][hk]);
         const bucketKey = hourBucketKey(day, hk);
         window._hourlyBucketStaff[bucketKey] = hourStaffFromCell(cell, hk);
         gridStaff[day][hk] = heads > 0 ? heads : null;
@@ -3335,7 +3358,7 @@ function renderHourlyThroughput() {
       const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
       HOURLY_BAND.forEach(hk => {
         const items = gridItems[day][hk];
-        const heads = hourHeadsFromCell(cell, hk);
+        const heads = hourHeadsFromCell(cell, hk, items);
         gridIps[day][hk] = heads > 0 && items > 0 ? +(items / heads).toFixed(1) : null;
       });
       const vals = HOURLY_BAND.map(hk => gridIps[day][hk]).filter(v => v != null && v > 0);
@@ -3711,6 +3734,8 @@ function getFamilyDayMetrics(venueKey, weekKey, family, day) {
     const hit = dayItemTotals(family, day, staffing, stationDetails, stationHourItems);
     items = hit.items || 0;
   }
+  // Items sold with no written staff → count as 1 person
+  if (!(heads > 0) && items > 0) heads = 1;
   if (itemsPerHead == null && heads > 0 && items > 0) {
     itemsPerHead = +(items / heads).toFixed(1);
   }
@@ -3967,29 +3992,30 @@ function renderIpsTable2Hourly(scope, family) {
       window._hourlyBucketEvents[bucketKey] = bucket.events || [];
       let hourHeads = 0;
       let hourStaff = [];
+      const itemN = bucket.items || 0;
       if (weekKeys.length === 1) {
         const cell = familyDayCell(currentVenue, weekKeys[0], family, day);
-        hourHeads = hourHeadsFromCell(cell, hk);
+        hourHeads = hourHeadsFromCell(cell, hk, itemN);
         hourStaff = hourStaffFromCell(cell, hk);
       } else {
         let sum = 0, n = 0;
         const seen = new Map();
         weekKeys.forEach(wk => {
           const cell = familyDayCell(currentVenue, wk, family, day);
-          const h = hourHeadsFromCell(cell, hk);
+          const h = hourHeadsFromCell(cell, hk, itemN);
           if (h > 0) { sum += h; n++; }
           hourStaffFromCell(cell, hk).forEach(s => {
             const k = (s.label || '') + '|' + (s.in || '');
             if (!seen.has(k)) seen.set(k, s);
           });
         });
-        hourHeads = n > 0 ? Math.round(sum / n) : 0;
+        hourHeads = n > 0 ? Math.round(sum / n) : (itemN > 0 ? 1 : 0);
         hourStaff = [...seen.values()];
       }
       window._hourlyBucketStaff[bucketKey] = hourStaff;
-      gridItems[day][hk] = bucket.items || 0;
+      gridItems[day][hk] = itemN;
       gridStaff[day][hk] = hourHeads > 0 ? hourHeads : null;
-      gridIps[day][hk] = hourHeads > 0 && gridItems[day][hk] > 0 ? +(gridItems[day][hk] / hourHeads).toFixed(1) : null;
+      gridIps[day][hk] = hourHeads > 0 && itemN > 0 ? +(itemN / hourHeads).toFixed(1) : null;
     });
     const itemVals = HOURLY_BAND.map(hk => gridItems[day][hk]).filter(v => v > 0);
     colItemScale[day] = { min: itemVals.length ? Math.min(...itemVals) : 0, max: itemVals.length ? Math.max(...itemVals) : 0 };
@@ -4355,12 +4381,11 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
       const cell = familyDayCell(v.key, weekKey, family, day);
       const ful = cell && cell.avgFulSec != null ? +(cell.avgFulSec / 60).toFixed(1) : null;
       let ipsh = null;
+      const hoursEff = effectiveHours(cell && cell.hours > 0 ? cell.hours : 0, m.items || 0);
       if (cell && cell.itemsPerStaffHour != null && Number(cell.itemsPerStaffHour) > 0) {
         ipsh = Number(cell.itemsPerStaffHour);
-      } else if (m.items > 0 && cell && cell.hours > 0) {
-        ipsh = +((m.items / cell.hours).toFixed(2));
-      } else if (m.items > 0 && m.heads > 0 && cell && cell.hours == null) {
-        ipsh = null;
+      } else if (m.items > 0 && hoursEff > 0) {
+        ipsh = +((m.items / hoursEff).toFixed(2));
       }
       const ipp = m.itemsPerHead != null ? m.itemsPerHead : (m.heads > 0 && m.items > 0 ? +(m.items / m.heads).toFixed(1) : null);
       if (ipsh != null && ipsh > 0) ipshVals.push(ipsh);
@@ -5589,14 +5614,30 @@ function buildVenueWeekScorecard(key, label, weekKey) {
   if (staffing && staffing.byFamily) {
     Object.keys(staffing.byFamily).forEach(f => {
       const fam = staffing.byFamily[f];
-      const headDays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-        .reduce((s, d) => s + ((fam.days && fam.days[d] && fam.days[d].heads) || 0), 0);
+      let headDays = 0;
+      let hoursEff = 0;
+      ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day => {
+        const c = fam.days && fam.days[day];
+        if (!c) return;
+        const vol = c.volume || 0;
+        const h = c.heads > 0 ? c.heads : (vol > 0 ? 1 : 0);
+        const hrs = c.hours > 0 ? c.hours : (vol > 0 ? 1 : 0);
+        headDays += h;
+        hoursEff += hrs;
+      });
+      const volume = fam.weekItemCount || 0;
+      const iph = headDays > 0 && volume > 0
+        ? +(volume / headDays).toFixed(1)
+        : (fam.weekItemsPerHeadDay != null ? fam.weekItemsPerHeadDay : null);
+      const ipsh = hoursEff > 0 && volume > 0
+        ? +(volume / hoursEff).toFixed(2)
+        : (fam.weekItemsPerStaffHour != null ? fam.weekItemsPerStaffHour : null);
       familyStats[f] = {
-        iph: fam.weekItemsPerHeadDay,
-        ipsh: fam.weekItemsPerStaffHour != null ? fam.weekItemsPerStaffHour : null,
+        iph,
+        ipsh,
         fulMin: fam.weekAvgFulSec != null ? +(fam.weekAvgFulSec / 60).toFixed(1) : null,
-        volume: fam.weekItemCount,
-        hours: fam.weekHours,
+        volume,
+        hours: hoursEff || fam.weekHours,
       };
       if (fam.weekItemCount) bohVolume += fam.weekItemCount;
       bohHeadDays += headDays;
@@ -6004,8 +6045,8 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues) {
         if (!d) { grid[day][hk][v.key] = null; return; }
         const bucket = sumFamilyHourItems(family, day, hk, d.staffing, d.stationDetails || {}, null, d.stationHourItems || {});
         const cell = familyDayCell(v.key, weekKey, family, day);
-        const hourHeads = hourHeadsFromCell(cell, hk);
         const items = bucket.items || 0;
+        const hourHeads = hourHeadsFromCell(cell, hk, items);
         const ipsh = hourHeads > 0 && items > 0 ? +(items / hourHeads).toFixed(1) : null;
         grid[day][hk][v.key] = ipsh;
         if (ipsh != null) { any = true; allVals.push(ipsh); }
@@ -6343,7 +6384,34 @@ function renderSettings() {
   const cloud = BOH_CLOUD_STATUS || {};
   const fmtWhen = (iso) => {
     if (!iso) return '—';
-    try { return new Date(iso).toLocaleString(); } catch(e) { return iso; }
+    try {
+      return new Date(iso).toLocaleString('en-US', {
+        month: 'numeric', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: '2-digit', hour12: true,
+      });
+    } catch (e) { return iso; }
+  };
+  const fmtUsClock = (raw) => {
+    if (raw == null || raw === '') return '—';
+    const s = String(raw).trim();
+    // Already US-ish: "10:30:00 AM" / "9/21/2026 10:30:00 AM" → drop seconds
+    const withMeridiem = s.replace(/\b(\d{1,2}:\d{2}):\d{2}(\s*[AaPp][Mm])\b/g, '$1$2');
+    if (/\b[AaPp][Mm]\b/.test(withMeridiem)) return withMeridiem.replace(/\s+/g, ' ').trim();
+    // 24h "14:30" / "09:00" → 12h
+    const m = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+    if (m) {
+      let h = parseInt(m[1], 10);
+      const min = m[2];
+      const ap = h >= 12 ? 'PM' : 'AM';
+      h = h % 12;
+      if (h === 0) h = 12;
+      return h + ':' + min + ' ' + ap;
+    }
+    try {
+      const d = new Date(s);
+      if (!isNaN(d.getTime())) return fmtWhen(d.toISOString());
+    } catch (_) {}
+    return withMeridiem;
   };
   const badge = (st) => {
     if (st === 'pass') return '<span style="color:#22c55e">✅ PASS</span>';
@@ -6360,13 +6428,13 @@ function renderSettings() {
   html += '<div class="card" style="border-color:' + cloudColor + '40">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">';
   html += '<div><h2 style="margin:0">Cloud Automation (Firebase)</h2>';
-  html += '<p class="note" style="margin:6px 0 0">Primary: laptop Monday <strong>10:30 AM ET</strong> · cloud backup ~10:30 / ~11:00 AM ET</p></div>';
+  html += '<p class="note" style="margin:6px 0 0">Primary: laptop Monday <strong>10:30 AM ET</strong> · cloud backup ~10:30 AM / ~11:00 AM ET</p></div>';
   html += '<div style="font-size:18px;font-weight:800;color:' + cloudColor + '">' + cloudLabel + '</div>';
   html += '</div>';
   html += '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:12px">';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Last cloud run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.atLocal || fmtWhen(cloud.at)) + '</td></tr>';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Week published</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.weekLabel || (BOH_CLOUD_META && BOH_CLOUD_META.latestWeek) || '—') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.schedule || 'Mon 10:30 AM ET laptop · cloud backup ~10:30 / ~11:00') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.schedule || 'Mon 10:30 AM ET laptop · cloud backup ~10:30 AM / ~11:00 AM') + '</td></tr>';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">What</td><td style="padding:8px 0;text-align:right;color:#e8eaed;max-width:420px">' + (cloud.what || '—') + '</td></tr>';
   html += '<tr><td style="padding:8px 0;color:#9aa0aa">Message</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.message || '—') + '</td></tr>';
   html += '</table></div>';
@@ -6397,13 +6465,13 @@ function renderSettings() {
   // Schedule card
   html += '<div class="card">';
   html += '<h2>Automatic Update Schedule</h2>';
-  html += '<p class="note">Primary: Windows Task Monday <strong>10:30 AM ET</strong> (Edge Toast login + exec publish gate). Cloud <code>boh-weekly.yml</code> backup ~10:30 / ~11:00 ET.</p>';
+  html += '<p class="note">Primary: Windows Task Monday <strong>10:30 AM ET</strong> (Edge Toast login + exec publish gate). Cloud <code>boh-weekly.yml</code> backup ~10:30 AM / ~11:00 AM ET.</p>';
   html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Laptop task registered</td><td style="padding:8px 0;text-align:right;font-weight:600;color:' + (sched.exists?'#22c55e':'#ef4444') + '">' + (sched.exists?'Yes':'No') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Laptop schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.days||'—') + ' ' + (sched.startTime||'') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Matches Monday 10:30</td><td style="padding:8px 0;text-align:right;font-weight:700;color:' + (schedOk?'#22c55e':'#ef4444') + '">' + (schedOk?'✅ Yes':'❌ No') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Next laptop run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.nextRun||'—') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Last laptop run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.lastRun||'—') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Laptop schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.days||'—') + ' ' + fmtUsClock(sched.startTime) + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Matches Monday 10:30 AM</td><td style="padding:8px 0;text-align:right;font-weight:700;color:' + (schedOk?'#22c55e':'#ef4444') + '">' + (schedOk?'✅ Yes':'❌ No') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Next laptop run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + fmtUsClock(sched.nextRun) + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Last laptop run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + fmtUsClock(sched.lastRun) + '</td></tr>';
   html += '<tr><td style="padding:8px 0;color:#9aa0aa">Laptop task status</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.status||'—') + '</td></tr>';
   html += '</table></div>';
 
@@ -6414,9 +6482,9 @@ function renderSettings() {
   html += '<p class="note">Expected: 1st of every month at 9:00 AM. Scrapes Toast Bulk Editor for Claudie, AVA CG, AVA WP, Casa Neos — updates stations only; REF targets preserved.</p>';
   html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Task registered</td><td style="padding:8px 0;text-align:right;font-weight:600;color:' + (msched.exists?'#22c55e':'#ef4444') + '">' + (msched.exists?'Yes':'No') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (msched.months||'—') + ' day ' + (msched.days||'—') + ' @ ' + (msched.startTime||'') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Matches 1st @ 9:00</td><td style="padding:8px 0;text-align:right;font-weight:700;color:' + (mschedOk?'#22c55e':'#ef4444') + '">' + (mschedOk?'✅ Yes':'❌ No') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Next run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (msched.nextRun||'—') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (msched.months||'—') + ' day ' + (msched.days||'—') + ' @ ' + fmtUsClock(msched.startTime) + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Matches 1st @ 9:00 AM</td><td style="padding:8px 0;text-align:right;font-weight:700;color:' + (mschedOk?'#22c55e':'#ef4444') + '">' + (mschedOk?'✅ Yes':'❌ No') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Next run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + fmtUsClock(msched.nextRun) + '</td></tr>';
   html += '<tr><td style="padding:8px 0;color:#9aa0aa">Last scrape files</td><td style="padding:8px 0;text-align:right;color:#e8eaed;font-size:12px">';
   (H.prepStationFiles || []).forEach((f, i) => {
     if (i) html += '<br>';

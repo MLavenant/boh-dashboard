@@ -764,13 +764,25 @@ function buildVenue(venueRaw, weekLabel) {
       cell.serviceHours = vol.serviceHours || 0;
       cell.itemsPerServiceHour = vol.itemsPerServiceHour ?? null;
       cell.avgFulSec = vol.avgFulSec != null ? vol.avgFulSec : null;
+      // Exec rule: sold items with no staff punch/roster → treat as 1 person (not 0).
+      if (cell.volume > 0 && !(cell.heads > 0)) {
+        cell.heads = 1;
+        cell.staffImputed = true;
+        if (!Array.isArray(cell.names) || !cell.names.length) {
+          cell.names = [{ name: '(unassigned · imputed 1)', position: 'Imputed' }];
+        }
+      }
+      if (cell.volume > 0 && !(cell.hours > 0)) {
+        cell.hours = 1;
+        cell.hoursImputed = true;
+      }
       cell.itemsPerHead = cell.heads > 0 ? +(cell.volume / cell.heads).toFixed(1) : null;
       cell.itemsPerStaffHour = cell.hours > 0 ? +(cell.volume / cell.hours).toFixed(2) : null;
       cell.names.sort((a, b) => a.name.localeCompare(b.name));
 
       let deny = null;
       if (!cell.heads) deny = 'No staff';
-      else if (cell.hours < GUARDS.minHours) deny = `Hours < ${GUARDS.minHours}`;
+      else if (cell.hours < GUARDS.minHours && !cell.hoursImputed) deny = `Hours < ${GUARDS.minHours}`;
       else if (cell.volume < GUARDS.minVolume) deny = `Volume < ${GUARDS.minVolume}`;
       cell.qc = { eligible: !deny, denyReason: deny };
     }

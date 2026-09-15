@@ -301,12 +301,12 @@ const health = {
   availableWeeks: weeks,
   schedule: {
     ...schedule,
-    expected: { day: 'Monday', time: '10:30', timezone: 'local' },
+    expected: { day: 'Monday', time: '10:30 AM', timezone: 'local' },
     matchesExpected: !!(schedule.exists && /MON/i.test(schedule.days || '') && /10:30/i.test(schedule.startTime || '')),
   },
   monthlyPrepSchedule: {
     ...monthlyPrepSchedule,
-    expected: { day: '1st', time: '09:00', timezone: 'local' },
+    expected: { day: '1st', time: '9:00 AM', timezone: 'local' },
     matchesExpected: !!(monthlyPrepSchedule.exists && /every month/i.test(monthlyPrepSchedule.months || '') && /9:00/i.test(monthlyPrepSchedule.startTime || '')),
   },
   prepStationFiles,
