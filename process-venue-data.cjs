@@ -240,22 +240,58 @@ Object.keys(hmGuests).forEach(day => {
 });
 
 // ---- workloadOverall using event-based intervals (matches Python algorithm) ----
-// Merge multi-station rows into one logical order per (Check #, Fired Date).
-// Toast fires the same check on Cold Expo, Hot Expo, Saute, etc. — each gets its own row.
-// Counting those separately inflated concurrency (~93) and diluted avg fulfillment (~3 min).
+// Merge multi-station KDS rows into one logical ORDER (course wave).
+// Toast prints the same check onto Cold Expo, Hot Expo, Saute, etc. — often with
+// slightly different Fired Date strings. Exact Check#+FiredDate matching left Claudie
+// Expo bumps (2–30s) as separate "orders", which inflated concurrency and crashed
+// pressure-curve avg fulfillment to ~3–5 min while stations sat near ~10 min.
+// Fix: same calendar day + Check #, cluster fires within ORDER_MERGE_WINDOW_SEC of
+// the wave's first fire; order span = earliest fire → latest fulfill.
+const ORDER_MERGE_WINDOW_SEC = 15 * 60;
+const MIN_ORDER_FUL_SEC = 60; // drop pure KDS bump noise after merge
 function mergeOrderTickets(rows) {
-  const groups = new Map();
+  const byCheckDay = new Map();
   rows.forEach(t => {
-    const key = `${t['Check #']}||${t['Fired Date']}`;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(t);
+    const dayKey = `${t._fired.getFullYear()}-${String(t._fired.getMonth() + 1).padStart(2, '0')}-${String(t._fired.getDate()).padStart(2, '0')}`;
+    const key = `${dayKey}||${t['Check #']}`;
+    if (!byCheckDay.has(key)) byCheckDay.set(key, []);
+    byCheckDay.get(key).push(t);
   });
-  return [...groups.values()].map(stationRows => {
-    const fired = new Date(Math.min(...stationRows.map(r => r._fired.getTime())));
-    const fulfilled = new Date(Math.max(...stationRows.map(r => r._fulfilled.getTime())));
-    const fulSec = (fulfilled.getTime() - fired.getTime()) / 1000;
-    return { ...stationRows[0], _fired: fired, _fulfilled: fulfilled, _fulSec: fulSec };
-  });
+
+  const orders = [];
+  for (const stationRows of byCheckDay.values()) {
+    stationRows.sort((a, b) => a._fired.getTime() - b._fired.getTime());
+    let cluster = [];
+    let clusterStart = null;
+    const flush = () => {
+      if (!cluster.length) return;
+      const fired = new Date(Math.min(...cluster.map(r => r._fired.getTime())));
+      const fulfilled = new Date(Math.max(...cluster.map(r => r._fulfilled.getTime())));
+      const fulSec = (fulfilled.getTime() - fired.getTime()) / 1000;
+      if (fulSec >= MIN_ORDER_FUL_SEC) {
+        orders.push({ ...cluster[0], _fired: fired, _fulfilled: fulfilled, _fulSec: fulSec });
+      }
+      cluster = [];
+      clusterStart = null;
+    };
+    for (const t of stationRows) {
+      const ts = t._fired.getTime();
+      if (!cluster.length) {
+        cluster = [t];
+        clusterStart = ts;
+        continue;
+      }
+      if (ts - clusterStart <= ORDER_MERGE_WINDOW_SEC * 1000) {
+        cluster.push(t);
+      } else {
+        flush();
+        cluster = [t];
+        clusterStart = ts;
+      }
+    }
+    flush();
+  }
+  return orders;
 }
 
 const orderTickets = mergeOrderTickets(foodTickets);
