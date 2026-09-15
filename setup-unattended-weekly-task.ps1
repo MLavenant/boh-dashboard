@@ -18,7 +18,7 @@ $existing = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
 if (-not $existing) { throw "Scheduled task not found: $taskName" }
 
 $action = New-ScheduledTaskAction -Execute 'cmd.exe' -Argument "/c `"$bat`"" -WorkingDirectory 'C:\Cursor\toast-mcp-server'
-$trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 8:30am
+$trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 10:30am
 
 # Allow wake + battery; start if missed while asleep (within a day)
 $settings = New-ScheduledTaskSettingsSet `

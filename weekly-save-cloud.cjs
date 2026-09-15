@@ -50,7 +50,7 @@ async function markFail(message) {
     ok: false,
     at: now.toISOString(),
     atLocal: now.toLocaleString('en-US', { timeZone: 'America/New_York' }),
-    schedule: 'Mon ~8:30 AM ET (GitHub Actions; backup ~9:00 AM)',
+    schedule: 'Mon 10:30 AM ET laptop primary · cloud backup ~10:30 / ~11:00',
     what: 'BOH weekly Toast+OT → processed venue JSON → Firebase + Pages',
     message,
     source: 'bohWeekly'

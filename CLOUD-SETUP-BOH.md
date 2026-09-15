@@ -2,17 +2,27 @@
 
 Website: https://mlavenant.github.io/boh-dashboard/dashboard.html  
 
-## Timing model (updated)
+## Timing model (exec)
 
 | Priority | Trigger | Time | Notes |
 |----------|---------|------|-------|
-| **1 – Primary** | Windows Task `BOH Dashboard Weekly Fetch` | **Monday 8:30 AM ET** | Runs on this laptop. Opens Edge to refresh Toast login, scrapes last full ISO week, publishes Firebase + Pages, refreshes GitHub secret. |
-| 2 – Backup | GitHub Actions `boh-weekly.yml` | Mon ~8:30 / ~9:00 ET | Often fails: Toast Cloudflare blocks hosted runners when cookies are stale. |
+| **1 – Primary** | Windows Task `BOH Dashboard Weekly Fetch` | **Monday 10:30 AM ET** | Runs on this laptop. Opens Edge to refresh Toast login, scrapes last full ISO week, runs exec publish gate, publishes Firebase + Pages, refreshes GitHub secret. |
+| 2 – Backup | GitHub Actions `boh-weekly.yml` | Mon ~10:30 / ~11:00 ET | Often fails: Toast Cloudflare blocks hosted runners when cookies are stale. |
 | Manual | `C:\Cursor\boh-rdg-publish\weekly-auto-run.bat` | Any time | Same path as the Monday task |
 
 **Why cloud alone is not enough:** Toast Web Admin cookies expire every few days, and GitHub-hosted IPs hit Cloudflare/login. The laptop Edge refresh is required before scrape.
 
-**Requirements for Monday success:** laptop on (and awake) at 8:30 AM ET; complete Cloudflare/2FA in the Edge window if prompted.
+**Requirements for Monday success:** laptop on (and awake) at 10:30 AM ET; complete Cloudflare/2FA in the Edge window if prompted.
+
+## Exec publish gate (blocks bad publishes)
+
+Before Firebase/Pages, the job runs:
+
+1. `pipeline-health.cjs` — venue file completeness  
+2. `audit-methodology-week.cjs` — kitchen → labor → staffing math  
+3. `exec-publish-gate.cjs` — all 5 venues ready; blocks publish on FAIL; warns on extreme items/staff-hr outliers  
+
+If the gate fails, status is marked failed in Firebase and nothing is pushed live.
 
 ## What the weekly job writes
 

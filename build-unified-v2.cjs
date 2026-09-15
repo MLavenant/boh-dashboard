@@ -249,7 +249,7 @@ html = html.replace(
   <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;margin:0 0 4px">
     <div>
       <h2 style="margin:0 0 4px">RDG STATIONS COMPARE</h2>
-      <p class="note" style="margin:0">All locations · selected week. Bars = <strong>items / staff-hour</strong> (numbers on bars). Tables below = every station family Mon→Sun.</p>
+      <p class="note" style="margin:0">All locations · selected week. Bars = <strong>items / staff-hour</strong> (numbers on bars). Tables below = every station family Mon→Sun. Expo excluded (pass-through, not comparable staffing).</p>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
       <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Export Stations PDF</button>
@@ -2681,6 +2681,8 @@ const HOURLY_BAND = [
 ];
 const HOURLY_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const HOURLY_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
+// Portfolio Stations (exec): production families only — Expo is pass-through / not comparable staffing.
+const PORTFOLIO_STATION_FAMILIES = HOURLY_FAMILIES.filter(f => f !== 'Expo');
 
 /** Prefer punch-overlap headsByHour; fall back to daily heads only when hourly map missing (legacy weeks). */
 function hourHeadsFromCell(dayCell, hk) {
@@ -4175,7 +4177,7 @@ function renderPortfolioStations() {
   const weekKey = WEEKS[currentWeekIdx]?.key;
   const labels = ${JSON.stringify(VENUE_LABELS)};
   const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
-  const families = HOURLY_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
+  const families = PORTFOLIO_STATION_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
 
   const canvas = document.getElementById('cPortfolioStations');
   if (canvas && typeof Chart !== 'undefined') {
@@ -4439,7 +4441,7 @@ function renderPortfolioStationsDayTable() {
   const weekKey = WEEKS[currentWeekIdx]?.key;
   const labels = ${JSON.stringify(VENUE_LABELS)};
   const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
-  const families = HOURLY_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
+  const families = PORTFOLIO_STATION_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
 
   if (!families.length) {
     el.innerHTML = '<p class="note" style="margin:0">No station families with items/staff this week.</p>';
@@ -6134,7 +6136,7 @@ function exportPortfolioStationsPdf() {
   const weekLabel = WEEKS[currentWeekIdx]?.label || weekKey || '';
   const labels = ${JSON.stringify(VENUE_LABELS)};
   const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
-  const families = HOURLY_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
+  const families = PORTFOLIO_STATION_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
   const printRoot = document.getElementById('portfolioStationsPrintRoot');
   if (!printRoot) {
     alert('Stations PDF root missing — rebuild dashboard.');
@@ -6358,13 +6360,13 @@ function renderSettings() {
   html += '<div class="card" style="border-color:' + cloudColor + '40">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">';
   html += '<div><h2 style="margin:0">Cloud Automation (Firebase)</h2>';
-  html += '<p class="note" style="margin:6px 0 0">Primary: GitHub-hosted Actions Mon ~8:30 AM ET · backup ~9:00 AM · laptop can be off</p></div>';
+  html += '<p class="note" style="margin:6px 0 0">Primary: laptop Monday <strong>10:30 AM ET</strong> · cloud backup ~10:30 / ~11:00 AM ET</p></div>';
   html += '<div style="font-size:18px;font-weight:800;color:' + cloudColor + '">' + cloudLabel + '</div>';
   html += '</div>';
   html += '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:12px">';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Last cloud run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.atLocal || fmtWhen(cloud.at)) + '</td></tr>';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Week published</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.weekLabel || (BOH_CLOUD_META && BOH_CLOUD_META.latestWeek) || '—') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.schedule || 'Mon ~8:30 AM ET · backup ~9:00 AM') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.schedule || 'Mon 10:30 AM ET laptop · cloud backup ~10:30 / ~11:00') + '</td></tr>';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">What</td><td style="padding:8px 0;text-align:right;color:#e8eaed;max-width:420px">' + (cloud.what || '—') + '</td></tr>';
   html += '<tr><td style="padding:8px 0;color:#9aa0aa">Message</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (cloud.message || '—') + '</td></tr>';
   html += '</table></div>';
@@ -6395,11 +6397,11 @@ function renderSettings() {
   // Schedule card
   html += '<div class="card">';
   html += '<h2>Automatic Update Schedule</h2>';
-  html += '<p class="note">Primary: GitHub-hosted <code>boh-weekly.yml</code> Mon ~8:30 AM ET with a ~9:00 AM backup. Laptop Task Scheduler is emergency-only.</p>';
+  html += '<p class="note">Primary: Windows Task Monday <strong>10:30 AM ET</strong> (Edge Toast login + exec publish gate). Cloud <code>boh-weekly.yml</code> backup ~10:30 / ~11:00 ET.</p>';
   html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Laptop task registered</td><td style="padding:8px 0;text-align:right;font-weight:600;color:' + (sched.exists?'#22c55e':'#ef4444') + '">' + (sched.exists?'Yes':'No') + '</td></tr>';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Laptop schedule</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.days||'—') + ' ' + (sched.startTime||'') + '</td></tr>';
-  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Matches Monday 8:30 (legacy)</td><td style="padding:8px 0;text-align:right;font-weight:700;color:' + (schedOk?'#22c55e':'#ef4444') + '">' + (schedOk?'✅ Yes':'❌ No') + '</td></tr>';
+  html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Matches Monday 10:30</td><td style="padding:8px 0;text-align:right;font-weight:700;color:' + (schedOk?'#22c55e':'#ef4444') + '">' + (schedOk?'✅ Yes':'❌ No') + '</td></tr>';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Next laptop run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.nextRun||'—') + '</td></tr>';
   html += '<tr style="border-bottom:1px solid #1e2533"><td style="padding:8px 0;color:#9aa0aa">Last laptop run</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.lastRun||'—') + '</td></tr>';
   html += '<tr><td style="padding:8px 0;color:#9aa0aa">Laptop task status</td><td style="padding:8px 0;text-align:right;color:#e8eaed">' + (sched.status||'—') + '</td></tr>';

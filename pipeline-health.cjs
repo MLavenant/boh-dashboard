@@ -275,15 +275,17 @@ const totals = venueResults.reduce((a, v) => {
 }, { pass: 0, warn: 0, fail: 0 });
 
 const pipelineSteps = [
-  { step: 1, name: 'Dispatch (primary)', how: 'GitHub schedule → boh-weekly.yml', when: 'Monday ~8:30 AM ET (+ ~9:00 backup)' },
-  { step: 2, name: 'Restore Toast session', how: 'TOAST_SESSION_GZIP_B64 GitHub secret → toast-session.json', when: 'Monday cloud job' },
-  { step: 3, name: 'Fetch Toast Kitchen Timing', how: 'GitHub-hosted weekly-save-cloud.cjs → kitchen-timing-{venue}.json', when: 'Monday cloud job' },
-  { step: 4, name: 'Fetch Toast Item Details', how: 'weekly-save-cloud.cjs → item-details-{venue}.json', when: 'Monday cloud job' },
-  { step: 5, name: 'Fetch Toast Item Fulfillment', how: 'weekly-save-cloud.cjs → item-fulfillment-{venue}.json', when: 'Monday cloud job' },
-  { step: 6, name: 'Fetch OpenTable Covers', how: 'weekly-save-cloud.cjs → covers-{venue}.json', when: 'Monday cloud job' },
-  { step: 7, name: 'Process venue metrics', how: 'process-venue-data.cjs per venue', when: 'Monday cloud job' },
-  { step: 8, name: 'Food staffing join', how: 'fetch-viktor-fte-week.mjs → weekly-staffing.cjs (FTE × Toast labor × volume) → build-staffing-balance.cjs', when: 'Local Monday task after venue process' },
-  { step: 9, name: 'Publish Firebase + Pages', how: 'boh-publish-firebase.cjs + build-unified-v2.cjs + git push', when: 'Monday cloud/local job' },
+  { step: 1, name: 'Dispatch (primary)', how: 'Laptop Task Scheduler → weekly-auto-run.bat (Edge Toast login)', when: 'Monday 10:30 AM ET' },
+  { step: 2, name: 'Cloud backup', how: 'GitHub schedule → boh-weekly.yml', when: 'Monday ~10:30 AM ET (+ ~11:00 backup)' },
+  { step: 3, name: 'Restore/refresh Toast session', how: 'Edge login (laptop) or TOAST_SESSION_GZIP_B64 (cloud)', when: 'Monday job' },
+  { step: 4, name: 'Fetch Toast Kitchen Timing', how: 'weekly-save → kitchen-timing-{venue}.json', when: 'Monday job' },
+  { step: 5, name: 'Fetch Toast Item Details', how: 'weekly-save → item-details-{venue}.json', when: 'Monday job' },
+  { step: 6, name: 'Fetch Toast Item Fulfillment', how: 'weekly-save → item-fulfillment-{venue}.json', when: 'Monday job' },
+  { step: 7, name: 'Fetch OpenTable Covers', how: 'fetch-ot-covers-week / weekly-save → covers-{venue}.json', when: 'Monday job' },
+  { step: 8, name: 'Process venue metrics', how: 'process-venue-data.cjs per venue', when: 'Monday job' },
+  { step: 9, name: 'Food staffing join', how: 'fetch-viktor-fte-week.mjs → weekly-staffing.cjs (FTE × labor × volume)', when: 'Monday job' },
+  { step: 10, name: 'Exec publish gate', how: 'pipeline-health + audit-methodology-week + exec-publish-gate', when: 'Before Firebase/Pages' },
+  { step: 11, name: 'Publish Firebase + Pages', how: 'boh-publish-firebase.cjs + build-unified-v2.cjs + git push', when: 'Monday job (only if gate passes)' },
 ];
 
 const monthlyPrepSteps = [
@@ -299,8 +301,8 @@ const health = {
   availableWeeks: weeks,
   schedule: {
     ...schedule,
-    expected: { day: 'Monday', time: '08:30', timezone: 'local' },
-    matchesExpected: !!(schedule.exists && /MON/i.test(schedule.days || '') && /8:30/i.test(schedule.startTime || '')),
+    expected: { day: 'Monday', time: '10:30', timezone: 'local' },
+    matchesExpected: !!(schedule.exists && /MON/i.test(schedule.days || '') && /10:30/i.test(schedule.startTime || '')),
   },
   monthlyPrepSchedule: {
     ...monthlyPrepSchedule,
@@ -326,7 +328,7 @@ fs.writeFileSync(OUT, JSON.stringify(health, null, 2));
 console.log(`✅ Written ${OUT}`);
 console.log(`Week: ${latestWeek} | PASS ${totals.pass} WARN ${totals.warn} FAIL ${totals.fail} | overall=${health.overall}`);
 console.log(`Schedule: ${schedule.exists ? `${schedule.days} ${schedule.startTime} (next ${schedule.nextRun})` : 'NOT FOUND'}`);
-console.log(`Matches Monday 8:30: ${health.schedule.matchesExpected}`);
+console.log(`Matches Monday 10:30: ${health.schedule.matchesExpected}`);
 
 // Automation must not publish a dashboard that is labeled as the latest week
 // when one or more required venue inputs are missing.

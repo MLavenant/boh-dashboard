@@ -204,7 +204,7 @@ async function main() {
     at: now.toISOString(),
     atLocal: now.toLocaleString('en-US', { timeZone: 'America/New_York' }),
     weekLabel: latestWeek,
-    schedule: 'Mon ~8:30 AM ET (GitHub-hosted Actions · backup ~9:00 AM)',
+    schedule: 'Mon 10:30 AM ET laptop primary · cloud backup ~10:30 / ~11:00',
     what: 'BOH weekly Toast+OT → processed venue JSON → Firebase + Pages',
     message: ok
       ? `Published ${publishedOk.length} week(s); meta tracks ${weeks.length} weeks`

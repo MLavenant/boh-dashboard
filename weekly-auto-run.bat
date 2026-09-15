@@ -11,7 +11,7 @@ echo [%date% %time%] Refreshing Toast session via Edge... >> auto-run.log 2>&1
 node toast-login-refresh.mjs >> auto-run.log 2>&1
 if errorlevel 1 (
   echo [%date% %time%] ERROR: toast-login-refresh.mjs failed >> auto-run.log 2>&1
-  node fb-scrape-status.cjs bohWeekly fail "Toast login refresh failed on laptop Monday job" "{\"schedule\":\"Mon 8:30 AM ET laptop\"}" >> auto-run.log 2>&1
+  node fb-scrape-status.cjs bohWeekly fail "Toast login refresh failed on laptop Monday job" "{\"schedule\":\"Mon 10:30 AM ET laptop\"}" >> auto-run.log 2>&1
   exit /b 1
 )
 copy /Y toast-session.json "C:\Cursor\toast-mcp-server\toast-session.json" >nul 2>&1
@@ -67,14 +67,29 @@ for %%V in (claudie casa_neos ava_coconut_grove ava_winter_park mila) do (
   node enrich-station-hour-items.cjs %%V >> auto-run.log 2>&1
 )
 
-:: 6) Health + methodology audit + rebuild + Firebase
+:: 6) Health + methodology audit + exec gate + rebuild + Firebase
 node pipeline-health.cjs >> auto-run.log 2>&1
 if defined BOH_WEEK (
   echo [%date% %time%] Methodology audit %BOH_WEEK%... >> auto-run.log 2>&1
   node audit-methodology-week.cjs %BOH_WEEK% >> auto-run.log 2>&1
   if errorlevel 1 (
-    echo [%date% %time%] ERROR: methodology audit failed for %BOH_WEEK% >> auto-run.log 2>&1
-    set ERR=1
+    echo [%date% %time%] ERROR: methodology audit failed for %BOH_WEEK% — blocking publish >> auto-run.log 2>&1
+    node fb-scrape-status.cjs bohWeekly fail "Methodology audit failed — publish blocked" "{\"schedule\":\"Mon 10:30 AM ET laptop\",\"week\":\"%BOH_WEEK%\"}" >> auto-run.log 2>&1
+    exit /b 1
+  )
+  echo [%date% %time%] Exec publish gate %BOH_WEEK%... >> auto-run.log 2>&1
+  node exec-publish-gate.cjs %BOH_WEEK% >> auto-run.log 2>&1
+  if errorlevel 1 (
+    echo [%date% %time%] ERROR: exec publish gate failed — blocking Firebase/Pages >> auto-run.log 2>&1
+    node fb-scrape-status.cjs bohWeekly fail "Exec publish gate failed — publish blocked" "{\"schedule\":\"Mon 10:30 AM ET laptop\",\"week\":\"%BOH_WEEK%\"}" >> auto-run.log 2>&1
+    exit /b 1
+  )
+) else (
+  node exec-publish-gate.cjs >> auto-run.log 2>&1
+  if errorlevel 1 (
+    echo [%date% %time%] ERROR: exec publish gate failed — blocking publish >> auto-run.log 2>&1
+    node fb-scrape-status.cjs bohWeekly fail "Exec publish gate failed — publish blocked" "{\"schedule\":\"Mon 10:30 AM ET laptop\"}" >> auto-run.log 2>&1
+    exit /b 1
   )
 )
 node build-unified-v2.cjs >> auto-run.log 2>&1
@@ -112,11 +127,11 @@ if errorlevel 1 (
 )
 
 if %ERR% EQU 0 (
-  node fb-scrape-status.cjs bohWeekly ok "BOH weekly laptop job succeeded" "{\"schedule\":\"Mon 8:30 AM ET laptop + Edge login\"}" >> auto-run.log 2>&1
+  node fb-scrape-status.cjs bohWeekly ok "BOH weekly laptop job succeeded" "{\"schedule\":\"Mon 10:30 AM ET laptop + Edge login\"}" >> auto-run.log 2>&1
   echo [%date% %time%] Live: https://mlavenant.github.io/boh-dashboard/dashboard.html >> auto-run.log 2>&1
   echo [%date% %time%] Weekly auto-run complete >> auto-run.log 2>&1
 ) else (
-  node fb-scrape-status.cjs bohWeekly fail "BOH weekly laptop job finished with errors" "{\"schedule\":\"Mon 8:30 AM ET laptop\"}" >> auto-run.log 2>&1
+  node fb-scrape-status.cjs bohWeekly fail "BOH weekly laptop job finished with errors" "{\"schedule\":\"Mon 10:30 AM ET laptop\"}" >> auto-run.log 2>&1
   echo [%date% %time%] Weekly auto-run finished with errors ERR=%ERR% >> auto-run.log 2>&1
 )
 

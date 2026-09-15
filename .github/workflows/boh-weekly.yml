@@ -5,9 +5,10 @@ name: BOH Weekly Refresh
 
 on:
   schedule:
-    # ~8:30 AM ET during daylight time; second run is the backup.
-    - cron: "30 12 * * 1"
-    - cron: "0 13 * * 1"
+    # ~10:30 AM ET during daylight time (EDT=UTC-4); second run is the backup.
+    # Primary path is the laptop task at 10:30 AM ET (Edge Toast login).
+    - cron: "30 14 * * 1"
+    - cron: "0 15 * * 1"
   workflow_dispatch:
 
 jobs:
@@ -89,18 +90,30 @@ jobs:
         run: node weekly-staffing.cjs
         continue-on-error: true
 
-      - name: Publish processed weeks to Firebase
-        id: firebase
+      - name: Methodology audit
         shell: cmd
         env:
           BOH_ROOT: ${{ github.workspace }}
-        run: node boh-publish-firebase.cjs
+        run: node audit-methodology-week.cjs
+
+      - name: Exec publish gate
+        shell: cmd
+        env:
+          BOH_ROOT: ${{ github.workspace }}
+        run: node exec-publish-gate.cjs
 
       - name: Rebuild dashboard shell
         shell: cmd
         env:
           BOH_ROOT: ${{ github.workspace }}
         run: node build-unified-v2.cjs
+
+      - name: Publish processed weeks to Firebase
+        id: firebase
+        shell: cmd
+        env:
+          BOH_ROOT: ${{ github.workspace }}
+        run: node boh-publish-firebase.cjs
 
       - name: Commit + push GitHub Pages
         shell: powershell
@@ -121,4 +134,4 @@ jobs:
       - name: Mark scrapeStatus failed
         if: failure()
         shell: cmd
-        run: node fb-scrape-status.cjs bohWeekly fail "BOH weekly GitHub-hosted Actions job failed" "{\"schedule\":\"Mon ~8:30 AM ET (+ ~9:00 backup)\",\"what\":\"BOH weekly Toast+OT → Firebase + Pages\"}"
+        run: node fb-scrape-status.cjs bohWeekly fail "BOH weekly GitHub-hosted Actions job failed" "{\"schedule\":\"Mon ~10:30 AM ET (+ ~11:00 backup)\",\"what\":\"BOH weekly Toast+OT → Firebase + Pages\"}"
