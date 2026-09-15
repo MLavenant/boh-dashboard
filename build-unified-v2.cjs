@@ -237,7 +237,10 @@ html = html.replace(
       <h2 style="margin:0 0 4px">RDG STATIONS COMPARE</h2>
       <p class="note" style="margin:0">All locations · selected week. Bars = <strong>items / staff-hour</strong> (numbers on bars). Tables below = every station family Mon→Sun.</p>
     </div>
-    <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Export Stations PDF</button>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+      <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Export Stations PDF</button>
+      <button type="button" id="portfolioPastryPlaceholderPdfBtn" onclick="exportPastryCasaNeosPlaceholderPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #6b7280;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 PASTRY (Casa Neos)</button>
+    </div>
   </div>
   <div style="position:relative;height:440px;margin:12px 0 8px">
     <canvas id="cPortfolioStations"></canvas>
@@ -245,7 +248,7 @@ html = html.replace(
   <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:4px 0 16px;font-size:11px;color:#9aa0aa">
     <span><strong style="color:#e8eaed">Bars</strong> = items / staff-hour</span>
     <span>Alternating bands = station families</span>
-    <span>PDF = intro chart page · then one page per station family</span>
+    <span>PDF = intro · then up to 3 station families per page · plus PASTRY (Casa Neos) placeholder</span>
   </div>
   <p class="note" style="margin:0 0 12px">Mon→Sun tables for each station family · only locations with items/staff. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> (green→red heat) · <strong>Items/person</strong>.</p>
   <div id="portfolioStationsDayTable"></div>
@@ -672,11 +675,10 @@ body.printing-portfolio footer,
 body.printing-portfolio #weekWelcomePopup,
 body.printing-portfolio #assignmentHelperBanner,
 body.printing-portfolio .coming-note,
-body.printing-portfolio #portfolioPdfBtn,
-body.printing-stations-pdf #portfolioStationsPdfBtn {
+body.printing-portfolio #portfolioPdfBtn {
   display:none !important;
 }
-/* Stations PDF: overview + one page per family */
+/* Stations PDF: intro + up to 3 families per page + optional placeholder */
 body.printing-stations-pdf header,
 body.printing-stations-pdf .tab-nav,
 body.printing-stations-pdf #venuePills,
@@ -723,32 +725,32 @@ body.printing-stations-pdf .ps-print-page:last-child {
 }
 body.printing-stations-pdf .ps-print-page h1 {
   margin:0 0 2px;
-  font-size:16px;
+  font-size:14px;
   color:#d9a441;
 }
 body.printing-stations-pdf .ps-print-page h2,
 body.printing-stations-pdf .ps-print-page h3 {
-  margin:6px 0 4px;
-  font-size:13px;
+  margin:2px 0 2px;
+  font-size:11px;
   color:#d9a441;
 }
 body.printing-stations-pdf .ps-print-page .ps-sub,
 body.printing-stations-pdf .ps-print-page .note {
-  margin:0 0 6px;
-  font-size:9px;
+  margin:0 0 4px;
+  font-size:8px;
   color:#9aa0aa;
 }
 body.printing-stations-pdf .ps-print-page table {
   width:100%;
   border-collapse:collapse;
-  font-size:9px;
+  font-size:8px;
 }
 body.printing-stations-pdf .ps-print-page th,
 body.printing-stations-pdf .ps-print-page td {
-  padding:3px 4px;
+  padding:1px 3px;
   border-bottom:1px solid #262a33;
   text-align:right;
-  line-height:1.2;
+  line-height:1.15;
 }
 body.printing-stations-pdf .ps-print-page th:first-child,
 body.printing-stations-pdf .ps-print-page td:first-child {
@@ -763,8 +765,29 @@ body.printing-stations-pdf .ps-print-page img.ps-chart {
   border-radius:6px;
   margin:4px 0 8px;
 }
-body.printing-stations-pdf .ps-family-block { margin-bottom:0; }
+body.printing-stations-pdf .ps-family-block { margin:0 0 6px !important; }
+body.printing-stations-pdf .ps-print-page.ps-multi .ps-family-block { margin:0 0 4px !important; }
+body.printing-stations-pdf .ps-print-page.ps-multi .ps-family-block h3 { font-size:10px !important; margin:0 0 1px !important; }
+body.printing-stations-pdf .ps-print-page.ps-placeholder {
+  border:1px dashed #6b7280;
+}
+body.printing-stations-pdf .ps-print-page.ps-placeholder .ps-placeholder-badge {
+  display:inline-block;
+  margin:0 0 4px;
+  padding:2px 8px;
+  border:1px solid #d9a441;
+  border-radius:4px;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:0.06em;
+  color:#d9a441;
+  text-transform:uppercase;
+}
 body.printing-stations-pdf .ps-print-page [style*="overflow"] { overflow:visible !important; }
+body.printing-stations-pdf #portfolioStationsPdfBtn,
+body.printing-stations-pdf #portfolioPastryPlaceholderPdfBtn {
+  display:none !important;
+}
 .ps-ipsh-heat {
   -webkit-print-color-adjust:exact !important;
   print-color-adjust:exact !important;
@@ -4040,13 +4063,36 @@ function renderPortfolioStations() {
   renderPortfolioStationsDayTable();
 }
 
-function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
-  const venues = portfolioVenuesForFamily(family, weekKey);
-  if (!venues.length) return '';
+function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
+  opts = opts || {};
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const venueKeys = Array.isArray(opts.venueKeys) && opts.venueKeys.length
+    ? opts.venueKeys
+    : null;
+  const venues = venueKeys
+    ? venueKeys.map(k => ({ key: k, label: labels[k] || k })).filter(v => {
+        const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
+        const st = sc.familyStats[family] || {};
+        if (st.ipsh != null && st.ipsh > 0) return true;
+        if (st.iph != null && st.iph > 0) return true;
+        if (st.volume > 0 && (st.hours > 0 || st.iph != null)) return true;
+        return HOURLY_DAYS.some(day => {
+          const m = getFamilyDayMetrics(v.key, weekKey, family, day);
+          return m && ((m.heads > 0 && m.items > 0) || (m.items > 0));
+        });
+      })
+    : portfolioVenuesForFamily(family, weekKey);
+  // Placeholder / forced single-venue: still render shell even if empty
+  const forceVenues = Array.isArray(opts.forceVenueKeys) && opts.forceVenueKeys.length
+    ? opts.forceVenueKeys.map(k => ({ key: k, label: labels[k] || k }))
+    : null;
+  const useVenues = (venues.length ? venues : (forceVenues || []));
+  if (!useVenues.length) return '';
 
+  const compact = !!opts.compact;
   const ipshVals = [];
   const dayRows = HOURLY_DAYS.map(day => {
-    const cells = venues.map(v => {
+    const cells = useVenues.map(v => {
       const m = getFamilyDayMetrics(v.key, weekKey, family, day) || {};
       const cell = familyDayCell(v.key, weekKey, family, day);
       const ful = cell && cell.avgFulSec != null ? +(cell.avgFulSec / 60).toFixed(1) : null;
@@ -4056,7 +4102,6 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
       } else if (m.items > 0 && cell && cell.hours > 0) {
         ipsh = +((m.items / cell.hours).toFixed(2));
       } else if (m.items > 0 && m.heads > 0 && cell && cell.hours == null) {
-        // fallback: if hours missing, still show a staff-rate proxy from volume/heads (not used for heat scale alone)
         ipsh = null;
       }
       const ipp = m.itemsPerHead != null ? m.itemsPerHead : (m.heads > 0 && m.items > 0 ? +(m.items / m.heads).toFixed(1) : null);
@@ -4067,18 +4112,25 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
   });
   const ipshMin = ipshVals.length ? Math.min(...ipshVals) : 0;
   const ipshMax = ipshVals.length ? Math.max(...ipshVals) : 0;
-  const metricCell = 'padding:5px 6px;text-align:right;font-size:11px;font-weight:600;min-width:70px;box-sizing:border-box;';
-  const metricHead = 'padding:4px 6px;text-align:right;background:#1e2533;font-size:10px;font-weight:600;min-width:70px;box-sizing:border-box;white-space:nowrap;color:#9aa0aa;';
+  const pad = compact ? '2px 4px' : '5px 6px';
+  const headPad = compact ? '2px 4px' : '4px 6px';
+  const dayPad = compact ? '2px 6px' : '6px 10px';
+  const fontSz = compact ? '9px' : '11px';
+  const headSz = compact ? '8px' : '10px';
+  const metricCell = 'padding:'+pad+';text-align:right;font-size:'+fontSz+';font-weight:600;min-width:'+(compact?54:70)+'px;box-sizing:border-box;';
+  const metricHead = 'padding:'+headPad+';text-align:right;background:#1e2533;font-size:'+headSz+';font-weight:600;min-width:'+(compact?54:70)+'px;box-sizing:border-box;white-space:nowrap;color:#9aa0aa;';
+  const titleExtra = opts.titleExtra ? ' · '+opts.titleExtra : '';
+  const blockMargin = compact ? '0 0 6px' : '0 0 14px';
 
-  let html = '<div class="ps-family-block" style="margin:0 0 22px">'+
-    '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">'+family+' · Mon→Sun · '+venues.length+' location'+(venues.length===1?'':'s')+'</h3>'+
-    '<div style="overflow:auto"><table class="ps-family-table" style="width:100%;border-collapse:collapse;font-size:11px;min-width:'+(90+venues.length*220)+'px"><thead>'+
-    '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:8px 10px;background:#1e2533;position:sticky;left:0;z-index:1;width:56px">Day</th>';
-  venues.forEach(v => {
-    html += '<th colspan="3" style="text-align:center;padding:8px 6px;background:#1e2533;border-left:1px solid #262a33;color:#e8eaed">'+v.label+'</th>';
+  let html = '<div class="ps-family-block" style="margin:'+blockMargin+'">'+
+    '<h3 style="margin:0 0 '+(compact?'2px':'6px')+';font-size:'+(compact?'12px':'15px')+';color:#d9a441">'+family+titleExtra+' · Mon→Sun · '+useVenues.length+' location'+(useVenues.length===1?'':'s')+'</h3>'+
+    '<div style="overflow:auto"><table class="ps-family-table" style="width:100%;border-collapse:collapse;font-size:'+fontSz+';min-width:'+(70+useVenues.length*(compact?160:220))+'px"><thead>'+
+    '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:'+dayPad+';background:#1e2533;position:sticky;left:0;z-index:1;width:56px">Day</th>';
+  useVenues.forEach(v => {
+    html += '<th colspan="3" style="text-align:center;padding:'+(compact?'3px 4px':'8px 6px')+';background:#1e2533;border-left:1px solid #262a33;color:#e8eaed">'+v.label+'</th>';
   });
-  html += '</tr><tr style="color:#6b7280;border-bottom:1px solid #262a33"><th style="padding:4px 10px;background:#13161c;position:sticky;left:0;z-index:1"></th>';
-  venues.forEach(() => {
+  html += '</tr><tr style="color:#6b7280;border-bottom:1px solid #262a33"><th style="padding:'+headPad+';background:#13161c;position:sticky;left:0;z-index:1"></th>';
+  useVenues.forEach(() => {
     html += '<th style="'+metricHead+'border-left:1px solid #262a33">Ful</th>'+
       '<th style="'+metricHead+'">Items/staff-hr</th>'+
       '<th style="'+metricHead+'">Items/person</th>';
@@ -4086,7 +4138,7 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
   html += '</tr></thead><tbody>';
 
   dayRows.forEach(row => {
-    html += '<tr style="border-top:1px solid #262a33"><td style="padding:6px 10px;color:#ffffff;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+row.day.slice(0,3)+'</td>';
+    html += '<tr style="border-top:1px solid #262a33"><td style="padding:'+dayPad+';color:#ffffff;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+row.day.slice(0,3)+'</td>';
     row.cells.forEach(c => {
       const heat = portfolioIpshHeat(c.ipsh, ipshMin, ipshMax);
       html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:#ffffff;background:transparent">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
@@ -4098,7 +4150,7 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
     html += '</tr>';
   });
 
-  const weekCells = venues.map(v => {
+  const weekCells = useVenues.map(v => {
     const sc = buildVenueWeekScorecard(v.key, v.label, weekKey);
     const st = sc.familyStats[family] || {};
     const ipsh = st.ipsh != null ? Number(st.ipsh) : (st.iph != null ? Number(st.iph) : null);
@@ -4108,7 +4160,7 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey) {
   const weekIpshMin = weekIpshVals.length ? Math.min(...weekIpshVals) : 0;
   const weekIpshMax = weekIpshVals.length ? Math.max(...weekIpshVals) : 0;
 
-  html += '<tr style="border-top:2px solid #3d4458;background:#0f1218"><td style="padding:6px 10px;color:#d9a441;font-weight:700;position:sticky;left:0;z-index:1;background:#0f1218">Week</td>';
+  html += '<tr style="border-top:2px solid #3d4458;background:#0f1218"><td style="padding:'+dayPad+';color:#d9a441;font-weight:700;position:sticky;left:0;z-index:1;background:#0f1218">Week</td>';
   weekCells.forEach(c => {
     const heat = portfolioIpshHeat(c.ipsh, weekIpshMin, weekIpshMax);
     html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:#ffffff;background:transparent">'+(c.ful != null ? Number(c.ful).toFixed(1) : '—')+'</td>'+
@@ -5626,8 +5678,53 @@ function fitPrintPagesToSheet(pages, maxW, maxH) {
   });
 }
 
-function exportPortfolioStationsPdf() {
-  // RDG Portfolio + Stations tab
+function chunkArray(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
+
+function buildPastryCasaNeosPlaceholderPageHtml(weekKey, weekLabel) {
+  const tableHtml = buildPortfolioStationsFamilyTableHtml('Pastry', weekKey, {
+    forceVenueKeys: ['casaneos'],
+    venueKeys: ['casaneos'],
+    titleExtra: 'Casa Neos',
+    compact: false,
+  });
+  return '<div class="ps-print-page ps-placeholder ps-family">'+
+    '<div class="ps-placeholder-badge">Placeholder page</div>'+
+    '<h1>PASTRY</h1>'+
+    '<p class="ps-sub">'+(weekLabel || weekKey || '')+' · Casa Neos only · Ful · Items/staff-hr · Items/person</p>'+
+    (tableHtml || '<p class="ps-sub">No Pastry items/staff for Casa Neos this week — shell reserved for future fill.</p>')+
+    '</div>';
+}
+
+function runStationsPdfPrint(printRoot, html) {
+  printRoot.innerHTML = html;
+  const cleanup = () => {
+    document.body.classList.remove('printing-stations-pdf');
+    printRoot.style.display = 'none';
+    printRoot.setAttribute('aria-hidden', 'true');
+    printRoot.querySelectorAll('.ps-print-page').forEach(pg => { pg.style.zoom = ''; });
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.removeEventListener('afterprint', cleanup);
+  window.addEventListener('afterprint', cleanup);
+
+  document.body.classList.add('printing-stations-pdf');
+  printRoot.style.display = 'block';
+  printRoot.setAttribute('aria-hidden', 'false');
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const pages = Array.from(printRoot.querySelectorAll('.ps-print-page'));
+      fitPrintPagesToSheet(pages, 1020, 730);
+      setTimeout(() => window.print(), 200);
+    });
+  });
+}
+
+function ensurePortfolioStationsContext() {
   if (currentVenue !== 'rdg_portfolio') {
     currentVenue = 'rdg_portfolio';
     document.querySelectorAll('.venue-pill').forEach(b => {
@@ -5640,6 +5737,28 @@ function exportPortfolioStationsPdf() {
   if (stationsBtn) switchTab('stations', stationsBtn);
   else if (typeof switchTab === 'function') switchTab('stations');
   renderAll();
+}
+
+function exportPastryCasaNeosPlaceholderPdf() {
+  ensurePortfolioStationsContext();
+  const weekKey = WEEKS[currentWeekIdx]?.key;
+  const weekLabel = WEEKS[currentWeekIdx]?.label || weekKey || '';
+  const printRoot = document.getElementById('portfolioStationsPrintRoot');
+  if (!printRoot) {
+    alert('Stations PDF root missing — rebuild dashboard.');
+    return;
+  }
+  renderPortfolioStations();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      runStationsPdfPrint(printRoot, buildPastryCasaNeosPlaceholderPageHtml(weekKey, weekLabel));
+    });
+  });
+}
+
+function exportPortfolioStationsPdf() {
+  // RDG Portfolio + Stations tab
+  ensurePortfolioStationsContext();
 
   const weekKey = WEEKS[currentWeekIdx]?.key;
   const weekLabel = WEEKS[currentWeekIdx]?.label || weekKey || '';
@@ -5664,7 +5783,7 @@ function exportPortfolioStationsPdf() {
     // Page 1 — intro: chart + week matrix (items/staff-hr)
     let intro = '<div class="ps-print-page ps-intro">'+
       '<h1>RDG Stations Compare</h1>'+
-      '<p class="ps-sub">'+weekLabel+' · intro · items / staff-hour across all locations · then one page per station family</p>';
+      '<p class="ps-sub">'+weekLabel+' · intro · items / staff-hour across all locations · then up to 3 station families per page</p>';
     if (chartImg) intro += '<img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart">';
     intro += '<h2>Week matrix — items / staff-hour</h2><table><thead><tr><th>Station family</th>';
     venueRows.forEach(v => { intro += '<th>'+(v.label || v.key)+'</th>'; });
@@ -5680,40 +5799,23 @@ function exportPortfolioStationsPdf() {
     });
     intro += '</tbody></table></div>';
 
-    // Pages 2+ — one family per page, all locations that have that family
-    const familyPages = families.map(f => {
-      const tableHtml = buildPortfolioStationsFamilyTableHtml(f, weekKey);
-      if (!tableHtml) return '';
-      return '<div class="ps-print-page ps-family">'+
-        '<h1>'+f.toUpperCase()+'</h1>'+
-        '<p class="ps-sub">'+weekLabel+' · all locations with items/staff for this station family · Ful · Items/staff-hr · Items/person</p>'+
-        tableHtml+
+    // Pages 2+ — up to 3 families per printed page
+    const FAMILIES_PER_PAGE = 3;
+    const familyChunks = chunkArray(families, FAMILIES_PER_PAGE);
+    const familyPages = familyChunks.map(chunk => {
+      const tables = chunk.map(f => buildPortfolioStationsFamilyTableHtml(f, weekKey, { compact: true })).filter(Boolean).join('');
+      if (!tables) return '';
+      return '<div class="ps-print-page ps-family ps-multi">'+
+        '<h1>'+chunk.map(f => f.toUpperCase()).join(' · ')+'</h1>'+
+        '<p class="ps-sub">'+weekLabel+' · '+chunk.length+' station famil'+(chunk.length===1?'y':'ies')+' on this page · Ful · Items/staff-hr · Items/person</p>'+
+        tables+
         '</div>';
     }).join('');
 
-    printRoot.innerHTML = intro + familyPages;
+    // Final placeholder page — PASTRY / Casa Neos
+    const pastryPlaceholder = buildPastryCasaNeosPlaceholderPageHtml(weekKey, weekLabel);
 
-    const cleanup = () => {
-      document.body.classList.remove('printing-stations-pdf');
-      printRoot.style.display = 'none';
-      printRoot.setAttribute('aria-hidden', 'true');
-      printRoot.querySelectorAll('.ps-print-page').forEach(pg => { pg.style.zoom = ''; });
-      window.removeEventListener('afterprint', cleanup);
-    };
-    window.removeEventListener('afterprint', cleanup);
-    window.addEventListener('afterprint', cleanup);
-
-    document.body.classList.add('printing-stations-pdf');
-    printRoot.style.display = 'block';
-    printRoot.setAttribute('aria-hidden', 'false');
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const pages = Array.from(printRoot.querySelectorAll('.ps-print-page'));
-        fitPrintPagesToSheet(pages, 1020, 730);
-        setTimeout(() => window.print(), 200);
-      });
-    });
+    runStationsPdfPrint(printRoot, intro + familyPages + pastryPlaceholder);
   };
 
   // Chart needs a paint cycle before canvas snapshot (labels included)
