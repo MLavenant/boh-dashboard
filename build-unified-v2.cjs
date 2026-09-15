@@ -247,7 +247,7 @@ html = html.replace(
   <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:4px 0 16px;font-size:11px;color:#9aa0aa">
     <span><strong style="color:#e8eaed">Bars</strong> = items / staff-hour</span>
     <span>Alternating bands = station families</span>
-    <span>PDF = title page per station · then one data page (locations side by side)</span>
+    <span>PDF = title page per station, then one data page (locations side by side)</span>
   </div>
   <p class="note" style="margin:0 0 12px">One table per station family · locations side by side. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> (green→red heat) · <strong>Items/person</strong>.</p>
   <div id="portfolioStationsDayTable"></div>
