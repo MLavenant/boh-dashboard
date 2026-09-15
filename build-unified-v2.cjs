@@ -239,7 +239,6 @@ html = html.replace(
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
       <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Export Stations PDF</button>
-      <button type="button" id="portfolioPastryPlaceholderPdfBtn" onclick="exportPastryCasaNeosPlaceholderPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #6b7280;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 PASTRY (Casa Neos)</button>
     </div>
   </div>
   <div style="position:relative;height:440px;margin:12px 0 8px">
@@ -248,9 +247,9 @@ html = html.replace(
   <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:4px 0 16px;font-size:11px;color:#9aa0aa">
     <span><strong style="color:#e8eaed">Bars</strong> = items / staff-hour</span>
     <span>Alternating bands = station families</span>
-    <span>PDF = intro · then up to 3 station families per page · plus PASTRY (Casa Neos) placeholder</span>
+    <span>PDF = title page per station · then one data page (locations side by side)</span>
   </div>
-  <p class="note" style="margin:0 0 12px">Mon→Sun tables for each station family · only locations with items/staff. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> (green→red heat) · <strong>Items/person</strong>.</p>
+  <p class="note" style="margin:0 0 12px">One table per station family · locations side by side. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> (green→red heat) · <strong>Items/person</strong>.</p>
   <div id="portfolioStationsDayTable"></div>
 </div>
 <div id="stationKpiBar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
@@ -710,7 +709,7 @@ body.printing-stations-pdf #portfolioStationsPrintRoot {
   zoom:1 !important;
 }
 body.printing-stations-pdf .ps-print-page {
-  padding:8px 12px 10px;
+  padding:16px 20px 18px;
   box-sizing:border-box;
   page-break-after:always;
   break-after:page;
@@ -723,69 +722,137 @@ body.printing-stations-pdf .ps-print-page:last-child {
   page-break-after:auto;
   break-after:auto;
 }
-body.printing-stations-pdf .ps-print-page h1 {
-  margin:0 0 2px;
-  font-size:14px;
+body.printing-stations-pdf .ps-print-page.ps-intro h1,
+body.printing-stations-pdf .ps-print-page.ps-family h1 {
+  margin:0 0 6px;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
   color:#d9a441;
 }
-body.printing-stations-pdf .ps-print-page h2,
-body.printing-stations-pdf .ps-print-page h3 {
-  margin:2px 0 2px;
-  font-size:11px;
+body.printing-stations-pdf .ps-print-page h2 {
+  margin:10px 0 6px;
+  font-size:14px;
   color:#d9a441;
 }
 body.printing-stations-pdf .ps-print-page .ps-sub,
 body.printing-stations-pdf .ps-print-page .note {
-  margin:0 0 4px;
-  font-size:8px;
+  margin:0 0 12px;
+  font-size:11px;
   color:#9aa0aa;
 }
-body.printing-stations-pdf .ps-print-page table {
+body.printing-stations-pdf .ps-print-page.ps-intro table {
   width:100%;
   border-collapse:collapse;
-  font-size:8px;
+  font-size:11px;
 }
-body.printing-stations-pdf .ps-print-page th,
-body.printing-stations-pdf .ps-print-page td {
-  padding:1px 3px;
+body.printing-stations-pdf .ps-print-page.ps-intro th,
+body.printing-stations-pdf .ps-print-page.ps-intro td {
+  padding:5px 8px;
   border-bottom:1px solid #262a33;
   text-align:right;
-  line-height:1.15;
 }
-body.printing-stations-pdf .ps-print-page th:first-child,
-body.printing-stations-pdf .ps-print-page td:first-child {
+body.printing-stations-pdf .ps-print-page.ps-intro th:first-child,
+body.printing-stations-pdf .ps-print-page.ps-intro td:first-child {
   text-align:left;
+}
+body.printing-stations-pdf .ps-print-page.ps-family table {
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  font-size:11px;
+}
+body.printing-stations-pdf .ps-print-page.ps-family th,
+body.printing-stations-pdf .ps-print-page.ps-family td {
+  padding:6px 8px;
+  border-bottom:1px solid #262a33;
+  text-align:right;
+  line-height:1.25;
+}
+body.printing-stations-pdf .ps-print-page.ps-family th:first-child,
+body.printing-stations-pdf .ps-print-page.ps-family td:first-child {
+  text-align:left;
+}
+body.printing-stations-pdf .ps-print-page.ps-family th.ps-loc-head {
+  font-size:13px;
+  font-weight:700;
+  color:#ffffff !important;
+  letter-spacing:0.02em;
+  padding-top:10px;
+  padding-bottom:10px;
+  border-left:3px solid #d9a441;
+}
+body.printing-stations-pdf .ps-print-page.ps-family th.ps-metric-head,
+body.printing-stations-pdf .ps-print-page.ps-family td.ps-metric-first {
+  border-left:3px solid #3d4458;
+  padding-left:12px;
 }
 body.printing-stations-pdf .ps-print-page img.ps-chart {
   width:100%;
-  max-height:420px;
+  max-height:400px;
   object-fit:contain;
   background:#13161c;
   border:1px solid #262a33;
   border-radius:6px;
-  margin:4px 0 8px;
+  margin:4px 0 10px;
 }
-body.printing-stations-pdf .ps-family-block { margin:0 0 6px !important; }
-body.printing-stations-pdf .ps-print-page.ps-multi .ps-family-block { margin:0 0 4px !important; }
-body.printing-stations-pdf .ps-print-page.ps-multi .ps-family-block h3 { font-size:10px !important; margin:0 0 1px !important; }
-body.printing-stations-pdf .ps-print-page.ps-placeholder {
-  border:1px dashed #6b7280;
-}
-body.printing-stations-pdf .ps-print-page.ps-placeholder .ps-placeholder-badge {
-  display:inline-block;
-  margin:0 0 4px;
-  padding:2px 8px;
-  border:1px solid #d9a441;
-  border-radius:4px;
-  font-size:9px;
-  font-weight:700;
-  letter-spacing:0.06em;
-  color:#d9a441;
-  text-transform:uppercase;
-}
+body.printing-stations-pdf .ps-family-block { margin:0 !important; }
+body.printing-stations-pdf .ps-family-block > h3 { display:none !important; }
 body.printing-stations-pdf .ps-print-page [style*="overflow"] { overflow:visible !important; }
-body.printing-stations-pdf #portfolioStationsPdfBtn,
-body.printing-stations-pdf #portfolioPastryPlaceholderPdfBtn {
+/* Station title divider (placeholder) — white page, navy pill, RDG mark */
+body.printing-stations-pdf .ps-print-page.ps-divider {
+  background:#ffffff !important;
+  color:#0a1628;
+  position:relative;
+  min-height:700px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:stretch;
+  padding:36px 48px;
+}
+body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo {
+  position:absolute;
+  top:28px;
+  right:40px;
+  width:88px;
+  text-align:center;
+  color:#0a1628;
+}
+body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo svg { width:54px; height:54px; display:block; margin:0 auto 6px; }
+body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo .ps-rdg-letters {
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:0.12em;
+  line-height:1;
+}
+body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo .ps-rdg-sub {
+  margin-top:3px;
+  font-size:7px;
+  letter-spacing:0.04em;
+  text-transform:lowercase;
+  color:#4b5563;
+}
+body.printing-stations-pdf .ps-print-page.ps-divider .ps-divider-pill {
+  margin:0 6%;
+  background:#0a1628;
+  border-radius:22px;
+  padding:52px 48px;
+  text-align:center;
+}
+body.printing-stations-pdf .ps-print-page.ps-divider .ps-divider-pill span {
+  display:block;
+  color:#ffffff;
+  font-size:68px;
+  font-weight:800;
+  font-style:italic;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  line-height:1.05;
+}
+body.printing-stations-pdf #portfolioStationsPdfBtn {
   display:none !important;
 }
 .ps-ipsh-heat {
@@ -4090,6 +4157,7 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
   if (!useVenues.length) return '';
 
   const compact = !!opts.compact;
+  const forPrint = !!opts.forPrint;
   const ipshVals = [];
   const dayRows = HOURLY_DAYS.map(day => {
     const cells = useVenues.map(v => {
@@ -4112,26 +4180,28 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
   });
   const ipshMin = ipshVals.length ? Math.min(...ipshVals) : 0;
   const ipshMax = ipshVals.length ? Math.max(...ipshVals) : 0;
-  const pad = compact ? '2px 4px' : '5px 6px';
-  const headPad = compact ? '2px 4px' : '4px 6px';
-  const dayPad = compact ? '2px 6px' : '6px 10px';
-  const fontSz = compact ? '9px' : '11px';
-  const headSz = compact ? '8px' : '10px';
-  const metricCell = 'padding:'+pad+';text-align:right;font-size:'+fontSz+';font-weight:600;min-width:'+(compact?54:70)+'px;box-sizing:border-box;';
-  const metricHead = 'padding:'+headPad+';text-align:right;background:#1e2533;font-size:'+headSz+';font-weight:600;min-width:'+(compact?54:70)+'px;box-sizing:border-box;white-space:nowrap;color:#9aa0aa;';
-  const titleExtra = opts.titleExtra ? ' · '+opts.titleExtra : '';
-  const blockMargin = compact ? '0 0 6px' : '0 0 14px';
+  const pad = forPrint ? '7px 9px' : (compact ? '2px 4px' : '6px 8px');
+  const headPad = forPrint ? '6px 9px' : (compact ? '2px 4px' : '5px 8px');
+  const dayPad = forPrint ? '7px 10px' : (compact ? '2px 6px' : '8px 12px');
+  const fontSz = forPrint ? '12px' : (compact ? '9px' : '12px');
+  const headSz = forPrint ? '11px' : (compact ? '8px' : '11px');
+  const metricCell = 'padding:'+pad+';text-align:right;font-size:'+fontSz+';font-weight:600;min-width:'+(forPrint?72:(compact?54:72))+'px;box-sizing:border-box;';
+  const metricHead = 'padding:'+headPad+';text-align:right;background:#1e2533;font-size:'+headSz+';font-weight:600;min-width:'+(forPrint?72:(compact?54:72))+'px;box-sizing:border-box;white-space:nowrap;color:#9aa0aa;';
+  const locSep = 'border-left:3px solid #3d4458;';
+  const blockMargin = forPrint ? '0' : '0 0 36px';
 
-  let html = '<div class="ps-family-block" style="margin:'+blockMargin+'">'+
-    '<h3 style="margin:0 0 '+(compact?'2px':'6px')+';font-size:'+(compact?'12px':'15px')+';color:#d9a441">'+family+titleExtra+' · Mon→Sun · '+useVenues.length+' location'+(useVenues.length===1?'':'s')+'</h3>'+
-    '<div style="overflow:auto"><table class="ps-family-table" style="width:100%;border-collapse:collapse;font-size:'+fontSz+';min-width:'+(70+useVenues.length*(compact?160:220))+'px"><thead>'+
-    '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:'+dayPad+';background:#1e2533;position:sticky;left:0;z-index:1;width:56px">Day</th>';
+  let html = '<div class="ps-family-block" style="margin:'+blockMargin+'">';
+  if (!forPrint) {
+    html += '<h3 style="margin:0 0 12px;font-size:20px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:#d9a441">'+family+'</h3>';
+  }
+  html += '<div style="overflow:auto"><table class="ps-family-table" style="width:100%;border-collapse:collapse;font-size:'+fontSz+';min-width:'+(80+useVenues.length*(forPrint?230:220))+'px"><thead>'+
+    '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:'+dayPad+';background:#1e2533;position:sticky;left:0;z-index:1;width:64px">Day</th>';
   useVenues.forEach(v => {
-    html += '<th colspan="3" style="text-align:center;padding:'+(compact?'3px 4px':'8px 6px')+';background:#1e2533;border-left:1px solid #262a33;color:#e8eaed">'+v.label+'</th>';
+    html += '<th colspan="3" class="ps-loc-head" style="text-align:center;padding:'+(forPrint?'10px 8px':'10px 8px')+';background:#1e2533;'+locSep+'color:#ffffff;font-size:'+(forPrint?'14px':'13px')+';font-weight:700">'+v.label+'</th>';
   });
   html += '</tr><tr style="color:#6b7280;border-bottom:1px solid #262a33"><th style="padding:'+headPad+';background:#13161c;position:sticky;left:0;z-index:1"></th>';
   useVenues.forEach(() => {
-    html += '<th style="'+metricHead+'border-left:1px solid #262a33">Ful</th>'+
+    html += '<th class="ps-metric-head" style="'+metricHead+locSep+'">Ful</th>'+
       '<th style="'+metricHead+'">Items/staff-hr</th>'+
       '<th style="'+metricHead+'">Items/person</th>';
   });
@@ -4141,7 +4211,7 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
     html += '<tr style="border-top:1px solid #262a33"><td style="padding:'+dayPad+';color:#ffffff;font-weight:700;background:#13161c;position:sticky;left:0;z-index:1">'+row.day.slice(0,3)+'</td>';
     row.cells.forEach(c => {
       const heat = portfolioIpshHeat(c.ipsh, ipshMin, ipshMax);
-      html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:#ffffff;background:transparent">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
+      html += '<td class="ps-metric-first" style="'+metricCell+locSep+'color:#ffffff;background:transparent">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
         (heat
           ? '<td class="ps-ipsh-heat" style="'+metricCell+heat.style+'">'+(Number(c.ipsh).toFixed(2))+'</td>'
           : '<td style="'+metricCell+'color:#ffffff;background:transparent">'+(c.ipsh != null ? Number(c.ipsh).toFixed(2) : '—')+'</td>')+
@@ -4163,7 +4233,7 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
   html += '<tr style="border-top:2px solid #3d4458;background:#0f1218"><td style="padding:'+dayPad+';color:#d9a441;font-weight:700;position:sticky;left:0;z-index:1;background:#0f1218">Week</td>';
   weekCells.forEach(c => {
     const heat = portfolioIpshHeat(c.ipsh, weekIpshMin, weekIpshMax);
-    html += '<td style="'+metricCell+'border-left:1px solid #262a33;color:#ffffff;background:transparent">'+(c.ful != null ? Number(c.ful).toFixed(1) : '—')+'</td>'+
+    html += '<td class="ps-metric-first" style="'+metricCell+locSep+'color:#ffffff;background:transparent">'+(c.ful != null ? Number(c.ful).toFixed(1) : '—')+'</td>'+
       (heat
         ? '<td class="ps-ipsh-heat" style="'+metricCell+heat.style+'">'+Number(c.ipsh).toFixed(2)+'</td>'
         : '<td style="'+metricCell+'color:#ffffff;background:transparent">'+(c.ipsh != null ? Number(c.ipsh).toFixed(2) : '—')+'</td>')+
@@ -5668,8 +5738,12 @@ function fitPrintPagesToSheet(pages, maxW, maxH) {
     page.style.width = '';
     page.style.height = '';
   });
-  // Force layout, then scale each page independently so nothing is cut
   pages.forEach(page => {
+    // Title divider pages stay full-size (branded white sheets)
+    if (page.classList.contains('ps-divider')) {
+      page.style.zoom = '1';
+      return;
+    }
     const w = Math.max(page.scrollWidth, page.offsetWidth, 1);
     const h = Math.max(page.scrollHeight, page.offsetHeight, 1);
     let zoom = Math.min(maxW / w, maxH / h, 1);
@@ -5678,24 +5752,24 @@ function fitPrintPagesToSheet(pages, maxW, maxH) {
   });
 }
 
-function chunkArray(arr, size) {
-  const out = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
+function rdgLogoHtml() {
+  return '<div class="ps-rdg-logo" aria-hidden="true">'+
+    '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">'+
+      '<circle cx="32" cy="32" r="30" fill="none" stroke="#0a1628" stroke-width="2.5"/>'+
+      '<path d="M12 24c6 4 12-4 18 0s12-4 22 0" fill="none" stroke="#0a1628" stroke-width="2.2" stroke-linecap="round"/>'+
+      '<path d="M12 32c6 4 12-4 18 0s12-4 22 0" fill="none" stroke="#0a1628" stroke-width="2.2" stroke-linecap="round"/>'+
+      '<path d="M12 40c6 4 12-4 18 0s12-4 22 0" fill="none" stroke="#0a1628" stroke-width="2.2" stroke-linecap="round"/>'+
+    '</svg>'+
+    '<div class="ps-rdg-letters">RDG</div>'+
+    '<div class="ps-rdg-sub">riviera dining group</div>'+
+    '</div>';
 }
 
-function buildPastryCasaNeosPlaceholderPageHtml(weekKey, weekLabel) {
-  const tableHtml = buildPortfolioStationsFamilyTableHtml('Pastry', weekKey, {
-    forceVenueKeys: ['casaneos'],
-    venueKeys: ['casaneos'],
-    titleExtra: 'Casa Neos',
-    compact: false,
-  });
-  return '<div class="ps-print-page ps-placeholder ps-family">'+
-    '<div class="ps-placeholder-badge">Placeholder page</div>'+
-    '<h1>PASTRY</h1>'+
-    '<p class="ps-sub">'+(weekLabel || weekKey || '')+' · Casa Neos only · Ful · Items/staff-hr · Items/person</p>'+
-    (tableHtml || '<p class="ps-sub">No Pastry items/staff for Casa Neos this week — shell reserved for future fill.</p>')+
+function buildStationDividerPageHtml(familyName) {
+  const title = String(familyName || '').toUpperCase();
+  return '<div class="ps-print-page ps-divider">'+
+    rdgLogoHtml()+
+    '<div class="ps-divider-pill"><span>'+title+'</span></div>'+
     '</div>';
 }
 
@@ -5739,25 +5813,7 @@ function ensurePortfolioStationsContext() {
   renderAll();
 }
 
-function exportPastryCasaNeosPlaceholderPdf() {
-  ensurePortfolioStationsContext();
-  const weekKey = WEEKS[currentWeekIdx]?.key;
-  const weekLabel = WEEKS[currentWeekIdx]?.label || weekKey || '';
-  const printRoot = document.getElementById('portfolioStationsPrintRoot');
-  if (!printRoot) {
-    alert('Stations PDF root missing — rebuild dashboard.');
-    return;
-  }
-  renderPortfolioStations();
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      runStationsPdfPrint(printRoot, buildPastryCasaNeosPlaceholderPageHtml(weekKey, weekLabel));
-    });
-  });
-}
-
 function exportPortfolioStationsPdf() {
-  // RDG Portfolio + Stations tab
   ensurePortfolioStationsContext();
 
   const weekKey = WEEKS[currentWeekIdx]?.key;
@@ -5780,12 +5836,12 @@ function exportPortfolioStationsPdf() {
       if (canvas && canvas.toDataURL) chartImg = canvas.toDataURL('image/png');
     } catch (e) { chartImg = ''; }
 
-    // Page 1 — intro: chart + week matrix (items/staff-hr)
+    // Page 1 — overview chart + week matrix
     let intro = '<div class="ps-print-page ps-intro">'+
       '<h1>RDG Stations Compare</h1>'+
-      '<p class="ps-sub">'+weekLabel+' · intro · items / staff-hour across all locations · then up to 3 station families per page</p>';
+      '<p class="ps-sub">'+weekLabel+' · overview · then one title page + one data page per station</p>';
     if (chartImg) intro += '<img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart">';
-    intro += '<h2>Week matrix — items / staff-hour</h2><table><thead><tr><th>Station family</th>';
+    intro += '<h2>Week matrix — items / staff-hour</h2><table><thead><tr><th>Station</th>';
     venueRows.forEach(v => { intro += '<th>'+(v.label || v.key)+'</th>'; });
     intro += '</tr></thead><tbody>';
     families.forEach(f => {
@@ -5799,26 +5855,21 @@ function exportPortfolioStationsPdf() {
     });
     intro += '</tbody></table></div>';
 
-    // Pages 2+ — up to 3 families per printed page
-    const FAMILIES_PER_PAGE = 3;
-    const familyChunks = chunkArray(families, FAMILIES_PER_PAGE);
-    const familyPages = familyChunks.map(chunk => {
-      const tables = chunk.map(f => buildPortfolioStationsFamilyTableHtml(f, weekKey, { compact: true })).filter(Boolean).join('');
-      if (!tables) return '';
-      return '<div class="ps-print-page ps-family ps-multi">'+
-        '<h1>'+chunk.map(f => f.toUpperCase()).join(' · ')+'</h1>'+
-        '<p class="ps-sub">'+weekLabel+' · '+chunk.length+' station famil'+(chunk.length===1?'y':'ies')+' on this page · Ful · Items/staff-hr · Items/person</p>'+
-        tables+
+    // Each station: title divider (placeholder) → data page with locations side by side
+    const stationPages = families.map(f => {
+      const tableHtml = buildPortfolioStationsFamilyTableHtml(f, weekKey, { forPrint: true });
+      if (!tableHtml) return '';
+      return buildStationDividerPageHtml(f)+
+        '<div class="ps-print-page ps-family">'+
+          '<h1>'+String(f).toUpperCase()+'</h1>'+
+          '<p class="ps-sub">'+weekLabel+' · locations side by side · Ful · Items/staff-hr · Items/person</p>'+
+          tableHtml+
         '</div>';
     }).join('');
 
-    // Final placeholder page — PASTRY / Casa Neos
-    const pastryPlaceholder = buildPastryCasaNeosPlaceholderPageHtml(weekKey, weekLabel);
-
-    runStationsPdfPrint(printRoot, intro + familyPages + pastryPlaceholder);
+    runStationsPdfPrint(printRoot, intro + stationPages);
   };
 
-  // Chart needs a paint cycle before canvas snapshot (labels included)
   requestAnimationFrame(() => {
     requestAnimationFrame(() => setTimeout(finish, 320));
   });
