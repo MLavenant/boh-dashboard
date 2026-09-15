@@ -4243,7 +4243,8 @@ function renderPortfolioStations() {
       label: (v.label || v.key),
       data: families.map(f => {
         const st = v.familyStats[f] || {};
-        return st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
+        const vIpsh = st.ipsh != null ? Number(st.ipsh) : (st.iph != null ? Number(st.iph) : null);
+        return (vIpsh != null && vIpsh > 0) ? vIpsh : null;
       }),
       backgroundColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
       borderColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
@@ -4253,6 +4254,7 @@ function renderPortfolioStations() {
       barPercentage: 0.85,
       categoryPercentage: 0.62,
       order: 1,
+      skipNull: true,
     }));
 
     new Chart(canvas, {
@@ -4268,14 +4270,18 @@ function renderPortfolioStations() {
             labels: { boxWidth: 12, boxHeight: 10, font: { size: 11 }, padding: 12 },
           },
           tooltip: {
+            filter(item) {
+              const v = item.parsed && item.parsed.y;
+              return v != null && Number(v) > 0;
+            },
             callbacks: {
               title(items) {
                 return items[0] ? String(items[0].label) : '';
               },
               label(ctx) {
                 const v = ctx.parsed.y;
-                if (v == null) return ctx.dataset.label + ': —';
-                return ctx.dataset.label + ': ' + v.toFixed(2) + ' items/staff-hr';
+                if (v == null || !(Number(v) > 0)) return null;
+                return ctx.dataset.label + ': ' + Number(v).toFixed(2) + ' items/staff-hr';
               },
             },
           },
@@ -6059,8 +6065,8 @@ function buildStationsPdfIntroHtml(weekLabel, chartImg, families, venueRows, ver
     intro += '<tr><td>'+f+'</td>';
     venueRows.forEach(v => {
       const st = v.familyStats[f] || {};
-      const ipsh = st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
-      intro += '<td>'+(ipsh != null ? ipsh : '—')+'</td>';
+      const ipsh = st.ipsh != null ? Number(st.ipsh) : (st.iph != null ? Number(st.iph) : null);
+      intro += '<td>'+(ipsh != null && ipsh > 0 ? ipsh : '')+'</td>';
     });
     intro += '</tr>';
   });
