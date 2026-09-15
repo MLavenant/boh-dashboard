@@ -1,0 +1,29 @@
+---
+description: RDG Stations PDF export versions (V1 vs V2) — keep both behaviors
+alwaysApply: true
+---
+
+# Stations PDF — V1 vs V2
+
+Single export entry points on Portfolio → Stations. Do not collapse these into one ambiguous PDF without labeling.
+
+## V1 (current baseline — preserve)
+
+Built in `build-unified-v2.cjs` → `exportPortfolioStationsPdf('v1')`.
+
+1. **Front / overview** — RDG logo (high-contrast), chart, week matrix; use full landscape page (not cramped top strip).
+2. **Portfolio compare** — up to **3 station families per page**, locations side by side (Ful · Items/staff-hr · Items/person). Clear station titles; spacing between blocks.
+3. **Per station** — white **title divider** (RDG logo top-right, navy rounded pill with station name e.g. SAUTE, navy footer bar).
+4. **Then one hour×day heatmap per location** that has the station (Casa Neos → Claudie → …): Items / staff-hour · Hour × Mon–Sun (Table 2 style).
+
+## V2 (compare locations in one table)
+
+`exportPortfolioStationsPdf('v2')`.
+
+1. Same overview + portfolio 3-per-page + station title dividers as V1.
+2. Instead of one heatmap per location: **one table per station** with columns = all locations, rows = Day × Hour (or Hour with day sections), so every location is comparable for the same hour and day.
+
+## Branding
+
+- Use a **visible** RDG mark (waves + mountains in circle, “RDG”, “riviera dining group”). Never embed the low-contrast dark-on-black JPEG without inversion/recolor — it reads as a blank black box.
+- Logo on dark pages: light/white. Logo on white divider pages: navy/dark.

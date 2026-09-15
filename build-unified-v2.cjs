@@ -250,7 +250,8 @@ html = html.replace(
       <p class="note" style="margin:0">All locations · selected week. Bars = <strong>items / staff-hour</strong> (numbers on bars). Tables below = every station family Mon→Sun.</p>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-      <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Export Stations PDF</button>
+      <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf('v1')" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Stations PDF V1</button>
+      <button type="button" id="portfolioStationsPdfBtnV2" onclick="exportPortfolioStationsPdf('v2')" style="padding:8px 14px;border-radius:8px;border:1px solid #6b7280;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Stations PDF V2</button>
     </div>
   </div>
   <div style="position:relative;height:440px;margin:12px 0 8px">
@@ -259,7 +260,7 @@ html = html.replace(
   <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:4px 0 16px;font-size:11px;color:#9aa0aa">
     <span><strong style="color:#e8eaed">Bars</strong> = items / staff-hour</span>
     <span>Alternating bands = station families</span>
-    <span>PDF = Portfolio (3 stations/page) then per-station title + hour×day tables by location</span>
+    <span>V1 = one hour×day table per location · V2 = one table, all locations side by side</span>
   </div>
   <p class="note" style="margin:0 0 12px">One table per station family · locations side by side. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> (green→red heat) · <strong>Items/person</strong>.</p>
   <div id="portfolioStationsDayTable"></div>
@@ -754,23 +755,67 @@ body.printing-stations-pdf .ps-print-page .note {
   font-size:11px;
   color:#9aa0aa;
 }
+body.printing-stations-pdf .ps-print-page.ps-intro {
+  min-height:700px;
+  display:flex;
+  flex-direction:column;
+  padding:20px 28px 24px;
+  box-sizing:border-box;
+}
+body.printing-stations-pdf .ps-print-page.ps-intro .ps-intro-top {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin:0 0 14px;
+}
+body.printing-stations-pdf .ps-print-page.ps-intro .ps-intro-top h1 {
+  margin:0;
+  font-size:26px;
+}
+body.printing-stations-pdf .ps-print-page.ps-intro .ps-sub {
+  margin:0 0 12px;
+  font-size:12px;
+}
 body.printing-stations-pdf .ps-print-page.ps-intro .ps-rdg-logo {
   position:static;
-  width:90px;
+  width:110px;
+  flex:0 0 auto;
 }
-body.printing-stations-pdf .ps-print-page.ps-intro .ps-rdg-logo img {
-  width:72px;
-  height:auto;
+body.printing-stations-pdf .ps-print-page.ps-intro .ps-rdg-logo svg {
+  width:64px;
+  height:64px;
   display:block;
-  margin:0 auto;
+  margin:0 auto 4px;
 }
+body.printing-stations-pdf .ps-print-page.ps-intro .ps-chart-wrap {
+  flex:1 1 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:280px;
+  margin:0 0 14px;
+}
+body.printing-stations-pdf .ps-print-page.ps-intro img.ps-chart {
+  width:100%;
+  max-height:340px;
+  object-fit:contain;
+  background:#13161c;
+  border:1px solid #262a33;
+  border-radius:6px;
+  margin:0;
+}
+body.printing-stations-pdf .ps-print-page.ps-intro .ps-matrix-wrap {
+  margin-top:auto;
+}
+body.printing-stations-pdf .ps-print-page.ps-intro table {
   width:100%;
   border-collapse:collapse;
-  font-size:11px;
+  font-size:12px;
 }
 body.printing-stations-pdf .ps-print-page.ps-intro th,
 body.printing-stations-pdf .ps-print-page.ps-intro td {
-  padding:5px 8px;
+  padding:6px 10px;
   border-bottom:1px solid #262a33;
   text-align:right;
 }
@@ -837,32 +882,31 @@ body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo {
   position:absolute;
   top:24px;
   right:36px;
-  width:96px;
+  width:120px;
   text-align:center;
   color:#0a1628;
 }
-body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo img {
-  width:72px;
-  height:auto;
+body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo svg {
+  width:70px;
+  height:70px;
   display:block;
-  margin:0 auto;
-  object-fit:contain;
+  margin:0 auto 6px;
 }
-body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo svg { width:54px; height:54px; display:block; margin:0 auto 6px; }
 body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo .ps-rdg-letters {
   font-family:Arial,Helvetica,sans-serif;
-  font-size:18px;
+  font-size:20px;
   font-weight:300;
-  letter-spacing:0.18em;
+  letter-spacing:0.2em;
   line-height:1;
   margin-top:4px;
+  color:#0a1628;
 }
 body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo .ps-rdg-sub {
-  margin-top:3px;
-  font-size:6.5px;
-  letter-spacing:0.08em;
+  margin-top:4px;
+  font-size:7px;
+  letter-spacing:0.1em;
   text-transform:lowercase;
-  color:#4b5563;
+  color:#0a1628;
 }
 body.printing-stations-pdf .ps-print-page.ps-divider .ps-divider-pill {
   margin:0 8%;
@@ -917,10 +961,23 @@ body.printing-stations-pdf .ps-print-page.ps-hourly h2 {
   text-transform:none;
   letter-spacing:0;
 }
+body.printing-stations-pdf .ps-print-page.ps-intro .ps-rdg-logo .ps-rdg-letters {
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:18px;
+  font-weight:300;
+  letter-spacing:0.2em;
+  text-align:center;
+}
+body.printing-stations-pdf .ps-print-page.ps-intro .ps-rdg-logo .ps-rdg-sub {
+  font-size:7px;
+  letter-spacing:0.08em;
+  text-align:center;
+  text-transform:lowercase;
+}
 body.printing-stations-pdf .ps-print-page.ps-hourly table {
   width:100%;
   border-collapse:collapse;
-  font-size:10px;
+  font-size:9px;
 }
 body.printing-stations-pdf .ps-print-page.ps-hourly th,
 body.printing-stations-pdf .ps-print-page.ps-hourly td {
@@ -933,7 +990,8 @@ body.printing-stations-pdf .ps-print-page.ps-hourly th:first-child,
 body.printing-stations-pdf .ps-print-page.ps-hourly td:first-child {
   text-align:left;
 }
-body.printing-stations-pdf #portfolioStationsPdfBtn {
+body.printing-stations-pdf #portfolioStationsPdfBtn,
+body.printing-stations-pdf #portfolioStationsPdfBtnV2 {
   display:none !important;
 }
 .ps-ipsh-heat {
@@ -5869,32 +5927,34 @@ function chunkArray(arr, size) {
   return out;
 }
 
-function rdgLogoHtml() {
-  if (RDG_LOGO_DATA_URL) {
-    return '<div class="ps-rdg-logo" aria-hidden="true"><img src="'+RDG_LOGO_DATA_URL+'" alt="RDG"></div>';
-  }
-  // Fallback SVG if logo asset missing at build time
+function rdgLogoHtml(tone) {
+  // High-contrast SVG — never use the dark-on-black JPEG (reads as a blank box).
+  const stroke = tone === 'light' ? '#ffffff' : '#0a1628';
+  const sub = tone === 'light' ? '#d1d5db' : '#374151';
   return '<div class="ps-rdg-logo" aria-hidden="true">'+
-    '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">'+
-      '<circle cx="32" cy="32" r="29" fill="none" stroke="#0a1628" stroke-width="2"/>'+
-      '<path d="M14 22c5 3 10-3 16 0s11-3 20 0M14 28c5 3 10-3 16 0s11-3 20 0M14 34c5 3 10-3 16 0s11-3 20 0" fill="none" stroke="#0a1628" stroke-width="1.8" stroke-linecap="round"/>'+
-      '<path d="M16 46 L24 36 L28 42 L32 34 L36 42 L40 36 L48 46" fill="none" stroke="#0a1628" stroke-width="1.8" stroke-linejoin="round"/>'+
+    '<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">'+
+      '<circle cx="40" cy="40" r="36" fill="none" stroke="'+stroke+'" stroke-width="2.2"/>'+
+      '<path d="M16 26c7 4 13-4 20 0s14-4 28 0" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round"/>'+
+      '<path d="M16 32c7 4 13-4 20 0s14-4 28 0" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round"/>'+
+      '<path d="M16 38c7 4 13-4 20 0s14-4 28 0" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linecap="round"/>'+
+      '<path d="M18 58 L28 44 L33 52 L40 40 L47 52 L52 44 L62 58" fill="none" stroke="'+stroke+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+
+      '<path d="M24 58 L31 48 L36 54 L40 48 L44 54 L49 48 L56 58" fill="none" stroke="'+stroke+'" stroke-width="1.4" stroke-linejoin="round" opacity="0.85"/>'+
     '</svg>'+
-    '<div class="ps-rdg-letters">RDG</div>'+
-    '<div class="ps-rdg-sub">riviera dining group</div>'+
+    '<div class="ps-rdg-letters" style="color:'+stroke+'">RDG</div>'+
+    '<div class="ps-rdg-sub" style="color:'+sub+'">riviera dining group</div>'+
     '</div>';
 }
 
 function buildStationDividerPageHtml(familyName) {
   const title = String(familyName || '').toUpperCase();
   return '<div class="ps-print-page ps-divider">'+
-    rdgLogoHtml()+
+    rdgLogoHtml('dark')+
     '<div class="ps-divider-pill"><span>'+title+'</span></div>'+
     '<div class="ps-divider-footer" aria-hidden="true"></div>'+
     '</div>';
 }
 
-/** Table 2 style: Items / staff-hour · hour × day for one venue + station family. */
+/** V1: Table 2 style hour×day for one venue + station family. */
 function buildVenueFamilyIpshHourHeatHtml(venueKey, family, weekKey) {
   const labels = ${JSON.stringify(VENUE_LABELS)};
   const venueLabel = labels[venueKey] || venueKey;
@@ -5921,13 +5981,10 @@ function buildVenueFamilyIpshHourHeatHtml(venueKey, family, weekKey) {
   if (!any) return '';
 
   let html = '<div class="ps-hourly-block">'+
-    '<h2>'+venueLabel+' · '+family+'</h2>'+
-    '<p class="ps-sub">Items / staff-hour × day · rows = hours · columns = Mon→Sun</p>'+
-    '<table><thead><tr>'+
-    '<th>Hour</th>';
-  HOURLY_DAYS.forEach(day => {
-    html += '<th>'+day.slice(0,3)+'</th>';
-  });
+    '<h2>'+venueLabel+' - '+family+'</h2>'+
+    '<p class="ps-sub">Items / staff-hour x day | rows = hours | columns = Mon-Sun</p>'+
+    '<table><thead><tr><th>Hour</th>';
+  HOURLY_DAYS.forEach(day => { html += '<th>'+day.slice(0,3)+'</th>'; });
   html += '</tr></thead><tbody>';
   HOURLY_BAND.forEach(hk => {
     html += '<tr><td>'+hourBandLabel(hk)+'</td>';
@@ -5941,6 +5998,106 @@ function buildVenueFamilyIpshHourHeatHtml(venueKey, family, weekKey) {
   });
   html += '</tbody></table></div>';
   return html;
+}
+
+/** V2: one table — Day x Hour rows, location columns — compare all venues. */
+function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues) {
+  if (!venues || !venues.length) return '';
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const short = (k) => {
+    const l = labels[k] || k;
+    if (l === 'AVA Coconut Grove') return 'AVA CG';
+    if (l === 'AVA Winter Park') return 'AVA WP';
+    return l;
+  };
+
+  // Collect values: day -> hour -> venueKey -> ipsh
+  const grid = {};
+  const allVals = [];
+  let any = false;
+  HOURLY_DAYS.forEach(day => {
+    grid[day] = {};
+    HOURLY_BAND.forEach(hk => {
+      grid[day][hk] = {};
+      venues.forEach(v => {
+        const d = ALL_DATA[v.key] && ALL_DATA[v.key][weekKey];
+        if (!d) { grid[day][hk][v.key] = null; return; }
+        const bucket = sumFamilyHourItems(family, day, hk, d.staffing, d.stationDetails || {}, null, d.stationHourItems || {});
+        const cell = familyDayCell(v.key, weekKey, family, day);
+        const hourHeads = hourHeadsFromCell(cell, hk);
+        const items = bucket.items || 0;
+        const ipsh = hourHeads > 0 && items > 0 ? +(items / hourHeads).toFixed(1) : null;
+        grid[day][hk][v.key] = ipsh;
+        if (ipsh != null) { any = true; allVals.push(ipsh); }
+      });
+    });
+  });
+  if (!any) return '';
+
+  const vmin = allVals.length ? Math.min(...allVals) : 0;
+  const vmax = allVals.length ? Math.max(...allVals) : 0;
+
+  let html = '<div class="ps-hourly-block">'+
+    '<h2>'+family+' — all locations</h2>'+
+    '<p class="ps-sub">Items / staff-hour | one row per day x hour | columns = locations (compare side by side)</p>'+
+    '<table><thead><tr><th>Day</th><th>Hour</th>';
+  venues.forEach(v => { html += '<th>'+short(v.key)+'</th>'; });
+  html += '</tr></thead><tbody>';
+
+  HOURLY_DAYS.forEach(day => {
+    HOURLY_BAND.forEach((hk, hi) => {
+      const rowVals = venues.map(v => grid[day][hk][v.key]).filter(x => x != null && x > 0);
+      if (!rowVals.length) return; // skip empty hour rows to keep page usable
+      html += '<tr>'+
+        '<td>'+(hi === 0 ? day.slice(0,3) : '')+'</td>'+
+        '<td>'+hourBandLabel(hk)+'</td>';
+      venues.forEach(v => {
+        const val = grid[day][hk][v.key];
+        const heat = val != null && val > 0 ? columnRelativeHeat(val, vmin, vmax) : { bg: '#13161c', fg: '#4b5563' };
+        html += '<td class="ps-ipsh-heat" style="background:'+heat.bg+';color:#ffffff;font-weight:700">'+(val != null ? val : '—')+'</td>';
+      });
+      html += '</tr>';
+    });
+  });
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function buildStationsPdfIntroHtml(weekLabel, chartImg, families, venueRows, versionTag) {
+  let intro = '<div class="ps-print-page ps-intro">'+
+    '<div class="ps-intro-top">'+
+      '<div><h1>RDG Portfolio - Stations</h1>'+
+      '<p class="ps-sub" style="margin:6px 0 0">'+weekLabel+' | '+versionTag+'</p></div>'+
+      rdgLogoHtml('light')+
+    '</div>';
+  if (chartImg) intro += '<div class="ps-chart-wrap"><img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart"></div>';
+  intro += '<div class="ps-matrix-wrap"><h2>Week matrix — items / staff-hour</h2><table><thead><tr><th>Station</th>';
+  venueRows.forEach(v => { intro += '<th>'+(v.label || v.key)+'</th>'; });
+  intro += '</tr></thead><tbody>';
+  families.forEach(f => {
+    intro += '<tr><td>'+f+'</td>';
+    venueRows.forEach(v => {
+      const st = v.familyStats[f] || {};
+      const ipsh = st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
+      intro += '<td>'+(ipsh != null ? ipsh : '—')+'</td>';
+    });
+    intro += '</tr>';
+  });
+  intro += '</tbody></table></div></div>';
+  return intro;
+}
+
+function buildStationsPdfPortfolioPagesHtml(families, weekKey, weekLabel) {
+  const FAMILIES_PER_PAGE = 3;
+  return chunkArray(families, FAMILIES_PER_PAGE).map((chunk, idx) => {
+    const tables = chunk.map(f => buildPortfolioStationsFamilyTableHtml(f, weekKey, { compact: false })).filter(Boolean).join('');
+    if (!tables) return '';
+    return '<div class="ps-print-page ps-family ps-multi">'+
+      '<h1>Portfolio - Stations '+(idx * FAMILIES_PER_PAGE + 1)+'-'+(idx * FAMILIES_PER_PAGE + chunk.length)+'</h1>'+
+      '<p class="ps-sub">'+weekLabel+' | locations side by side | Ful | Items/staff-hr | Items/person</p>'+
+      tables+
+      '</div>';
+  }).join('');
 }
 
 function runStationsPdfPrint(printRoot, html) {
@@ -5983,7 +6140,8 @@ function ensurePortfolioStationsContext() {
   renderAll();
 }
 
-function exportPortfolioStationsPdf() {
+function exportPortfolioStationsPdf(version) {
+  const ver = (version === 'v2') ? 'v2' : 'v1';
   ensurePortfolioStationsContext();
 
   const weekKey = WEEKS[currentWeekIdx]?.key;
@@ -6006,42 +6164,25 @@ function exportPortfolioStationsPdf() {
       if (canvas && canvas.toDataURL) chartImg = canvas.toDataURL('image/png');
     } catch (e) { chartImg = ''; }
 
-    // ── Part A: RDG Portfolio overview + 3 station compare tables per page ──
-    let intro = '<div class="ps-print-page ps-intro">'+
-      '<div style="display:flex;justify-content:flex-end;margin:0 0 8px">'+rdgLogoHtml()+'</div>'+
-      '<h1>RDG Portfolio · Stations</h1>'+
-      '<p class="ps-sub">'+weekLabel+' | overview | then 3 stations per page | then each station hour x day by location</p>';
-    if (chartImg) intro += '<img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart">';
-    intro += '<h2>Week matrix — items / staff-hour</h2><table><thead><tr><th>Station</th>';
-    venueRows.forEach(v => { intro += '<th>'+(v.label || v.key)+'</th>'; });
-    intro += '</tr></thead><tbody>';
-    families.forEach(f => {
-      intro += '<tr><td>'+f+'</td>';
-      venueRows.forEach(v => {
-        const st = v.familyStats[f] || {};
-        const ipsh = st.ipsh != null ? st.ipsh : (st.iph != null ? st.iph : null);
-        intro += '<td>'+(ipsh != null ? ipsh : '—')+'</td>';
-      });
-      intro += '</tr>';
-    });
-    intro += '</tbody></table></div>';
+    const versionTag = ver === 'v2'
+      ? 'V2 | overview + 3 stations/page + one all-locations hour x day table per station'
+      : 'V1 | overview + 3 stations/page + one hour x day table per location';
 
-    const FAMILIES_PER_PAGE = 3;
-    const familyChunks = chunkArray(families, FAMILIES_PER_PAGE);
-    const portfolioPages = familyChunks.map((chunk, idx) => {
-      const tables = chunk.map(f => buildPortfolioStationsFamilyTableHtml(f, weekKey, { compact: false })).filter(Boolean).join('');
-      if (!tables) return '';
-      return '<div class="ps-print-page ps-family ps-multi">'+
-        '<h1>Portfolio - Stations '+(idx * FAMILIES_PER_PAGE + 1)+'-'+(idx * FAMILIES_PER_PAGE + chunk.length)+'</h1>'+
-        '<p class="ps-sub">'+weekLabel+' | locations side by side | Ful | Items/staff-hr | Items/person</p>'+
-        tables+
-        '</div>';
-    }).join('');
+    const intro = buildStationsPdfIntroHtml(weekLabel, chartImg, families, venueRows, versionTag);
+    const portfolioPages = buildStationsPdfPortfolioPagesHtml(families, weekKey, weekLabel);
 
-    // ── Part B: each station — title divider, then hour×day table per location ──
     const detailPages = families.map(f => {
       const venues = portfolioVenuesForFamily(f, weekKey);
       if (!venues.length) return '';
+      if (ver === 'v2') {
+        const combined = buildFamilyAllLocationsIpshCompareHtml(f, weekKey, venues);
+        if (!combined) return '';
+        return buildStationDividerPageHtml(f)+
+          '<div class="ps-print-page ps-hourly">'+
+            '<h1>'+String(f).toUpperCase()+'</h1>'+
+            combined+
+          '</div>';
+      }
       const heatPages = venues.map(v => {
         const heat = buildVenueFamilyIpshHourHeatHtml(v.key, f, weekKey);
         if (!heat) return '';
