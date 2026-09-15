@@ -21,7 +21,10 @@ Built in `build-unified-v2.cjs` → `exportPortfolioStationsPdf('v1')`.
 `exportPortfolioStationsPdf('v2')`.
 
 1. Same overview + portfolio 3-per-page + station title dividers as V1.
-2. Instead of one heatmap per location: **one table per station** with columns = all locations, rows = Day × Hour (or Hour with day sections), so every location is comparable for the same hour and day.
+2. Instead of one heatmap per location: **one table per station** where:
+   - **Rows (Y)** = hours once (10:00–11:00 …)
+   - **Columns (X)** = days (Mon…Sun), each with **location sub-columns underneath** (CL / CN / ACG / AWP / MILA)
+   - So you compare all locations for the same hour and day without repeating the hour list.
 
 ## Branding
 

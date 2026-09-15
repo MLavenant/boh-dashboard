@@ -6000,18 +6000,20 @@ function buildVenueFamilyIpshHourHeatHtml(venueKey, family, weekKey) {
   return html;
 }
 
-/** V2: one table — Day x Hour rows, location columns — compare all venues. */
+/** V2: hours on Y once; days on X; locations under each day. */
 function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues) {
   if (!venues || !venues.length) return '';
   const labels = ${JSON.stringify(VENUE_LABELS)};
   const short = (k) => {
     const l = labels[k] || k;
-    if (l === 'AVA Coconut Grove') return 'AVA CG';
-    if (l === 'AVA Winter Park') return 'AVA WP';
-    return l;
+    if (k === 'claudie' || l === 'Claudie') return 'CL';
+    if (k === 'casaneos' || l === 'Casa Neos') return 'CN';
+    if (k === 'ava_cg' || l === 'AVA Coconut Grove') return 'ACG';
+    if (k === 'ava_wp' || l === 'AVA Winter Park') return 'AWP';
+    if (k === 'mila' || l === 'MILA') return 'MILA';
+    return l.slice(0, 4);
   };
 
-  // Collect values: day -> hour -> venueKey -> ipsh
   const grid = {};
   const allVals = [];
   let any = false;
@@ -6036,28 +6038,37 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues) {
 
   const vmin = allVals.length ? Math.min(...allVals) : 0;
   const vmax = allVals.length ? Math.max(...allVals) : 0;
+  const nLoc = venues.length;
+  const locSep = 'border-left:2px solid #3d4458;';
 
   let html = '<div class="ps-hourly-block">'+
-    '<h2>'+family+' — all locations</h2>'+
-    '<p class="ps-sub">Items / staff-hour | one row per day x hour | columns = locations (compare side by side)</p>'+
-    '<table><thead><tr><th>Day</th><th>Hour</th>';
-  venues.forEach(v => { html += '<th>'+short(v.key)+'</th>'; });
+    '<h2>'+family+' - all locations</h2>'+
+    '<p class="ps-sub">Items / staff-hour | rows = hours (once) | columns = day, then location under each day</p>'+
+    '<table class="ps-v2-compare"><thead>'+
+    '<tr><th rowspan="2" style="vertical-align:bottom;text-align:left">Hour</th>';
+  HOURLY_DAYS.forEach(day => {
+    html += '<th colspan="'+nLoc+'" style="text-align:center;'+locSep+'background:#1e2533;color:#ffffff;font-weight:700;padding:6px 4px">'+day.slice(0,3)+'</th>';
+  });
+  html += '</tr><tr>';
+  HOURLY_DAYS.forEach(() => {
+    venues.forEach((v, vi) => {
+      html += '<th style="text-align:center;font-size:8px;color:#9aa0aa;background:#13161c;padding:3px 2px;'+(vi===0?locSep:'')+'">'+short(v.key)+'</th>';
+    });
+  });
   html += '</tr></thead><tbody>';
 
-  HOURLY_DAYS.forEach(day => {
-    HOURLY_BAND.forEach((hk, hi) => {
-      const rowVals = venues.map(v => grid[day][hk][v.key]).filter(x => x != null && x > 0);
-      if (!rowVals.length) return; // skip empty hour rows to keep page usable
-      html += '<tr>'+
-        '<td>'+(hi === 0 ? day.slice(0,3) : '')+'</td>'+
-        '<td>'+hourBandLabel(hk)+'</td>';
-      venues.forEach(v => {
+  HOURLY_BAND.forEach(hk => {
+    const has = HOURLY_DAYS.some(day => venues.some(v => grid[day][hk][v.key] != null));
+    if (!has) return;
+    html += '<tr><td style="text-align:left;white-space:nowrap;font-weight:600;color:#9aa0aa">'+hourBandLabel(hk)+'</td>';
+    HOURLY_DAYS.forEach(day => {
+      venues.forEach((v, vi) => {
         const val = grid[day][hk][v.key];
         const heat = val != null && val > 0 ? columnRelativeHeat(val, vmin, vmax) : { bg: '#13161c', fg: '#4b5563' };
-        html += '<td class="ps-ipsh-heat" style="background:'+heat.bg+';color:#ffffff;font-weight:700">'+(val != null ? val : '—')+'</td>';
+        html += '<td class="ps-ipsh-heat" style="background:'+heat.bg+';color:#ffffff;font-weight:700;padding:3px 2px;text-align:center;'+(vi===0?locSep:'')+'">'+(val != null ? val : '—')+'</td>';
       });
-      html += '</tr>';
     });
+    html += '</tr>';
   });
   html += '</tbody></table></div>';
   return html;
