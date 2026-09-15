@@ -5970,53 +5970,7 @@ function buildStationDividerPageHtml(familyName) {
     '</div>';
 }
 
-/** V1: Table 2 style hour×day for one venue + station family. */
-function buildVenueFamilyIpshHourHeatHtml(venueKey, family, weekKey) {
-  const labels = ${JSON.stringify(VENUE_LABELS)};
-  const venueLabel = labels[venueKey] || venueKey;
-  const d = ALL_DATA[venueKey] && ALL_DATA[venueKey][weekKey];
-  if (!d) return '';
-
-  const gridIps = {};
-  const colIpsScale = {};
-  let any = false;
-  HOURLY_DAYS.forEach(day => {
-    gridIps[day] = {};
-    HOURLY_BAND.forEach(hk => {
-      const bucket = sumFamilyHourItems(family, day, hk, d.staffing, d.stationDetails || {}, null, d.stationHourItems || {});
-      const cell = familyDayCell(venueKey, weekKey, family, day);
-      const hourHeads = hourHeadsFromCell(cell, hk);
-      const items = bucket.items || 0;
-      const ipsh = hourHeads > 0 && items > 0 ? +(items / hourHeads).toFixed(1) : null;
-      gridIps[day][hk] = ipsh;
-      if (ipsh != null) any = true;
-    });
-    const ipsVals = HOURLY_BAND.map(hk => gridIps[day][hk]).filter(v => v != null && v > 0);
-    colIpsScale[day] = { min: ipsVals.length ? Math.min(...ipsVals) : 0, max: ipsVals.length ? Math.max(...ipsVals) : 0 };
-  });
-  if (!any) return '';
-
-  let html = '<div class="ps-hourly-block">'+
-    '<h2>'+venueLabel+' - '+family+'</h2>'+
-    '<p class="ps-sub">Items / staff-hour x day | rows = hours | columns = Mon-Sun</p>'+
-    '<table><thead><tr><th>Hour</th>';
-  HOURLY_DAYS.forEach(day => { html += '<th>'+day.slice(0,3)+'</th>'; });
-  html += '</tr></thead><tbody>';
-  HOURLY_BAND.forEach(hk => {
-    html += '<tr><td>'+hourBandLabel(hk)+'</td>';
-    HOURLY_DAYS.forEach(day => {
-      const val = gridIps[day][hk];
-      const scale = colIpsScale[day];
-      const heat = val != null && val > 0 ? columnRelativeHeat(val, scale.min, scale.max) : { bg: '#13161c', fg: '#4b5563' };
-      html += '<td class="ps-ipsh-heat" style="background:'+heat.bg+';color:#ffffff;font-weight:700">'+(val != null ? val : '—')+'</td>';
-    });
-    html += '</tr>';
-  });
-  html += '</tbody></table></div>';
-  return html;
-}
-
-/** V2: hours on Y once; days on X; locations under each day. */
+/** Hours on Y once; days on X; locations under each day. */
 function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues) {
   if (!venues || !venues.length) return '';
   const labels = ${JSON.stringify(VENUE_LABELS)};
