@@ -926,6 +926,9 @@ const output = {
     itemDetailSkuCount: summary.length,
     itemQtyTotal: Math.round(summary.reduce((s, r) => s + (r.qty || 0), 0)),
     fulfillmentAdjustSec: FULFILLMENT_ADJUST_SEC,
+    orderMerge: 'check-day-window',
+    orderMergeWindowSec: ORDER_MERGE_WINDOW_SEC,
+    orderMergeVersion: 2,
   },
 };
 

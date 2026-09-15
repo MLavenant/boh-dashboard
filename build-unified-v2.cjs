@@ -1155,10 +1155,12 @@ function mergeBohWeekPayload(local, cloud) {
   const cloudTs = weekPayloadBuiltAtMs(cloud);
   // Embedded Pages payload is richer, or equally rich but fresher → keep local
   // (prevents stale Firebase wiping staffing / −5s metrics / day volumes)
+  let out;
   if (localScore > cloudScore || (localScore === cloudScore && localTs > cloudTs)) {
-    return Object.assign({}, cloud, local);
+    out = Object.assign({}, cloud, local);
+  } else {
+    out = Object.assign({}, local, cloud);
   }
-  const out = Object.assign({}, local, cloud);
   // Field-level: never drop local staffing / timeline when cloud is thinner or older
   const localFam = local.staffing && local.staffing.byFamily ? Object.keys(local.staffing.byFamily).length : 0;
   const cloudFam = cloud.staffing && cloud.staffing.byFamily ? Object.keys(cloud.staffing.byFamily).length : 0;
@@ -1178,6 +1180,33 @@ function mergeBohWeekPayload(local, cloud) {
     const cloudEmpty = cv == null || (Array.isArray(cv) && cv.length === 0) || (typeof cv === 'object' && !Array.isArray(cv) && !Object.keys(cv).length);
     if (localOk && cloudEmpty) out[k] = lv;
   });
+  // Pressure curve: prefer the tighter order-merge (same station fires → fewer logical orders).
+  // Stale Firebase still has Check#+exact FiredDate merge (~3–5 min Claudie curve); Pages has
+  // check-day 15m wave merge (~15–16 min). Without this, cloud staffing timestamps win and
+  // overwrite the fixed curve on every load.
+  const localTS = local.ticketSummary || {};
+  const cloudTS = cloud.ticketSummary || {};
+  const localFires = localTS.stationFireCount || localTS.foodStationTicketRows;
+  const cloudFires = cloudTS.stationFireCount || cloudTS.foodStationTicketRows;
+  const localOrders = localTS.orderCount != null ? localTS.orderCount : localTS.uniqueTickets;
+  const cloudOrders = cloudTS.orderCount != null ? cloudTS.orderCount : cloudTS.uniqueTickets;
+  const localMergeVer = Number(localTS.orderMergeVersion) || 0;
+  const cloudMergeVer = Number(cloudTS.orderMergeVersion) || 0;
+  const preferLocalCurve =
+    (local.curve && local.curve.length && (
+      localMergeVer > cloudMergeVer ||
+      (localOrders != null && cloudOrders != null && localFires != null && cloudFires != null &&
+        localFires === cloudFires && localOrders < cloudOrders) ||
+      (localOrders != null && cloudOrders != null && localOrders < cloudOrders &&
+        Array.isArray(local.curve) && Array.isArray(cloud.curve) &&
+        local.curve.length && cloud.curve.length &&
+        (local.curve[local.curve.length - 1].conc || 0) < (cloud.curve[cloud.curve.length - 1].conc || 0))
+    ));
+  if (preferLocalCurve) {
+    ['curve', 'curveByDay', 'tbk', 'breakingPoint', 'breakingPointGuests', 'ticketSummary'].forEach(function(k) {
+      if (local[k] != null) out[k] = local[k];
+    });
+  }
   return out;
 }
 async function loadBohFromFirebase() {
