@@ -67,8 +67,16 @@ for %%V in (claudie casa_neos ava_coconut_grove ava_winter_park mila) do (
   node enrich-station-hour-items.cjs %%V >> auto-run.log 2>&1
 )
 
-:: 6) Health + rebuild + Firebase
+:: 6) Health + methodology audit + rebuild + Firebase
 node pipeline-health.cjs >> auto-run.log 2>&1
+if defined BOH_WEEK (
+  echo [%date% %time%] Methodology audit %BOH_WEEK%... >> auto-run.log 2>&1
+  node audit-methodology-week.cjs %BOH_WEEK% >> auto-run.log 2>&1
+  if errorlevel 1 (
+    echo [%date% %time%] ERROR: methodology audit failed for %BOH_WEEK% >> auto-run.log 2>&1
+    set ERR=1
+  )
+)
 node build-unified-v2.cjs >> auto-run.log 2>&1
 if errorlevel 1 (
   echo [%date% %time%] ERROR: build-unified-v2.cjs failed >> auto-run.log 2>&1
