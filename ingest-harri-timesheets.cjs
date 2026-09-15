@@ -25,6 +25,8 @@ const BRAND_TO_VENUE = {
   'CASA NEOS': 'casa_neos',
   'Casa Neos': 'casa_neos',
   'Casa Neos Beach Club': 'casa_neos',
+  'CASA NEOS LOUNGE': null, // FOH / lounge — not kitchen staffing
+  'Casa Neos Lounge': null,
 };
 
 function parseCsv(filePath) {
