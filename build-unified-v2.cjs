@@ -2,6 +2,18 @@
 const fs = require('fs');
 const path = require('path');
 
+// Brand mark for Stations PDF title pages (white / navy dividers)
+let RDG_LOGO_DATA_URL = '';
+try {
+  const logoPath = path.join(__dirname, 'assets', 'rdg-logo.png');
+  if (fs.existsSync(logoPath)) {
+    const buf = fs.readFileSync(logoPath);
+    const isJpeg = buf[0] === 0xff && buf[1] === 0xd8;
+    const mime = isJpeg ? 'image/jpeg' : 'image/png';
+    RDG_LOGO_DATA_URL = 'data:' + mime + ';base64,' + buf.toString('base64');
+  }
+} catch (_) { /* optional */ }
+
 // ── Load rolling.json to get available weeks ──────────────────────────────────
 let rollingWeeks = [];
 try {
@@ -247,7 +259,7 @@ html = html.replace(
   <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:4px 0 16px;font-size:11px;color:#9aa0aa">
     <span><strong style="color:#e8eaed">Bars</strong> = items / staff-hour</span>
     <span>Alternating bands = station families</span>
-    <span>PDF = title page per station, then one data page (locations side by side)</span>
+    <span>PDF = Portfolio (3 stations/page) then per-station title + hour×day tables by location</span>
   </div>
   <p class="note" style="margin:0 0 12px">One table per station family · locations side by side. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> (green→red heat) · <strong>Items/person</strong>.</p>
   <div id="portfolioStationsDayTable"></div>
@@ -742,7 +754,16 @@ body.printing-stations-pdf .ps-print-page .note {
   font-size:11px;
   color:#9aa0aa;
 }
-body.printing-stations-pdf .ps-print-page.ps-intro table {
+body.printing-stations-pdf .ps-print-page.ps-intro .ps-rdg-logo {
+  position:static;
+  width:90px;
+}
+body.printing-stations-pdf .ps-print-page.ps-intro .ps-rdg-logo img {
+  width:72px;
+  height:auto;
+  display:block;
+  margin:0 auto;
+}
   width:100%;
   border-collapse:collapse;
   font-size:11px;
@@ -810,47 +831,107 @@ body.printing-stations-pdf .ps-print-page.ps-divider {
   flex-direction:column;
   justify-content:center;
   align-items:stretch;
-  padding:36px 48px;
+  padding:36px 48px 72px;
 }
 body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo {
   position:absolute;
-  top:28px;
-  right:40px;
-  width:88px;
+  top:24px;
+  right:36px;
+  width:96px;
   text-align:center;
   color:#0a1628;
 }
+body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo img {
+  width:72px;
+  height:auto;
+  display:block;
+  margin:0 auto;
+  object-fit:contain;
+}
 body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo svg { width:54px; height:54px; display:block; margin:0 auto 6px; }
 body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo .ps-rdg-letters {
-  font-family:Georgia,'Times New Roman',serif;
-  font-size:22px;
-  font-weight:700;
-  letter-spacing:0.12em;
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:18px;
+  font-weight:300;
+  letter-spacing:0.18em;
   line-height:1;
+  margin-top:4px;
 }
 body.printing-stations-pdf .ps-print-page.ps-divider .ps-rdg-logo .ps-rdg-sub {
   margin-top:3px;
-  font-size:7px;
-  letter-spacing:0.04em;
+  font-size:6.5px;
+  letter-spacing:0.08em;
   text-transform:lowercase;
   color:#4b5563;
 }
 body.printing-stations-pdf .ps-print-page.ps-divider .ps-divider-pill {
-  margin:0 6%;
+  margin:0 8%;
   background:#0a1628;
-  border-radius:22px;
-  padding:52px 48px;
+  border-radius:18px;
+  padding:48px 44px;
   text-align:center;
 }
 body.printing-stations-pdf .ps-print-page.ps-divider .ps-divider-pill span {
   display:block;
   color:#ffffff;
-  font-size:68px;
+  font-size:64px;
   font-weight:800;
   font-style:italic;
   letter-spacing:0.06em;
   text-transform:uppercase;
   line-height:1.05;
+}
+body.printing-stations-pdf .ps-print-page.ps-divider .ps-divider-footer {
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:28px;
+  background:#0a1628;
+}
+body.printing-stations-pdf .ps-print-page.ps-multi .ps-family-block {
+  margin:0 0 18px !important;
+}
+body.printing-stations-pdf .ps-print-page.ps-multi .ps-family-block > h3 {
+  display:block !important;
+  margin:0 0 8px !important;
+  font-size:18px !important;
+  font-weight:800 !important;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  color:#d9a441 !important;
+}
+body.printing-stations-pdf .ps-print-page.ps-hourly h1 {
+  margin:0 0 4px;
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  color:#d9a441;
+}
+body.printing-stations-pdf .ps-print-page.ps-hourly h2 {
+  margin:0 0 10px;
+  font-size:14px;
+  color:#e8eaed;
+  font-weight:600;
+  text-transform:none;
+  letter-spacing:0;
+}
+body.printing-stations-pdf .ps-print-page.ps-hourly table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:10px;
+}
+body.printing-stations-pdf .ps-print-page.ps-hourly th,
+body.printing-stations-pdf .ps-print-page.ps-hourly td {
+  padding:3px 5px;
+  border-bottom:1px solid #262a33;
+  text-align:center;
+  line-height:1.15;
+}
+body.printing-stations-pdf .ps-print-page.ps-hourly th:first-child,
+body.printing-stations-pdf .ps-print-page.ps-hourly td:first-child {
+  text-align:left;
 }
 body.printing-stations-pdf #portfolioStationsPdfBtn {
   display:none !important;
@@ -972,6 +1053,7 @@ const newScript = `
 ${allDataJS}
 
 const WEEKS = ${JSON.stringify(rollingWeeks)};
+const RDG_LOGO_DATA_URL = ${JSON.stringify(RDG_LOGO_DATA_URL)};
 const KNOWN_WEEKS = ${JSON.stringify(KNOWN_WEEKS)};
 const FB_BOH_DB = 'https://rdg-dj-dashboard-default-rtdb.firebaseio.com';
 let BOH_CLOUD_STATUS = null; // /rdg/scrapeStatus/bohWeekly
@@ -5781,13 +5863,22 @@ function fitPrintPagesToSheet(pages, maxW, maxH) {
   });
 }
 
+function chunkArray(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
+
 function rdgLogoHtml() {
+  if (RDG_LOGO_DATA_URL) {
+    return '<div class="ps-rdg-logo" aria-hidden="true"><img src="'+RDG_LOGO_DATA_URL+'" alt="RDG"></div>';
+  }
+  // Fallback SVG if logo asset missing at build time
   return '<div class="ps-rdg-logo" aria-hidden="true">'+
     '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">'+
-      '<circle cx="32" cy="32" r="30" fill="none" stroke="#0a1628" stroke-width="2.5"/>'+
-      '<path d="M12 24c6 4 12-4 18 0s12-4 22 0" fill="none" stroke="#0a1628" stroke-width="2.2" stroke-linecap="round"/>'+
-      '<path d="M12 32c6 4 12-4 18 0s12-4 22 0" fill="none" stroke="#0a1628" stroke-width="2.2" stroke-linecap="round"/>'+
-      '<path d="M12 40c6 4 12-4 18 0s12-4 22 0" fill="none" stroke="#0a1628" stroke-width="2.2" stroke-linecap="round"/>'+
+      '<circle cx="32" cy="32" r="29" fill="none" stroke="#0a1628" stroke-width="2"/>'+
+      '<path d="M14 22c5 3 10-3 16 0s11-3 20 0M14 28c5 3 10-3 16 0s11-3 20 0M14 34c5 3 10-3 16 0s11-3 20 0" fill="none" stroke="#0a1628" stroke-width="1.8" stroke-linecap="round"/>'+
+      '<path d="M16 46 L24 36 L28 42 L32 34 L36 42 L40 36 L48 46" fill="none" stroke="#0a1628" stroke-width="1.8" stroke-linejoin="round"/>'+
     '</svg>'+
     '<div class="ps-rdg-letters">RDG</div>'+
     '<div class="ps-rdg-sub">riviera dining group</div>'+
@@ -5799,7 +5890,57 @@ function buildStationDividerPageHtml(familyName) {
   return '<div class="ps-print-page ps-divider">'+
     rdgLogoHtml()+
     '<div class="ps-divider-pill"><span>'+title+'</span></div>'+
+    '<div class="ps-divider-footer" aria-hidden="true"></div>'+
     '</div>';
+}
+
+/** Table 2 style: Items / staff-hour · hour × day for one venue + station family. */
+function buildVenueFamilyIpshHourHeatHtml(venueKey, family, weekKey) {
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const venueLabel = labels[venueKey] || venueKey;
+  const d = ALL_DATA[venueKey] && ALL_DATA[venueKey][weekKey];
+  if (!d) return '';
+
+  const gridIps = {};
+  const colIpsScale = {};
+  let any = false;
+  HOURLY_DAYS.forEach(day => {
+    gridIps[day] = {};
+    HOURLY_BAND.forEach(hk => {
+      const bucket = sumFamilyHourItems(family, day, hk, d.staffing, d.stationDetails || {}, null, d.stationHourItems || {});
+      const cell = familyDayCell(venueKey, weekKey, family, day);
+      const hourHeads = hourHeadsFromCell(cell, hk);
+      const items = bucket.items || 0;
+      const ipsh = hourHeads > 0 && items > 0 ? +(items / hourHeads).toFixed(1) : null;
+      gridIps[day][hk] = ipsh;
+      if (ipsh != null) any = true;
+    });
+    const ipsVals = HOURLY_BAND.map(hk => gridIps[day][hk]).filter(v => v != null && v > 0);
+    colIpsScale[day] = { min: ipsVals.length ? Math.min(...ipsVals) : 0, max: ipsVals.length ? Math.max(...ipsVals) : 0 };
+  });
+  if (!any) return '';
+
+  let html = '<div class="ps-hourly-block">'+
+    '<h2>'+venueLabel+' · '+family+'</h2>'+
+    '<p class="ps-sub">Items / staff-hour × day · rows = hours · columns = Mon→Sun</p>'+
+    '<table><thead><tr>'+
+    '<th>Hour</th>';
+  HOURLY_DAYS.forEach(day => {
+    html += '<th>'+day.slice(0,3)+'</th>';
+  });
+  html += '</tr></thead><tbody>';
+  HOURLY_BAND.forEach(hk => {
+    html += '<tr><td>'+hourBandLabel(hk)+'</td>';
+    HOURLY_DAYS.forEach(day => {
+      const val = gridIps[day][hk];
+      const scale = colIpsScale[day];
+      const heat = val != null && val > 0 ? columnRelativeHeat(val, scale.min, scale.max) : { bg: '#13161c', fg: '#4b5563' };
+      html += '<td class="ps-ipsh-heat" style="background:'+heat.bg+';color:#ffffff;font-weight:700">'+(val != null ? val : '—')+'</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  return html;
 }
 
 function runStationsPdfPrint(printRoot, html) {
@@ -5865,10 +6006,11 @@ function exportPortfolioStationsPdf() {
       if (canvas && canvas.toDataURL) chartImg = canvas.toDataURL('image/png');
     } catch (e) { chartImg = ''; }
 
-    // Page 1 — overview chart + week matrix
+    // ── Part A: RDG Portfolio overview + 3 station compare tables per page ──
     let intro = '<div class="ps-print-page ps-intro">'+
-      '<h1>RDG Stations Compare</h1>'+
-      '<p class="ps-sub">'+weekLabel+' · overview · then one title page + one data page per station</p>';
+      '<div style="display:flex;justify-content:flex-end;margin:0 0 8px">'+rdgLogoHtml()+'</div>'+
+      '<h1>RDG Portfolio · Stations</h1>'+
+      '<p class="ps-sub">'+weekLabel+' | overview | then 3 stations per page | then each station hour x day by location</p>';
     if (chartImg) intro += '<img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart">';
     intro += '<h2>Week matrix — items / staff-hour</h2><table><thead><tr><th>Station</th>';
     venueRows.forEach(v => { intro += '<th>'+(v.label || v.key)+'</th>'; });
@@ -5884,19 +6026,35 @@ function exportPortfolioStationsPdf() {
     });
     intro += '</tbody></table></div>';
 
-    // Each station: title divider (placeholder) → data page with locations side by side
-    const stationPages = families.map(f => {
-      const tableHtml = buildPortfolioStationsFamilyTableHtml(f, weekKey, { forPrint: true });
-      if (!tableHtml) return '';
-      return buildStationDividerPageHtml(f)+
-        '<div class="ps-print-page ps-family">'+
-          '<h1>'+String(f).toUpperCase()+'</h1>'+
-          '<p class="ps-sub">'+weekLabel+' · locations side by side · Ful · Items/staff-hr · Items/person</p>'+
-          tableHtml+
+    const FAMILIES_PER_PAGE = 3;
+    const familyChunks = chunkArray(families, FAMILIES_PER_PAGE);
+    const portfolioPages = familyChunks.map((chunk, idx) => {
+      const tables = chunk.map(f => buildPortfolioStationsFamilyTableHtml(f, weekKey, { compact: false })).filter(Boolean).join('');
+      if (!tables) return '';
+      return '<div class="ps-print-page ps-family ps-multi">'+
+        '<h1>Portfolio - Stations '+(idx * FAMILIES_PER_PAGE + 1)+'-'+(idx * FAMILIES_PER_PAGE + chunk.length)+'</h1>'+
+        '<p class="ps-sub">'+weekLabel+' | locations side by side | Ful | Items/staff-hr | Items/person</p>'+
+        tables+
         '</div>';
     }).join('');
 
-    runStationsPdfPrint(printRoot, intro + stationPages);
+    // ── Part B: each station — title divider, then hour×day table per location ──
+    const detailPages = families.map(f => {
+      const venues = portfolioVenuesForFamily(f, weekKey);
+      if (!venues.length) return '';
+      const heatPages = venues.map(v => {
+        const heat = buildVenueFamilyIpshHourHeatHtml(v.key, f, weekKey);
+        if (!heat) return '';
+        return '<div class="ps-print-page ps-hourly">'+
+          '<h1>'+String(f).toUpperCase()+'</h1>'+
+          heat+
+          '</div>';
+      }).join('');
+      if (!heatPages) return '';
+      return buildStationDividerPageHtml(f) + heatPages;
+    }).join('');
+
+    runStationsPdfPrint(printRoot, intro + portfolioPages + detailPages);
   };
 
   requestAnimationFrame(() => {
