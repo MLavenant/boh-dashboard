@@ -2694,16 +2694,34 @@ const PORTFOLIO_STATION_FAMILIES = HOURLY_FAMILIES.filter(f => f !== 'Expo');
 /** Prefer punch-overlap headsByHour; fall back to daily heads only when hourly map missing (legacy weeks).
  *  Exec rule: if this hour/day has sold items but no written staff, count 1 person (not 0). */
 function hourHeadsFromCell(dayCell, hk, itemCount) {
-  if (!dayCell) return (itemCount > 0) ? 1 : 0;
+  const items = Number(itemCount) || 0;
+  if (!dayCell) return items > 0 ? 1 : 0;
   const map = dayCell.headsByHour;
   let n = 0;
   if (map && typeof map === 'object' && Object.keys(map).length) {
-    n = map[hk] > 0 ? map[hk] : 0;
+    const raw = map[hk];
+    n = raw > 0 ? Number(raw) : 0;
   } else {
-    n = dayCell.heads > 0 ? dayCell.heads : 0;
+    n = dayCell.heads > 0 ? Number(dayCell.heads) : 0;
   }
-  if (!(n > 0) && itemCount > 0) return 1;
+  if (!(n > 0) && items > 0) return 1;
   return n > 0 ? n : 0;
+}
+/** After grids are built: force items>0 & staff empty → 1 head and items/1. */
+function applyImputedStaffGrids(gridItems, gridStaff, gridIps) {
+  HOURLY_DAYS.forEach(day => {
+    if (!gridItems[day]) return;
+    HOURLY_BAND.forEach(hk => {
+      const items = Number(gridItems[day][hk]) || 0;
+      if (!(items > 0)) return;
+      if (!(gridStaff[day][hk] > 0)) {
+        gridStaff[day][hk] = 1;
+        gridIps[day][hk] = +items.toFixed(1);
+      } else if (!(gridIps[day][hk] > 0)) {
+        gridIps[day][hk] = +(items / gridStaff[day][hk]).toFixed(1);
+      }
+    });
+  });
 }
 function effectiveHeads(heads, items) {
   if (heads > 0) return heads;
@@ -2937,10 +2955,18 @@ function stationsForFamily(family, staffing, stationDetails) {
   });
 }
 
+function hourToUsLabel(h) {
+  const n = Number(h);
+  if (n === 24) return '12:00 AM';
+  const hour = ((n % 24) + 24) % 24;
+  const ap = hour >= 12 ? 'PM' : 'AM';
+  const hr = hour % 12 || 12;
+  return hr + ':00 ' + ap;
+}
 function hourBandLabel(hourKey) {
-  const [a, b] = hourKey.split('-').map(Number);
-  const pad = n => (n < 10 ? '0' : '') + n;
-  return pad(a) + ':00–' + pad(b) + ':00';
+  const parts = String(hourKey || '').split('-');
+  if (parts.length < 2) return String(hourKey || '');
+  return hourToUsLabel(parts[0]) + '–' + hourToUsLabel(parts[1]);
 }
 
 function hourBucketKey(day, hourKey) {
@@ -3320,8 +3346,27 @@ function renderHourlyThroughput() {
         window._hourlyBucketStaff[bucketKey] = hourStaffFromCell(cell, hk);
         gridStaff[day][hk] = heads > 0 ? heads : null;
       });
+    });
+
+    const gridIps = {};
+    HOURLY_DAYS.forEach(day => {
+      gridIps[day] = {};
+      const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
+      HOURLY_BAND.forEach(hk => {
+        const items = gridItems[day][hk];
+        const heads = hourHeadsFromCell(cell, hk, items);
+        gridIps[day][hk] = heads > 0 && items > 0 ? +(items / heads).toFixed(1) : null;
+      });
+    });
+    applyImputedStaffGrids(gridItems, gridStaff, gridIps);
+    HOURLY_DAYS.forEach(day => {
       const vals = HOURLY_BAND.map(hk => gridStaff[day][hk]).filter(v => v != null && v > 0);
       colStaffScale[day] = { min: vals.length ? Math.min(...vals) : 0, max: vals.length ? Math.max(...vals) : 0 };
+    });
+    const colIpsScale = {};
+    HOURLY_DAYS.forEach(day => {
+      const vals = HOURLY_BAND.map(hk => gridIps[day][hk]).filter(v => v != null && v > 0);
+      colIpsScale[day] = { min: vals.length ? Math.min(...vals) : 0, max: vals.length ? Math.max(...vals) : 0 };
     });
 
     HOURLY_BAND.forEach(hk => {
@@ -3342,28 +3387,14 @@ function renderHourlyThroughput() {
 
     html += '<h3 style="margin:0 0 8px;font-size:14px;color:#d9a441">Items / staff · hour × day</h3>' +
       '<p class="note" style="margin:0 0 10px">'+(hasHourlyStaff
-        ? 'Items in that hour ÷ people clocked in during that hour.'
-        : 'Items ÷ day headcount for each hour (legacy).')+' Color: green = lowest pressure that day, red = highest.</p>' +
+        ? 'Items in that hour ÷ people clocked in during that hour. If items exist with no punch overlap, staff = 1.'
+        : 'Items ÷ day headcount for each hour (legacy). If items exist with no staff, staff = 1.')+' Color: green = lowest pressure that day, red = highest.</p>' +
       '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px"><thead><tr style="'+thStyle+'">'+
       '<th style="text-align:left;padding:6px 10px;background:#1e2533;position:sticky;left:0;z-index:1">Hour</th>';
     HOURLY_DAYS.forEach(day => {
       html += '<th style="text-align:center;padding:6px 10px;background:#1e2533;min-width:52px">'+day.slice(0,3)+'</th>';
     });
     html += '</tr></thead><tbody>';
-
-    const gridIps = {};
-    const colIpsScale = {};
-    HOURLY_DAYS.forEach(day => {
-      gridIps[day] = {};
-      const cell = famStaff && famStaff.days ? famStaff.days[day] : null;
-      HOURLY_BAND.forEach(hk => {
-        const items = gridItems[day][hk];
-        const heads = hourHeadsFromCell(cell, hk, items);
-        gridIps[day][hk] = heads > 0 && items > 0 ? +(items / heads).toFixed(1) : null;
-      });
-      const vals = HOURLY_BAND.map(hk => gridIps[day][hk]).filter(v => v != null && v > 0);
-      colIpsScale[day] = { min: vals.length ? Math.min(...vals) : 0, max: vals.length ? Math.max(...vals) : 0 };
-    });
 
     HOURLY_BAND.forEach(hk => {
       html += '<tr style="border-top:1px solid #262a33"><td style="padding:5px 10px;color:#9aa0aa;white-space:nowrap;font-weight:600;background:#13161c;position:sticky;left:0;z-index:1">'+hourBandLabel(hk)+'</td>';
@@ -3930,9 +3961,10 @@ function renderIpsTable2Hourly(scope, family) {
   });
   const aggNote = weekKeys.length > 1 ? ' · '+weekKeys.length+' weeks aggregated' : '';
   let html = '<h3 style="margin:0 0 6px;font-size:15px;color:#d9a441">Table 2 — '+(labels[currentVenue]||currentVenue)+' · items, items/staff &amp; staff by hour</h3>' +
-    '<p class="note" style="margin:0 0 12px">'+scopeLabel+' · '+family+aggNote+' · daily totals then hour×day (10:00→02:00). '+(hasHourlyStaff
+    '<p class="note" style="margin:0 0 12px">'+scopeLabel+' · '+family+aggNote+' · daily totals then hour×day (10:00 AM→2:00 AM). '+(hasHourlyStaff
       ? 'Hourly staff = people whose punch <strong>in→out</strong> overlaps that hour. '
       : 'Staff = daily headcount (same across hours) until staffing is rebuilt. ')+
+    '<strong>If items sold with no staff written for that hour, staff counts as 1</strong> (items÷1). '+
     'Click item counts for sold lists; click staff for roster / clock times.</p>';
 
   html += '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:18px;min-width:640px"><thead><tr style="'+thStyle+'">'+
@@ -4019,6 +4051,14 @@ function renderIpsTable2Hourly(scope, family) {
     });
     const itemVals = HOURLY_BAND.map(hk => gridItems[day][hk]).filter(v => v > 0);
     colItemScale[day] = { min: itemVals.length ? Math.min(...itemVals) : 0, max: itemVals.length ? Math.max(...itemVals) : 0 };
+    const staffVals = HOURLY_BAND.map(hk => gridStaff[day][hk]).filter(v => v != null && v > 0);
+    colStaffScale[day] = { min: staffVals.length ? Math.min(...staffVals) : 0, max: staffVals.length ? Math.max(...staffVals) : 0 };
+    const ipsVals = HOURLY_BAND.map(hk => gridIps[day][hk]).filter(v => v != null && v > 0);
+    colIpsScale[day] = { min: ipsVals.length ? Math.min(...ipsVals) : 0, max: ipsVals.length ? Math.max(...ipsVals) : 0 };
+  });
+  applyImputedStaffGrids(gridItems, gridStaff, gridIps);
+  // Recompute scales after imputation
+  HOURLY_DAYS.forEach(day => {
     const staffVals = HOURLY_BAND.map(hk => gridStaff[day][hk]).filter(v => v != null && v > 0);
     colStaffScale[day] = { min: staffVals.length ? Math.min(...staffVals) : 0, max: staffVals.length ? Math.max(...staffVals) : 0 };
     const ipsVals = HOURLY_BAND.map(hk => gridIps[day][hk]).filter(v => v != null && v > 0);
@@ -6050,6 +6090,23 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues) {
         const ipsh = hourHeads > 0 && items > 0 ? +(items / hourHeads).toFixed(1) : null;
         grid[day][hk][v.key] = ipsh;
         if (ipsh != null) { any = true; allVals.push(ipsh); }
+      });
+    });
+  });
+  // Impute: venue-hour cells with items but null ipsh → items/1
+  HOURLY_DAYS.forEach(day => {
+    HOURLY_BAND.forEach(hk => {
+      venues.forEach(v => {
+        if (grid[day][hk][v.key] != null) return;
+        const d = ALL_DATA[v.key] && ALL_DATA[v.key][weekKey];
+        if (!d) return;
+        const bucket = sumFamilyHourItems(family, day, hk, d.staffing, d.stationDetails || {}, null, d.stationHourItems || {});
+        const items = bucket.items || 0;
+        if (items > 0) {
+          grid[day][hk][v.key] = +items.toFixed(1);
+          any = true;
+          allVals.push(grid[day][hk][v.key]);
+        }
       });
     });
   });
