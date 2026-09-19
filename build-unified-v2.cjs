@@ -242,6 +242,7 @@ html = html.replace(
         <select id="ipsStationFamily" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
       </label>
     </div>
+    <div id="ipsFamilyStations" style="margin:0 0 14px"></div>
     <div id="ipsMissingBanner" style="display:none;margin-bottom:14px;padding:12px 14px;background:#2a2210;border:1px solid #854d0e;border-radius:10px;font-size:12px;color:#fcd34d"></div>
     <div id="ipsTable1Summary" style="margin-bottom:24px"></div>
     <div id="ipsTable2Hourly" style="margin-bottom:24px"></div>
@@ -3580,6 +3581,37 @@ function getIpsFamily() {
   return (sel && sel.value) || 'Pastry';
 }
 
+function familyStationsByVenue(weekKeys, family) {
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  return IPS_VENUE_KEYS.map(vk => {
+    const names = new Set();
+    (weekKeys || []).forEach(wk => {
+      const d = ALL_DATA[vk]?.[wk];
+      if (!d) return;
+      stationsForFamily(family, d.staffing, d.stationDetails || {}).forEach(st => names.add(st));
+    });
+    return { key: vk, label: labels[vk] || vk, stations: [...names].sort((a, b) => a.localeCompare(b)) };
+  });
+}
+
+function renderIpsFamilyStations(scope, family) {
+  const el = document.getElementById('ipsFamilyStations');
+  if (!el) return;
+  const rows = familyStationsByVenue(scope.weekKeys, family);
+  const chips = rows.map(r => {
+    const on = r.key === currentVenue;
+    const list = r.stations.length
+      ? r.stations.map(s => '<span style="color:#e8eaed">' + s + '</span>').join('<span style="color:#4b5563"> · </span>')
+      : '<span style="color:#6b7280">none this scope</span>';
+    return '<span style="display:inline-flex;flex-wrap:wrap;gap:6px;align-items:baseline;padding:6px 10px;border-radius:8px;border:1px solid ' +
+      (on ? '#d9a441' : '#262a33') + ';background:' + (on ? '#2a2210' : '#13161c') + '">' +
+      '<strong style="color:' + (on ? '#d9a441' : '#9aa0aa') + '">' + r.label + '</strong>' +
+      '<span>' + list + '</span></span>';
+  }).join('');
+  el.innerHTML = '<div style="font-size:11px;color:#9aa0aa;margin-bottom:6px;letter-spacing:0.04em;text-transform:uppercase">Toast stations under ' + family + '</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:8px">' + chips + '</div>';
+}
+
 function renderIpsTable1Summary(scope, family) {
   const el = document.getElementById('ipsTable1Summary');
   if (!el) return;
@@ -3873,6 +3905,8 @@ function _renderItemsPerStaffBody() {
       const t = document.getElementById(id);
       if (t) t.innerHTML = '<p class="note" style="margin:0">No weekly data for this scope yet — if cloud publish is still catching up, wait a moment and re-select the period.</p>';
     });
+    const mapEl = document.getElementById('ipsFamilyStations');
+    if (mapEl) mapEl.innerHTML = '';
     if (noteEl) noteEl.textContent = '';
     return;
   }
@@ -3880,18 +3914,14 @@ function _renderItemsPerStaffBody() {
   const famSel = document.getElementById('ipsStationFamily');
   populateIpsFamilySelect(famSel, scope.weekKeys, 'Pastry');
   const family = getIpsFamily();
+  renderIpsFamilyStations(scope, family);
 
   renderIpsTable1Summary(scope, family);
   renderIpsTable2Hourly(scope, family);
   renderIpsTable3Fulfillment(scope, family);
 
-  const refWk = scope.weekKeys[scope.weekKeys.length - 1];
-  const d = ALL_DATA[currentVenue]?.[refWk] || getD();
-  const stList = stationsForFamily(family, d.staffing, d.stationDetails || {});
   if (noteEl) {
-    noteEl.textContent = scope.label+' · '+family+
-      (stList.length ? ' · Stations: '+stList.join(', ')+'.' : '.')+
-      ' Hour tables: green = lowest pressure in that day column, red = highest.';
+    noteEl.textContent = scope.label + ' · ' + family + '. Hour tables: green = lowest pressure in that day column, red = highest.';
   }
 }
 
