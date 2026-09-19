@@ -342,9 +342,9 @@ html = html.replace(
 </div>`
 );
 
-// Add Visual 4 (WoW heatmap) + Stations Recap before Visual 5 (3D)
+// Add Stations Recap + Visual 4 (WoW heatmap) after Visual 2+3 row
 html = html.replace(
-  '</div>\n\n<!-- Visual 5: 3D -->',
+  '</div>\n\n</section>\n\n<!-- ========== TAB 2: STATIONS ========== -->',
   `</div>
 
 <!-- Stations Recap -->
@@ -368,7 +368,9 @@ html = html.replace(
   <div><span class="trend-badge" id="wowTrendBadge">📊 Week-over-week trend: available from Week 2</span></div>
 </div>
 
-<!-- Visual 5: 3D -->`
+</section>
+
+<!-- ========== TAB 2: STATIONS ========== -->`
 );
 
 // Add bubble chart canvas to menu tab + station column in header
@@ -1735,25 +1737,20 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'overview' && window._threeRenderer) {
-    const host = document.getElementById('kitchen');
-    const W = host.clientWidth || 900;
-    window._threeRenderer.setSize(W, 500);
-    window._threeCamera.aspect = W / 500;
-    window._threeCamera.updateProjectionMatrix();
-  }
 }
 
 // ============================================================
 // HEATMAP TOGGLE
 // ============================================================
 function showHM(which, btn) {
-  const group = btn && btn.closest ? btn.closest('.hm-toggle') : null;
+  const ful = document.getElementById('hmFul');
+  const guests = document.getElementById('hmGuests');
+  if (!ful || !guests || !btn) return;
+  const group = btn.closest ? btn.closest('.hm-toggle') : null;
   if (group) group.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-  else document.querySelectorAll('.hm-toggle button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('hmFul').style.display = which === 'ful' ? '' : 'none';
-  document.getElementById('hmGuests').style.display = which === 'guests' ? '' : 'none';
+  ful.style.display = which === 'ful' ? '' : 'none';
+  guests.style.display = which === 'guests' ? '' : 'none';
 }
 
 // ============================================================
@@ -2197,323 +2194,10 @@ function renderLoadPerf() {
 }
 
 // ============================================================
-// VISUAL 4: 3D Station View
+// Visual 5 (3D) + Visual 6 (heatmaps) removed from overview
 // ============================================================
-function render3D() {
-  const STATIONS = getD().stations.filter(s => !/cold[\\s_-]?expo|^pass$/i.test(s.station));
-  const host = document.getElementById('kitchen');
-  if (!window.THREE) {
-    host.innerHTML='<div style="padding:40px;color:#9aa0aa;text-align:center">Three.js failed to load.<br><small>CDN: cdnjs.cloudflare.com</small></div>';
-    return;
-  }
-  if (window._threeRenderer) {
-    window._threeRenderer.dispose();
-    window._threeRenderer = null;
-  }
-  host.innerHTML = '';
-
-  // ── Claudie floor plan (physical positions) ──────────────────────────────
-  const FLOOR_PLANS = {
-    claudie: [
-      { match: /garde.manger|^gm$|^gm\\b/i,  x:  7,  z: -7,  w: 3.5, d: 2   },
-      { match: /fry/i,                       x:  7,  z: -4.5,w: 3.5, d: 2   },
-      { match: /saut/i,                      x:  7,  z: -2,  w: 3.5, d: 2   },
-      { match: /fish(?!.*market)|fish.market/i, x: 4, z: 1,  w: 3,   d: 2.5 },
-      { match: /crudo/i,                     x:  7.5,z: 1,   w: 3,   d: 2.5 },
-      { match: /pastry/i,                    x:  7,  z: 5,   w: 3.5, d: 2   },
-      { match: /meat/i,                      x:  3,  z: 7.5, w: 5,   d: 2   },
-      { match: /hot.expo/i,                  x: -2,  z: -3,  w: 2,   d: 3   },
-      { match: /pizza|oven/i,                x: -1,  z: -8,  w: 3,   d: 2   },
-    ]
-  };
-
-  const useFloorPlan = currentVenue === 'claudie';
-
-  function perfBoxColor(s) {
-    if (!s.exp_sec) return 0x6b7280;
-    const r = s.avg_sec / s.exp_sec;
-    if (r <= 1.0) return 0x2e8b57;
-    if (r <= 1.15) return 0xc99a2e;
-    return 0xc0392b;
-  }
-  function perfLightColor(s) {
-    if (!s.exp_sec) return 0x4488cc;
-    const r = s.avg_sec / s.exp_sec;
-    if (r <= 1.0) return 0x00ff88;
-    if (r <= 1.15) return 0xff9900;
-    return 0xff3300;
-  }
-  function tSprite(t, sub, color, big) {
-    const c = document.createElement('canvas'); c.width = 320; c.height = sub ? 100 : 48;
-    const g = c.getContext('2d');
-    g.font = 'bold ' + (big ? 26 : 20) + 'px sans-serif'; g.fillStyle = color || '#fff'; g.textAlign = 'center';
-    g.fillText(t, 160, sub ? 34 : 32);
-    if (sub) { g.font = '22px sans-serif'; g.fillStyle = '#ffd479'; g.fillText(sub, 160, 70); }
-    return new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true }));
-  }
-
-  let W = host.clientWidth || 900, H = 500;
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0c0e13);
-  scene.fog = new THREE.Fog(0x0c0e13, 20, 45);
-  const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 200);
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio || 1); renderer.setSize(W, H);
-  host.appendChild(renderer.domElement);
-  window._threeRenderer = renderer; window._threeCamera = camera;
-
-  scene.add(new THREE.AmbientLight(0xffffff, 1.1));
-  const dl = new THREE.DirectionalLight(0xffffff, 0.5); dl.position.set(6, 14, 8); scene.add(dl);
-
-  const kitchen = new THREE.Group(); scene.add(kitchen);
-
-  const FW = useFloorPlan ? 28 : 22;
-  const FD = useFloorPlan ? 26 : 22;
-  const floor = new THREE.Mesh(new THREE.BoxGeometry(FW, 0.2, FD), new THREE.MeshLambertMaterial({ color: 0x161a21 }));
-  floor.position.y = -0.1; kitchen.add(floor);
-  const grid = new THREE.GridHelper(Math.max(FW, FD), 20, 0x2a2f3a, 0x1e222a); grid.position.y = 0.02; kitchen.add(grid);
-  const wallMat = new THREE.MeshLambertMaterial({ color: 0x222831 });
-  function wall(w, d, x, z) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, 1.6, d), wallMat); m.position.set(x, 0.8, z); kitchen.add(m); }
-  wall(FW, 0.25, 0, -FD / 2); wall(FW, 0.25, 0, FD / 2); wall(0.25, FD, -FW / 2, 0); wall(0.25, FD, FW / 2, 0);
-
-  // PASS strip for Claudie
-  if (useFloorPlan) {
-    const passMat = new THREE.MeshLambertMaterial({ color: 0x3a3f4a });
-    const passWall = new THREE.Mesh(new THREE.BoxGeometry(0.6, 2.5, FD), passMat);
-    passWall.position.set(-10.5, 1.25, 0); kitchen.add(passWall);
-    const passSp = tSprite('PASS', null, '#6b7280', false);
-    passSp.scale.set(2.2, 0.55, 1); passSp.position.set(-10.5, 2.8, 0); kitchen.add(passSp);
-  }
-
-  const withTargets = STATIONS.filter(s => s.exp_sec > 0);
-  const overTarget = withTargets.filter(s => s.avg_sec > s.exp_sec).length;
-  document.getElementById('kTotal').textContent = overTarget + '/' + withTargets.length + ' over target';
-
-  const boxes = [];
-  const stationLights = [];
-  let gi = 0;
-
-  STATIONS.forEach(s => {
-    let x, z, bw = 2.0, bd = 2.0;
-
-    if (useFloorPlan) {
-      const fp = FLOOR_PLANS.claudie;
-      const entry = fp.find(e => e.match.test(s.station));
-      if (entry) { x = entry.x; z = entry.z; bw = entry.w * 0.9; bd = entry.d * 0.9; }
-      else { const col = gi % 3, row = Math.floor(gi / 3); x = -8 + col * 2.5; z = 8 + row * 2.5; gi++; }
-    } else {
-      // Auto-grid layout for non-Claudie venues
-      const cols = Math.ceil(Math.sqrt(STATIONS.length));
-      const rows = Math.ceil(STATIONS.length / cols);
-      const spacingX = (FW - 4) / Math.max(1, cols - 1 + 1);
-      const spacingZ = (FD - 4) / Math.max(1, rows - 1 + 1);
-      const col = gi % cols, row = Math.floor(gi / cols);
-      x = -FW / 2 + 2 + col * spacingX;
-      z = -FD / 2 + 2 + row * spacingZ;
-      bw = Math.min(2.0, spacingX * 0.75);
-      bd = Math.min(2.0, spacingZ * 0.75);
-      gi++;
-    }
-
-    const mins = s.avg_sec ? s.avg_sec / 60 : 0;
-    const boxColor = perfBoxColor(s);
-    const boxH = Math.max(0.5, Math.min(2.5, mins / 6));
-
-    // Simple colored box
-    const box = new THREE.Mesh(
-      new THREE.BoxGeometry(bw, boxH, bd),
-      new THREE.MeshLambertMaterial({ color: boxColor })
-    );
-    box.position.set(x, boxH / 2, z);
-    box.userData = s;
-    kitchen.add(box);
-    boxes.push(box);
-
-    // Edge outline
-    const edgesGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(bw, boxH, bd));
-    const edgesMesh = new THREE.LineSegments(edgesGeo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 }));
-    edgesMesh.position.set(x, boxH / 2, z);
-    kitchen.add(edgesMesh);
-
-    // Performance point light above station
-    const glow = new THREE.PointLight(perfLightColor(s), 1.4, 6);
-    glow.position.set(x, boxH + 1.2, z);
-    kitchen.add(glow);
-    stationLights.push({ light: glow, baseIntensity: 1.4, station: s });
-
-    // Text label (station name + avg time)
-    const shortName = s.station.replace('Garde Manger', 'Garde M.').replace('Cold Expo', 'PASS').replace('Hot Expo', 'HOT EXP');
-    const label = tSprite(shortName, (mins ? mins.toFixed(1) : '–') + ' min', '#fff', true);
-    label.scale.set(Math.max(2.4, bw * 0.95), 0.88, 1);
-    label.position.set(x, boxH + 1.6, z);
-    kitchen.add(label);
-  });
-
-  const rotYInit = useFloorPlan ? 0.3 : 0.7;
-  const distInit = useFloorPlan ? 32 : 28;
-  let rotY = rotYInit, rotX = 0.65, dist = distInit;
-  function place() { camera.position.set(dist * Math.sin(rotY) * Math.cos(rotX), dist * Math.sin(rotX), dist * Math.cos(rotY) * Math.cos(rotX)); camera.lookAt(0, 0.6, 0); }
-  place();
-  let drag = false, px = 0, py = 0, moved = 0, spin = true;
-  const dom = renderer.domElement;
-  dom.addEventListener('pointerdown', e => { drag = true; moved = 0; px = e.clientX; py = e.clientY; spin = false; host.style.cursor = 'grabbing'; });
-  window.addEventListener('pointerup', e => { if (drag && moved < 6) pick(e); drag = false; host.style.cursor = 'grab'; });
-  window.addEventListener('pointermove', e => {
-    if (!drag) {
-      const r = dom.getBoundingClientRect();
-      const hm2 = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
-      const hray = new THREE.Raycaster(); hray.setFromCamera(hm2, camera);
-      const hits = hray.intersectObjects(boxes, false);
-      stationLights.forEach(sl => { sl.light.intensity = sl.baseIntensity; });
-      if (hits.length) { const sl = stationLights.find(sl => sl.station === hits[0].object.userData); if (sl) sl.light.intensity = 2.2; }
-      return;
-    }
-    const dx = e.clientX - px, dy = e.clientY - py;
-    moved += Math.abs(dx) + Math.abs(dy);
-    rotY -= dx * 0.008;
-    rotX = Math.max(0.2, Math.min(1.45, rotX + dy * 0.006));
-    px = e.clientX; py = e.clientY; place();
-  });
-  dom.addEventListener('wheel', e => { e.preventDefault(); dist = Math.max(9, Math.min(46, dist + (e.deltaY > 0 ? 1.4 : -1.4))); place(); }, { passive: false });
-
-  const ray = new THREE.Raycaster(), m2 = new THREE.Vector2();
-  let zoomTimer = null;
-  function pick(e) {
-    const r = dom.getBoundingClientRect();
-    m2.x = ((e.clientX - r.left) / r.width) * 2 - 1;
-    m2.y = -((e.clientY - r.top) / r.height) * 2 + 1;
-    ray.setFromCamera(m2, camera);
-    const hit = ray.intersectObjects(boxes, false);
-    if (hit.length) {
-      selectStation3D(hit[0].object.userData);
-      const sd = dist, td = Math.max(9, dist - 6);
-      let zt = 0;
-      if (zoomTimer) clearInterval(zoomTimer);
-      zoomTimer = setInterval(() => {
-        zt += 0.04;
-        if (zt >= 1) { dist = td; clearInterval(zoomTimer); setTimeout(() => { let zt2 = 0; const t2 = setInterval(() => { zt2 += 0.04; dist = td + (sd - td) * zt2; place(); if (zt2 >= 1) { dist = sd; clearInterval(t2); } }, 16); }, 1500); }
-        else { dist = sd + (td - sd) * zt; }
-        place();
-      }, 16);
-    }
-  }
-  function selectStation3D(s) {
-    const ratio = s.exp_sec > 0 ? (s.avg_sec / s.exp_sec * 100).toFixed(1) + '%' : 'no target';
-    let sc = '#74d39a', st = 'On target';
-    if (!s.exp_sec) { sc = '#9aa0aa'; st = 'No target'; }
-    else if (s.avg_sec / s.exp_sec > 1.15) { sc = '#e2706a'; st = 'Over target'; }
-    else if (s.avg_sec > s.exp_sec) { sc = '#c99a2e'; st = 'Slightly over'; }
-    const targetCoverageLabel = s.target_coverage != null ? 'Target · ' + Math.round(s.target_coverage * 100) + '% mix covered' : 'Target';
-    document.getElementById('kDetail').innerHTML = '<div style="border-top:1px solid #262a33;padding-top:14px"><h2 style="font-size:15px;margin:0 0 10px">' + s.station + '</h2><div class="kpis" style="margin-bottom:0"><div class="kpi"><div class="v" style="font-size:19px">' + s.count + '</div><div class="l">Tickets</div></div><div class="kpi"><div class="v" style="font-size:19px">' + fmtSec(s.avg_sec) + '</div><div class="l">Avg time</div></div><div class="kpi"><div class="v" style="font-size:19px">' + (s.exp_sec > 0 ? fmtSec(s.exp_sec) : '—') + '</div><div class="l">' + targetCoverageLabel + '</div></div><div class="kpi"><div class="v" style="font-size:19px;color:' + sc + '">' + ratio + '</div><div class="l">' + st + '</div></div></div></div>';
-  }
-
-  if (window._threeLoopId) cancelAnimationFrame(window._threeLoopId);
-  let loopActive = true;
-  function loop() {
-    if (!loopActive) return;
-    window._threeLoopId = requestAnimationFrame(loop);
-    if (spin) kitchen.rotation.y += 0.0022;
-    renderer.render(scene, camera);
-  }
-  loop();
-  window._threeCleanup = () => { loopActive = false; };
-  window.addEventListener('resize', () => { W = host.clientWidth || W; renderer.setSize(W, H); camera.aspect = W / H; camera.updateProjectionMatrix(); });
-}
-
-// ============================================================
-// VISUAL 5: Day x Hour Heatmaps
-// ============================================================
-function renderHeatmaps() {
-  const HM_FUL = getD().hmFul;
-  const HM_GUESTS = getD().hmGuests;
-
-  // Find max cell in fulfillment heatmap for callout
-  let hmPeakVal = 0, hmPeakDay = '', hmPeakHr = '';
-  let hmGPeakVal = 0;
-  HM_HRS.forEach(hr => {
-    HM_DAYS_FULL.forEach(day => {
-      const v = HM_FUL[day] && HM_FUL[day][hr] != null ? HM_FUL[day][hr] : null;
-      if (v != null && v > hmPeakVal) { hmPeakVal = v; hmPeakDay = day; hmPeakHr = hr; }
-    });
-  });
-  if (hmPeakDay && HM_GUESTS[hmPeakDay]) hmGPeakVal = HM_GUESTS[hmPeakDay][hmPeakHr] || 0;
-  const hmCalloutEl = document.getElementById('hmFulCallout');
-  if (hmCalloutEl && hmPeakDay) {
-    hmCalloutEl.style.display = '';
-    hmCalloutEl.innerHTML = '🔥 <strong>Peak pressure:</strong> ' + hmPeakDay + ' ' + hmPeakHr + ' — <strong style="color:#ef4444">' + hmPeakVal.toFixed(1) + 'min</strong> avg fulfillment' + (hmGPeakVal ? ' / <strong>' + Math.round(hmGPeakVal) + '</strong> guests' : '');
-  }
-
-  function buildHM(tblId, getVal, colorFn, dispFn, tipFn, isFul) {
-    const tbl = document.getElementById(tblId);
-    // Find max cell for worst-cell highlight (only for fulfillment)
-    let maxV = -Infinity, maxDay = '', maxHr = '';
-    if (isFul) {
-      HM_HRS.forEach(hr => { HM_DAYS_FULL.forEach(day => { const v = getVal(day, hr); if (v != null && v > maxV) { maxV = v; maxDay = day; maxHr = hr; } }); });
-    }
-    // Row averages (per hour)
-    const rowAvg = {};
-    HM_HRS.forEach(hr => {
-      let sum = 0, cnt = 0;
-      HM_DAYS_FULL.forEach(day => { const v = getVal(day, hr); if (v != null) { sum += v; cnt++; } });
-      rowAvg[hr] = cnt > 0 ? sum / cnt : null;
-    });
-    // Col averages (per day)
-    const colAvg = {};
-    HM_DAYS_FULL.forEach(day => {
-      let sum = 0, cnt = 0;
-      HM_HRS.forEach(hr => { const v = getVal(day, hr); if (v != null) { sum += v; cnt++; } });
-      colAvg[day] = cnt > 0 ? sum / cnt : null;
-    });
-
-    let html2 = '<thead><tr><th class="row-head" style="background:#1e2533">Hour</th>';
-    HM_DAYS_SHORT.forEach(d => { html2 += '<th style="background:#1e2533;min-width:72px">'+d+'</th>'; });
-    html2 += '<th style="background:#1a1d25;min-width:60px;color:#d9a441;font-size:11px">Avg</th>';
-    html2 += '</tr></thead><tbody>';
-    HM_HRS.forEach(hr => {
-      html2 += '<tr><td class="row-head" style="background:#181b22;font-weight:600;color:#9aa0aa">'+hr+'</td>';
-      HM_DAYS_FULL.forEach(day => {
-        const v = getVal(day, hr);
-        const bg = colorFn(v);
-        const fg = textFor(bg);
-        const isWorst = isFul && day === maxDay && hr === maxHr && v != null;
-        const worstStyle = isWorst ? ';outline:2px solid #fff;outline-offset:-2px;position:relative' : '';
-        const worstLabel = isWorst ? ' ⭐' : '';
-        html2 += '<td title="'+tipFn(day,hr,v)+'" style="background:'+bg+';color:'+fg+';padding:6px 3px'+worstStyle+'">'+dispFn(v)+worstLabel+'</td>';
-      });
-      // Row summary
-      const ra = rowAvg[hr];
-      const raBg = colorFn(ra);
-      const raFg = textFor(raBg);
-      html2 += '<td style="background:' + raBg + ';color:' + raFg + ';padding:6px 3px;font-weight:700;opacity:0.9">' + (ra != null ? dispFn(ra) : '') + '</td>';
-      html2 += '</tr>';
-    });
-    // Column summary row
-    html2 += '<tr><td class="row-head" style="background:#1a1d25;color:#d9a441;font-weight:700;font-size:11px">Avg</td>';
-    HM_DAYS_FULL.forEach(day => {
-      const ca = colAvg[day];
-      const caBg = colorFn(ca);
-      const caFg = textFor(caBg);
-      html2 += '<td style="background:' + caBg + ';color:' + caFg + ';padding:6px 3px;font-weight:700;opacity:0.9">' + (ca != null ? dispFn(ca) : '') + '</td>';
-    });
-    html2 += '<td style="background:#1a1d25;padding:6px 3px"></td></tr>';
-    html2 += '</tbody>';
-    tbl.innerHTML = html2;
-  }
-  buildHM('hmFulTable',
-    (day,hr) => HM_FUL[day]&&HM_FUL[day][hr]!=null?HM_FUL[day][hr]:null,
-    fulColor,
-    v => v!=null?v.toFixed(1):'',
-    (day,hr,v) => v!=null?day+' '+hr+': '+v.toFixed(1)+' min':day+' '+hr+': no data',
-    true
-  );
-  buildHM('hmGuestsTable',
-    (day,hr) => HM_GUESTS[day]&&HM_GUESTS[day][hr]?HM_GUESTS[day][hr]:null,
-    guestColor,
-    v => v!=null?v.toFixed(0):'',
-    (day,hr,v) => v!=null?day+' '+hr+': '+v.toFixed(0)+' guests':day+' '+hr+': no data',
-    false
-  );
-}
+function render3D() { /* removed */ }
+function renderHeatmaps() { /* removed */ }
 
 // ============================================================
 // VISUAL 4: Station Fulfillment Week-over-Week (heatmap)
@@ -2522,7 +2206,26 @@ function renderStationWoW() {
   const el = document.getElementById('stationWowHeatmap');
   if (!el) return;
 
-  const weeks = WEEKS.slice().sort((a, b) => String(a.key).localeCompare(String(b.key)));
+  if (currentVenue === 'rdg_portfolio') {
+    el.innerHTML = '<p class="note" style="margin:0">Pick a restaurant pill to see station fulfillment by week.</p>';
+    return;
+  }
+
+  const venueWeeks = ALL_DATA[currentVenue] || {};
+  // Prefer embedded/selected week list, but always include any week that already has stations.
+  const weekByKey = new Map();
+  (WEEKS || []).forEach(w => { if (w && w.key) weekByKey.set(w.key, w); });
+  Object.keys(venueWeeks).forEach(key => {
+    if (key === 'latest') return;
+    if (!weekByKey.has(key)) weekByKey.set(key, { key, label: 'W' + String(key).slice(-2) });
+  });
+  const weeks = [...weekByKey.values()]
+    .filter(w => {
+      const d = venueWeeks[w.key];
+      return d && Array.isArray(d.stations) && d.stations.length > 0;
+    })
+    .sort((a, b) => String(a.key).localeCompare(String(b.key)));
+
   const numWeeks = weeks.length;
   const badge = document.getElementById('wowTrendBadge');
   if (badge) {
@@ -2531,23 +2234,21 @@ function renderStationWoW() {
       : '📊 Week-over-week trend: available from Week 2';
   }
 
-  if (currentVenue === 'rdg_portfolio') {
-    el.innerHTML = '<p class="note" style="margin:0">Pick a restaurant pill to see station fulfillment by week.</p>';
-    return;
-  }
-
   const stationNames = new Set();
   weeks.forEach(w => {
-    ((ALL_DATA[currentVenue] && ALL_DATA[currentVenue][w.key] && ALL_DATA[currentVenue][w.key].stations) || [])
-      .filter(s => isFoodStation(s.station))
+    (venueWeeks[w.key].stations || [])
+      .filter(s => s && isFoodStation(s.station))
       .forEach(s => stationNames.add(s.station));
   });
 
-  const latestKey = weeks.length ? weeks[weeks.length - 1].key : null;
-  const curKey = WEEKS[currentWeekIdx] && WEEKS[currentWeekIdx].key;
+  const curKey = (WEEKS[currentWeekIdx] && WEEKS[currentWeekIdx].key)
+    || (weeks.length ? weeks[weeks.length - 1].key : null);
+  const sortKey = (curKey && venueWeeks[curKey] && venueWeeks[curKey].stations)
+    ? curKey
+    : (weeks.length ? weeks[weeks.length - 1].key : null);
   const stations = [...stationNames].sort((a, b) => {
-    const sa = ((ALL_DATA[currentVenue] && ALL_DATA[currentVenue][latestKey] && ALL_DATA[currentVenue][latestKey].stations) || []).find(s => s.station === a);
-    const sb = ((ALL_DATA[currentVenue] && ALL_DATA[currentVenue][latestKey] && ALL_DATA[currentVenue][latestKey].stations) || []).find(s => s.station === b);
+    const sa = ((venueWeeks[sortKey] && venueWeeks[sortKey].stations) || []).find(s => s.station === a);
+    const sb = ((venueWeeks[sortKey] && venueWeeks[sortKey].stations) || []).find(s => s.station === b);
     return ((sb && sb.avg_sec) || 0) - ((sa && sa.avg_sec) || 0);
   });
 
@@ -2570,8 +2271,7 @@ function renderStationWoW() {
     html += '<tr style="border-top:1px solid #262a33"><td style="padding:6px 10px;color:#e8eaed;font-weight:600;white-space:nowrap;background:#13161c;position:sticky;left:0;z-index:1">' +
       name + '</td>';
     weeks.forEach(w => {
-      const st = ((ALL_DATA[currentVenue] && ALL_DATA[currentVenue][w.key] && ALL_DATA[currentVenue][w.key].stations) || [])
-        .find(s => s.station === name);
+      const st = (venueWeeks[w.key].stations || []).find(s => s.station === name);
       const sec = st && st.avg_sec > 0 ? st.avg_sec : null;
       const on = w.key === curKey;
       if (sec == null) {
@@ -2580,7 +2280,7 @@ function renderStationWoW() {
         return;
       }
       const min = sec / 60;
-      const bg = hmColor(sec, 900);
+      const bg = fulColor(min);
       const fg = textFor(bg);
       const tip = name + ' · ' + w.label + ': ' + fmtSec(sec);
       html += '<td title="' + tip + '" style="padding:6px 8px;text-align:center;font-weight:700;background:' + bg +
@@ -6798,9 +6498,9 @@ function renderAll() {
   renderServiceBreakTimeline();
   renderBreaking();
   renderLoadPerf();
+  renderStationWoW();
   render3D();
   renderHeatmaps();
-  renderStationWoW();
   renderStations();
   renderMenuItems();
   renderAssignment();

@@ -165,56 +165,6 @@ table.menu-tbl tr:hover td{background:#1e2533}
   </div>
 </div>
 
-<!-- Visual 5: 3D -->
-<div class="card">
-  <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap">
-    <h2 style="margin:0">Visual 5 — 3D Station View (Food stations only)</h2>
-    <span style="margin-left:auto">
-      <span style="font-size:28px;font-weight:700;color:#d9a441" id="kTotal">—</span>
-      <span style="color:#9aa0aa;font-size:12px;display:block;margin-top:-4px">stations over target</span>
-    </span>
-  </div>
-  <p class="note">Each block = a food station. Height ∝ avg fulfillment time. <strong style="color:#2e8b57">Green</strong> ≤ target, <strong style="color:#c99a2e">amber</strong> up to +15%, <strong style="color:#c0392b">red</strong> &gt;+15%. Drag to rotate, scroll to zoom, click for detail.</p>
-  <div id="kitchen" style="height:500px;border-radius:10px;overflow:hidden;background:#0c0e13;cursor:grab"></div>
-  <div class="legend" style="margin-top:10px">
-    <span><span class="sw" style="background:#2e8b57"></span>On target</span>
-    <span><span class="sw" style="background:#c99a2e"></span>Up to +15% over</span>
-    <span><span class="sw" style="background:#c0392b"></span>&gt;15% over target</span>
-    <span><span class="sw" style="background:#6b7280"></span>No target</span>
-  </div>
-  <div id="kDetail" style="margin-top:14px"></div>
-</div>
-
-<!-- Visual 6: Heatmaps -->
-<div class="card">
-  <h2>Visual 6 — Day × Hour Heatmaps</h2>
-  <p class="note">Toggle between fulfillment time and guest count. Y-axis = hour window. X-axis = day of week.</p>
-  <div class="hm-toggle">
-    <button class="active" onclick="showHM('ful',this)">⏱ Avg Fulfillment Time (min)</button>
-    <button onclick="showHM('guests',this)">👥 Avg Guests Seated (OT)</button>
-  </div>
-  <div id="hmFulCallout" style="display:none;background:#2d1a0a;border:1px solid #92400e;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:#fcd34d"></div>
-  <div id="hmFul">
-    <div style="font-size:12px;color:#9aa0aa;margin-bottom:6px">Color scale: <span style="color:#22c55e">■</span> ≤10 min → <span style="color:#f59e0b">■</span> 10–15 min → <span style="color:#ef4444">■</span> &gt;15 min</div>
-    <div class="hm-wrap"><table class="hm-table" id="hmFulTable"></table></div>
-    <div class="legend" style="margin-top:8px">
-      <span><span class="sw" style="background:#22c55e"></span>≤10 min</span>
-      <span><span class="sw" style="background:#f59e0b"></span>10–15 min</span>
-      <span><span class="sw" style="background:#ef4444"></span>&gt;15 min</span>
-      <span><span class="sw" style="background:#1a1d24"></span>No data</span>
-    </div>
-  </div>
-  <div id="hmGuests" style="display:none">
-    <div style="font-size:12px;color:#9aa0aa;margin-bottom:6px">Color scale: <span style="color:#b3d9f7">■</span> few → <span style="color:#1565c0">■</span> many guests</div>
-    <div class="hm-wrap"><table class="hm-table" id="hmGuestsTable"></table></div>
-    <div class="legend" style="margin-top:8px">
-      <span><span class="sw" style="background:#b3d9f7"></span>Few guests</span>
-      <span><span class="sw" style="background:#1565c0"></span>Many guests (170+)</span>
-      <span><span class="sw" style="background:#1a1d24"></span>No data</span>
-    </div>
-  </div>
-</div>
-
 </section>
 
 <!-- ========== TAB 2: STATIONS ========== -->
