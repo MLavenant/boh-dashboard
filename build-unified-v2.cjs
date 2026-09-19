@@ -310,7 +310,7 @@ html = html.replace(
 <div class="row two">
   <div class="card">
     <h2>Visual 2 — Breaking Point</h2>
-    <p class="note">Avg fulfillment time and guests vs concurrent ticket load.</p>
+    <p class="note">Avg fulfillment vs how many <strong>production station tickets</strong> are open at once (Saute, Pastry, Fry… each count while unfulfilled; Expo excluded).</p>
     <div class="row two" style="margin-bottom:12px;gap:8px">
       <div class="bpbox"><div class="big">26</div><div class="l">tickets → kitchen falls behind</div></div>
       <div class="bpbox"><div class="big">141</div><div class="l">guests → kitchen falls behind</div></div>
@@ -332,7 +332,7 @@ html = html.replace(
   `<!-- Visual 2 -->
 <div class="card">
   <h2>Visual 2 — Breaking Point</h2>
-  <p class="note">Avg fulfillment time and guests vs concurrent ticket load.</p>
+    <p class="note">Avg fulfillment vs how many <strong>production station tickets</strong> are open at once (Saute, Pastry, Fry… each count while unfulfilled; Expo excluded).</p>
   <div class="row two" style="margin-bottom:12px;gap:8px">
     <div class="bpbox"><div class="big">26</div><div class="l">tickets → kitchen falls behind</div></div>
     <div class="bpbox"><div class="big">141</div><div class="l">guests → kitchen falls behind</div></div>
@@ -642,11 +642,11 @@ html = html.replace(
 <!-- Service Break Timeline (1-min) -->
 <div class="card" id="serviceBreakCard">
   <h2>Visual 1B — Service Break Timeline (1-min)</h2>
-  <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent tickets open</strong> in the kitchen. Gold line = <strong>avg fulfillment of those open tickets</strong>. Red band / markers = minutes where open-ticket avg &gt; 15 min. This is the live pressure view — different from Breaking Point (which is a capacity curve, not a clock).</p>
+  <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent production tickets open</strong> (Saute, Pastry, Fry…; Expo excluded). Gold line = <strong>avg fulfillment of those open tickets</strong>. Red = minutes where that avg &gt; 15 min.</p>
   <div id="serviceBreakDayPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
   <canvas id="cServiceBreak" style="max-height:420px"></canvas>
   <div class="legend">
-    <span><span class="sw" style="background:#5aa9e6"></span>Concurrent tickets open</span>
+    <span><span class="sw" style="background:#5aa9e6"></span>Concurrent station tickets open</span>
     <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment of open tickets (min)</span>
     <span><span class="sw" style="background:#e2706a"></span>Over 15 min (break)</span>
   </div>
@@ -1858,20 +1858,20 @@ function renderPressure() {
       {type:'line',label:'Avg fulfillment (min)',data:CURVE.map(d=>d.ful),borderColor:'#d9a441',backgroundColor:'rgba(217,164,65,0.0)',tension:0.3,pointRadius:2,pointHoverRadius:5,borderWidth:2.5,yAxisID:'y1',order:1},
       {type:'line',label:'P75 fulfillment (min)',data:CURVE.map(d=>d.p75),borderColor:'#e2706a',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:0.3,yAxisID:'y1',order:1}
     ]},
-    options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent tickets open'},grid:{color:gc}},y:{position:'left',title:{display:true,text:'Occurrences'},grid:{color:gc},min:0},y1:{position:'right',title:{display:true,text:'Fulfillment time (min)'},grid:{display:false},min:0,suggestedMax:24}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
+    options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent production tickets open'},grid:{color:gc}},y:{position:'left',title:{display:true,text:'Occurrences'},grid:{color:gc},min:0},y1:{position:'right',title:{display:true,text:'Fulfillment time (min)'},grid:{display:false},min:0,suggestedMax:24}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
     plugins:[bpPlugin]
   });
   const dayLabel = pressureDay === 'Total' ? 'all days' : pressureDay;
   const annEl = document.getElementById('bpAnnotation');
   if (annEl) {
     if (BP != null) {
-      annEl.innerHTML = '⚡ Breaking point at <strong>'+BP+' concurrent tickets</strong> ('+dayLabel+') — avg fulfillment jumps to '+(CURVE.find(d=>d.conc===BP)||{ful:'?'}).ful+' min.';
+      annEl.innerHTML = '⚡ Breaking point at <strong>'+BP+' concurrent production tickets</strong> ('+dayLabel+') — avg fulfillment jumps to '+(CURVE.find(d=>d.conc===BP)||{ful:'?'}).ful+' min. <span style="color:#9aa0aa;font-weight:500">(Each open KDS fire on Saute, Pastry, Fry… counts. Expo excluded.)</span>';
     } else {
       annEl.innerHTML = 'No breaking point detected for <strong>'+dayLabel+'</strong> — avg fulfillment stays below threshold across observed load levels.';
     }
   }
   const bpNote = document.getElementById('bpMethodNote');
-  if (bpNote) bpNote.textContent = 'BP = first load level (skip 1–10) where avg fulfillment crosses the target · view: ' + dayLabel;
+  if (bpNote) bpNote.textContent = 'X-axis = open production station tickets (Saute, Pastry, Fry… each count; Expo excluded). When N are open, gold = avg fulfill of those N. BP = first load (skip 1–10) where avg crosses target · view: ' + dayLabel;
   // Page KPIs stay on week Total so day toggle only changes Visual 1
   const bpObj = computeBreakingPoint(getPressureCurve('Total'));
   const bp1 = document.getElementById('kpiBP1');

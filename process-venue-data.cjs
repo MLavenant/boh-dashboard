@@ -297,8 +297,24 @@ function mergeOrderTickets(rows) {
 const orderTickets = mergeOrderTickets(foodTickets);
 console.log(`Order tickets (merged): ${orderTickets.length} from ${foodTickets.length} station fires`);
 
-// Legacy alias — curve / breaking point / service-break use merged orders, not per-station rows
-const uniqueTickets = orderTickets;
+// Pressure curve / BP / service-break X-axis:
+// Concurrent OPEN STATION TICKETS — each KDS fire on a production station counts
+// while unfulfilled (Saute + Pastry + Fry = 3). Expo excluded: expeditor bumps
+// inflate concurrency and pull avg fulfillment down to nonsense (~5–7 min).
+// Also drop sub-60s fires (pure bump / bump noise).
+const MIN_PRESSURE_FUL_SEC = 60;
+function isExpoStation(name) {
+  return /expo/i.test(String(name || ''));
+}
+const pressureTickets = foodTickets.filter(t =>
+  !isExpoStation(t['Station'] || t.Station) && (t._fulSec || 0) >= MIN_PRESSURE_FUL_SEC
+);
+const uniqueTickets = pressureTickets;
+console.log(
+  `Pressure-curve unit: production station fires (${uniqueTickets.length}` +
+  `; excluded expo=${foodTickets.filter(t => isExpoStation(t['Station'] || t.Station)).length}` +
+  `, <${MIN_PRESSURE_FUL_SEC}s=${foodTickets.filter(t => !isExpoStation(t['Station'] || t.Station) && (t._fulSec || 0) < MIN_PRESSURE_FUL_SEC).length})`
+);
 
 function weightedP75Min(entries) {
   if (!entries.length) return 0;
@@ -921,14 +937,19 @@ const output = {
     over90MinExcluded: skippedLong,
     foodStationTicketRows: foodTickets.length,
     orderCount: orderTickets.length,
-    uniqueTickets: orderTickets.length,
+    uniqueTickets: foodTickets.length,
     stationFireCount: stations.reduce((s, st) => s + (st.count || 0), 0),
     itemDetailSkuCount: summary.length,
     itemQtyTotal: Math.round(summary.reduce((s, r) => s + (r.qty || 0), 0)),
     fulfillmentAdjustSec: FULFILLMENT_ADJUST_SEC,
+    // Curve X-axis = concurrent open PRODUCTION station KDS tickets (Expo excluded)
+    concurrencyUnit: 'production_station_fire',
+    concurrencyExcludeExpo: true,
+    concurrencyMinFulSec: MIN_PRESSURE_FUL_SEC,
+    pressureTicketCount: pressureTickets.length,
     orderMerge: 'check-day-window',
     orderMergeWindowSec: ORDER_MERGE_WINDOW_SEC,
-    orderMergeVersion: 2,
+    orderMergeVersion: 3,
   },
 };
 
