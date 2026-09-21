@@ -45,7 +45,9 @@ const FCAST_TO = [
   /* TEST: only Matthias until Forecast flash capture is verified end-to-end */
   'matthias@rivieradininggroup.com'
 ];
-const FCAST_CC = [];
+const FCAST_CC = [
+  'gabrielle@rivieradininggroup.com'
+];
 
 function log(msg) {
   console.log(`[forecast-email ${new Date().toISOString()}] ${msg}`);
