@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T13:52:01.695Z",
+  "generatedAt": "2026-09-21T13:57:00.354Z",
   "latestWeek": "2026-W38",
   "availableWeeks": [
     "2026-W38",
@@ -81,8 +81,8 @@
   "files": {
     "dashboardHtml": {
       "path": "C:\\Cursor\\boh-rdg-publish\\dashboard.html",
-      "mtime": "2026-09-21T13:43:09.868Z",
-      "size": 28793202,
+      "mtime": "2026-09-21T13:52:19.702Z",
+      "size": 29335615,
       "rows": null
     },
     "rolling": {
@@ -169,8 +169,8 @@
           "message": "11 stations, curve=78, BP=56",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\claudie-data-2026-W38.json",
-            "mtime": "2026-09-21T13:51:05.129Z",
-            "size": 650754,
+            "mtime": "2026-09-21T13:56:58.457Z",
+            "size": 755236,
             "rows": 11
           }
         },
@@ -192,12 +192,12 @@
           "source": "Staffing",
           "label": "Toast Labor Week",
           "status": "pass",
-          "message": "104 entries",
+          "message": "496 entries",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\labor-claudie.json",
-            "mtime": "2026-09-21T13:49:15.779Z",
-            "size": 46382,
-            "rows": 104
+            "mtime": "2026-09-21T13:56:33.436Z",
+            "size": 192065,
+            "rows": 496
           }
         },
         {
@@ -205,11 +205,11 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "8 food families · matched 0 · BOH match 0%",
+          "message": "8 food families · matched 136 · BOH match 97%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-claudie.json",
-            "mtime": "2026-09-21T13:50:33.966Z",
-            "size": 130902,
+            "mtime": "2026-09-21T13:56:42.934Z",
+            "size": 420495,
             "rows": 12
           }
         },
@@ -286,8 +286,8 @@
           "message": "30 stations, curve=61, BP=46",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\casa_neos-data-2026-W38.json",
-            "mtime": "2026-09-21T13:51:05.673Z",
-            "size": 607377,
+            "mtime": "2026-09-21T13:56:58.796Z",
+            "size": 777816,
             "rows": 30
           }
         },
@@ -309,12 +309,12 @@
           "source": "Staffing",
           "label": "Toast Labor Week",
           "status": "pass",
-          "message": "152 entries",
+          "message": "788 entries",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\labor-casa_neos.json",
-            "mtime": "2026-09-21T13:49:07.754Z",
-            "size": 68354,
-            "rows": 152
+            "mtime": "2026-09-21T13:56:33.435Z",
+            "size": 306419,
+            "rows": 788
           }
         },
         {
@@ -322,11 +322,11 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "10 food families · matched 0 · BOH match 0%",
+          "message": "10 food families · matched 238 · BOH match 96%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-casa_neos.json",
-            "mtime": "2026-09-21T13:50:32.383Z",
-            "size": 169135,
+            "mtime": "2026-09-21T13:56:39.342Z",
+            "size": 643857,
             "rows": 12
           }
         },
@@ -403,8 +403,8 @@
           "message": "14 stations, curve=59, BP=33",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\ava_coconut_grove-data-2026-W38.json",
-            "mtime": "2026-09-21T13:51:06.159Z",
-            "size": 629782,
+            "mtime": "2026-09-21T13:56:59.073Z",
+            "size": 710252,
             "rows": 14
           }
         },
@@ -426,12 +426,12 @@
           "source": "Staffing",
           "label": "Toast Labor Week",
           "status": "pass",
-          "message": "99 entries",
+          "message": "406 entries",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\labor-ava_coconut_grove.json",
-            "mtime": "2026-09-21T13:49:12.694Z",
-            "size": 44355,
-            "rows": 99
+            "mtime": "2026-09-21T13:56:33.432Z",
+            "size": 157075,
+            "rows": 406
           }
         },
         {
@@ -439,11 +439,11 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "9 food families · matched 0 · BOH match 0%",
+          "message": "9 food families · matched 107 · BOH match 93%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-ava_coconut_grove.json",
-            "mtime": "2026-09-21T13:50:33.436Z",
-            "size": 139638,
+            "mtime": "2026-09-21T13:56:41.810Z",
+            "size": 364449,
             "rows": 12
           }
         },
@@ -520,7 +520,7 @@
           "message": "9 stations, curve=145, BP=12",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\ava_winter_park-data-2026-W38.json",
-            "mtime": "2026-09-21T13:51:06.798Z",
+            "mtime": "2026-09-21T13:56:59.445Z",
             "size": 721877,
             "rows": 9
           }
@@ -559,7 +559,7 @@
           "message": "7 food families · matched 132 · BOH match 99%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-ava_winter_park.json",
-            "mtime": "2026-09-21T13:50:33.921Z",
+            "mtime": "2026-09-21T13:56:42.421Z",
             "size": 390680,
             "rows": 12
           }
@@ -643,8 +643,8 @@
           "message": "12 stations, curve=80, BP=none",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\mila-data-2026-W38.json",
-            "mtime": "2026-09-21T13:51:07.264Z",
-            "size": 1682382,
+            "mtime": "2026-09-21T13:56:59.730Z",
+            "size": 1682435,
             "rows": 12
           }
         },
@@ -682,8 +682,8 @@
           "message": "9 food families · matched 209 · BOH match 91%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-mila.json",
-            "mtime": "2026-09-21T13:50:33.303Z",
-            "size": 622400,
+            "mtime": "2026-09-21T13:56:40.990Z",
+            "size": 622454,
             "rows": 12
           }
         },
