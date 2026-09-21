@@ -155,6 +155,7 @@ async function fetchVenue(venueRaw, weekLabel, token) {
     weekLabel,
     fetchedAt: new Date().toISOString(),
     venueGuid,
+    source: HARRI_LABOR_VENUES.includes(venue) ? 'toast_fallback' : 'toast',
     entryCount: entries.length,
     entries,
   };
@@ -170,9 +171,12 @@ async function main() {
 
   if (arg1 === '--all') {
     for (const v of STAFFING_VENUES) {
-      if (HARRI_LABOR_VENUES.includes(v)) {
+      if (HARRI_LABOR_VENUES.includes(v) && process.env.ALLOW_TOAST_FOR_HARRI !== '1') {
         console.log(`Skip Toast labor for ${v} (Harri source of truth)`);
         continue;
+      }
+      if (HARRI_LABOR_VENUES.includes(v)) {
+        console.log(`Toast labor fallback for ${v} (ALLOW_TOAST_FOR_HARRI=1)`);
       }
       await fetchVenue(v, weekLabel, token);
     }

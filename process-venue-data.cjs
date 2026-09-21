@@ -954,21 +954,25 @@ const output = {
 };
 
 // Preserve previously joined staffing aggregates if present (rebuilt by weekly-staffing)
-function mergePreserveStaffing(outObj, existingPath) {
+function mergePreserveStaffing(outObj, existingPath, weekKey) {
   if (!fs.existsSync(existingPath)) return outObj;
   try {
     const prev = JSON.parse(fs.readFileSync(existingPath, 'utf8'));
-    if (prev && prev.staffing && !outObj.staffing) outObj.staffing = prev.staffing;
+    if (!prev || !prev.staffing || outObj.staffing) return outObj;
+    const prevWeek = prev.staffing.weekLabel || prev.staffing.week || null;
+    if (weekKey && prevWeek && String(prevWeek) !== String(weekKey)) return outObj;
+    outObj.staffing = prev.staffing;
   } catch (_) { /* ignore */ }
   return outObj;
 }
 
 const outPath = path.join(__dirname, `${venueArg}-data.json`);
-fs.writeFileSync(outPath, JSON.stringify(mergePreserveStaffing(output, outPath)), 'utf8');
+const weekKeyForMerge = weekArg || null;
+fs.writeFileSync(outPath, JSON.stringify(mergePreserveStaffing({ ...output }, outPath, weekKeyForMerge)), 'utf8');
 console.log(`Written to ${outPath}`);
 if (weekArg) {
   const weekOutPath = path.join(__dirname, `${venueArg}-data-${weekArg}.json`);
-  fs.writeFileSync(weekOutPath, JSON.stringify(mergePreserveStaffing({ ...output }, weekOutPath)), 'utf8');
+  fs.writeFileSync(weekOutPath, JSON.stringify(mergePreserveStaffing({ ...output }, weekOutPath, weekArg)), 'utf8');
   console.log(`Written to ${weekOutPath}`);
 }
 console.log('Stations:', stations.map(s => `${s.station}(${s.count})`).join(', '));

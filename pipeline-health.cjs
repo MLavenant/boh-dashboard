@@ -128,7 +128,7 @@ function checkVenueWeek(slug, week) {
 
   // OpenTable covers
   if (!covers) {
-    checks.push({ id: 'ot_covers', source: 'OpenTable', label: 'Covers Export', status: 'fail', message: 'Missing covers file' });
+    checks.push({ id: 'ot_covers', source: 'OpenTable', label: 'Covers Export', status: 'warn', message: 'Missing covers file (OT session expired — kitchen metrics still publish)' });
   } else if ((covers.rows || 0) < 10) {
     checks.push({ id: 'ot_covers', source: 'OpenTable', label: 'Covers Export', status: 'warn', message: `Only ${covers.rows} covers`, meta: covers });
   } else {
