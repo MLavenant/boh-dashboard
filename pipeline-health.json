@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T13:57:00.354Z",
+  "generatedAt": "2026-09-21T14:39:47.839Z",
   "latestWeek": "2026-W38",
   "availableWeeks": [
     "2026-W38",
@@ -15,10 +15,10 @@
   ],
   "schedule": {
     "exists": true,
-    "status": "Ready",
-    "nextRun": "9/21/2026 10:30:00 AM",
-    "lastRun": "9/14/2026 4:37:20 PM",
-    "lastResult": "1",
+    "status": "Running",
+    "nextRun": "9/28/2026 10:30:00 AM",
+    "lastRun": "9/21/2026 10:30:00 AM",
+    "lastResult": "267009",
     "startTime": "10:30:00 AM",
     "days": "MON",
     "scheduleType": "Weekly",
@@ -81,26 +81,26 @@
   "files": {
     "dashboardHtml": {
       "path": "C:\\Cursor\\boh-rdg-publish\\dashboard.html",
-      "mtime": "2026-09-21T13:52:19.702Z",
-      "size": 29335615,
+      "mtime": "2026-09-21T14:38:09.354Z",
+      "size": 29485895,
       "rows": null
     },
     "rolling": {
       "path": "C:\\Cursor\\boh-rdg-publish\\data\\rolling.json",
-      "mtime": "2026-09-21T13:45:43.482Z",
-      "size": 3522,
+      "mtime": "2026-09-21T14:37:49.872Z",
+      "size": 3651,
       "rows": 1
     },
     "sessionToast": {
       "path": "C:\\Cursor\\boh-rdg-publish\\toast-session.json",
-      "mtime": "2026-09-21T13:35:24.284Z",
-      "size": 46208,
+      "mtime": "2026-09-21T14:30:46.385Z",
+      "size": 53465,
       "rows": 2
     },
     "sessionOT": {
       "path": "C:\\Cursor\\boh-rdg-publish\\ot-session.json",
-      "mtime": "2026-09-14T20:52:18.363Z",
-      "size": 5448,
+      "mtime": "2026-09-21T14:37:31.322Z",
+      "size": 8249,
       "rows": 3
     },
     "itemStationMap": {
@@ -123,7 +123,7 @@
           "message": "23,657 tickets",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\kitchen-timing-claudie.json",
-            "mtime": "2026-09-21T13:36:11.146Z",
+            "mtime": "2026-09-21T14:31:22.826Z",
             "size": 10404232,
             "rows": 23657
           }
@@ -136,7 +136,7 @@
           "message": "10,339 item rows",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\item-details-claudie.json",
-            "mtime": "2026-09-21T13:38:56.265Z",
+            "mtime": "2026-09-21T14:34:08.958Z",
             "size": 3413480,
             "rows": 10339
           }
@@ -149,7 +149,7 @@
           "message": "380 items",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\item-fulfillment-claudie.json",
-            "mtime": "2026-09-21T13:41:00.569Z",
+            "mtime": "2026-09-21T14:36:18.491Z",
             "size": 35467,
             "rows": 380
           }
@@ -158,8 +158,14 @@
           "id": "ot_covers",
           "source": "OpenTable",
           "label": "Covers Export",
-          "status": "warn",
-          "message": "Missing covers file (OT session expired — kitchen metrics still publish)"
+          "status": "pass",
+          "message": "665 covers",
+          "meta": {
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\covers-claudie.json",
+            "mtime": "2026-09-21T14:38:11.688Z",
+            "size": 119981,
+            "rows": 665
+          }
         },
         {
           "id": "processed",
@@ -169,8 +175,8 @@
           "message": "11 stations, curve=78, BP=56",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\claudie-data-2026-W38.json",
-            "mtime": "2026-09-21T13:56:58.457Z",
-            "size": 755236,
+            "mtime": "2026-09-21T14:39:44.767Z",
+            "size": 762101,
             "rows": 11
           }
         },
@@ -205,11 +211,11 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "8 food families · matched 136 · BOH match 97%",
+          "message": "8 food families · matched 140 · BOH match 99%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-claudie.json",
-            "mtime": "2026-09-21T13:56:42.934Z",
-            "size": 420495,
+            "mtime": "2026-09-21T14:39:43.339Z",
+            "size": 426873,
             "rows": 12
           }
         },
@@ -217,16 +223,22 @@
           "id": "staffing_balance",
           "source": "Staffing",
           "label": "Match Balance",
-          "status": "warn",
-          "message": "Missing staffing-balance file — run build-staffing-balance.cjs"
+          "status": "pass",
+          "message": "BOH match 100.0% · coverage 94% · conflicts 62",
+          "meta": {
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-balance-claudie.json",
+            "mtime": "2026-09-21T14:39:44.305Z",
+            "size": 118434,
+            "rows": 12
+          }
         }
       ],
       "summary": {
-        "pass": 7,
-        "warn": 2,
+        "pass": 9,
+        "warn": 0,
         "fail": 0
       },
-      "overall": "warn"
+      "overall": "pass"
     },
     {
       "slug": "casa_neos",
@@ -240,7 +252,7 @@
           "message": "12,739 tickets",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\kitchen-timing-casa_neos.json",
-            "mtime": "2026-09-21T13:37:32.769Z",
+            "mtime": "2026-09-21T14:32:36.349Z",
             "size": 5450175,
             "rows": 12739
           }
@@ -253,7 +265,7 @@
           "message": "10,670 item rows",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\item-details-casa_neos.json",
-            "mtime": "2026-09-21T13:39:31.437Z",
+            "mtime": "2026-09-21T14:34:46.930Z",
             "size": 3567404,
             "rows": 10670
           }
@@ -266,7 +278,7 @@
           "message": "391 items",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\item-fulfillment-casa_neos.json",
-            "mtime": "2026-09-21T13:41:14.956Z",
+            "mtime": "2026-09-21T14:36:49.691Z",
             "size": 36557,
             "rows": 391
           }
@@ -275,8 +287,14 @@
           "id": "ot_covers",
           "source": "OpenTable",
           "label": "Covers Export",
-          "status": "warn",
-          "message": "Missing covers file (OT session expired — kitchen metrics still publish)"
+          "status": "pass",
+          "message": "675 covers",
+          "meta": {
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\covers-casa_neos.json",
+            "mtime": "2026-09-21T14:38:15.287Z",
+            "size": 122641,
+            "rows": 675
+          }
         },
         {
           "id": "processed",
@@ -286,8 +304,8 @@
           "message": "30 stations, curve=61, BP=46",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\casa_neos-data-2026-W38.json",
-            "mtime": "2026-09-21T13:56:58.796Z",
-            "size": 777816,
+            "mtime": "2026-09-21T14:39:45.307Z",
+            "size": 784454,
             "rows": 30
           }
         },
@@ -322,11 +340,11 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "10 food families · matched 238 · BOH match 96%",
+          "message": "10 food families · matched 243 · BOH match 98%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-casa_neos.json",
-            "mtime": "2026-09-21T13:56:39.342Z",
-            "size": 643857,
+            "mtime": "2026-09-21T14:39:38.284Z",
+            "size": 650438,
             "rows": 12
           }
         },
@@ -334,16 +352,22 @@
           "id": "staffing_balance",
           "source": "Staffing",
           "label": "Match Balance",
-          "status": "warn",
-          "message": "Missing staffing-balance file — run build-staffing-balance.cjs"
+          "status": "pass",
+          "message": "BOH match 100.0% · coverage 92% · conflicts 92",
+          "meta": {
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-balance-casa_neos.json",
+            "mtime": "2026-09-21T14:39:43.861Z",
+            "size": 185750,
+            "rows": 12
+          }
         }
       ],
       "summary": {
-        "pass": 7,
-        "warn": 2,
+        "pass": 9,
+        "warn": 0,
         "fail": 0
       },
-      "overall": "warn"
+      "overall": "pass"
     },
     {
       "slug": "ava_coconut_grove",
@@ -357,8 +381,8 @@
           "message": "10,953 tickets",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\kitchen-timing-ava_coconut_grove.json",
-            "mtime": "2026-09-21T13:45:12.149Z",
-            "size": 3919700,
+            "mtime": "2026-09-21T14:31:45.220Z",
+            "size": 5080790,
             "rows": 10953
           }
         },
@@ -370,7 +394,7 @@
           "message": "8,468 item rows",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\item-details-ava_coconut_grove.json",
-            "mtime": "2026-09-21T13:39:47.807Z",
+            "mtime": "2026-09-21T14:35:03.164Z",
             "size": 2770744,
             "rows": 8468
           }
@@ -383,7 +407,7 @@
           "message": "341 items",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\item-fulfillment-ava_coconut_grove.json",
-            "mtime": "2026-09-21T13:41:16.457Z",
+            "mtime": "2026-09-21T14:36:51.306Z",
             "size": 32116,
             "rows": 341
           }
@@ -392,8 +416,14 @@
           "id": "ot_covers",
           "source": "OpenTable",
           "label": "Covers Export",
-          "status": "warn",
-          "message": "Missing covers file (OT session expired — kitchen metrics still publish)"
+          "status": "pass",
+          "message": "477 covers",
+          "meta": {
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\covers-ava_coconut_grove.json",
+            "mtime": "2026-09-21T14:38:16.365Z",
+            "size": 86696,
+            "rows": 477
+          }
         },
         {
           "id": "processed",
@@ -403,8 +433,8 @@
           "message": "14 stations, curve=59, BP=33",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\ava_coconut_grove-data-2026-W38.json",
-            "mtime": "2026-09-21T13:56:59.073Z",
-            "size": 710252,
+            "mtime": "2026-09-21T14:39:45.750Z",
+            "size": 715945,
             "rows": 14
           }
         },
@@ -439,11 +469,11 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "9 food families · matched 107 · BOH match 93%",
+          "message": "9 food families · matched 110 · BOH match 96%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-ava_coconut_grove.json",
-            "mtime": "2026-09-21T13:56:41.810Z",
-            "size": 364449,
+            "mtime": "2026-09-21T14:39:41.462Z",
+            "size": 369565,
             "rows": 12
           }
         },
@@ -451,16 +481,22 @@
           "id": "staffing_balance",
           "source": "Staffing",
           "label": "Match Balance",
-          "status": "warn",
-          "message": "Missing staffing-balance file — run build-staffing-balance.cjs"
+          "status": "pass",
+          "message": "BOH match 96.1% · coverage 104% · conflicts 41",
+          "meta": {
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-balance-ava_coconut_grove.json",
+            "mtime": "2026-09-21T14:39:44.146Z",
+            "size": 97864,
+            "rows": 12
+          }
         }
       ],
       "summary": {
-        "pass": 7,
-        "warn": 2,
+        "pass": 9,
+        "warn": 0,
         "fail": 0
       },
-      "overall": "warn"
+      "overall": "pass"
     },
     {
       "slug": "ava_winter_park",
@@ -474,7 +510,7 @@
           "message": "10,834 tickets",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\kitchen-timing-ava_winter_park.json",
-            "mtime": "2026-09-21T13:37:04.251Z",
+            "mtime": "2026-09-21T14:32:07.617Z",
             "size": 4700656,
             "rows": 10834
           }
@@ -487,7 +523,7 @@
           "message": "9,927 item rows",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\item-details-ava_winter_park.json",
-            "mtime": "2026-09-21T13:40:20.088Z",
+            "mtime": "2026-09-21T14:35:22.516Z",
             "size": 3227378,
             "rows": 9927
           }
@@ -500,7 +536,7 @@
           "message": "154 items",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\item-fulfillment-ava_winter_park.json",
-            "mtime": "2026-09-21T13:41:04.004Z",
+            "mtime": "2026-09-21T14:36:38.807Z",
             "size": 14424,
             "rows": 154
           }
@@ -509,8 +545,14 @@
           "id": "ot_covers",
           "source": "OpenTable",
           "label": "Covers Export",
-          "status": "warn",
-          "message": "Missing covers file (OT session expired — kitchen metrics still publish)"
+          "status": "pass",
+          "message": "535 covers",
+          "meta": {
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\covers-ava_winter_park.json",
+            "mtime": "2026-09-21T14:38:18.728Z",
+            "size": 97066,
+            "rows": 535
+          }
         },
         {
           "id": "processed",
@@ -520,8 +562,8 @@
           "message": "9 stations, curve=145, BP=12",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\ava_winter_park-data-2026-W38.json",
-            "mtime": "2026-09-21T13:56:59.445Z",
-            "size": 721877,
+            "mtime": "2026-09-21T14:39:46.274Z",
+            "size": 725650,
             "rows": 9
           }
         },
@@ -546,8 +588,8 @@
           "message": "456 entries",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\labor-ava_winter_park.json",
-            "mtime": "2026-09-21T13:49:14.818Z",
-            "size": 203449,
+            "mtime": "2026-09-21T14:39:30.378Z",
+            "size": 203448,
             "rows": 456
           }
         },
@@ -559,8 +601,8 @@
           "message": "7 food families · matched 132 · BOH match 99%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-ava_winter_park.json",
-            "mtime": "2026-09-21T13:56:42.421Z",
-            "size": 390680,
+            "mtime": "2026-09-21T14:39:42.293Z",
+            "size": 389068,
             "rows": 12
           }
         },
@@ -572,18 +614,18 @@
           "message": "BOH match 98.6% · coverage 94% · conflicts 0",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-balance-ava_winter_park.json",
-            "mtime": "2026-09-21T13:46:38.346Z",
-            "size": 98224,
+            "mtime": "2026-09-21T14:39:44.210Z",
+            "size": 98222,
             "rows": 12
           }
         }
       ],
       "summary": {
-        "pass": 8,
-        "warn": 1,
+        "pass": 9,
+        "warn": 0,
         "fail": 0
       },
-      "overall": "warn"
+      "overall": "pass"
     },
     {
       "slug": "mila",
@@ -597,7 +639,7 @@
           "message": "19,836 tickets",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\kitchen-timing-mila.json",
-            "mtime": "2026-09-21T13:38:23.234Z",
+            "mtime": "2026-09-21T14:33:20.980Z",
             "size": 8539846,
             "rows": 19836
           }
@@ -610,7 +652,7 @@
           "message": "16,813 item rows",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\item-details-mila.json",
-            "mtime": "2026-09-21T13:40:57.938Z",
+            "mtime": "2026-09-21T14:36:17.407Z",
             "size": 5519272,
             "rows": 16813
           }
@@ -623,7 +665,7 @@
           "message": "494 items",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\item-fulfillment-mila.json",
-            "mtime": "2026-09-21T13:41:01.254Z",
+            "mtime": "2026-09-21T14:36:35.943Z",
             "size": 46420,
             "rows": 494
           }
@@ -632,8 +674,14 @@
           "id": "ot_covers",
           "source": "OpenTable",
           "label": "Covers Export",
-          "status": "warn",
-          "message": "Missing covers file (OT session expired — kitchen metrics still publish)"
+          "status": "pass",
+          "message": "1,101 covers",
+          "meta": {
+            "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\covers-mila.json",
+            "mtime": "2026-09-21T14:38:22.270Z",
+            "size": 199869,
+            "rows": 1101
+          }
         },
         {
           "id": "processed",
@@ -643,8 +691,8 @@
           "message": "12 stations, curve=80, BP=none",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\mila-data-2026-W38.json",
-            "mtime": "2026-09-21T13:56:59.730Z",
-            "size": 1682435,
+            "mtime": "2026-09-21T14:39:46.800Z",
+            "size": 1694617,
             "rows": 12
           }
         },
@@ -669,7 +717,7 @@
           "message": "810 entries",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\labor-mila.json",
-            "mtime": "2026-09-21T13:49:11.876Z",
+            "mtime": "2026-09-21T14:39:28.079Z",
             "size": 363626,
             "rows": 810
           }
@@ -679,11 +727,11 @@
           "source": "Staffing",
           "label": "Staffing Join",
           "status": "pass",
-          "message": "9 food families · matched 209 · BOH match 91%",
+          "message": "9 food families · matched 219 · BOH match 95%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-mila.json",
-            "mtime": "2026-09-21T13:56:40.990Z",
-            "size": 622454,
+            "mtime": "2026-09-21T14:39:40.737Z",
+            "size": 637437,
             "rows": 12
           }
         },
@@ -695,26 +743,26 @@
           "message": "BOH match 95.9% · coverage 77% · conflicts 0",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W38\\staffing-balance-mila.json",
-            "mtime": "2026-09-21T13:46:38.247Z",
+            "mtime": "2026-09-21T14:39:44.083Z",
             "size": 156627,
             "rows": 12
           }
         }
       ],
       "summary": {
-        "pass": 8,
-        "warn": 1,
+        "pass": 9,
+        "warn": 0,
         "fail": 0
       },
-      "overall": "warn"
+      "overall": "pass"
     }
   ],
   "totals": {
-    "pass": 37,
-    "warn": 8,
+    "pass": 45,
+    "warn": 0,
     "fail": 0
   },
-  "overall": "warn",
+  "overall": "pass",
   "pipelineSteps": [
     {
       "step": 1,
