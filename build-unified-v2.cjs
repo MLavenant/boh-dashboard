@@ -2416,9 +2416,9 @@ function applyImputedStaffGrids(gridItems, gridStaff, gridIps) {
       if (!(items > 0)) return;
       if (!(gridStaff[day][hk] > 0)) {
         gridStaff[day][hk] = 1;
-        gridIps[day][hk] = +items.toFixed(1);
+        gridIps[day][hk] = Math.round(items);
       } else if (!(gridIps[day][hk] > 0)) {
-        gridIps[day][hk] = +(items / gridStaff[day][hk]).toFixed(1);
+        gridIps[day][hk] = Math.round(items / gridStaff[day][hk]);
       }
     });
   });
@@ -2426,6 +2426,12 @@ function applyImputedStaffGrids(gridItems, gridStaff, gridIps) {
 function effectiveHeads(heads, items) {
   if (heads > 0) return heads;
   return items > 0 ? 1 : 0;
+}
+/** Display counts and ratios as nearest whole number (48.11 → 48, 48.6 → 49). */
+function roundN(n) {
+  const x = Number(n);
+  if (!Number.isFinite(x)) return null;
+  return Math.round(x);
 }
 function effectiveHours(hours, items) {
   if (hours > 0) return hours;
@@ -2584,11 +2590,11 @@ function getStaffPlayers(staffing) {
     families: [...p.families].sort(),
     weekHours: +p.weekHours.toFixed(2),
     weekItems: Math.round(p.weekItems),
-    weekItemsPerHour: p.weekHours > 0 ? +(p.weekItems / p.weekHours).toFixed(2) : null,
+    weekItemsPerHour: p.weekHours > 0 ? Math.round(p.weekItems / p.weekHours) : null,
     days: Object.fromEntries(Object.entries(p.days).map(([d, v]) => [d, {
       hours: +v.hours.toFixed(2),
       items: Math.round(v.items),
-      itemsPerHour: v.hours > 0 ? +(v.items / v.hours).toFixed(2) : null,
+      itemsPerHour: v.hours > 0 ? Math.round(v.items / v.hours) : null,
       families: v.families,
     }])),
   })).sort((a, b) => b.weekItems - a.weekItems);
@@ -2934,15 +2940,16 @@ function renderHourlyThroughput() {
     window._hourlyDayStaff[day] = staffList;
     totalItems += hit.items;
     if (heads > 0) staffSamples.push(heads);
-    const ips = heads > 0 && hit.items > 0 ? +(hit.items / heads).toFixed(1) : null;
+    const ips = heads > 0 && hit.items > 0 ? Math.round(hit.items / heads) : null;
     const dayCell = famStaff && famStaff.days ? famStaff.days[day] : null;
     const hoursEff = effectiveHours(dayCell && dayCell.hours > 0 ? dayCell.hours : 0, hit.items);
     const ipsh = dayCell && dayCell.itemsPerStaffHour != null && Number(dayCell.itemsPerStaffHour) > 0
-      ? dayCell.itemsPerStaffHour
-      : (hoursEff > 0 && hit.items > 0 ? +(hit.items / hoursEff).toFixed(2) : null);
-    const itemsCell = (hit.items && hasItemListings)
-      ? '<button type="button" data-day="'+day+'" onclick="openHourlyItemList(this.dataset.day)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+hit.items+'</button>'
-      : (hit.items || '—');
+      ? Math.round(dayCell.itemsPerStaffHour)
+      : (hoursEff > 0 && hit.items > 0 ? Math.round(hit.items / hoursEff) : null);
+    const itemQty = hit.items > 0 ? Math.round(hit.items) : 0;
+    const itemsCell = (itemQty && hasItemListings)
+      ? '<button type="button" data-day="'+day+'" onclick="openHourlyItemList(this.dataset.day)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+itemQty+'</button>'
+      : (itemQty || '—');
     const staffCell = heads > 0
       ? '<button type="button" data-day="'+day+'" onclick="openHourlyStaffList(this.dataset.day)" style="background:none;border:none;color:#e8eaed;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline" title="Show who worked">'+heads+'</button>'
       : '—';
@@ -2956,18 +2963,19 @@ function renderHourlyThroughput() {
   });
 
   const avgHeads = staffSamples.length ? staffSamples.reduce((a,b)=>a+b,0)/staffSamples.length : null;
-  const totalIps = avgHeads > 0 ? +(totalItems / avgHeads).toFixed(1) : null;
+  const totalIps = avgHeads > 0 ? Math.round(totalItems / avgHeads) : null;
   const allEvents = HOURLY_DAYS.flatMap(day => window._hourlyDayEvents[day] || []);
   window._hourlyDayEvents.__total = allEvents;
-  const totalItemsCell = (totalItems && hasItemListings)
-    ? '<button type="button" data-day="__total" onclick="openHourlyItemList(this.dataset.day)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+totalItems+'</button>'
-    : totalItems;
+  const totalShown = totalItems > 0 ? Math.round(totalItems) : 0;
+  const totalItemsCell = (totalShown && hasItemListings)
+    ? '<button type="button" data-day="__total" onclick="openHourlyItemList(this.dataset.day)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+totalShown+'</button>'
+    : (totalShown || '—');
 
-  const weekIpsh = famStaff && famStaff.weekItemsPerStaffHour != null ? famStaff.weekItemsPerStaffHour : null;
+  const weekIpsh = famStaff && famStaff.weekItemsPerStaffHour != null ? Math.round(famStaff.weekItemsPerStaffHour) : null;
   html += '<tr style="border-top:2px solid #3d4458;background:#0f1218">' +
     '<td style="padding:8px 10px;color:#d9a441;font-weight:700">Total</td>' +
     '<td style="'+cellR+';font-weight:700;color:#e8eaed">'+totalItemsCell+'</td>' +
-    '<td style="'+cellR+';color:#9aa0aa">'+(avgHeads!=null?avgHeads.toFixed(1)+' avg':'—')+'</td>' +
+    '<td style="'+cellR+';color:#9aa0aa">'+(avgHeads!=null?Math.round(avgHeads)+' avg':'—')+'</td>' +
     '<td style="'+cellR+';font-weight:700;color:#d9a441">'+(totalIps!=null?totalIps:'—')+'</td>' +
     '<td style="'+cellR+';font-weight:700;color:#d9a441">'+(weekIpsh!=null?weekIpsh:'—')+'</td>' +
     '</tr></tbody></table>';
@@ -2989,7 +2997,7 @@ function renderHourlyThroughput() {
       const hit = sumFamilyHourItems(family, day, hk, staffing, stationDetails, null, stationHourItems);
       const bucketKey = hourBucketKey(day, hk);
       window._hourlyBucketEvents[bucketKey] = hit.events || [];
-      gridItems[day][hk] = hit.items || 0;
+      gridItems[day][hk] = hit.items > 0 ? Math.round(hit.items) : 0;
     });
     const vals = HOURLY_BAND.map(hk => gridItems[day][hk]).filter(v => v > 0);
     colItemScale[day] = { min: vals.length ? Math.min(...vals) : 0, max: vals.length ? Math.max(...vals) : 0 };
@@ -3055,7 +3063,7 @@ function renderHourlyThroughput() {
       HOURLY_BAND.forEach(hk => {
         const items = gridItems[day][hk];
         const heads = hourHeadsFromCell(cell, hk, items);
-        gridIps[day][hk] = heads > 0 && items > 0 ? +(items / heads).toFixed(1) : null;
+        gridIps[day][hk] = heads > 0 && items > 0 ? Math.round(items / heads) : null;
       });
     });
     applyImputedStaffGrids(gridItems, gridStaff, gridIps);
@@ -3468,7 +3476,7 @@ function getFamilyDayMetrics(venueKey, weekKey, family, day) {
   // Items sold with no written staff → count as 1 person
   if (!(heads > 0) && items > 0) heads = 1;
   if (itemsPerHead == null && heads > 0 && items > 0) {
-    itemsPerHead = +(items / heads).toFixed(1);
+    itemsPerHead = Math.round(items / heads);
   }
   return { items, heads, itemsPerHead, staff, weekKey };
 }
@@ -3484,7 +3492,7 @@ function getFamilyDayMetricsAgg(venueKey, weekKeys, family, day) {
     if (m.heads > 0) { totalHeads += m.heads; weeksWithStaff++; }
     if (m.staff?.length) staff = staff.concat(m.staff);
   });
-  const itemsPerHead = totalHeads > 0 && totalItems > 0 ? +(totalItems / totalHeads).toFixed(1) : null;
+  const itemsPerHead = totalHeads > 0 && totalItems > 0 ? Math.round(totalItems / totalHeads) : null;
   return { items: totalItems, heads: totalHeads || null, itemsPerHead, staff, weeksWithData, weeksWithStaff };
 }
 
@@ -3624,7 +3632,7 @@ function renderIpsTable1Summary(scope, family) {
       const m = weekKeys.length === 1
         ? getFamilyDayMetrics(vk, weekKeys[0], family, day)
         : getFamilyDayMetricsAgg(vk, weekKeys, family, day);
-      if (m && m.itemsPerHead != null && m.itemsPerHead > 0) matrix.push(m.itemsPerHead);
+      if (m && m.itemsPerHead != null && m.itemsPerHead > 0) matrix.push(Math.round(m.itemsPerHead));
     });
   });
   const gMin = matrix.length ? Math.min(...matrix) : 0;
@@ -3645,11 +3653,11 @@ function renderIpsTable1Summary(scope, family) {
       const m = weekKeys.length === 1
         ? (getFamilyDayMetrics(vk, weekKeys[0], family, day) || {})
         : (getFamilyDayMetricsAgg(vk, weekKeys, family, day) || {});
-      const ips = m.itemsPerHead;
+      const ips = m.itemsPerHead != null ? Math.round(m.itemsPerHead) : null;
       const heat = globalRelativeHeat(ips, gMin, gMax);
       const tip = (labels[vk]||vk)+' · '+day+' · '+family+
         '\\nItems: '+(m.items!=null?Math.round(m.items):'—')+
-        ' · Staff: '+(m.heads!=null?m.heads:'—')+
+        ' · Staff: '+(m.heads!=null?Math.round(m.heads):'—')+
         ' · Items/staff: '+(ips!=null?ips:'—');
       html += '<td title="'+tip.replace(/"/g,'&quot;')+'" style="padding:8px 6px;text-align:center;font-weight:700;background:'+heat.bg+';color:'+heat.fg+'">'+(ips!=null?ips:'—')+'</td>';
     });
@@ -3728,15 +3736,16 @@ function renderIpsTable2Hourly(scope, family) {
       : (getFamilyDayMetricsAgg(currentVenue, weekKeys, family, day) || {});
     const heads = m.heads > 0 ? m.heads : 0;
     const staffList = Array.isArray(m.staff) ? m.staff : [];
+    const itemQty = hit.items > 0 ? Math.round(hit.items) : 0;
     window._hourlyDayEvents[day] = hit.events || [];
     window._hourlyDayStaff[day] = staffList;
-    const ips = heads > 0 && hit.items > 0 ? +(hit.items / heads).toFixed(1) : null;
+    const ips = heads > 0 && itemQty > 0 ? Math.round(itemQty / heads) : null;
     const staffCell = heads > 0
-      ? '<button type="button" data-day="'+day+'" onclick="openHourlyStaffList(this.dataset.day)" style="background:none;border:none;color:#e8eaed;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+heads+'</button>'
+      ? '<button type="button" data-day="'+day+'" onclick="openHourlyStaffList(this.dataset.day)" style="background:none;border:none;color:#e8eaed;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+Math.round(heads)+'</button>'
       : '—';
-    const itemsCell = hit.items > 0 && hasItemListings
-      ? '<button type="button" data-day="'+day+'" onclick="openHourlyItemList(this.dataset.day)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+hit.items+'</button>'
-      : (hit.items || '—');
+    const itemsCell = itemQty > 0 && hasItemListings
+      ? '<button type="button" data-day="'+day+'" onclick="openHourlyItemList(this.dataset.day)" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;font-weight:700;padding:0;text-decoration:underline">'+itemQty+'</button>'
+      : (itemQty || '—');
     rowStaff.push('<td style="'+cellR+'">'+staffCell+'</td>');
     rowIps.push('<td style="'+cellR+';font-weight:700;color:#d9a441">'+(ips!=null?ips:'—')+'</td>');
     rowItems.push('<td style="'+cellR+';color:#e8eaed;font-weight:600">'+itemsCell+'</td>');
@@ -3755,7 +3764,7 @@ function renderIpsTable2Hourly(scope, family) {
       window._hourlyBucketEvents[bucketKey] = bucket.events || [];
       let hourHeads = 0;
       let hourStaff = [];
-      const itemN = bucket.items || 0;
+      const itemN = bucket.items > 0 ? Math.round(bucket.items) : 0;
       if (weekKeys.length === 1) {
         const cell = familyDayCell(currentVenue, weekKeys[0], family, day);
         hourHeads = hourHeadsFromCell(cell, hk, itemN);
@@ -3778,7 +3787,7 @@ function renderIpsTable2Hourly(scope, family) {
       window._hourlyBucketStaff[bucketKey] = hourStaff;
       gridItems[day][hk] = itemN;
       gridStaff[day][hk] = hourHeads > 0 ? hourHeads : null;
-      gridIps[day][hk] = hourHeads > 0 && itemN > 0 ? +(itemN / hourHeads).toFixed(1) : null;
+      gridIps[day][hk] = hourHeads > 0 && itemN > 0 ? Math.round(itemN / hourHeads) : null;
     });
     const itemVals = HOURLY_BAND.map(hk => gridItems[day][hk]).filter(v => v > 0);
     colItemScale[day] = { min: itemVals.length ? Math.min(...itemVals) : 0, max: itemVals.length ? Math.max(...itemVals) : 0 };
@@ -4019,7 +4028,7 @@ function renderPortfolioStations() {
             const raw = ds.data[i];
             if (raw == null || !(Number(raw) > 0)) return;
             const props = el.getProps(['x', 'y'], true);
-            const label = Number(raw).toFixed(1);
+            const label = String(Math.round(Number(raw)));
             ctx.save();
             ctx.font = '700 9px ui-sans-serif, system-ui, sans-serif';
             ctx.fillStyle = '#f3f4f6';
@@ -4078,7 +4087,7 @@ function renderPortfolioStations() {
               label(ctx) {
                 const v = ctx.parsed.y;
                 if (v == null || !(Number(v) > 0)) return null;
-                return ctx.dataset.label + ': ' + Number(v).toFixed(2) + ' items/staff-hr';
+                return ctx.dataset.label + ': ' + Math.round(Number(v)) + ' items/staff-hr';
               },
             },
           },
@@ -4154,9 +4163,9 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
       if (cell && cell.itemsPerStaffHour != null && Number(cell.itemsPerStaffHour) > 0) {
         ipsh = Number(cell.itemsPerStaffHour);
       } else if (m.items > 0 && hoursEff > 0) {
-        ipsh = +((m.items / hoursEff).toFixed(2));
+        ipsh = Math.round(m.items / hoursEff);
       }
-      const ipp = m.itemsPerHead != null ? m.itemsPerHead : (m.heads > 0 && m.items > 0 ? +(m.items / m.heads).toFixed(1) : null);
+      const ipp = m.itemsPerHead != null ? Math.round(m.itemsPerHead) : (m.heads > 0 && m.items > 0 ? Math.round(m.items / m.heads) : null);
       if (ipsh != null && ipsh > 0) ipshVals.push(ipsh);
       return { ful, ipsh, ipp, items: m.items || 0, heads: m.heads || 0 };
     });
@@ -4197,8 +4206,8 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
       const heat = portfolioIpshHeat(c.ipsh, ipshMin, ipshMax);
       html += '<td class="ps-metric-first" style="'+metricCell+locSep+'color:#ffffff;background:transparent">'+(c.ful != null ? c.ful.toFixed(1) : '—')+'</td>'+
         (heat
-          ? '<td class="ps-ipsh-heat" style="'+metricCell+heat.style+'">'+(Number(c.ipsh).toFixed(2))+'</td>'
-          : '<td style="'+metricCell+'color:#ffffff;background:transparent">'+(c.ipsh != null ? Number(c.ipsh).toFixed(2) : '—')+'</td>')+
+          ? '<td class="ps-ipsh-heat" style="'+metricCell+heat.style+'">'+(c.ipsh != null ? Math.round(Number(c.ipsh)) : '—')+'</td>'
+          : '<td style="'+metricCell+'color:#ffffff;background:transparent">'+(c.ipsh != null ? Math.round(Number(c.ipsh)) : '—')+'</td>')+
         '<td style="'+metricCell+'color:#ffffff;background:transparent">'+(c.ipp != null ? c.ipp : '—')+'</td>';
     });
     html += '</tr>';
@@ -4219,8 +4228,8 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
     const heat = portfolioIpshHeat(c.ipsh, weekIpshMin, weekIpshMax);
     html += '<td class="ps-metric-first" style="'+metricCell+locSep+'color:#ffffff;background:transparent">'+(c.ful != null ? Number(c.ful).toFixed(1) : '—')+'</td>'+
       (heat
-        ? '<td class="ps-ipsh-heat" style="'+metricCell+heat.style+'">'+Number(c.ipsh).toFixed(2)+'</td>'
-        : '<td style="'+metricCell+'color:#ffffff;background:transparent">'+(c.ipsh != null ? Number(c.ipsh).toFixed(2) : '—')+'</td>')+
+        ? '<td class="ps-ipsh-heat" style="'+metricCell+heat.style+'">'+(c.ipsh != null ? Math.round(Number(c.ipsh)) : '—')+'</td>'
+        : '<td style="'+metricCell+'color:#ffffff;background:transparent">'+(c.ipsh != null ? Math.round(Number(c.ipsh)) : '—')+'</td>')+
       '<td style="'+metricCell+'color:#ffffff;background:transparent">'+(c.ipp != null ? c.ipp : '—')+'</td>';
   });
   html += '</tr></tbody></table></div></div>';
@@ -5396,11 +5405,11 @@ function buildVenueWeekScorecard(key, label, weekKey) {
       });
       const volume = fam.weekItemCount || 0;
       const iph = headDays > 0 && volume > 0
-        ? +(volume / headDays).toFixed(1)
-        : (fam.weekItemsPerHeadDay != null ? fam.weekItemsPerHeadDay : null);
+        ? Math.round(volume / headDays)
+        : (fam.weekItemsPerHeadDay != null ? Math.round(fam.weekItemsPerHeadDay) : null);
       const ipsh = hoursEff > 0 && volume > 0
-        ? +(volume / hoursEff).toFixed(2)
-        : (fam.weekItemsPerStaffHour != null ? fam.weekItemsPerStaffHour : null);
+        ? Math.round(volume / hoursEff)
+        : (fam.weekItemsPerStaffHour != null ? Math.round(fam.weekItemsPerStaffHour) : null);
       familyStats[f] = {
         iph,
         ipsh,
@@ -5412,7 +5421,7 @@ function buildVenueWeekScorecard(key, label, weekKey) {
       bohHeadDays += headDays;
     });
   }
-  const bohIph = bohHeadDays > 0 ? +(bohVolume / bohHeadDays).toFixed(1) : null;
+  const bohIph = bohHeadDays > 0 ? Math.round(bohVolume / bohHeadDays) : null;
   const top3 = [...stations].sort((a,b)=>b.avg_sec-a.avg_sec).slice(0,3);
   const mapSlug = ({ claudie:'claudie', casaneos:'casa_neos', ava_cg:'ava_cg', ava_wp:'ava_wp', mila:'mila' })[key] || key;
   const venueMap = ITEM_STATION_MAP_DATA[mapSlug] || {};
@@ -5816,7 +5825,7 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues) {
         const cell = familyDayCell(v.key, weekKey, family, day);
         const items = bucket.items || 0;
         const hourHeads = hourHeadsFromCell(cell, hk, items);
-        const ipsh = hourHeads > 0 && items > 0 ? +(items / hourHeads).toFixed(1) : null;
+        const ipsh = hourHeads > 0 && items > 0 ? Math.round(items / hourHeads) : null;
         grid[day][hk][v.key] = ipsh;
         if (ipsh != null) { any = true; allVals.push(ipsh); }
       });
@@ -5832,7 +5841,7 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues) {
         const bucket = sumFamilyHourItems(family, day, hk, d.staffing, d.stationDetails || {}, null, d.stationHourItems || {});
         const items = bucket.items || 0;
         if (items > 0) {
-          grid[day][hk][v.key] = +items.toFixed(1);
+          grid[day][hk][v.key] = Math.round(items);
           any = true;
           allVals.push(grid[day][hk][v.key]);
         }
