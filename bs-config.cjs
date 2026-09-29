@@ -2,9 +2,10 @@
  * Bottle Service table sets + time windows — mirrors FP&A Excel methodology.
  *
  * Casa Neos Beach Club (regular): VIP floor + cabanas + dock, 2:30–8:00 PM
- * Casa Neos Beach Club MM Rooftop (Aug 1 – Sep 30): rooftop VIP + bar M* + dock,
+ * Casa Neos Beach Club MM Rooftop (Aug 1 – Oct 4): rooftop VIP + bar M1–M12,
  *   same 2:30–8:00 PM window — from
  *   "Bottle Service - Beach Club Sales Moved to MM Rooftop.xlsx"
+ *   After Sunday Oct 4 → regular Beach Club tables again.
  *
  * VIP display tiers (Flash columns) exclude BAR/Lounge/Booths/Seating/Cabana/Deck;
  * those still count in BS day totals via getBsTables().
@@ -19,14 +20,13 @@ const CASA_NEOS_BEACH_TABLES = new Set([
   'D1','D2','D3','D4','D5','D6','D7',
 ]);
 
-/* Excel Bottle Service tab — Diamond/Prestige/Platinum/Gold + Bar M1–M15 + Dock D1–D7 */
+/* Rooftop inventory — Diamond/Prestige/Platinum/Gold + Bar M1–M12 (no M13–M15 / dock). */
 const CASA_NEOS_ROOFTOP_TABLES = new Set([
   '61','63','81','83','73',           // Diamond
   '64','65','84','85','74',           // Prestige
   '66','68','76','75','88','86',      // Platinum
   '91','92','93','94',                // Gold
-  'M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12','M13','M14','M15',
-  'D1','D2','D3','D4','D5','D6','D7',
+  'M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12',
 ]);
 
 const BS_CONFIG = {
@@ -35,8 +35,8 @@ const BS_CONFIG = {
     days: [6, 0], // Saturday, Sunday
     tables: CASA_NEOS_BEACH_TABLES,
     rooftopTables: CASA_NEOS_ROOFTOP_TABLES,
-    /* Rooftop Excel totals include unassigned-table checks in the 2:30–8 PM window. */
-    rooftopIncludeNoTable: true,
+    /* Rooftop BS = pictured tier tables + M1–M12 only; exclude blank / No Table checks. */
+    rooftopIncludeNoTable: false,
     startFrac: 0.604167, // 2:30 PM
     endFrac: 0.833333,   // 8:00 PM
     crossesMidnight: false,
@@ -86,10 +86,10 @@ const VIP_TIER_MAP_BEACH = {
 };
 
 const VIP_TIER_MAP_ROOFTOP = {
-  Diamond:  { tables: new Set(['61','63','81','83','73']), minPerTable: 4000 },
-  Prestige: { tables: new Set(['64','65','84','85','74']), minPerTable: 3500 },
-  Platinum: { tables: new Set(['66','68','76','75','88','86']), minPerTable: 2000 },
-  Gold:     { tables: new Set(['91','92','93','94']), minPerTable: 1500 },
+  Diamond:  { tables: new Set(['61','63','81','83','73']), minPerTable: 3000 },
+  Prestige: { tables: new Set(['64','65','84','85','74']), minPerTable: 2000 },
+  Platinum: { tables: new Set(['66','68','76','75','88','86']), minPerTable: 1500 },
+  Gold:     { tables: new Set(['91','92','93','94']), minPerTable: 1000 },
 };
 
 const VIP_TIER_MAP_MILA = {
@@ -114,12 +114,16 @@ const VIP_DISPLAY_TIERS = {
   casa_neos_lounge: ['Diamond', 'Platinum', 'Gold'],
 };
 
-/** Aug 1 – Sep 30 (inclusive): Beach Club bottle service uses MM Rooftop floor plan. */
+/** Aug 1 – Oct 4 (inclusive): Beach Club bottle service uses MM Rooftop floor plan.
+ *  From Oct 5 onward → regular Beach Club tables. */
 function isCnbcSummerRoof(dateStr) {
   const parts = String(dateStr || '').split('-');
-  if (parts.length < 2) return false;
+  if (parts.length < 3) return false;
   const m = +parts[1];
-  return m >= 8 && m <= 9;
+  const d = +parts[2];
+  if (m === 8 || m === 9) return true;
+  if (m === 10 && d <= 4) return true;
+  return false;
 }
 
 function getBsTables(venueKey, dateStr) {

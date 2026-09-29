@@ -31,6 +31,12 @@ const BS_CONFIG = {
       '21','22','23','C1','C2','C3','C4','C5','C6','C7','C8','C9','C10',
       'C1A','C2A','C3A','C4A','C5A','C6A','C7A','C8A','C9A','C10A',
       'D1','D2','D3','D4','D5','D6','D7']),
+    rooftopTables: new Set([
+      '61','63','81','83','73','64','65','84','85','74',
+      '66','68','76','75','88','86','91','92','93','94',
+      'M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'
+    ]),
+    rooftopIncludeNoTable: false,
     startFrac: 0.604167, endFrac: 0.833333, crossesMidnight: false,
   },
   mm_mila: {
@@ -84,6 +90,22 @@ function shiftDate(dateStr, days) {
   d.setDate(d.getDate() + days);
   const y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
   return y + '-' + String(m).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+}
+
+function isCnbcRooftopDate(dateStr) {
+  return !!(dateStr && dateStr >= '2026-08-01' && dateStr <= '2026-10-04');
+}
+
+function bsTablesForDate(venueKey, dateStr) {
+  const cfg = BS_CONFIG[venueKey];
+  if (venueKey === 'casa_neos' && isCnbcRooftopDate(dateStr)) return cfg.rooftopTables;
+  return cfg.tables;
+}
+
+function includeNoTableForDate(venueKey, dateStr) {
+  const cfg = BS_CONFIG[venueKey];
+  if (venueKey === 'casa_neos' && isCnbcRooftopDate(dateStr)) return cfg.rooftopIncludeNoTable;
+  return !!cfg.includeNoTable;
 }
 
 function liveBusinessDate(parts) {
@@ -161,7 +183,7 @@ async function fetchBsForDate(venueKey, date, token, opts = {}) {
   }
   const auth = token || await getToken();
   const [bsGuids, orders] = await Promise.all([
-    getTableGuids(auth, guid, cfg.tables),
+    getTableGuids(auth, guid, bsTablesForDate(venueKey, date)),
     getAllOrders(auth, guid, date)
   ]);
   let total = 0;
@@ -169,7 +191,7 @@ async function fetchBsForDate(venueKey, date, token, opts = {}) {
   for (const order of orders) {
     const hasTable = !!(order.table?.guid);
     const isBsTable = bsGuids.has(order.table?.guid ?? '');
-    if (!isBsTable && !(cfg.includeNoTable && !hasTable)) continue;
+    if (!isBsTable && !(includeNoTableForDate(venueKey, date) && !hasTable)) continue;
     const openedUtc = order.openedDate;
     if (!openedUtc) continue;
     const localMs = new Date(openedUtc).getTime() - 4 * 60 * 60 * 1000;
@@ -189,7 +211,7 @@ async function fetchBsForDate(venueKey, date, token, opts = {}) {
     if (orderAmt <= 0) continue;
     total += orderAmt;
     if (order.table?.guid) active.add(order.table.guid);
-    else if (cfg.includeNoTable && !hasTable) active.add('no-table');
+    else if (includeNoTableForDate(venueKey, date) && !hasTable) active.add('no-table');
   }
   return { total: Math.round(total * 100) / 100, activeTables: active.size };
 }

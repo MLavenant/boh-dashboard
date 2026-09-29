@@ -526,7 +526,13 @@ function updateSchedInHtml(html, salesByVenueDate) {
   const dates = getRelevantDates();
   log(`Date range: ${dates[0]} → ${dates[dates.length - 1]}`);
 
-  const venueKeys = ["casa_neos", "mm_mila", "casa_neos_lounge"];
+  const requestedVenues = String(process.env.TOAST_VENUES || "")
+    .split(",")
+    .map(v => v.trim())
+    .filter(v => BS_CONFIG[v]);
+  const venueKeys = requestedVenues.length
+    ? requestedVenues
+    : ["casa_neos", "mm_mila", "casa_neos_lounge"];
   const allResults = {};
   const allNights = {};
   const failedVenues = [];
