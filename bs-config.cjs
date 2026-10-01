@@ -126,12 +126,33 @@ function isCnbcSummerRoof(dateStr) {
   return false;
 }
 
+/** CN Lounge Oct 1 floor — 15 tables from the live booking map. 811 and 908 are off the plan. */
+const CNL_OCT_TABLES = new Set([
+  '803','804','805','806','901','902','907',
+  '807','903','906',
+  '808','809','810',
+  '904','905',
+]);
+
+const VIP_TIER_MAP_CN_LOUNGE_OCT = {
+  Diamond:  { tables: new Set(['803','804','805','806','901','902','907']), minPerTable: 3500 },
+  Prestige: { tables: new Set(['807','903','906']), minPerTable: 3000 },
+  Platinum: { tables: new Set(['808','809','810']), minPerTable: 2500 },
+  Gold:     { tables: new Set(['904','905']), minPerTable: 1500 },
+};
+
+/** Oct 1, 2026 onward: new CN Lounge floor replaces the remodel. */
+function isCnlOctFloor(dateStr) {
+  return String(dateStr || '') >= '2026-10-01';
+}
+
 function getBsTables(venueKey, dateStr) {
   const cfg = BS_CONFIG[venueKey];
   if (!cfg) return new Set();
   if (venueKey === 'casa_neos' && isCnbcSummerRoof(dateStr) && cfg.rooftopTables) {
     return cfg.rooftopTables;
   }
+  if (venueKey === 'casa_neos_lounge' && isCnlOctFloor(dateStr)) return CNL_OCT_TABLES;
   return cfg.tables;
 }
 
@@ -140,12 +161,17 @@ function getVipTierMap(venueKey, dateStr) {
     return isCnbcSummerRoof(dateStr) ? VIP_TIER_MAP_ROOFTOP : VIP_TIER_MAP_BEACH;
   }
   if (venueKey === 'mm_mila') return VIP_TIER_MAP_MILA;
-  if (venueKey === 'casa_neos_lounge') return VIP_TIER_MAP_CN_LOUNGE;
+  if (venueKey === 'casa_neos_lounge') {
+    return isCnlOctFloor(dateStr) ? VIP_TIER_MAP_CN_LOUNGE_OCT : VIP_TIER_MAP_CN_LOUNGE;
+  }
   return {};
 }
 
 function getVipDisplayTiers(venueKey, dateStr) {
   if (venueKey === 'casa_neos' && isCnbcSummerRoof(dateStr)) {
+    return ['Diamond', 'Prestige', 'Platinum', 'Gold'];
+  }
+  if (venueKey === 'casa_neos_lounge' && isCnlOctFloor(dateStr)) {
     return ['Diamond', 'Prestige', 'Platinum', 'Gold'];
   }
   return VIP_DISPLAY_TIERS[venueKey] || [];
@@ -174,8 +200,11 @@ module.exports = {
   VIP_TIER_MAP_ROOFTOP,
   VIP_TIER_MAP_MILA,
   VIP_TIER_MAP_CN_LOUNGE,
+  VIP_TIER_MAP_CN_LOUNGE_OCT,
+  CNL_OCT_TABLES,
   VIP_DISPLAY_TIERS,
   isCnbcSummerRoof,
+  isCnlOctFloor,
   getBsTables,
   getVipTierMap,
   getVipDisplayTiers,

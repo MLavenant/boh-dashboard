@@ -35,6 +35,7 @@ const {
   includeNoTable,
   isOperatingDay,
   isCnbcSummerRoof,
+  isCnlOctFloor,
 } = require("./bs-config.cjs");
 
 function log(msg) {
@@ -287,7 +288,9 @@ async function fetchBsSales(venueKey, dates, showDates) {
   const token = await getToken();
   const mapCache = new Map();
   async function mapsForDate(date) {
-    const key = (venueKey === "casa_neos" && isCnbcSummerRoof(date)) ? "roof" : "base";
+    const key = (venueKey === "casa_neos" && isCnbcSummerRoof(date)) ? "roof"
+      : (venueKey === "casa_neos_lounge" && isCnlOctFloor(date)) ? "cnl-oct"
+      : "base";
     if (!mapCache.has(key)) {
       mapCache.set(key, await getTableMaps(token, guid, getBsTables(venueKey, date)));
     }

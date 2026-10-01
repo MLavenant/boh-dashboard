@@ -96,15 +96,28 @@ function isCnbcRooftopDate(dateStr) {
   return !!(dateStr && dateStr >= '2026-08-01' && dateStr <= '2026-10-04');
 }
 
+const CNL_OCT_TABLES = new Set([
+  '803','804','805','806','901','902','907',
+  '807','903','906',
+  '808','809','810',
+  '904','905',
+]);
+
+function isCnlOctFloor(dateStr) {
+  return !!(dateStr && dateStr >= '2026-10-01');
+}
+
 function bsTablesForDate(venueKey, dateStr) {
   const cfg = BS_CONFIG[venueKey];
   if (venueKey === 'casa_neos' && isCnbcRooftopDate(dateStr)) return cfg.rooftopTables;
+  if (venueKey === 'casa_neos_lounge' && isCnlOctFloor(dateStr)) return CNL_OCT_TABLES;
   return cfg.tables;
 }
 
 function includeNoTableForDate(venueKey, dateStr) {
   const cfg = BS_CONFIG[venueKey];
   if (venueKey === 'casa_neos' && isCnbcRooftopDate(dateStr)) return cfg.rooftopIncludeNoTable;
+  if (venueKey === 'casa_neos_lounge' && isCnlOctFloor(dateStr)) return false;
   return !!cfg.includeNoTable;
 }
 
