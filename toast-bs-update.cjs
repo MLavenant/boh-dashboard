@@ -369,7 +369,10 @@ async function fetchBsSales(venueKey, dates, showDates) {
       venue: cfg.label,
       date,
       totalRevenue: Math.round(rounded),
-      bookedTables: allSold,
+      /* Oct 1 Lounge inventory is the 15 VIP floor tables; ancillary L tables
+         contribute revenue but must not inflate the displayed VIP sold count. */
+      bookedTables: venueKey === "casa_neos_lounge" && isCnlOctFloor(date) ? vipSold : allSold,
+      bsTablesSold: allSold,
       totalTables: vipInv || Object.values(tierMap).reduce((s, t) => s + t.tables.size, 0),
       vipSoldTables: vipSold,
       tierSummary,

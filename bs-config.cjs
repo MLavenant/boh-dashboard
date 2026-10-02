@@ -132,6 +132,9 @@ const CNL_OCT_TABLES = new Set([
   '807','903','906',
   '808','809','810',
   '904','905',
+  /* Named Lounge / BAR tables remain in BS totals, but not VIP tier columns. */
+  'L1','L2','L3','L4','L5','L6','L7','L8','L9','L10','L11','L12',
+  'L1A','L2A','L3A','L4A','L5A','L6A','L7A','L8A','L9A','L10A','L11A','L12A',
 ]);
 
 const VIP_TIER_MAP_CN_LOUNGE_OCT = {
