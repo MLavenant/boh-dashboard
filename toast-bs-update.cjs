@@ -35,6 +35,7 @@ const {
   includeNoTable,
   isOperatingDay,
   isCnbcSummerRoof,
+  isCnlOctFloor,
 } = require("./bs-config.cjs");
 
 function log(msg) {
@@ -287,7 +288,9 @@ async function fetchBsSales(venueKey, dates, showDates) {
   const token = await getToken();
   const mapCache = new Map();
   async function mapsForDate(date) {
-    const key = (venueKey === "casa_neos" && isCnbcSummerRoof(date)) ? "roof" : "base";
+    const key = (venueKey === "casa_neos" && isCnbcSummerRoof(date)) ? "roof"
+      : (venueKey === "casa_neos_lounge" && isCnlOctFloor(date)) ? "cnl-oct"
+      : "base";
     if (!mapCache.has(key)) {
       mapCache.set(key, await getTableMaps(token, guid, getBsTables(venueKey, date)));
     }
@@ -366,7 +369,10 @@ async function fetchBsSales(venueKey, dates, showDates) {
       venue: cfg.label,
       date,
       totalRevenue: Math.round(rounded),
-      bookedTables: allSold,
+      /* Oct 1 Lounge inventory is the 15 VIP floor tables; ancillary L tables
+         contribute revenue but must not inflate the displayed VIP sold count. */
+      bookedTables: venueKey === "casa_neos_lounge" && isCnlOctFloor(date) ? vipSold : allSold,
+      bsTablesSold: allSold,
       totalTables: vipInv || Object.values(tierMap).reduce((s, t) => s + t.tables.size, 0),
       vipSoldTables: vipSold,
       tierSummary,
@@ -526,7 +532,13 @@ function updateSchedInHtml(html, salesByVenueDate) {
   const dates = getRelevantDates();
   log(`Date range: ${dates[0]} → ${dates[dates.length - 1]}`);
 
-  const venueKeys = ["casa_neos", "mm_mila", "casa_neos_lounge"];
+  const requestedVenues = String(process.env.TOAST_VENUES || "")
+    .split(",")
+    .map(v => v.trim())
+    .filter(v => BS_CONFIG[v]);
+  const venueKeys = requestedVenues.length
+    ? requestedVenues
+    : ["casa_neos", "mm_mila", "casa_neos_lounge"];
   const allResults = {};
   const allNights = {};
   const failedVenues = [];
