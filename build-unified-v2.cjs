@@ -249,80 +249,56 @@ let html = htmlPart
     sidebarShellHtml
   );
 
-// Stations tab: weekly items/staff by family; hide station selector + detail KPIs
+// Stations tab: one clean table (DA-style) + station filter
 html = html.replace(
   /<div class="section-title">Station Selector<\/div>\r?\n<div class="station-pills" id="stationPills"><\/div>[\s\S]*?<div class="station-detail" id="stationDetail">[\s\S]*?<\/div>(\r?\n\r?\n<div class="section-title"[^>]*>All Stations)/,
-  `<div class="section-title">Items Per Staff</div>
-<div class="card" id="itemsPerStaffCard" style="margin:0 0 18px">
-  <h2 style="margin:0 0 4px">ITEMS PER STAFF</h2>
-  <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Stations dashboard — compare locations and drill into hourly load, staffing, and fulfillment. Use the left sidebar for <strong>Location</strong> and <strong>Week</strong>, or switch to <strong>Period</strong> / <strong>Year</strong> below. Prep is excluded from Stations. Early weeks load from cloud on demand.</p>
-  <p id="itemsPerStaffWeekNote" class="note" style="display:none;margin:8px 0 0;color:#f59e0b"></p>
-  <div id="itemsPerStaffBody">
-    <div id="ipsScopeBar" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px;padding:12px 14px;background:#13161c;border:1px solid #262a33;border-radius:10px">
-      <label style="font-size:12px;color:#9aa0aa">View
-        <select id="ipsViewMode" onchange="onIpsViewModeChange()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit">
-          <option value="week">Week</option>
-          <option value="period">Period (4-4-5)</option>
-          <option value="year">Fiscal year</option>
-        </select>
-      </label>
-      <span id="ipsWeekScopeNote" class="note" style="margin:0;font-size:12px">Week follows the sidebar filter.</span>
-      <label id="ipsPeriodWrap" style="display:none;font-size:12px;color:#9aa0aa">Period
-        <select id="ipsPeriodSelect" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
-      </label>
-      <label id="ipsYearWrap" style="display:none;font-size:12px;color:#9aa0aa">Fiscal year
-        <select id="ipsYearSelect" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
-      </label>
-      <label style="font-size:12px;color:#9aa0aa">Station family
-        <select id="ipsStationFamily" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
-      </label>
-    </div>
-    <div id="ipsFamilyStations" style="margin:0 0 14px"></div>
-    <div id="ipsMissingBanner" style="display:none;margin-bottom:14px;padding:12px 14px;background:#2a2210;border:1px solid #854d0e;border-radius:10px;font-size:12px;color:#fcd34d"></div>
-    <div id="ipsTable1Summary" style="margin-bottom:24px"></div>
-    <div id="ipsTable2Hourly" style="margin-bottom:24px"></div>
-    <div id="ipsTable3Fulfillment"></div>
-    <p id="itemsPerStaffNote" style="font-size:11px;color:#9aa0aa;margin:8px 0 0"></p>
-  </div>
-</div>
-<div class="card" id="portfolioStationsPanel" style="display:none;margin:0 0 18px">
-  <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;margin:0 0 4px">
+  `<div class="section-title">Stations</div>
+<div class="card stations-da-card" id="itemsPerStaffCard" style="margin:0 0 18px">
+  <div class="stations-da-head">
     <div>
-      <h2 style="margin:0 0 4px">RDG STATIONS COMPARE</h2>
-      <p class="note" style="margin:0">All locations · selected week. Bars = <strong>items / staff-hour</strong> (numbers on bars). Tables below = every station family Mon→Sun. Expo excluded (pass-through, not comparable staffing).</p>
+      <div class="stations-da-kicker" id="stationsDaKicker">This week</div>
+      <h2 class="stations-da-title" id="stationsDaTitle">Stations</h2>
     </div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-      <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf()" style="padding:8px 14px;border-radius:8px;border:1px solid #d9a441;background:#262a33;color:#e8eaed;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">📄 Export Stations PDF</button>
+    <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf()" class="stations-da-pdf" style="display:none">Export PDF</button>
+  </div>
+  <div id="stationsDaFilters" class="stations-da-filters">
+    <div class="stations-da-filter-label">Stations</div>
+    <div id="stationsFamilyChips" class="stations-da-chips"></div>
+    <div class="stations-da-chip-actions">
+      <button type="button" class="stations-da-link" onclick="setStationsFamilyFilter('all')">All</button>
+      <button type="button" class="stations-da-link" onclick="setStationsFamilyFilter('none')">None</button>
     </div>
   </div>
-  <div style="position:relative;height:440px;margin:12px 0 8px">
-    <canvas id="cPortfolioStations"></canvas>
+  <div id="stationsDaMetricBar" class="stations-da-metrics" style="display:none">
+    <button type="button" class="stations-da-metric active" data-metric="ipsh" onclick="setStationsDaMetric('ipsh',this)">Items / staff-hr</button>
+    <button type="button" class="stations-da-metric" data-metric="people" onclick="setStationsDaMetric('people',this)">People</button>
+    <button type="button" class="stations-da-metric" data-metric="items" onclick="setStationsDaMetric('items',this)">Items</button>
   </div>
-  <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:4px 0 16px;font-size:11px;color:#9aa0aa">
-    <span><strong style="color:#e8eaed">Bars</strong> = items / staff-hour</span>
-    <span>Alternating bands = station families</span>
-    <span>PDF = portfolio (3/page) then station title + one hour×day table (days across, locations under each day)</span>
-  </div>
-  <p class="note" style="margin:0 0 12px">One table per station family · locations side by side. <strong>Ful</strong> = avg min · <strong>Items/staff-hr</strong> (green→red heat) · <strong>Items/person</strong>.</p>
-  <div id="portfolioStationsDayTable"></div>
-</div>
-<div id="stationKpiBar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
-  <div class="card" style="margin:0;text-align:center">
-    <div style="font-size:11px;color:#9aa0aa;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">Overall Avg Fulfillment</div>
-    <div id="skpiAvg" style="font-size:2.5rem;font-weight:700;line-height:1.1">—</div>
-    <div style="font-size:11px;color:#9aa0aa;margin-top:2px">all food stations combined</div>
-  </div>
-  <div class="card" style="margin:0;text-align:center">
-    <div style="font-size:11px;color:#9aa0aa;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">Stations Over Target</div>
-    <div id="skpiOver" style="font-size:2.5rem;font-weight:700;line-height:1.1">—</div>
-    <div style="font-size:11px;color:#9aa0aa;margin-top:2px" id="skpiOverLabel">stations over target</div>
-  </div>
-  <div class="card" style="margin:0;text-align:center">
-    <div style="font-size:11px;color:#9aa0aa;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">Worst Station This Week</div>
-    <div id="skpiWorst" style="font-size:1.4rem;font-weight:700;line-height:1.2">—</div>
-    <div style="font-size:11px;color:#9aa0aa;margin-top:2px" id="skpiWorstSub"></div>
+  <div id="ipsMissingBanner" style="display:none;margin:0 0 14px;padding:12px 14px;background:#2a2210;border:1px solid #854d0e;border-radius:10px;font-size:13px;color:#fcd34d"></div>
+  <div id="stationsDaTable" class="stations-da-table-wrap"></div>
+  <!-- legacy hooks kept for older helpers -->
+  <div id="itemsPerStaffBody" style="display:none">
+    <div id="ipsScopeBar" style="display:none">
+      <select id="ipsViewMode"><option value="week">Week</option></select>
+      <select id="ipsPeriodSelect"></select>
+      <select id="ipsYearSelect"></select>
+      <select id="ipsStationFamily"></select>
+    </div>
+    <div id="ipsFamilyStations"></div>
+    <div id="ipsTable1Summary"></div>
+    <div id="ipsTable2Hourly"></div>
+    <div id="ipsTable3Fulfillment"></div>
+    <p id="itemsPerStaffNote"></p>
+    <p id="itemsPerStaffWeekNote" style="display:none"></p>
+    <p id="itemsPerStaffIntro" style="display:none"></p>
+    <span id="ipsWeekScopeNote" style="display:none"></span>
   </div>
 </div>
+<div class="card" id="portfolioStationsPanel" style="display:none">
+  <canvas id="cPortfolioStations" style="display:none"></canvas>
+  <div id="portfolioStationsDayTable" style="display:none"></div>
+</div>
+<div id="stationKpiBar" style="display:none"></div>
 <div class="station-pills" id="stationPills" style="display:none"></div>
 <div class="station-detail" id="stationDetail" style="display:none"></div>$1`
 );
@@ -728,6 +704,31 @@ html = html.replace('</style>', `
   .sidebar-nav{flex-direction:row;flex-wrap:wrap}
   .app-sidebar .tab-btn{width:auto}
 }
+/* Stations DA board */
+.stations-da-card{padding:22px 22px 18px!important}
+.stations-da-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+.stations-da-kicker{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#9aa0aa;margin-bottom:4px}
+.stations-da-title{margin:0;font-size:28px;line-height:1.15;font-weight:700;color:#e8eaed}
+.stations-da-pdf{padding:8px 14px;border-radius:999px;border:1px solid #3d4458;background:#1e2533;color:#e8eaed;cursor:pointer;font:600 12px inherit}
+.stations-da-filters{margin:0 0 16px;padding:14px 16px;background:#13161c;border:1px solid #262a33;border-radius:14px}
+.stations-da-filter-label{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;margin-bottom:10px}
+.stations-da-chips{display:flex;flex-wrap:wrap;gap:8px}
+.stations-da-chip{padding:8px 14px;border-radius:999px;border:1px solid #2d3448;background:#1e2533;color:#9aa0aa;cursor:pointer;font:600 13px inherit}
+.stations-da-chip.active{background:#2a2114;border-color:#d9a441;color:#f5e6c8}
+.stations-da-chip-actions{margin-top:10px;display:flex;gap:12px}
+.stations-da-link{background:none;border:none;color:#d9a441;cursor:pointer;font:600 12px inherit;padding:0}
+.stations-da-metrics{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.stations-da-metric{padding:8px 14px;border-radius:999px;border:1px solid #2d3448;background:#1e2533;color:#9aa0aa;cursor:pointer;font:600 13px inherit}
+.stations-da-metric.active{background:#e8eaed;color:#11151c;border-color:#e8eaed}
+.stations-da-table-wrap{overflow-x:auto}
+.stations-da-table{width:100%;border-collapse:separate;border-spacing:0;min-width:520px}
+.stations-da-table th{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#9aa0aa;text-align:right;padding:10px 14px;border-bottom:1px solid #262a33;white-space:nowrap}
+.stations-da-table th:first-child,.stations-da-table td:first-child{text-align:left}
+.stations-da-table td{padding:16px 14px;border-bottom:1px solid #1e2533;color:#e8eaed;font-size:18px;font-weight:650;text-align:right;white-space:nowrap}
+.stations-da-table td:first-child{font-size:15px;font-weight:700}
+.stations-da-table tr.total td{border-top:1px solid #3d4458;border-bottom:none;color:#f5e6c8;background:#171b24}
+.stations-da-table .muted{color:#6b7280;font-weight:500;font-size:13px}
+.stations-da-heat{display:inline-block;min-width:2.5rem;padding:4px 8px;border-radius:8px}
 /* Venue pills */
 .venue-pill{padding:5px 14px;border:1px solid #2d3448;background:#1e2533;color:#9aa0aa;border-radius:20px;cursor:pointer;font-size:13px;font-family:inherit;transition:all .15s}
 .venue-pill:hover{border-color:#d9a441;color:#e8eaed}
@@ -2444,19 +2445,176 @@ function buildStaffingTableHtml(staffing, guests) {
     : 'Food families only · closed food tickets';
   return { html, note };
 }
-function renderStaffingGrid() {
+let stationsFamilyFilter = null; // null = all production families
+let stationsDaMetric = 'ipsh'; // portfolio: ipsh | people | items
+
+function stationsBoardFamilies() {
+  return PORTFOLIO_STATION_FAMILIES.slice();
+}
+function getSelectedStationFamilies() {
+  const all = stationsBoardFamilies();
+  if (!stationsFamilyFilter) return all.slice();
+  return all.filter((f) => stationsFamilyFilter.has(f));
+}
+function setStationsFamilyFilter(mode) {
+  const all = stationsBoardFamilies();
+  if (mode === 'all') stationsFamilyFilter = null;
+  else if (mode === 'none') stationsFamilyFilter = new Set();
+  renderStationsBoard();
+}
+function toggleStationsFamilyChip(family) {
+  const all = stationsBoardFamilies();
+  if (!stationsFamilyFilter) stationsFamilyFilter = new Set(all);
+  if (stationsFamilyFilter.has(family)) stationsFamilyFilter.delete(family);
+  else stationsFamilyFilter.add(family);
+  if (stationsFamilyFilter.size === all.length) stationsFamilyFilter = null;
+  renderStationsBoard();
+}
+function setStationsDaMetric(metric, btn) {
+  stationsDaMetric = metric || 'ipsh';
+  document.querySelectorAll('.stations-da-metric').forEach((b) => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderStationsBoard();
+}
+function getStationWeekMetrics(venueKey, weekKey, family) {
+  const fam = ALL_DATA[venueKey]?.[weekKey]?.staffing?.byFamily?.[family];
+  if (!fam) return { people: 0, items: 0, hours: 0, ipsh: null };
+  let hours = 0;
+  HOURLY_DAYS.forEach((day) => {
+    const c = fam.days && fam.days[day];
+    if (!c) return;
+    const vol = c.volume || c.itemCount || 0;
+    hours += c.hours > 0 ? Number(c.hours) : (vol > 0 ? 1 : 0);
+  });
+  const people = Number(fam.weekHeadsUnique) || 0;
+  const items = Number(fam.weekItemCount) || 0;
+  const ipsh = hours > 0 && items > 0
+    ? Math.round(items / hours)
+    : (fam.weekItemsPerStaffHour != null ? Math.round(fam.weekItemsPerStaffHour) : null);
+  return { people, items, hours, ipsh };
+}
+function renderStationsFamilyChips(selected) {
+  const el = document.getElementById('stationsFamilyChips');
+  if (!el) return;
+  const all = stationsBoardFamilies();
+  const sel = new Set(selected || []);
+  el.innerHTML = '';
+  all.forEach((f) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'stations-da-chip' + (sel.has(f) ? ' active' : '');
+    btn.textContent = f;
+    btn.onclick = () => toggleStationsFamilyChip(f);
+    el.appendChild(btn);
+  });
+}
+function renderStationsBoard() {
+  const card = document.getElementById('itemsPerStaffCard');
+  const tableEl = document.getElementById('stationsDaTable');
+  const metricBar = document.getElementById('stationsDaMetricBar');
+  const pdfBtn = document.getElementById('portfolioStationsPdfBtn');
+  const port = document.getElementById('portfolioStationsPanel');
   const ovCard = document.getElementById('overviewStaffingCard');
-  if (currentVenue === 'rdg_portfolio') {
-    if (ovCard) ovCard.style.display = 'none';
-    const ips = document.getElementById('itemsPerStaffCard');
-    if (ips) ips.style.display = 'none';
-    renderPortfolioStations();
+  if (ovCard) ovCard.style.display = 'none';
+  if (port) port.style.display = 'none';
+  if (card) card.style.display = '';
+
+  const weekKey = WEEKS[currentWeekIdx]?.key;
+  const weekLabel = WEEKS[currentWeekIdx]?.label || (weekKey ? weekKey.replace('2026-', '') : '—');
+  const kicker = document.getElementById('stationsDaKicker');
+  const title = document.getElementById('stationsDaTitle');
+  const portfolio = currentVenue === 'rdg_portfolio';
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const venueLabel = portfolio ? 'RDG Portfolio' : (labels[currentVenue] || currentVenue);
+
+  if (kicker) kicker.textContent = weekLabel + ' · ' + (portfolio ? 'All locations' : venueLabel);
+  if (title) title.textContent = portfolio ? 'Station benchmark' : 'Stations';
+  if (metricBar) metricBar.style.display = portfolio ? '' : 'none';
+  if (pdfBtn) pdfBtn.style.display = portfolio ? '' : 'none';
+
+  const selected = getSelectedStationFamilies();
+  renderStationsFamilyChips(selected);
+
+  if (!tableEl) return;
+  if (!weekKey) {
+    tableEl.innerHTML = '<p class="note" style="margin:0;font-size:14px">Pick a week in the sidebar.</p>';
     return;
   }
-  if (ovCard) ovCard.style.display = 'none';
-  const port = document.getElementById('portfolioStationsPanel');
-  if (port) port.style.display = 'none';
-  renderItemsPerStaff();
+  if (!selected.length) {
+    tableEl.innerHTML = '<p class="note" style="margin:0;font-size:14px">Select at least one station.</p>';
+    return;
+  }
+
+  if (portfolio) {
+    const venues = PORTFOLIO_VENUE_KEYS.map((k) => ({ key: k, label: labels[k] || k }));
+    const metric = stationsDaMetric || 'ipsh';
+    const metricLabel = metric === 'people' ? 'People' : (metric === 'items' ? 'Items' : 'Items / staff-hr');
+    let html = '<table class="stations-da-table"><thead><tr><th>Station</th>';
+    venues.forEach((v) => { html += '<th>' + v.label + '</th>'; });
+    html += '<th>RDG</th></tr></thead><tbody>';
+    let totPeople = 0, totItems = 0, totHours = 0;
+    const colPeople = Object.fromEntries(venues.map((v) => [v.key, 0]));
+    const colItems = Object.fromEntries(venues.map((v) => [v.key, 0]));
+    const colHours = Object.fromEntries(venues.map((v) => [v.key, 0]));
+    selected.forEach((family) => {
+      html += '<tr><td>' + family + '<div class="muted">' + metricLabel + '</div></td>';
+      let rowPeople = 0, rowItems = 0, rowHours = 0;
+      venues.forEach((v) => {
+        const m = getStationWeekMetrics(v.key, weekKey, family);
+        rowPeople += m.people; rowItems += m.items; rowHours += m.hours;
+        colPeople[v.key] += m.people; colItems[v.key] += m.items; colHours[v.key] += m.hours;
+        let val = '—';
+        if (metric === 'people' && m.people > 0) val = String(m.people);
+        else if (metric === 'items' && m.items > 0) val = m.items.toLocaleString();
+        else if (metric === 'ipsh' && m.ipsh != null) val = String(m.ipsh);
+        html += '<td>' + val + '</td>';
+      });
+      totPeople += rowPeople; totItems += rowItems; totHours += rowHours;
+      let rdg = '—';
+      if (metric === 'people' && rowPeople > 0) rdg = String(rowPeople);
+      else if (metric === 'items' && rowItems > 0) rdg = rowItems.toLocaleString();
+      else if (metric === 'ipsh' && rowHours > 0 && rowItems > 0) rdg = String(Math.round(rowItems / rowHours));
+      html += '<td>' + rdg + '</td></tr>';
+    });
+    html += '<tr class="total"><td>Total<div class="muted">' + metricLabel + '</div></td>';
+    venues.forEach((v) => {
+      let val = '—';
+      if (metric === 'people' && colPeople[v.key] > 0) val = String(colPeople[v.key]);
+      else if (metric === 'items' && colItems[v.key] > 0) val = colItems[v.key].toLocaleString();
+      else if (metric === 'ipsh' && colHours[v.key] > 0 && colItems[v.key] > 0) val = String(Math.round(colItems[v.key] / colHours[v.key]));
+      html += '<td>' + val + '</td>';
+    });
+    let grand = '—';
+    if (metric === 'people' && totPeople > 0) grand = String(totPeople);
+    else if (metric === 'items' && totItems > 0) grand = totItems.toLocaleString();
+    else if (metric === 'ipsh' && totHours > 0 && totItems > 0) grand = String(Math.round(totItems / totHours));
+    html += '<td>' + grand + '</td></tr></tbody></table>';
+    tableEl.innerHTML = html;
+    return;
+  }
+
+  // Single venue: People / Items / Items per staff-hr + Total
+  let html = '<table class="stations-da-table"><thead><tr>' +
+    '<th>Station</th><th>People</th><th>Items</th><th>Items / staff-hr</th></tr></thead><tbody>';
+  let totPeople = 0, totItems = 0, totHours = 0;
+  selected.forEach((family) => {
+    const m = getStationWeekMetrics(currentVenue, weekKey, family);
+    totPeople += m.people; totItems += m.items; totHours += m.hours;
+    html += '<tr><td>' + family + '</td>' +
+      '<td>' + (m.people > 0 ? m.people : '—') + '</td>' +
+      '<td>' + (m.items > 0 ? m.items.toLocaleString() : '—') + '</td>' +
+      '<td>' + (m.ipsh != null ? m.ipsh : '—') + '</td></tr>';
+  });
+  const totIpsh = totHours > 0 && totItems > 0 ? Math.round(totItems / totHours) : null;
+  html += '<tr class="total"><td>Total</td>' +
+    '<td>' + (totPeople > 0 ? totPeople : '—') + '</td>' +
+    '<td>' + (totItems > 0 ? totItems.toLocaleString() : '—') + '</td>' +
+    '<td>' + (totIpsh != null ? totIpsh : '—') + '</td></tr></tbody></table>';
+  tableEl.innerHTML = html;
+}
+
+function renderStaffingGrid() {
+  renderStationsBoard();
 }
 
 /** Hours 10:00 → 02:00 (next calendar day overnight). */
@@ -3987,49 +4145,7 @@ function renderIpsTable3Fulfillment(scope, family) {
 }
 
 function _renderItemsPerStaffBody() {
-  const card = document.getElementById('itemsPerStaffCard');
-  const body = document.getElementById('itemsPerStaffBody');
-  const noteEl = document.getElementById('itemsPerStaffNote');
-  const weekNote = document.getElementById('itemsPerStaffWeekNote');
-
-  if (currentVenue === 'rdg_portfolio') {
-    if (card) card.style.display = 'none';
-    renderPortfolioStations();
-    return;
-  }
-  const port = document.getElementById('portfolioStationsPanel');
-  if (port) port.style.display = 'none';
-  if (card) card.style.display = '';
-  if (weekNote) weekNote.style.display = 'none';
-  if (body) body.style.display = '';
-
-  initIpsScopeSelectors();
-  const scope = getIpsScope();
-  renderIpsMissingBanner(scope);
-
-  if (!scope.weekKeys.length) {
-    ['ipsTable1Summary','ipsTable2Hourly','ipsTable3Fulfillment'].forEach(id => {
-      const t = document.getElementById(id);
-      if (t) t.innerHTML = '<p class="note" style="margin:0">No weekly data for this scope yet — if cloud publish is still catching up, wait a moment and re-select the period.</p>';
-    });
-    const mapEl = document.getElementById('ipsFamilyStations');
-    if (mapEl) mapEl.innerHTML = '';
-    if (noteEl) noteEl.textContent = '';
-    return;
-  }
-
-  const famSel = document.getElementById('ipsStationFamily');
-  populateIpsFamilySelect(famSel, scope.weekKeys, 'Pastry');
-  const family = getIpsFamily();
-  renderIpsFamilyStations(scope, family);
-
-  renderIpsTable1Summary(scope, family);
-  renderIpsTable2Hourly(scope, family);
-  renderIpsTable3Fulfillment(scope, family);
-
-  if (noteEl) {
-    noteEl.textContent = scope.label + ' · ' + family + '. Hour tables: green = lowest pressure in that day column, red = highest.';
-  }
+  renderStationsBoard();
 }
 
 const PORTFOLIO_STATION_COLORS = {
@@ -4067,19 +4183,20 @@ function portfolioVenuesForFamily(family, weekKey) {
 }
 
 function renderPortfolioStations() {
+  // Portfolio Stations now uses the same DA board as venue Stations.
+  if (currentVenue === 'rdg_portfolio') renderStationsBoard();
   const panel = document.getElementById('portfolioStationsPanel');
-  const ips = document.getElementById('itemsPerStaffCard');
-  if (currentVenue !== 'rdg_portfolio') {
-    if (panel) panel.style.display = 'none';
-    return;
-  }
-  if (ips) ips.style.display = 'none';
-  if (panel) panel.style.display = '';
+  if (panel) panel.style.display = 'none';
+  if (currentVenue !== 'rdg_portfolio') return;
 
   const weekKey = WEEKS[currentWeekIdx]?.key;
   const labels = ${JSON.stringify(VENUE_LABELS)};
   const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
   const families = PORTFOLIO_STATION_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
+  // Keep chart helpers available for PDF export; do not show the old dense UI.
+  if (true) return;
+  const ips = document.getElementById('itemsPerStaffCard');
+  if (ips) ips.style.display = '';
 
   const canvas = document.getElementById('cPortfolioStations');
   if (canvas && typeof Chart !== 'undefined') {
@@ -4354,17 +4471,21 @@ function renderPortfolioStationsDayTable() {
 
 function renderStations() {
   renderStaffingGrid();
-  const portfolio = currentVenue === 'rdg_portfolio';
+  // DA Stations board is the only Stations UI — hide legacy charts / WoW clutter.
   const kpi = document.getElementById('stationKpiBar');
   const wow = document.getElementById('stationWowTable');
   const wowCard = wow && wow.closest ? wow.closest('.card') : null;
   const stCanvas = document.getElementById('cStations');
   const stCard = stCanvas && stCanvas.closest ? stCanvas.closest('.card') : null;
-  if (kpi) kpi.style.display = portfolio ? 'none' : '';
-  if (wowCard) wowCard.style.display = portfolio ? 'none' : '';
-  else if (wow) wow.style.display = portfolio ? 'none' : '';
-  if (stCard) stCard.style.display = portfolio ? 'none' : '';
-  if (portfolio) return;
+  const hm = document.getElementById('stationWowHeatmap');
+  const hmCard = hm && hm.closest ? hm.closest('.card') : null;
+  if (kpi) kpi.style.display = 'none';
+  if (wowCard) wowCard.style.display = 'none';
+  else if (wow) wow.style.display = 'none';
+  if (stCard) stCard.style.display = 'none';
+  if (hmCard) hmCard.style.display = 'none';
+  return;
+  if (false) {
   const STATIONS = getD().stations;
   const STATION_ITEMS = getD().stationItemsArr;
   const STATION_DETAILS = getD().stationDetails;
@@ -6730,11 +6851,7 @@ function selectVenue(key) {
   document.querySelectorAll('.venue-pill').forEach(b => {
     b.classList.toggle('active', b.dataset.venue === key);
   });
-  if (key === 'rdg_portfolio') {
-    // Portfolio aggregator — open Group under Admin
-    const groupBtn = [...document.querySelectorAll('.tab-btn')].find(b => (b.getAttribute('onclick') || '').includes("'group'"));
-    if (groupBtn) switchTab('group', groupBtn);
-  }
+  // RDG Portfolio stays on the current tab (Stations = station×venue benchmark).
   renderAll();
 }
 function initVenuePills() {
