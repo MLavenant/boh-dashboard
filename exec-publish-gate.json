@@ -1,31 +1,11 @@
 {
   "week": "2026-W40",
-  "generatedAt": "2026-10-06T19:43:05.885Z",
+  "generatedAt": "2026-10-08T18:30:52.826Z",
   "ready": true,
   "fails": [],
   "warns": [
-    "pipeline-health overall=warn",
-    "casa_neos Pastry: items/staff-hr=82.57 is unusually high (review before exec share)",
-    "casa_neos Sushi: items/staff-hr=86.33 is unusually high (review before exec share)",
-    "casa_neos Garde Manger: items/staff-hr=106.33 exceeds 90 but labor match is weak (0% / unknown) — kitchen metrics still publish; refresh Harri timesheets",
-    "casa_neos Saute: items/staff-hr=107.17 exceeds 90 but labor match is weak (0% / unknown) — kitchen metrics still publish; refresh Harri timesheets",
-    "casa_neos Robata: items/staff-hr=69 is unusually high (review before exec share)",
-    "casa_neos Raw: items/staff-hr=181.83 exceeds 90 but labor match is weak (0% / unknown) — kitchen metrics still publish; refresh Harri timesheets",
-    "casa_neos Fry: items/staff-hr=121.5 exceeds 90 but labor match is weak (0% / unknown) — kitchen metrics still publish; refresh Harri timesheets",
     "mila Raw: items/staff-hr=62.29 is unusually high (review before exec share)",
-    "ava_coconut_grove Robata: items/staff-hr=27.14 is unusually high (review before exec share)",
-    "ava_coconut_grove Garde Manger: items/staff-hr=75.71 is unusually high (review before exec share)",
-    "ava_coconut_grove Raw: items/staff-hr=163.69 exceeds 90 but labor match is weak (0% / unknown) — kitchen metrics still publish; refresh Harri timesheets",
-    "ava_coconut_grove Saute: items/staff-hr=82.43 is unusually high (review before exec share)",
-    "ava_coconut_grove Pastry: items/staff-hr=71.86 is unusually high (review before exec share)",
-    "ava_coconut_grove Fry: items/staff-hr=54 is unusually high (review before exec share)",
-    "claudie Robata: items/staff-hr=81.71 is unusually high (review before exec share)",
-    "claudie Saute: items/staff-hr=56.57 is unusually high (review before exec share)",
-    "claudie Pastry: items/staff-hr=96.43 exceeds 90 but labor match is weak (0% / unknown) — kitchen metrics still publish; refresh Harri timesheets",
-    "claudie Raw: items/staff-hr=82.57 is unusually high (review before exec share)",
-    "claudie Prep: items/staff-hr=31.57 is unusually high (review before exec share)",
-    "claudie Garde Manger: items/staff-hr=78.43 is unusually high (review before exec share)",
-    "claudie Fry: items/staff-hr=85.86 is unusually high (review before exec share)"
+    "ava_coconut_grove Fry: items/staff-hr=54 is unusually high (review before exec share)"
   ],
   "venues": [
     "casa_neos",
