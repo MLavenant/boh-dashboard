@@ -190,28 +190,63 @@ const latestWeekKey = rollingWeeks.length ? rollingWeeks[rollingWeeks.length - 1
 const scriptTagIdx = template.indexOf('\n<script>');
 const htmlPart = template.slice(0, scriptTagIdx);
 
-// ── Modify HTML header to add venue pills + week selector ────────────────────
+// ── Shell: left sidebar (filters + nav) + main content ───────────────────────
+const weekOptionsHtml = rollingWeeks
+  .map((w, i) => `<option value="${i}"${i === rollingWeeks.length - 1 ? ' selected' : ''}>${w.label}</option>`)
+  .join('');
+const sidebarShellHtml = [
+  '<aside id="appSidebar" class="app-sidebar">',
+  '  <div class="sidebar-brand">',
+  '    <div class="sidebar-brand-title">BOH Dashboard</div>',
+  '    <div class="sidebar-brand-sub" id="dashBadge">Latest ' + latestWeekKey + ' · Built ' + buildStamp + '</div>',
+  '  </div>',
+  '  <div class="sidebar-block">',
+  '    <label class="sidebar-label" for="venueSelect">Location</label>',
+  '    <select id="venueSelect" class="sidebar-select" onchange="selectVenue(this.value)"></select>',
+  '    <div id="venuePills" class="sidebar-venue-pills"></div>',
+  '  </div>',
+  '  <div class="sidebar-block">',
+  '    <label class="sidebar-label" for="weekDropdown">Week</label>',
+  '    <div id="weekSelector" class="sidebar-week">',
+  '      <button type="button" id="weekPrev" onclick="changeWeek(-1)" class="sidebar-week-btn">&#8249;</button>',
+  '      <select id="weekDropdown" onchange="selectWeek(this.value)" class="sidebar-select sidebar-week-select">' + weekOptionsHtml + '</select>',
+  '      <button type="button" id="weekNext" onclick="changeWeek(1)" class="sidebar-week-btn">&#8250;</button>',
+  '    </div>',
+  '  </div>',
+  '  <div class="sidebar-block">',
+  '    <div class="sidebar-label">Data Analysis</div>',
+  '    <nav class="sidebar-nav" id="navDataAnalysis">',
+  "      <button type=\"button\" class=\"tab-btn active\" onclick=\"switchTab('overview',this)\">Overview</button>",
+  "      <button type=\"button\" class=\"tab-btn\" onclick=\"switchTab('stations',this)\">Stations</button>",
+  "      <button type=\"button\" class=\"tab-btn\" onclick=\"switchTab('menu',this)\">Menu Items</button>",
+  '    </nav>',
+  '  </div>',
+  '  <div class="sidebar-block">',
+  '    <div class="sidebar-label">Admin</div>',
+  '    <nav class="sidebar-nav" id="navAdmin">',
+  "      <button type=\"button\" class=\"tab-btn\" onclick=\"switchTab('assignment',this)\">Assignment</button>",
+  "      <button type=\"button\" class=\"tab-btn\" onclick=\"switchTab('group',this)\">Group</button>",
+  "      <button type=\"button\" class=\"tab-btn\" onclick=\"switchTab('people',this)\">People</button>",
+  "      <button type=\"button\" class=\"tab-btn\" onclick=\"switchTab('settings',this)\">Settings</button>",
+  '    </nav>',
+  '  </div>',
+  '</aside>',
+  '<main class="app-main">',
+  '<header>',
+  '  <h1 id="dashTitle">BOH Dashboard</h1>',
+  '</header>',
+].join('\n');
+
 let html = htmlPart
   .replace('<title>Claudie · BOH Dashboard</title>',
-    `<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">\n` +
-    `<meta http-equiv="Pragma" content="no-cache">\n` +
-    `<meta http-equiv="Expires" content="0">\n` +
-    `<title>BOH Dashboard · ${latestWeekKey}</title>`)
+    '<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">\n' +
+    '<meta http-equiv="Pragma" content="no-cache">\n' +
+    '<meta http-equiv="Expires" content="0">\n' +
+    '<title>BOH Dashboard · ' + latestWeekKey + '</title>')
+  .replace('<div class="wrap">', '<div class="wrap app-shell">')
   .replace(
     '<header>\n  <h1>Claudie · BOH Dashboard</h1>\n  <span class="badge">Week of Jun 29 – Jul 5, 2026 · Updated Jul 6, 2026</span>\n</header>',
-    `<header>
-  <h1 id="dashTitle">BOH Dashboard</h1>
-  <span class="badge" id="dashBadge">Latest ${latestWeekKey} · Built ${buildStampUs}</span>
-</header>
-<div id="venuePills" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"></div>
-<div id="weekSelector" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:#9aa0aa">
-  <span style="color:#9aa0aa">Week:</span>
-  <button id="weekPrev" onclick="changeWeek(-1)" style="background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">&#8249;</button>
-  <select id="weekDropdown" onchange="selectWeek(this.value)" style="background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">
-    ${rollingWeeks.map((w,i) => `<option value="${i}"${i===rollingWeeks.length-1?' selected':''}>${w.label}</option>`).join('')}
-  </select>
-  <button id="weekNext" onclick="changeWeek(1)" style="background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:13px">&#8250;</button>
-</div>`
+    sidebarShellHtml
   );
 
 // Stations tab: weekly items/staff by family; hide station selector + detail KPIs
@@ -220,7 +255,7 @@ html = html.replace(
   `<div class="section-title">Items Per Staff</div>
 <div class="card" id="itemsPerStaffCard" style="margin:0 0 18px">
   <h2 style="margin:0 0 4px">ITEMS PER STAFF</h2>
-  <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Stations dashboard — compare locations and drill into hourly load, staffing, and fulfillment. Use <strong>Week</strong> (W01–W34 in the header dropdown), <strong>Period</strong> (4-4-5 from 12/29/2025, e.g. P4 = W14–W17), or <strong>Year</strong>. Early weeks load from cloud on demand when you select them.</p>
+  <p class="note" id="itemsPerStaffIntro" style="margin-top:0">Stations dashboard — compare locations and drill into hourly load, staffing, and fulfillment. Use the left sidebar for <strong>Location</strong> and <strong>Week</strong>, or switch to <strong>Period</strong> / <strong>Year</strong> below. Prep is excluded from Stations. Early weeks load from cloud on demand.</p>
   <p id="itemsPerStaffWeekNote" class="note" style="display:none;margin:8px 0 0;color:#f59e0b"></p>
   <div id="itemsPerStaffBody">
     <div id="ipsScopeBar" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px;padding:12px 14px;background:#13161c;border:1px solid #262a33;border-radius:10px">
@@ -231,7 +266,7 @@ html = html.replace(
           <option value="year">Fiscal year</option>
         </select>
       </label>
-      <span id="ipsWeekScopeNote" class="note" style="margin:0;font-size:12px">Week follows selector above.</span>
+      <span id="ipsWeekScopeNote" class="note" style="margin:0;font-size:12px">Week follows the sidebar filter.</span>
       <label id="ipsPeriodWrap" style="display:none;font-size:12px;color:#9aa0aa">Period
         <select id="ipsPeriodSelect" onchange="renderItemsPerStaff()" style="margin-left:6px;padding:6px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font-size:13px;font-family:inherit"></select>
       </label>
@@ -292,16 +327,22 @@ html = html.replace(
 <div class="station-detail" id="stationDetail" style="display:none"></div>$1`
 );
 
-// Add Assignment + Group + People + Settings tabs to nav
+// Top tab bar moved into left sidebar (Data Analysis + Admin)
 {
-  const navRe = /(<button class="tab-btn"[^>]*>Menu Items<\/button>)(\s*)<\/nav>/;
-  if (!navRe.test(html)) {
-    console.warn('WARN: could not find Menu Items nav button to inject extra tabs');
+  const topNavRe = /<nav class="tab-nav">[\s\S]*?<\/nav>/;
+  if (!topNavRe.test(html)) {
+    console.warn('WARN: could not find top tab-nav to remove (sidebar owns navigation)');
   } else {
-    html = html.replace(
-      navRe,
-      '$1$2  <button class="tab-btn" onclick="switchTab(\'assignment\',this)">📋 Assignment</button>\n  <button class="tab-btn" onclick="switchTab(\'group\',this)">🏢 Group</button>\n  <button class="tab-btn" onclick="switchTab(\'people\',this)">People</button>\n  <button class="tab-btn" onclick="switchTab(\'settings\',this)">⚙️ Settings</button>\n</nav>'
-    );
+    html = html.replace(topNavRe, '<!-- tab-nav moved to #appSidebar -->');
+  }
+}
+// Close app-main after footer (opened with sidebar shell)
+{
+  const footRe = /(<footer>[\s\S]*?<\/footer>)/;
+  if (!footRe.test(html)) {
+    console.warn('WARN: could not find footer to close app-main');
+  } else {
+    html = html.replace(footRe, '$1\n</main>');
   }
 }
 
@@ -661,6 +702,32 @@ html = html.replace(
 
 // Add venue pill styles + new UI styles
 html = html.replace('</style>', `
+/* App shell + left sidebar */
+.wrap.app-shell{max-width:none;margin:0;padding:0;display:flex;align-items:stretch;min-height:100vh}
+.app-sidebar{width:248px;flex:0 0 248px;background:#11151c;border-right:1px solid #262a33;padding:18px 14px 28px;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:20}
+.app-main{flex:1;min-width:0;padding:0 22px 64px;max-width:1400px}
+.sidebar-brand{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #262a33}
+.sidebar-brand-title{font-size:15px;font-weight:700;color:#e8eaed;letter-spacing:0.02em}
+.sidebar-brand-sub{font-size:11px;color:#9aa0aa;margin-top:4px;line-height:1.35}
+.sidebar-block{margin-bottom:18px}
+.sidebar-label{display:block;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;margin:0 0 8px}
+.sidebar-select{width:100%;padding:8px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font:13px/1.3 inherit;cursor:pointer}
+.sidebar-week{display:flex;align-items:center;gap:6px}
+.sidebar-week-select{flex:1}
+.sidebar-week-btn{flex:0 0 auto;background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:7px 10px;cursor:pointer;font:13px inherit}
+.sidebar-week-btn:hover{border-color:#d9a441;color:#e8eaed}
+.sidebar-venue-pills{display:none}
+.sidebar-nav{display:flex;flex-direction:column;gap:2px}
+.app-sidebar .tab-btn{width:100%;text-align:left;padding:9px 12px;border:none;border-radius:8px;border-bottom:none;margin:0;background:transparent;color:#9aa0aa;font:600 13px/1.2 inherit;cursor:pointer}
+.app-sidebar .tab-btn:hover{background:#1a1f28;color:#e8eaed}
+.app-sidebar .tab-btn.active{background:#1e2533;color:#e8eaed;box-shadow:inset 3px 0 0 #d9a441}
+.app-main > header{padding-top:18px}
+@media(max-width:900px){
+  .wrap.app-shell{flex-direction:column}
+  .app-sidebar{width:100%;flex:none;height:auto;position:relative;border-right:none;border-bottom:1px solid #262a33}
+  .sidebar-nav{flex-direction:row;flex-wrap:wrap}
+  .app-sidebar .tab-btn{width:auto}
+}
 /* Venue pills */
 .venue-pill{padding:5px 14px;border:1px solid #2d3448;background:#1e2533;color:#9aa0aa;border-radius:20px;cursor:pointer;font-size:13px;font-family:inherit;transition:all .15s}
 .venue-pill:hover{border-color:#d9a441;color:#e8eaed}
@@ -688,6 +755,7 @@ html = html.replace('</style>', `
 /* Portfolio PDF prep (also used while measuring before print) + print output */
 body.printing-portfolio header,
 body.printing-portfolio .tab-nav,
+body.printing-portfolio #appSidebar,
 body.printing-portfolio #venuePills,
 body.printing-portfolio #weekSelector,
 body.printing-portfolio #portfolioTopChrome,
@@ -698,9 +766,12 @@ body.printing-portfolio .coming-note,
 body.printing-portfolio #portfolioPdfBtn {
   display:none !important;
 }
+body.printing-portfolio .wrap.app-shell{display:block}
+body.printing-portfolio .app-main{max-width:none;padding:0}
 /* Stations PDF: intro + up to 3 families per page + optional placeholder */
 body.printing-stations-pdf header,
 body.printing-stations-pdf .tab-nav,
+body.printing-stations-pdf #appSidebar,
 body.printing-stations-pdf #venuePills,
 body.printing-stations-pdf #weekSelector,
 body.printing-stations-pdf footer,
@@ -710,6 +781,8 @@ body.printing-stations-pdf .coming-note,
 body.printing-stations-pdf .tab-section {
   display:none !important;
 }
+body.printing-stations-pdf .wrap.app-shell{display:block}
+body.printing-stations-pdf .app-main{max-width:none;padding:0}
 body.printing-stations-pdf,
 body.printing-stations-pdf html {
   background:#0d1117 !important;
@@ -1088,12 +1161,15 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
   }
   body.printing-stations-pdf header,
   body.printing-stations-pdf .tab-nav,
+  body.printing-stations-pdf #appSidebar,
   body.printing-stations-pdf #venuePills,
   body.printing-stations-pdf #weekSelector,
   body.printing-stations-pdf footer,
   body.printing-stations-pdf .tab-section {
     display:none !important;
   }
+  body.printing-stations-pdf .wrap.app-shell{display:block !important}
+  body.printing-stations-pdf .app-main{max-width:none !important;padding:0 !important}
   body.printing-stations-pdf #portfolioStationsPrintRoot {
     display:block !important;
     zoom:1 !important;
@@ -2440,10 +2516,20 @@ function effectiveHours(hours, items) {
   if (hours > 0) return hours;
   return items > 0 ? 1 : 0;
 }
+function isPrepStaffEntry(s) {
+  if (s == null) return false;
+  if (typeof s === 'string') return /\bprep\b/i.test(s);
+  const pos = String(s.position || s.job || s.jobName || '').toLowerCase();
+  return /\bprep\b/.test(pos);
+}
+/** Staff shown on Stations hour modals — never Prep (or butcher mapped to Prep). */
 function hourStaffFromCell(dayCell, hk) {
   if (!dayCell) return [];
-  if (dayCell.staffByHour && Array.isArray(dayCell.staffByHour[hk])) return dayCell.staffByHour[hk];
-  return Array.isArray(dayCell.staff) ? dayCell.staff : (Array.isArray(dayCell.names) ? dayCell.names : []);
+  let list = [];
+  if (dayCell.staffByHour && Array.isArray(dayCell.staffByHour[hk])) list = dayCell.staffByHour[hk];
+  else if (Array.isArray(dayCell.staff)) list = dayCell.staff;
+  else if (Array.isArray(dayCell.names)) list = dayCell.names;
+  return list.filter((s) => !isPrepStaffEntry(s));
 }
 function familyDayCell(venueKey, weekKey, family, day) {
   return ALL_DATA[venueKey]?.[weekKey]?.staffing?.byFamily?.[family]?.days?.[day] || null;
@@ -3151,17 +3237,21 @@ function openHourlyStaffList(dayKey) {
     day = parts[0];
     hourKey = parts[1] || null;
   }
-  const staff = hourKey
+  const staffRaw = hourKey
     ? ((window._hourlyBucketStaff && window._hourlyBucketStaff[dayKey]) || [])
     : ((window._hourlyDayStaff && window._hourlyDayStaff[day]) || []);
+  const staff = (staffRaw || []).filter((s) => !isPrepStaffEntry(s));
   const family = getIpsFamily();
   const title = hourKey ? (day + ' · ' + hourBandLabel(hourKey)) : day;
-  const subtitle = hourKey
-    ? (family + ' · clocked in during this hour · ' + staff.length + ' people')
-    : (family + ' family · ' + staff.length + ' people (full day)');
+  const allImputed = staff.length > 0 && staff.every((n) => /imputed/i.test(String(n.position || '')) || /unassigned/i.test(String(n.label || n.name || '')));
+  const subtitle = allImputed
+    ? (family + ' · no clocked staff this hour — placeholder headcount (not Prep)')
+    : (hourKey
+      ? (family + ' · clocked in during this hour · ' + staff.length + ' people')
+      : (family + ' family · ' + staff.length + ' people (full day)'));
   let body = '';
   if (!staff.length) {
-    body = '<p class="note">No named staff on file for this slot (headcount only, or no one matched).</p>';
+    body = '<p class="note">No named staff on file for this slot (headcount only, or no one matched). Prep is never listed on Stations.</p>';
   } else {
     const hasPunch = staff.some(n => n.in || n.out);
     body = '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
@@ -3170,13 +3260,15 @@ function openHourlyStaffList(dayKey) {
       '<th style="text-align:left;padding:8px 6px">Position</th>'+
       '</tr></thead><tbody>';
     staff.forEach(n => {
-      const label = (n.label || n.name || '').replace(/</g,'&lt;');
+      const rawLabel = n.label || n.name || '';
+      const isImp = /imputed/i.test(String(n.position || '')) || /unassigned/i.test(rawLabel);
+      const label = (isImp ? 'No clocked staff (est. 1)' : rawLabel).replace(/</g,'&lt;');
       body += '<tr style="border-top:1px solid #262a33">' +
         '<td style="padding:6px;color:#e8eaed;font-weight:600">'+label+'</td>' +
         (hasPunch
           ? ('<td style="padding:6px;color:#9aa0aa">'+(n.in || '—')+'</td><td style="padding:6px;color:#9aa0aa">'+(n.out || '—')+'</td>')
           : ('<td style="padding:6px;text-align:right;color:#9aa0aa">'+(n.hours != null ? n.hours : '—')+'</td>')) +
-        '<td style="padding:6px;color:#9aa0aa">'+(n.position || '')+'</td>' +
+        '<td style="padding:6px;color:#9aa0aa">'+(isImp ? 'Estimated' : (n.position || ''))+'</td>' +
         '</tr>';
     });
     body += '</tbody></table>';
@@ -6626,27 +6718,43 @@ function showWeekWelcomePopup(weekKey) {
 // VENUE PILLS INIT
 // ============================================================
 const VENUE_LABELS = ${JSON.stringify(VENUE_LABELS)};
+function selectVenue(key) {
+  if (!key) return;
+  currentVenue = key;
+  _serviceBreakDay = null;
+  const label = key === 'rdg_portfolio' ? 'RDG Portfolio' : (VENUE_LABELS[key] || key);
+  const title = document.getElementById('dashTitle');
+  if (title) title.textContent = label + ' · BOH Dashboard';
+  const sel = document.getElementById('venueSelect');
+  if (sel && sel.value !== key) sel.value = key;
+  document.querySelectorAll('.venue-pill').forEach(b => {
+    b.classList.toggle('active', b.dataset.venue === key);
+  });
+  if (key === 'rdg_portfolio') {
+    // Portfolio aggregator — open Group under Admin
+    const groupBtn = [...document.querySelectorAll('.tab-btn')].find(b => (b.getAttribute('onclick') || '').includes("'group'"));
+    if (groupBtn) switchTab('group', groupBtn);
+  }
+  renderAll();
+}
 function initVenuePills() {
+  const options = [...Object.entries(VENUE_LABELS), ['rdg_portfolio', 'RDG Portfolio']];
+  const sel = document.getElementById('venueSelect');
+  if (sel) {
+    sel.innerHTML = options.map(([key, label]) =>
+      '<option value="' + key + '"' + (key === currentVenue ? ' selected' : '') + '>' + label + '</option>'
+    ).join('');
+  }
   const container = document.getElementById('venuePills');
-  const pills = [...Object.entries(VENUE_LABELS), ['rdg_portfolio', 'RDG Portfolio']];
-  pills.forEach(([key, label]) => {
+  if (!container) return;
+  container.innerHTML = '';
+  options.forEach(([key, label]) => {
     const btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = 'venue-pill' + (key === currentVenue ? ' active' : '');
     btn.textContent = label;
     btn.dataset.venue = key;
-    btn.onclick = () => {
-      currentVenue = key;
-      _serviceBreakDay = null;
-      document.querySelectorAll('.venue-pill').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('dashTitle').textContent = label + ' · BOH Dashboard';
-      if (key === 'rdg_portfolio') {
-        // Portfolio is a client-side aggregator — open Group tab, never feed empty getD() into charts
-        const groupBtn = [...document.querySelectorAll('.tab-btn')].find(b => (b.getAttribute('onclick')||'').includes("'group'"));
-        if (groupBtn) switchTab('group', groupBtn);
-      }
-      renderAll();
-    };
+    btn.onclick = () => selectVenue(key);
     container.appendChild(btn);
   });
 }
