@@ -270,8 +270,7 @@ html = html.replace(
     <div class="stations-da-filter-label">Stations</div>
     <div id="stationsFamilyChips" class="stations-da-chips"></div>
     <div class="stations-da-chip-actions">
-      <button type="button" class="stations-da-link" onclick="setStationsFamilyFilter('all')">All</button>
-      <button type="button" class="stations-da-link" onclick="setStationsFamilyFilter('none')">None</button>
+      <span class="note" style="margin:0;font-size:12px">Pick one station family</span>
     </div>
   </div>
   <div id="stationsDaMetricBar" class="stations-da-metrics" style="display:none">
@@ -734,6 +733,19 @@ html = html.replace('</style>', `
 .stations-da-table tr.total td{border-top:1px solid #3d4458;border-bottom:none;color:#f5e6c8;background:#171b24}
 .stations-da-table .muted{color:#6b7280;font-weight:500;font-size:13px}
 .stations-da-heat{display:inline-block;min-width:2.5rem;padding:4px 8px;border-radius:8px}
+.stations-hour-block{margin:0 0 22px}
+.stations-hour-title{margin:0 0 10px;font-size:18px;font-weight:700}
+.stations-hour-table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+.stations-hour-table th,.stations-hour-table td{padding:8px 10px;text-align:center;border-bottom:1px solid #262a33;font-weight:700}
+.stations-hour-table th:first-child,.stations-hour-label{text-align:left;position:sticky;left:0;z-index:1;white-space:nowrap;font-weight:600;color:#9aa0aa}
+.stations-hour-btn{background:none;border:none;color:inherit;cursor:pointer;font:inherit;font-weight:700;padding:0;width:100%}
+body.theme-daylight .stations-hour-label{color:#7a6a58}
+body.theme-daylight .stations-hour-table th,body.theme-daylight .stations-hour-table td{border-bottom-color:#e2d6c4}
+body.theme-daylight #pressureDayToggle button{border-color:#d9cbb6!important;background:#fff!important;color:#6b5b4b!important}
+body.theme-daylight #pressureDayToggle button[style*="#d9a441"],body.theme-daylight #pressureDayToggle button[style*="262a33"]{background:#3f2a1d!important;border-color:#3f2a1d!important;color:#f7f1e7!important}
+body.theme-daylight .annotation-box{background:#3f2a1d;color:#f7f1e7;border-color:#3f2a1d}
+body.theme-daylight .kpi .v,body.theme-daylight .kpi.alert .v{color:#3f2a1d}
+body.theme-daylight .legend{color:#7a6a58}
 .sidebar-theme{margin-top:auto;padding-top:12px;border-top:1px solid #262a33}
 .sidebar-theme-btn{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #2d3448;background:#1e2533;color:#e8eaed;cursor:pointer;font:600 13px inherit;text-align:left}
 /* Daylight (RDG DA) theme */
@@ -1776,6 +1788,9 @@ function applyDerivedStationTargets() {
 function getThreshold() { return 15; }
 const THRESHOLD = 15;
 const gc = '#262a33';
+function chartGridColor() {
+  return (typeof isDaylightTheme === 'function' && isDaylightTheme()) ? '#e2d6c4' : gc;
+}
 
 const HM_HRS = ["11-12","12-13","13-14","14-15","15-16","16-17","17-18","18-19","19-20","20-21","21-22","22-23","23-24","0-1"];
 const HM_DAYS_FULL = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
@@ -1962,19 +1977,21 @@ function renderPressure() {
   };
   const existing = Chart.getChart('cPressure');
   if (existing) existing.destroy();
+  const gridC = chartGridColor();
+  const dayTheme = typeof isDaylightTheme === 'function' && isDaylightTheme();
   new Chart(document.getElementById('cPressure'),{
     data:{labels,datasets:[
-      {type:'bar',label:'Occurrences',data:CURVE.map(d=>d.occ),backgroundColor:labels.map(l=>BP!=null&&l>=BP?'rgba(226,112,106,0.7)':'rgba(74,159,255,0.55)'),borderColor:labels.map(l=>BP!=null&&l>=BP?'#e2706a':'#4a9eff'),borderWidth:1,yAxisID:'y',order:2,borderRadius:2},
-      {type:'line',label:'Avg fulfillment (min)',data:CURVE.map(d=>d.ful),borderColor:'#d9a441',backgroundColor:'rgba(217,164,65,0.0)',tension:0.3,pointRadius:2,pointHoverRadius:5,borderWidth:2.5,yAxisID:'y1',order:1}
+      {type:'bar',label:'Occurrences',data:CURVE.map(d=>d.occ),backgroundColor:labels.map(l=>BP!=null&&l>=BP?'rgba(196,75,63,0.65)':'rgba(74,159,255,0.55)'),borderColor:labels.map(l=>BP!=null&&l>=BP?'#c44b3f':'#4a9eff'),borderWidth:1,yAxisID:'y',order:2,borderRadius:2},
+      {type:'line',label:'Avg fulfillment (min)',data:CURVE.map(d=>d.ful),borderColor: dayTheme ? '#b8860b' : '#d9a441',backgroundColor:'rgba(217,164,65,0.0)',tension:0.3,pointRadius:2,pointHoverRadius:5,borderWidth:2.5,yAxisID:'y1',order:1}
     ]},
-    options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent production tickets open'},grid:{color:gc}},y:{position:'left',title:{display:true,text:'Occurrences'},grid:{color:gc},min:0},y1:{position:'right',title:{display:true,text:'Fulfillment time (min)'},grid:{display:false},min:0,suggestedMax:24}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
+    options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent production tickets open'},grid:{color:gridC}},y:{position:'left',title:{display:true,text:'Occurrences'},grid:{color:gridC},min:0},y1:{position:'right',title:{display:true,text:'Fulfillment time (min)'},grid:{display:false},min:0,suggestedMax:24}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
     plugins:[bpPlugin]
   });
   const dayLabel = pressureDay === 'Total' ? 'all days' : pressureDay;
   const annEl = document.getElementById('bpAnnotation');
   if (annEl) {
     if (BP != null) {
-      annEl.innerHTML = '⚡ Breaking point at <strong>'+BP+' concurrent production tickets</strong> ('+dayLabel+') — avg fulfillment jumps to '+(CURVE.find(d=>d.conc===BP)||{ful:'?'}).ful+' min. <span style="color:#9aa0aa;font-weight:500">(Each open KDS fire on Saute, Pastry, Fry… counts. Expo excluded.)</span>';
+      annEl.innerHTML = '⚡ Breaking point at <strong>'+BP+' concurrent production tickets</strong> ('+dayLabel+') — avg fulfillment jumps to '+(CURVE.find(d=>d.conc===BP)||{ful:'?'}).ful+' min. <span style="opacity:0.85;font-weight:500">(Each open KDS fire on Saute, Pastry, Fry… counts. Expo excluded.)</span>';
     } else {
       annEl.innerHTML = 'No breaking point detected for <strong>'+dayLabel+'</strong> — avg fulfillment stays below threshold across observed load levels.';
     }
@@ -2478,7 +2495,7 @@ function buildStaffingTableHtml(staffing, guests) {
     : 'Food families only · closed food tickets';
   return { html, note };
 }
-let stationsFamilyFilter = null; // null = all production families
+let stationsSelectedFamily = 'Pastry'; // single station family for hour×day tables
 let stationsDaMetric = 'ipsh'; // portfolio: ipsh | people | items
 // Defined here (not later) so Stations filters never hit a TDZ / nested-scope bug.
 const STATIONS_BOARD_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Pizza'];
@@ -2488,21 +2505,18 @@ function stationsBoardFamilies() {
   return STATIONS_BOARD_FAMILIES.slice();
 }
 function getSelectedStationFamilies() {
-  const all = stationsBoardFamilies();
-  if (!stationsFamilyFilter) return all.slice();
-  return all.filter((f) => stationsFamilyFilter.has(f));
+  // Portfolio benchmark can show many families; venue hour tables use the selected chip.
+  return stationsBoardFamilies();
 }
 function setStationsFamilyFilter(mode) {
-  if (mode === 'all') stationsFamilyFilter = null;
-  else if (mode === 'none') stationsFamilyFilter = new Set();
+  const all = stationsBoardFamilies();
+  if (mode === 'all' || mode === 'none') {
+    stationsSelectedFamily = all.includes('Pastry') ? 'Pastry' : (all[0] || 'Saute');
+  }
   renderStationsBoard();
 }
 function toggleStationsFamilyChip(family) {
-  const all = stationsBoardFamilies();
-  if (!stationsFamilyFilter) stationsFamilyFilter = new Set(all);
-  if (stationsFamilyFilter.has(family)) stationsFamilyFilter.delete(family);
-  else stationsFamilyFilter.add(family);
-  if (stationsFamilyFilter.size === all.length) stationsFamilyFilter = null;
+  stationsSelectedFamily = family;
   renderStationsBoard();
 }
 function setStationsDaMetric(metric, btn) {
@@ -2510,6 +2524,9 @@ function setStationsDaMetric(metric, btn) {
   document.querySelectorAll('.stations-da-metric').forEach((b) => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   renderStationsBoard();
+}
+function isDaylightTheme() {
+  return !!(document.body && document.body.classList.contains('theme-daylight'));
 }
 function getStationWeekMetrics(venueKey, weekKey, family) {
   const fam = ALL_DATA[venueKey]?.[weekKey]?.staffing?.byFamily?.[family];
@@ -2529,24 +2546,109 @@ function getStationWeekMetrics(venueKey, weekKey, family) {
     : (fam.weekItemsPerStaffHour != null ? Math.round(fam.weekItemsPerStaffHour) : null);
   return { people, items, hours, ipsh };
 }
-window.setStationsFamilyFilter = setStationsFamilyFilter;
-window.toggleStationsFamilyChip = toggleStationsFamilyChip;
-window.setStationsDaMetric = setStationsDaMetric;
-window.renderStationsBoard = renderStationsBoard;
-function renderStationsFamilyChips(selected) {
+function renderStationsFamilyChips(activeFamily) {
   const el = document.getElementById('stationsFamilyChips');
   if (!el) return;
   const all = stationsBoardFamilies();
-  const sel = new Set(selected || []);
   el.innerHTML = '';
   all.forEach((f) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'stations-da-chip' + (sel.has(f) ? ' active' : '');
+    btn.className = 'stations-da-chip' + (f === activeFamily ? ' active' : '');
     btn.textContent = f;
     btn.onclick = () => toggleStationsFamilyChip(f);
     el.appendChild(btn);
   });
+}
+function buildStationsHourGrids(venueKey, weekKey, family) {
+  const band = (typeof HOURLY_BAND !== 'undefined' && HOURLY_BAND) || [
+    '10-11','11-12','12-13','13-14','14-15','15-16','16-17','17-18',
+    '18-19','19-20','20-21','21-22','22-23','23-24','0-1','1-2'
+  ];
+  const days = (typeof HOURLY_DAYS !== 'undefined' && HOURLY_DAYS) || STATIONS_BOARD_DAYS;
+  const d = ALL_DATA[venueKey]?.[weekKey];
+  const staffing = d?.staffing;
+  const stationDetails = d?.stationDetails || {};
+  const stationHourItems = d?.stationHourItems || {};
+  const gridItems = {};
+  const gridStaff = {};
+  const gridIps = {};
+  window._hourlyDayEvents = window._hourlyDayEvents || {};
+  window._hourlyDayStaff = window._hourlyDayStaff || {};
+  window._hourlyBucketEvents = window._hourlyBucketEvents || {};
+  window._hourlyBucketStaff = window._hourlyBucketStaff || {};
+
+  days.forEach((day) => {
+    gridItems[day] = {};
+    gridStaff[day] = {};
+    gridIps[day] = {};
+    const dayHit = (typeof dayItemTotals === 'function')
+      ? dayItemTotals(family, day, staffing, stationDetails, stationHourItems)
+      : { items: 0, events: [] };
+    const m = getFamilyDayMetrics(venueKey, weekKey, family, day) || {};
+    window._hourlyDayEvents[day] = dayHit.events || [];
+    window._hourlyDayStaff[day] = Array.isArray(m.staff) ? m.staff.filter((s) => !isPrepStaffEntry(s)) : [];
+
+    band.forEach((hk) => {
+      const bucket = (typeof sumFamilyHourItems === 'function')
+        ? sumFamilyHourItems(family, day, hk, staffing, stationDetails, null, stationHourItems)
+        : { items: 0, events: [] };
+      const bucketKey = (typeof hourBucketKey === 'function') ? hourBucketKey(day, hk) : (day + '|' + hk);
+      window._hourlyBucketEvents[bucketKey] = bucket.events || [];
+      const itemN = bucket.items > 0 ? Math.round(bucket.items) : 0;
+      const cell = familyDayCell(venueKey, weekKey, family, day);
+      const hourHeads = hourHeadsFromCell(cell, hk, itemN);
+      const hourStaff = hourStaffFromCell(cell, hk);
+      window._hourlyBucketStaff[bucketKey] = hourStaff;
+      gridItems[day][hk] = itemN;
+      gridStaff[day][hk] = hourHeads > 0 ? hourHeads : null;
+      gridIps[day][hk] = hourHeads > 0 && itemN > 0 ? Math.round(itemN / hourHeads) : null;
+    });
+  });
+  if (typeof applyImputedStaffGrids === 'function') applyImputedStaffGrids(gridItems, gridStaff, gridIps);
+  return { gridItems, gridStaff, gridIps, band, days };
+}
+function stationsHourHeatTable(title, grid, band, days, clickMode) {
+  const day = isDaylightTheme();
+  const headBg = day ? '#efe8dc' : '#1e2533';
+  const headFg = day ? '#7a6a58' : '#9aa0aa';
+  const rowBg = day ? '#fffdf8' : '#13161c';
+  const border = day ? '#e2d6c4' : '#262a33';
+  const titleColor = day ? '#2c241c' : '#e8eaed';
+  const colScale = {};
+  days.forEach((d) => {
+    const vals = band.map((hk) => grid[d][hk]).filter((v) => v != null && v > 0);
+    colScale[d] = { min: vals.length ? Math.min(...vals) : 0, max: vals.length ? Math.max(...vals) : 0 };
+  });
+  let t = '<div class="stations-hour-block"><h3 class="stations-hour-title" style="color:' + titleColor + '">' + title + '</h3>' +
+    '<table class="stations-hour-table"><thead><tr>' +
+    '<th style="background:' + headBg + ';color:' + headFg + ';border-color:' + border + '">Hour</th>';
+  days.forEach((d) => {
+    t += '<th style="background:' + headBg + ';color:' + headFg + ';border-color:' + border + '">' + d.slice(0, 3) + '</th>';
+  });
+  t += '</tr></thead><tbody>';
+  band.forEach((hk) => {
+    const label = (typeof hourBandLabel === 'function') ? hourBandLabel(hk) : hk;
+    t += '<tr><td class="stations-hour-label" style="background:' + rowBg + ';border-color:' + border + '">' + label + '</td>';
+    days.forEach((d) => {
+      const val = grid[d][hk];
+      const scale = colScale[d];
+      const heat = val != null && val > 0
+        ? columnRelativeHeat(val, scale.min, scale.max)
+        : { bg: day ? '#f7f1e7' : '#13161c', fg: day ? '#b5a48f' : '#4b5563' };
+      const bucketKey = (typeof hourBucketKey === 'function') ? hourBucketKey(d, hk) : (d + '|' + hk);
+      let inner = (val != null && val > 0) ? String(val) : '—';
+      if (clickMode === 'items' && val > 0) {
+        inner = '<button type="button" class="stations-hour-btn" data-bucket="' + bucketKey + '" onclick="openHourlyItemList(this.dataset.bucket)">' + inner + '</button>';
+      } else if (clickMode === 'staff' && val != null && val > 0) {
+        inner = '<button type="button" class="stations-hour-btn" data-bucket="' + bucketKey + '" onclick="openHourlyStaffList(this.dataset.bucket)">' + inner + '</button>';
+      }
+      t += '<td style="background:' + heat.bg + ';color:' + heat.fg + ';border-color:' + border + '">' + inner + '</td>';
+    });
+    t += '</tr>';
+  });
+  t += '</tbody></table></div>';
+  return t;
 }
 function renderStationsBoard() {
   const card = document.getElementById('itemsPerStaffCard');
@@ -2566,22 +2668,21 @@ function renderStationsBoard() {
   const portfolio = currentVenue === 'rdg_portfolio';
   const labels = ${JSON.stringify(VENUE_LABELS)};
   const venueLabel = portfolio ? 'RDG Portfolio' : (labels[currentVenue] || currentVenue);
+  const allFamilies = stationsBoardFamilies();
+  if (!allFamilies.includes(stationsSelectedFamily)) {
+    stationsSelectedFamily = allFamilies.includes('Pastry') ? 'Pastry' : (allFamilies[0] || 'Saute');
+  }
 
   if (kicker) kicker.textContent = weekLabel + ' · ' + (portfolio ? 'All locations' : venueLabel);
   if (title) title.textContent = portfolio ? 'Station benchmark' : 'Stations';
   if (metricBar) metricBar.style.display = portfolio ? '' : 'none';
   if (pdfBtn) pdfBtn.style.display = portfolio ? '' : 'none';
 
-  const selected = getSelectedStationFamilies();
-  renderStationsFamilyChips(selected);
+  renderStationsFamilyChips(stationsSelectedFamily);
 
   if (!tableEl) return;
   if (!weekKey) {
     tableEl.innerHTML = '<p class="note" style="margin:0;font-size:14px">Pick a week in the sidebar.</p>';
-    return;
-  }
-  if (!selected.length) {
-    tableEl.innerHTML = '<p class="note" style="margin:0;font-size:14px">Select at least one station.</p>';
     return;
   }
 
@@ -2592,6 +2693,7 @@ function renderStationsBoard() {
     const venues = venueKeys.map((k) => ({ key: k, label: labels[k] || k }));
     const metric = stationsDaMetric || 'ipsh';
     const metricLabel = metric === 'people' ? 'People' : (metric === 'items' ? 'Items' : 'Items / staff-hr');
+    const selected = allFamilies;
     let html = '<table class="stations-da-table"><thead><tr><th>Station</th>';
     venues.forEach((v) => { html += '<th>' + v.label + '</th>'; });
     html += '<th>RDG</th></tr></thead><tbody>';
@@ -2636,25 +2738,19 @@ function renderStationsBoard() {
     return;
   }
 
-  // Single venue: People / Items / Items per staff-hr + Total
-  let html = '<table class="stations-da-table"><thead><tr>' +
-    '<th>Station</th><th>People</th><th>Items</th><th>Items / staff-hr</th></tr></thead><tbody>';
-  let totPeople = 0, totItems = 0, totHours = 0;
-  selected.forEach((family) => {
-    const m = getStationWeekMetrics(currentVenue, weekKey, family);
-    totPeople += m.people; totItems += m.items; totHours += m.hours;
-    html += '<tr><td>' + family + '</td>' +
-      '<td>' + (m.people > 0 ? m.people : '—') + '</td>' +
-      '<td>' + (m.items > 0 ? m.items.toLocaleString() : '—') + '</td>' +
-      '<td>' + (m.ipsh != null ? m.ipsh : '—') + '</td></tr>';
-  });
-  const totIpsh = totHours > 0 && totItems > 0 ? Math.round(totItems / totHours) : null;
-  html += '<tr class="total"><td>Total</td>' +
-    '<td>' + (totPeople > 0 ? totPeople : '—') + '</td>' +
-    '<td>' + (totItems > 0 ? totItems.toLocaleString() : '—') + '</td>' +
-    '<td>' + (totIpsh != null ? totIpsh : '—') + '</td></tr></tbody></table>';
+  // Venue: 3 hour×day tables (10:00 → 02:00)
+  const family = stationsSelectedFamily;
+  const { gridItems, gridStaff, gridIps, band, days } = buildStationsHourGrids(currentVenue, weekKey, family);
+  let html = '<p class="note stations-hour-note" style="margin:0 0 14px">'+family+' · Mon→Sun · 10:00 AM–2:00 AM. Click a staff or item cell for detail.</p>';
+  html += stationsHourHeatTable('1 · Items / staff', gridIps, band, days, null);
+  html += stationsHourHeatTable('2 · Total staffing', gridStaff, band, days, 'staff');
+  html += stationsHourHeatTable('3 · Total items', gridItems, band, days, 'items');
   tableEl.innerHTML = html;
 }
+window.setStationsFamilyFilter = setStationsFamilyFilter;
+window.toggleStationsFamilyChip = toggleStationsFamilyChip;
+window.setStationsDaMetric = setStationsDaMetric;
+window.renderStationsBoard = renderStationsBoard;
 
 function renderStaffingGrid() {
   renderStationsBoard();
@@ -2738,13 +2834,13 @@ function familyDayCell(venueKey, weekKey, family, day) {
 
 function columnRelativeHeat(val, colMin, colMax) {
   // Pressure scale: green = lowest load, red = highest (within the day column)
-  if (val == null || !(val > 0)) return { bg: '#13161c', fg: '#ffffff' };
-  if (!(colMax > colMin)) return { bg: '#22c55e', fg: '#ffffff' };
+  const day = typeof isDaylightTheme === 'function' && isDaylightTheme();
+  if (val == null || !(val > 0)) return { bg: day ? '#f7f1e7' : '#13161c', fg: day ? '#b5a48f' : '#ffffff' };
+  if (!(colMax > colMin)) return { bg: day ? '#3d9a5f' : '#22c55e', fg: '#ffffff' };
   const t = Math.max(0, Math.min(1, (val - colMin) / (colMax - colMin)));
-  // Brighter greens so fills stay readable on the dark dashboard
   const bg = t <= 0.5
-    ? lerpColor('#22c55e', '#eab308', t / 0.5)
-    : lerpColor('#eab308', '#ef4444', (t - 0.5) / 0.5);
+    ? lerpColor(day ? '#3d9a5f' : '#22c55e', day ? '#d4a017' : '#eab308', t / 0.5)
+    : lerpColor(day ? '#d4a017' : '#eab308', day ? '#c44b3f' : '#ef4444', (t - 0.5) / 0.5);
   return { bg, fg: textFor(bg) };
 }
 
@@ -6292,11 +6388,24 @@ function syncThemeToggleBtn() {
   const day = document.body.classList.contains('theme-daylight');
   btn.textContent = day ? 'Daylight · on' : 'Daylight · off';
 }
+function applyChartTheme() {
+  const day = isDaylightTheme();
+  if (typeof Chart === 'undefined') return;
+  Chart.defaults.color = day ? '#7a6a58' : '#9aa0aa';
+  Chart.defaults.borderColor = day ? '#e2d6c4' : '#262a33';
+  // Re-render open charts so axis/grid colors match theme
+  try {
+    if (typeof renderPressure === 'function') renderPressure();
+    if (typeof renderBreaking === 'function') renderBreaking();
+    if (typeof renderStationsBoard === 'function') renderStationsBoard();
+  } catch (_) { /* ignore mid-init */ }
+}
 function toggleDaylightTheme() {
   document.body.classList.toggle('theme-daylight');
   const day = document.body.classList.contains('theme-daylight');
   try { localStorage.setItem('boh_theme', day ? 'daylight' : 'dark'); } catch (_) {}
   syncThemeToggleBtn();
+  applyChartTheme();
 }
 window.toggleDaylightTheme = toggleDaylightTheme;
 function initVenuePills() {
@@ -6359,6 +6468,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.body.classList.add('theme-daylight');
   }
   syncThemeToggleBtn();
+  applyChartTheme();
   initVenuePills();
   // Seed full YTD week list in the dropdown (payloads load on demand from Firebase).
   seedKnownWeeksIntoSelector();
