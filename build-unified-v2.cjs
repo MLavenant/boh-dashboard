@@ -1435,6 +1435,8 @@ async function loadBohFromFirebase() {
 function isFoodStation(name) {
   const n = String(name || '').toLowerCase().trim();
   if (!n) return false;
+  // Prep is not shown on Stations (exec line-production views only)
+  if (/\bprep\b/.test(n) || n === 'back kitchen') return false;
   if (/\\bsushi\\s*bar\\b/.test(n) || /\\braw\\s*bar\\b/.test(n)) return true;
   if (/(^|[^a-z])bar([^a-z]|$)/i.test(n)) return false;
   return !['champagne','wine','btg','pos','barista','somm','water','service','beach','btl','drink','no print','lounge'].some(p => n.includes(p));
@@ -2320,7 +2322,7 @@ function fmtFulMin(sec) {
 }
 function buildStaffingTableHtml(staffing, guests) {
   const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  const FOOD_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
+  const FOOD_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza'];
   const families = FOOD_FAMILIES.filter(f => staffing.byFamily[f]);
   if (!families.length) {
     return { html: '<p style="color:#9aa0aa;font-size:13px">No BOH station-family staffing for this week.</p>', note: '' };
@@ -2387,7 +2389,8 @@ const HOURLY_BAND = [
   '18-19','19-20','20-21','21-22','22-23','23-24','0-1','1-2'
 ];
 const HOURLY_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const HOURLY_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
+// Stations UI families — Prep is excluded (not a line production station for exec views).
+const HOURLY_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza'];
 // Portfolio Stations (exec): production families only — Expo is pass-through / not comparable staffing.
 const PORTFOLIO_STATION_FAMILIES = HOURLY_FAMILIES.filter(f => f !== 'Expo');
 
@@ -2525,7 +2528,9 @@ function buildTicketQcHtml(d, staffing) {
   const bohMatch = ms && ms.bohMatchRate != null ? Math.round(ms.bohMatchRate * 100) : null;
   let famRows = '';
   if (staffing && staffing.byFamily) {
-    famRows = Object.entries(staffing.byFamily).map(([f, fam]) =>
+    famRows = Object.entries(staffing.byFamily)
+      .filter(([f]) => HOURLY_FAMILIES.includes(f))
+      .map(([f, fam]) =>
       '<tr style="border-top:1px solid #262a33"><td style="padding:4px 8px;color:#e8eaed">'+f+'</td>'+
       '<td style="padding:4px 8px;text-align:right;color:#9aa0aa">'+(fam.weekTicketCount||0)+'</td>'+
       '<td style="padding:4px 8px;text-align:right;color:#9aa0aa">'+(fam.weekItemCount||0)+'</td>'+
@@ -2560,6 +2565,7 @@ function getStaffPlayers(staffing) {
   const byFamily = staffing.byFamily || {};
   HOURLY_DAYS.forEach(day => {
     Object.entries(byFamily).forEach(([family, fam]) => {
+      if (!HOURLY_FAMILIES.includes(family)) return;
       const cell = fam.days && fam.days[day];
       if (!cell) return;
       const staff = cell.staff || [];
@@ -5391,6 +5397,7 @@ function buildVenueWeekScorecard(key, label, weekKey) {
   const familyStats = {};
   if (staffing && staffing.byFamily) {
     Object.keys(staffing.byFamily).forEach(f => {
+      if (!HOURLY_FAMILIES.includes(f)) return;
       const fam = staffing.byFamily[f];
       let headDays = 0;
       let hoursEff = 0;
@@ -5516,7 +5523,7 @@ function renderGroup() {
   // ── Station family comparison: fulfillment + items/person ──
   const famEl = document.getElementById('groupFamilyTable');
   if (famEl) {
-    const FOOD_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza','Prep'];
+    const FOOD_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Expo','Pizza'];
     let fh = '<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:720px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
       '<th style="text-align:left;padding:8px">Station family</th>';
     venueData.forEach(v => {
