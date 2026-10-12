@@ -402,6 +402,32 @@ body.printing-stations-pdf .ps-print-page.ps-hourly .ps-avg-caption {
   border:1px solid #d9a441 !important;
   font-size:12px !important;
 }
+body.printing-stations-pdf .ps-print-page.ps-hourly .ps-stmap {
+  margin:0 0 8px;
+  padding:6px 10px;
+  border:1px solid #3d3424;
+  border-radius:8px;
+  background:#161a22;
+}
+body.printing-stations-pdf .ps-print-page.ps-hourly .ps-stmap-title {
+  font-size:10px;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  color:#9aa0aa;
+  margin:0 0 4px;
+}
+body.printing-stations-pdf .ps-print-page.ps-hourly .ps-stmap-row {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 12px;
+  font-size:11px;
+  line-height:1.35;
+  color:#e8eaed;
+}
+body.printing-stations-pdf .ps-print-page.ps-hourly .ps-stmap-chip strong {
+  color:#d9a441;
+  margin-right:4px;
+}
 body.printing-stations-pdf .ps-print-page.ps-hourly.ps-hourly-large table.ps-v2-compare td,
 body.printing-stations-pdf .ps-print-page.ps-hourly.ps-hourly-large table.ps-v2-compare th {
   font-size:12px !important;
@@ -707,7 +733,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <aside id="appSidebar" class="app-sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-title">BOH Dashboard</div>
-    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W41 · Built 2026-10-12T17:26:24.383Z</div>
+    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W41 · Built 2026-10-12T17:35:01.731Z</div>
   </div>
   <div class="sidebar-block">
     <label class="sidebar-label" for="venueSelect">Location</label>
@@ -5684,6 +5710,38 @@ function buildStationsPdfFamilyDayPageHtml(family, weekKey, weekLabel) {
     '</div>';
 }
 
+/** Compact legend: Toast station names under this family, per restaurant. */
+function buildFamilyStationsMapHtml(family, weekKey) {
+  const labels = {"claudie":"Claudie","casaneos":"Casa Neos","ava_cg":"AVA Coconut Grove","ava_wp":"AVA Winter Park","mila":"MILA"};
+  const short = (k) => {
+    if (k === 'claudie') return 'CL';
+    if (k === 'casaneos') return 'CN';
+    if (k === 'ava_cg') return 'ACG';
+    if (k === 'ava_wp') return 'AWP';
+    if (k === 'mila') return 'MILA';
+    return (labels[k] || k).slice(0, 4);
+  };
+  const rows = (typeof familyStationsByVenue === 'function'
+    ? familyStationsByVenue([weekKey], family)
+    : PORTFOLIO_VENUE_KEYS.map(vk => {
+        const d = ALL_DATA[vk] && ALL_DATA[vk][weekKey];
+        const stations = d
+          ? stationsForFamily(family, d.staffing, d.stationDetails || {})
+          : [];
+        return { key: vk, label: labels[vk] || vk, stations: stations.slice().sort((a, b) => a.localeCompare(b)) };
+      }));
+  const chips = rows.map(r => {
+    const list = r.stations.length
+      ? r.stations.map(s => String(s).replace(/</g, '&lt;')).join(' · ')
+      : '—';
+    return '<span class="ps-stmap-chip"><strong>'+short(r.key)+'</strong> '+list+'</span>';
+  }).join('');
+  return '<div class="ps-stmap">'+
+    '<div class="ps-stmap-title">Toast stations under '+String(family).replace(/</g, '&lt;')+'</div>'+
+    '<div class="ps-stmap-row">'+chips+'</div>'+
+    '</div>';
+}
+
 /** Per-station PDF: hour × day × location heatmap with visible AVG banner. */
 function buildStationsPdfFamilyHourPageHtml(family, weekKey, weekLabel) {
   const allVenues = PORTFOLIO_VENUE_KEYS.map(k => ({ key: k, label: ({"claudie":"Claudie","casaneos":"Casa Neos","ava_cg":"AVA Coconut Grove","ava_wp":"AVA Winter Park","mila":"MILA"})[k] || k }));
@@ -5694,9 +5752,11 @@ function buildStationsPdfFamilyHourPageHtml(family, weekKey, weekLabel) {
     large: true,
   });
   if (!table) return '';
+  const stationMap = buildFamilyStationsMapHtml(family, weekKey);
   return '<div class="ps-print-page ps-hourly ps-hourly-large">'+
     '<h1>'+String(family).toUpperCase()+' · Hour × Day</h1>'+
     '<p class="ps-sub">'+weekLabel+' · hours ↓ · days → · locations under each day · items / staff-hour</p>'+
+    stationMap+
     table+
     '</div>';
 }
@@ -5758,8 +5818,7 @@ function exportPortfolioStationsPdf() {
   renderPortfolioStations();
 
   const finish = () => {
-    // PDF: STATIONS ANALYSIS cover → Overview bar chart → per station divider → hour×day table
-    const coverPage = buildStationDividerPageHtml('Stations Analysis');
+    // PDF: Overview bar chart → per station divider → hour×day table (no cover page)
     let chartImg = captureStationsCompareChartPng(weekKey);
     if (!chartImg) {
       try {
@@ -5774,7 +5833,7 @@ function exportPortfolioStationsPdf() {
       return buildStationDividerPageHtml(f) + hourPage;
     }).join('');
 
-    runStationsPdfPrint(printRoot, coverPage + chartPage + detailPages);
+    runStationsPdfPrint(printRoot, chartPage + detailPages);
   };
 
   requestAnimationFrame(() => {
