@@ -2594,9 +2594,14 @@ function buildStaffingTableHtml(staffing, guests) {
   });
   html += '</tbody></table>';
   const ms = staffing.matchStats;
-  const note = ms
+  let note = ms
     ? 'Food families only · closed food tickets · matched '+ms.laborShiftsMatched+' labor days · unmatched '+ms.laborShiftsUnmatched
     : 'Food families only · closed food tickets';
+  if (ms && ms.excludedEarlyWeekdayClockIns > 0) {
+    note += ' · excluded '+ms.excludedEarlyWeekdayClockIns+' Mon–Fri 5–10am clock-ins (prep)';
+  } else if (ms && ms.earlyClockInExcludeRule && /Claudie/.test(ms.earlyClockInExcludeRule)) {
+    note += ' · Claudie keeps Mon–Fri early clock-ins';
+  }
   return { html, note };
 }
 let stationsSelectedFamily = 'Pastry'; // single station family for hour×day tables

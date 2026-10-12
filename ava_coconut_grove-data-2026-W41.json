@@ -53369,7 +53369,7 @@
   "staffing": {
     "venue": "ava_coconut_grove",
     "weekLabel": "2026-W41",
-    "builtAt": "2026-10-12T16:34:38.223Z",
+    "builtAt": "2026-10-12T17:19:07.792Z",
     "matchStats": {
       "laborShiftsMatched": 104,
       "laborShiftsUnmatched": 276,
@@ -53379,7 +53379,10 @@
       "bohLaborShiftsUnmatched": 4,
       "bohMatchRate": 0.963,
       "rosterCoverage": 0.923,
-      "noStationPeopleCount": 1
+      "noStationPeopleCount": 1,
+      "excludedEarlyWeekdayClockIns": 0,
+      "excludedEarlyWeekdayHours": 0,
+      "earlyClockInExcludeRule": "Non-Claudie: exclude Mon–Fri punches with clock-in 5:00–9:59 ET"
     },
     "guestsSeated": {
       "total": 0,
@@ -61919,7 +61922,7 @@
               "nPeer": 25,
               "nHist": 5,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 1.43
+              "staffingRatio": 1.67
             }
           },
           "Tuesday": {
@@ -62097,7 +62100,7 @@
               "nPeer": 33,
               "nHist": 4,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 2
+              "staffingRatio": 2.22
             }
           },
           "Wednesday": {

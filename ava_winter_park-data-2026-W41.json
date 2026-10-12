@@ -43580,17 +43580,20 @@
   "staffing": {
     "venue": "ava_winter_park",
     "weekLabel": "2026-W41",
-    "builtAt": "2026-10-12T16:34:00.051Z",
+    "builtAt": "2026-10-12T17:18:51.309Z",
     "matchStats": {
-      "laborShiftsMatched": 128,
-      "laborShiftsUnmatched": 286,
-      "rosterUnused": 3,
+      "laborShiftsMatched": 96,
+      "laborShiftsUnmatched": 277,
+      "rosterUnused": 5,
       "rosterTotal": 31,
-      "matchRate": 0.309,
+      "matchRate": 0.257,
       "bohLaborShiftsUnmatched": 5,
-      "bohMatchRate": 0.962,
-      "rosterCoverage": 0.903,
-      "noStationPeopleCount": 2
+      "bohMatchRate": 0.95,
+      "rosterCoverage": 0.839,
+      "noStationPeopleCount": 2,
+      "excludedEarlyWeekdayClockIns": 41,
+      "excludedEarlyWeekdayHours": 288.45,
+      "earlyClockInExcludeRule": "Non-Claudie: exclude Mon–Fri punches with clock-in 5:00–9:59 ET"
     },
     "guestsSeated": {
       "total": 0,
@@ -43612,30 +43615,20 @@
       "Pastry": {
         "family": "Pastry",
         "rosterCount": 5,
-        "weekHeadsUnique": 5,
-        "weekHours": 155.68,
+        "weekHeadsUnique": 4,
+        "weekHours": 93.5,
         "weekItemCount": 411,
         "weekTicketCount": 324,
-        "weekItemsPerHeadDay": 19.6,
-        "weekItemsPerStaffHour": 2.64,
+        "weekItemsPerHeadDay": 34.3,
+        "weekItemsPerStaffHour": 4.4,
         "weekServiceHours": 43,
         "weekItemsPerServiceHour": 9.56,
         "weekAvgFulSec": 505.2,
         "days": {
           "Monday": {
-            "heads": 3,
-            "hours": 19.4,
+            "heads": 1,
+            "hours": 6.39,
             "staff": [
-              {
-                "label": "Juan P.",
-                "hours": 5.88,
-                "position": "Pastry"
-              },
-              {
-                "label": "Guillermina R.",
-                "hours": 7.13,
-                "position": "Pastry"
-              },
               {
                 "label": "Leticia F.",
                 "hours": 6.39,
@@ -43643,12 +43636,12 @@
               }
             ],
             "headsByHour": {
-              "10-11": 2,
-              "11-12": 2,
-              "12-13": 2,
-              "13-14": 2,
-              "14-15": 2,
-              "15-16": 3,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 1,
               "16-17": 1,
               "17-18": 1,
               "18-19": 1,
@@ -43661,89 +43654,12 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "3:18p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "3:18p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "3:18p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "3:18p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "3:18p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
               "15-16": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "3:18p"
-                },
                 {
                   "label": "Leticia F.",
                   "position": "Pastry",
@@ -43809,10 +43725,10 @@
             "volume": 1,
             "volumeSource": "ticketCount",
             "itemCount": 1,
-            "itemsPerHead": 0.3,
+            "itemsPerHead": 1,
             "serviceHours": 1,
             "itemsPerServiceHour": 1,
-            "itemsPerStaffHour": 0.05,
+            "itemsPerStaffHour": 0.16,
             "avgFulSec": 829,
             "qc": {
               "eligible": false,
@@ -43829,14 +43745,9 @@
             }
           },
           "Tuesday": {
-            "heads": 2,
-            "hours": 14.71,
+            "heads": 1,
+            "hours": 7.66,
             "staff": [
-              {
-                "label": "Guillermina R.",
-                "hours": 7.05,
-                "position": "Pastry"
-              },
               {
                 "label": "Leticia F.",
                 "hours": 7.66,
@@ -43844,11 +43755,11 @@
               }
             ],
             "headsByHour": {
-              "10-11": 1,
-              "11-12": 1,
-              "12-13": 1,
-              "13-14": 1,
-              "14-15": 1,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
               "15-16": 1,
               "16-17": 1,
               "17-18": 1,
@@ -43862,46 +43773,11 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "2:58p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "2:58p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "2:58p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "2:58p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "2:58p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
               "15-16": [
                 {
                   "label": "Leticia F.",
@@ -43982,10 +43858,10 @@
             "volume": 39,
             "volumeSource": "itemQty",
             "itemCount": 39,
-            "itemsPerHead": 19.5,
+            "itemsPerHead": 39,
             "serviceHours": 6,
             "itemsPerServiceHour": 6.5,
-            "itemsPerStaffHour": 2.65,
+            "itemsPerStaffHour": 5.09,
             "avgFulSec": 597,
             "qc": {
               "eligible": true,
@@ -43998,18 +43874,13 @@
               "nPeer": 28,
               "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 2.22
+              "staffingRatio": 1.11
             }
           },
           "Wednesday": {
-            "heads": 2,
-            "hours": 13.24,
+            "heads": 1,
+            "hours": 7.67,
             "staff": [
-              {
-                "label": "Guillermina R.",
-                "hours": 5.57,
-                "position": "Pastry"
-              },
               {
                 "label": "Angela R.",
                 "hours": 7.67,
@@ -44017,9 +43888,9 @@
               }
             ],
             "headsByHour": {
-              "10-11": 1,
-              "11-12": 1,
-              "12-13": 1,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
               "13-14": 0,
               "14-15": 1,
               "15-16": 1,
@@ -44035,30 +43906,9 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "12:59p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "12:59p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "12:59p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
               "13-14": [],
               "14-15": [
                 {
@@ -44148,10 +43998,10 @@
             "volume": 25,
             "volumeSource": "itemQty",
             "itemCount": 25,
-            "itemsPerHead": 12.5,
+            "itemsPerHead": 25,
             "serviceHours": 6,
             "itemsPerServiceHour": 4.17,
-            "itemsPerStaffHour": 1.89,
+            "itemsPerStaffHour": 3.26,
             "avgFulSec": 278.2,
             "qc": {
               "eligible": true,
@@ -44164,28 +44014,13 @@
               "nPeer": 31,
               "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 2.5
+              "staffingRatio": 1.25
             }
           },
           "Thursday": {
-            "heads": 4,
-            "hours": 28.35,
+            "heads": 1,
+            "hours": 8.02,
             "staff": [
-              {
-                "label": "Tannia A.",
-                "hours": 6.25,
-                "position": "Pastry"
-              },
-              {
-                "label": "Juan P.",
-                "hours": 6.43,
-                "position": "Pastry"
-              },
-              {
-                "label": "Guillermina R.",
-                "hours": 7.65,
-                "position": "Pastry"
-              },
               {
                 "label": "Angela R.",
                 "hours": 8.02,
@@ -44193,12 +44028,12 @@
               }
             ],
             "headsByHour": {
-              "10-11": 3,
-              "11-12": 3,
-              "12-13": 3,
-              "13-14": 3,
-              "14-15": 3,
-              "15-16": 3,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 1,
               "16-17": 1,
               "17-18": 1,
               "18-19": 1,
@@ -44211,119 +44046,12 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:26a",
-                  "out": "3:35p"
-                },
-                {
-                  "label": "Tannia A.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "2:45p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "3:20p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:26a",
-                  "out": "3:35p"
-                },
-                {
-                  "label": "Tannia A.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "2:45p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "3:20p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:26a",
-                  "out": "3:35p"
-                },
-                {
-                  "label": "Tannia A.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "2:45p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "3:20p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:26a",
-                  "out": "3:35p"
-                },
-                {
-                  "label": "Tannia A.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "2:45p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "3:20p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:26a",
-                  "out": "3:35p"
-                },
-                {
-                  "label": "Tannia A.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "2:45p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "3:20p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
               "15-16": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:26a",
-                  "out": "3:35p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "3:20p"
-                },
                 {
                   "label": "Angela R.",
                   "position": "Pastry",
@@ -44403,39 +44131,29 @@
             "volume": 52,
             "volumeSource": "itemQty",
             "itemCount": 52,
-            "itemsPerHead": 13,
+            "itemsPerHead": 52,
             "serviceHours": 7,
             "itemsPerServiceHour": 7.43,
-            "itemsPerStaffHour": 1.83,
+            "itemsPerStaffHour": 6.48,
             "avgFulSec": 365.6,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Likely overstaffed",
-              "code": "overstaffed_slack",
+              "label": "Strong performance",
+              "code": "efficient_busy",
               "source": "history",
               "nPeer": 33,
               "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 2.35
+              "staffingRatio": 0.59
             }
           },
           "Friday": {
-            "heads": 4,
-            "hours": 28.9,
+            "heads": 2,
+            "hours": 12.68,
             "staff": [
-              {
-                "label": "Juan P.",
-                "hours": 7.59,
-                "position": "Pastry"
-              },
-              {
-                "label": "Guillermina R.",
-                "hours": 8.63,
-                "position": "Pastry"
-              },
               {
                 "label": "Angela R.",
                 "hours": 3.48,
@@ -44448,13 +44166,13 @@
               }
             ],
             "headsByHour": {
-              "10-11": 2,
-              "11-12": 2,
-              "12-13": 2,
-              "13-14": 2,
-              "14-15": 2,
-              "15-16": 4,
-              "16-17": 4,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 2,
+              "16-17": 2,
               "17-18": 2,
               "18-19": 2,
               "19-20": 2,
@@ -44466,89 +44184,12 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "4:30p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "4:30p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "4:30p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "4:30p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "4:30p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
               "15-16": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "4:30p"
-                },
                 {
                   "label": "Angela R.",
                   "position": "Pastry",
@@ -44563,18 +44204,6 @@
                 }
               ],
               "16-17": [
-                {
-                  "label": "Guillermina R.",
-                  "position": "Pastry",
-                  "in": "7:25a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Juan P.",
-                  "position": "Pastry",
-                  "in": "8:55a",
-                  "out": "4:30p"
-                },
                 {
                   "label": "Angela R.",
                   "position": "Pastry",
@@ -44677,10 +44306,10 @@
             "volume": 62,
             "volumeSource": "itemQty",
             "itemCount": 62,
-            "itemsPerHead": 15.5,
+            "itemsPerHead": 31,
             "serviceHours": 7,
             "itemsPerServiceHour": 8.86,
-            "itemsPerStaffHour": 2.15,
+            "itemsPerStaffHour": 4.89,
             "avgFulSec": 412.6,
             "qc": {
               "eligible": true,
@@ -44693,7 +44322,7 @@
               "nPeer": 35,
               "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 2.67
+              "staffingRatio": 1.33
             }
           },
           "Saturday": {
@@ -45206,8 +44835,8 @@
       "Prep": {
         "family": "Prep",
         "rosterCount": 8,
-        "weekHeadsUnique": 7,
-        "weekHours": 217.3,
+        "weekHeadsUnique": 6,
+        "weekHours": 63,
         "weekItemCount": 0,
         "weekTicketCount": 0,
         "weekItemsPerHeadDay": 0,
@@ -45217,44 +44846,18 @@
         "weekAvgFulSec": null,
         "days": {
           "Monday": {
-            "heads": 5,
-            "hours": 34.29,
-            "staff": [
-              {
-                "label": "Nicson B.",
-                "hours": 6.94,
-                "position": "Prep"
-              },
-              {
-                "label": "Kelsi B.",
-                "hours": 6.11,
-                "position": "Prep"
-              },
-              {
-                "label": "Jameson J.",
-                "hours": 7.82,
-                "position": "Prep"
-              },
-              {
-                "label": "Fernando M.",
-                "hours": 6.65,
-                "position": "Prep"
-              },
-              {
-                "label": "Judith R.",
-                "hours": 6.77,
-                "position": "Prep"
-              }
-            ],
+            "heads": 0,
+            "hours": 0,
+            "staff": [],
             "headsByHour": {
-              "10-11": 5,
-              "11-12": 5,
-              "12-13": 5,
-              "13-14": 5,
-              "14-15": 5,
-              "15-16": 5,
-              "16-17": 3,
-              "17-18": 1,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 0,
+              "16-17": 0,
+              "17-18": 0,
               "18-19": 0,
               "19-20": 0,
               "20-21": 0,
@@ -45265,226 +44868,14 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "3:32p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:17p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:00a",
-                  "out": "4:26p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:12a",
-                  "out": "4:41p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "3:32p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:17p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:00a",
-                  "out": "4:26p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:12a",
-                  "out": "4:41p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "3:32p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:17p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:00a",
-                  "out": "4:26p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:12a",
-                  "out": "4:41p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "3:32p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:17p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:00a",
-                  "out": "4:26p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:12a",
-                  "out": "4:41p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "3:32p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:17p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:00a",
-                  "out": "4:26p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:12a",
-                  "out": "4:41p"
-                }
-              ],
-              "15-16": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "3:32p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:17p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:00a",
-                  "out": "4:26p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:12a",
-                  "out": "4:41p"
-                }
-              ],
-              "16-17": [
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:17p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:00a",
-                  "out": "4:26p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:12a",
-                  "out": "4:41p"
-                }
-              ],
-              "17-18": [
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:17p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
+              "15-16": [],
+              "16-17": [],
+              "17-18": [],
               "18-19": [],
               "19-20": [],
               "20-21": [],
@@ -45499,58 +44890,37 @@
             "volume": 0,
             "volumeSource": "ticketCount",
             "itemCount": 0,
-            "itemsPerHead": 0,
+            "itemsPerHead": null,
             "serviceHours": 0,
             "itemsPerServiceHour": null,
-            "itemsPerStaffHour": 0,
+            "itemsPerStaffHour": null,
             "avgFulSec": null,
             "qc": {
               "eligible": false,
-              "denyReason": "Volume < 25"
+              "denyReason": "No staff"
             },
             "signal": {
-              "label": "Attribution caution",
-              "code": "weak_attribution",
+              "label": "—",
+              "code": "closed_or_empty",
               "source": null,
               "nPeer": 0,
               "nHist": 0,
-              "note": "Prep volume/labor attribution is often imperfect",
+              "note": "No staff clocked",
               "staffingRatio": null
             }
           },
           "Tuesday": {
-            "heads": 4,
-            "hours": 25.51,
-            "staff": [
-              {
-                "label": "Kelsi B.",
-                "hours": 6.57,
-                "position": "Prep"
-              },
-              {
-                "label": "Fernando M.",
-                "hours": 6.56,
-                "position": "Prep"
-              },
-              {
-                "label": "Judith R.",
-                "hours": 6.53,
-                "position": "Prep"
-              },
-              {
-                "label": "Omar S.",
-                "hours": 5.85,
-                "position": "Prep"
-              }
-            ],
+            "heads": 0,
+            "hours": 0,
+            "staff": [],
             "headsByHour": {
-              "10-11": 4,
-              "11-12": 4,
-              "12-13": 4,
-              "13-14": 4,
-              "14-15": 4,
-              "15-16": 3,
-              "16-17": 1,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 0,
+              "16-17": 0,
               "17-18": 0,
               "18-19": 0,
               "19-20": 0,
@@ -45562,164 +44932,13 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "2:58p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "3:59p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:09p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:27a",
-                  "out": "3:50p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "2:58p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "3:59p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:09p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:27a",
-                  "out": "3:50p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "2:58p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "3:59p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:09p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:27a",
-                  "out": "3:50p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "2:58p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "3:59p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:09p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:27a",
-                  "out": "3:50p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "2:58p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "3:59p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:09p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:27a",
-                  "out": "3:50p"
-                }
-              ],
-              "15-16": [
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "3:59p"
-                },
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:09p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:27a",
-                  "out": "3:50p"
-                }
-              ],
-              "16-17": [
-                {
-                  "label": "Judith R.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:09p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
+              "15-16": [],
+              "16-17": [],
               "17-18": [],
               "18-19": [],
               "19-20": [],
@@ -45735,58 +44954,37 @@
             "volume": 0,
             "volumeSource": "ticketCount",
             "itemCount": 0,
-            "itemsPerHead": 0,
+            "itemsPerHead": null,
             "serviceHours": 0,
             "itemsPerServiceHour": null,
-            "itemsPerStaffHour": 0,
+            "itemsPerStaffHour": null,
             "avgFulSec": null,
             "qc": {
               "eligible": false,
-              "denyReason": "Volume < 25"
+              "denyReason": "No staff"
             },
             "signal": {
-              "label": "Attribution caution",
-              "code": "weak_attribution",
+              "label": "—",
+              "code": "closed_or_empty",
               "source": null,
               "nPeer": 0,
               "nHist": 0,
-              "note": "Prep volume/labor attribution is often imperfect",
+              "note": "No staff clocked",
               "staffingRatio": null
             }
           },
           "Wednesday": {
-            "heads": 4,
-            "hours": 22.4,
-            "staff": [
-              {
-                "label": "Nicson B.",
-                "hours": 4.72,
-                "position": "Prep"
-              },
-              {
-                "label": "Jameson J.",
-                "hours": 4.82,
-                "position": "Prep"
-              },
-              {
-                "label": "Yasmin L.",
-                "hours": 6.78,
-                "position": "Prep"
-              },
-              {
-                "label": "Fernando M.",
-                "hours": 6.08,
-                "position": "Prep"
-              }
-            ],
+            "heads": 0,
+            "hours": 0,
+            "staff": [],
             "headsByHour": {
-              "10-11": 4,
-              "11-12": 4,
-              "12-13": 4,
-              "13-14": 4,
-              "14-15": 2,
-              "15-16": 1,
-              "16-17": 1,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 0,
+              "16-17": 0,
               "17-18": 0,
               "18-19": 0,
               "19-20": 0,
@@ -45798,140 +44996,13 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "2:00p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:12p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "1:44p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "8:59a",
-                  "out": "1:42p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "2:00p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:12p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "1:44p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "8:59a",
-                  "out": "1:42p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "2:00p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:12p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "1:44p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "8:59a",
-                  "out": "1:42p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "2:00p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:12p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "1:44p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "8:59a",
-                  "out": "1:42p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "2:00p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:12p"
-                }
-              ],
-              "15-16": [
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:12p"
-                }
-              ],
-              "16-17": [
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:12p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
+              "15-16": [],
+              "16-17": [],
               "17-18": [],
               "18-19": [],
               "19-20": [],
@@ -45947,64 +45018,38 @@
             "volume": 0,
             "volumeSource": "ticketCount",
             "itemCount": 0,
-            "itemsPerHead": 0,
+            "itemsPerHead": null,
             "serviceHours": 0,
             "itemsPerServiceHour": null,
-            "itemsPerStaffHour": 0,
+            "itemsPerStaffHour": null,
             "avgFulSec": null,
             "qc": {
               "eligible": false,
-              "denyReason": "Volume < 25"
+              "denyReason": "No staff"
             },
             "signal": {
-              "label": "Attribution caution",
-              "code": "weak_attribution",
+              "label": "—",
+              "code": "closed_or_empty",
               "source": null,
               "nPeer": 0,
               "nHist": 0,
-              "note": "Prep volume/labor attribution is often imperfect",
+              "note": "No staff clocked",
               "staffingRatio": null
             }
           },
           "Thursday": {
-            "heads": 5,
-            "hours": 35.1,
-            "staff": [
-              {
-                "label": "Nicson B.",
-                "hours": 6.89,
-                "position": "Prep"
-              },
-              {
-                "label": "Kelsi B.",
-                "hours": 7.08,
-                "position": "Prep"
-              },
-              {
-                "label": "Yasmin L.",
-                "hours": 7.89,
-                "position": "Prep"
-              },
-              {
-                "label": "Fernando M.",
-                "hours": 7.16,
-                "position": "Prep"
-              },
-              {
-                "label": "Omar S.",
-                "hours": 6.08,
-                "position": "Prep"
-              }
-            ],
+            "heads": 0,
+            "hours": 0,
+            "staff": [],
             "headsByHour": {
-              "10-11": 5,
-              "11-12": 5,
-              "12-13": 5,
-              "13-14": 5,
-              "14-15": 5,
-              "15-16": 5,
-              "16-17": 3,
-              "17-18": 1,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 0,
+              "16-17": 0,
+              "17-18": 0,
               "18-19": 0,
               "19-20": 0,
               "20-21": 0,
@@ -46015,226 +45060,14 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "3:35p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:18p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:57a",
-                  "out": "4:31p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:28p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:10a",
-                  "out": "3:45p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "3:35p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:18p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:57a",
-                  "out": "4:31p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:28p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:10a",
-                  "out": "3:45p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "3:35p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:18p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:57a",
-                  "out": "4:31p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:28p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:10a",
-                  "out": "3:45p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "3:35p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:18p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:57a",
-                  "out": "4:31p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:28p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:10a",
-                  "out": "3:45p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "3:35p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:18p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:57a",
-                  "out": "4:31p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:28p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:10a",
-                  "out": "3:45p"
-                }
-              ],
-              "15-16": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "3:35p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:18p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:57a",
-                  "out": "4:31p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:28p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:10a",
-                  "out": "3:45p"
-                }
-              ],
-              "16-17": [
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:18p"
-                },
-                {
-                  "label": "Kelsi B.",
-                  "position": "Prep",
-                  "in": "8:57a",
-                  "out": "4:31p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:04a",
-                  "out": "4:28p"
-                }
-              ],
-              "17-18": [
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:18p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
+              "15-16": [],
+              "16-17": [],
+              "17-18": [],
               "18-19": [],
               "19-20": [],
               "20-21": [],
@@ -46249,64 +45082,38 @@
             "volume": 0,
             "volumeSource": "ticketCount",
             "itemCount": 0,
-            "itemsPerHead": 0,
+            "itemsPerHead": null,
             "serviceHours": 0,
             "itemsPerServiceHour": null,
-            "itemsPerStaffHour": 0,
+            "itemsPerStaffHour": null,
             "avgFulSec": null,
             "qc": {
               "eligible": false,
-              "denyReason": "Volume < 25"
+              "denyReason": "No staff"
             },
             "signal": {
-              "label": "Attribution caution",
-              "code": "weak_attribution",
+              "label": "—",
+              "code": "closed_or_empty",
               "source": null,
               "nPeer": 0,
               "nHist": 0,
-              "note": "Prep volume/labor attribution is often imperfect",
+              "note": "No staff clocked",
               "staffingRatio": null
             }
           },
           "Friday": {
-            "heads": 5,
-            "hours": 37,
-            "staff": [
-              {
-                "label": "Nicson B.",
-                "hours": 6.97,
-                "position": "Prep"
-              },
-              {
-                "label": "Jameson J.",
-                "hours": 7.84,
-                "position": "Prep"
-              },
-              {
-                "label": "Yasmin L.",
-                "hours": 7.3,
-                "position": "Prep"
-              },
-              {
-                "label": "Fernando M.",
-                "hours": 8.14,
-                "position": "Prep"
-              },
-              {
-                "label": "Omar S.",
-                "hours": 6.75,
-                "position": "Prep"
-              }
-            ],
+            "heads": 0,
+            "hours": 0,
+            "staff": [],
             "headsByHour": {
-              "10-11": 5,
-              "11-12": 5,
-              "12-13": 5,
-              "13-14": 5,
-              "14-15": 5,
-              "15-16": 5,
-              "16-17": 4,
-              "17-18": 1,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 0,
+              "16-17": 0,
+              "17-18": 0,
               "18-19": 0,
               "19-20": 0,
               "20-21": 0,
@@ -46317,232 +45124,14 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:43p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:16p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:01a",
-                  "out": "4:29p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:02a",
-                  "out": "3:46p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:43p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:16p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:01a",
-                  "out": "4:29p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:02a",
-                  "out": "3:46p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:43p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:16p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:01a",
-                  "out": "4:29p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:02a",
-                  "out": "3:46p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:43p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:16p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:01a",
-                  "out": "4:29p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:02a",
-                  "out": "3:46p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:43p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:16p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:01a",
-                  "out": "4:29p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:02a",
-                  "out": "3:46p"
-                }
-              ],
-              "15-16": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:43p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:16p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:01a",
-                  "out": "4:29p"
-                },
-                {
-                  "label": "Omar S.",
-                  "position": "Prep",
-                  "in": "9:02a",
-                  "out": "3:46p"
-                }
-              ],
-              "16-17": [
-                {
-                  "label": "Fernando M.",
-                  "position": "Prep",
-                  "in": "7:55a",
-                  "out": "4:33p"
-                },
-                {
-                  "label": "Yasmin L.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "4:43p"
-                },
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:16p"
-                },
-                {
-                  "label": "Nicson B.",
-                  "position": "Prep",
-                  "in": "9:01a",
-                  "out": "4:29p"
-                }
-              ],
-              "17-18": [
-                {
-                  "label": "Jameson J.",
-                  "position": "Prep",
-                  "in": "8:55a",
-                  "out": "5:16p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
+              "15-16": [],
+              "16-17": [],
+              "17-18": [],
               "18-19": [],
               "19-20": [],
               "20-21": [],
@@ -46557,22 +45146,22 @@
             "volume": 0,
             "volumeSource": "ticketCount",
             "itemCount": 0,
-            "itemsPerHead": 0,
+            "itemsPerHead": null,
             "serviceHours": 0,
             "itemsPerServiceHour": null,
-            "itemsPerStaffHour": 0,
+            "itemsPerStaffHour": null,
             "avgFulSec": null,
             "qc": {
               "eligible": false,
-              "denyReason": "Volume < 25"
+              "denyReason": "No staff"
             },
             "signal": {
-              "label": "Attribution caution",
-              "code": "weak_attribution",
+              "label": "—",
+              "code": "closed_or_empty",
               "source": null,
               "nPeer": 0,
               "nHist": 0,
-              "note": "Prep volume/labor attribution is often imperfect",
+              "note": "No staff clocked",
               "staffingRatio": null
             }
           },
@@ -54169,6 +52758,58 @@
         }
       },
       {
+        "label": "Leticia F.",
+        "position": "Pastry",
+        "families": [
+          "Pastry"
+        ],
+        "weekHours": 38.2,
+        "weekItems": 148,
+        "weekItemsPerHour": 3.88,
+        "days": {
+          "Monday": {
+            "hours": 6.39,
+            "items": 1,
+            "itemsPerHour": 0.16,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Tuesday": {
+            "hours": 7.66,
+            "items": 39,
+            "itemsPerHour": 5.09,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Friday": {
+            "hours": 9.2,
+            "items": 31,
+            "itemsPerHour": 3.37,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Saturday": {
+            "hours": 6.65,
+            "items": 13,
+            "itemsPerHour": 1.95,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Sunday": {
+            "hours": 8.3,
+            "items": 64,
+            "itemsPerHour": 7.75,
+            "families": [
+              "Pastry"
+            ]
+          }
+        }
+      },
+      {
         "label": "Quinton H.",
         "position": "Robata",
         "families": [
@@ -54437,103 +53078,35 @@
         }
       },
       {
-        "label": "Leticia F.",
+        "label": "Angela R.",
         "position": "Pastry",
         "families": [
           "Pastry"
         ],
-        "weekHours": 38.2,
-        "weekItems": 113,
-        "weekItemsPerHour": 2.95,
+        "weekHours": 19.17,
+        "weekItems": 108,
+        "weekItemsPerHour": 5.63,
         "days": {
-          "Monday": {
-            "hours": 6.39,
-            "items": 0,
-            "itemsPerHour": 0.05,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Tuesday": {
-            "hours": 7.66,
-            "items": 20,
-            "itemsPerHour": 2.55,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Friday": {
-            "hours": 9.2,
-            "items": 16,
-            "itemsPerHour": 1.68,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Saturday": {
-            "hours": 6.65,
-            "items": 13,
-            "itemsPerHour": 1.95,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Sunday": {
-            "hours": 8.3,
-            "items": 64,
-            "itemsPerHour": 7.75,
-            "families": [
-              "Pastry"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Juan P.",
-        "position": "Pastry",
-        "families": [
-          "Pastry"
-        ],
-        "weekHours": 36.66,
-        "weekItems": 106,
-        "weekItemsPerHour": 2.9,
-        "days": {
-          "Monday": {
-            "hours": 5.88,
-            "items": 0,
-            "itemsPerHour": 0.06,
+          "Wednesday": {
+            "hours": 7.67,
+            "items": 25,
+            "itemsPerHour": 3.26,
             "families": [
               "Pastry"
             ]
           },
           "Thursday": {
-            "hours": 6.43,
-            "items": 13,
-            "itemsPerHour": 2.02,
+            "hours": 8.02,
+            "items": 52,
+            "itemsPerHour": 6.48,
             "families": [
               "Pastry"
             ]
           },
           "Friday": {
-            "hours": 7.59,
-            "items": 16,
-            "itemsPerHour": 2.04,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Saturday": {
-            "hours": 8.92,
-            "items": 13,
-            "itemsPerHour": 1.46,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Sunday": {
-            "hours": 7.84,
-            "items": 64,
-            "itemsPerHour": 8.21,
+            "hours": 3.48,
+            "items": 31,
+            "itemsPerHour": 8.91,
             "families": [
               "Pastry"
             ]
@@ -54681,42 +53254,6 @@
         }
       },
       {
-        "label": "Tannia A.",
-        "position": "Pastry",
-        "families": [
-          "Pastry"
-        ],
-        "weekHours": 25.62,
-        "weekItems": 90,
-        "weekItemsPerHour": 3.53,
-        "days": {
-          "Thursday": {
-            "hours": 6.25,
-            "items": 13,
-            "itemsPerHour": 2.08,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Saturday": {
-            "hours": 10.12,
-            "items": 13,
-            "itemsPerHour": 1.28,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Sunday": {
-            "hours": 9.25,
-            "items": 64,
-            "itemsPerHour": 6.95,
-            "families": [
-              "Pastry"
-            ]
-          }
-        }
-      },
-      {
         "label": "Zachary B.",
         "position": "Robata",
         "families": [
@@ -54769,51 +53306,55 @@
         }
       },
       {
-        "label": "Guillermina R.",
+        "label": "Tannia A.",
         "position": "Pastry",
         "families": [
           "Pastry"
         ],
-        "weekHours": 36.03,
-        "weekItems": 61,
-        "weekItemsPerHour": 1.69,
+        "weekHours": 19.37,
+        "weekItems": 77,
+        "weekItemsPerHour": 3.99,
         "days": {
-          "Monday": {
-            "hours": 7.13,
-            "items": 0,
-            "itemsPerHour": 0.05,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Tuesday": {
-            "hours": 7.05,
-            "items": 20,
-            "itemsPerHour": 2.77,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Wednesday": {
-            "hours": 5.57,
+          "Saturday": {
+            "hours": 10.12,
             "items": 13,
-            "itemsPerHour": 2.24,
+            "itemsPerHour": 1.28,
             "families": [
               "Pastry"
             ]
           },
-          "Thursday": {
-            "hours": 7.65,
+          "Sunday": {
+            "hours": 9.25,
+            "items": 64,
+            "itemsPerHour": 6.95,
+            "families": [
+              "Pastry"
+            ]
+          }
+        }
+      },
+      {
+        "label": "Juan P.",
+        "position": "Pastry",
+        "families": [
+          "Pastry"
+        ],
+        "weekHours": 16.76,
+        "weekItems": 77,
+        "weekItemsPerHour": 4.61,
+        "days": {
+          "Saturday": {
+            "hours": 8.92,
             "items": 13,
-            "itemsPerHour": 1.7,
+            "itemsPerHour": 1.46,
             "families": [
               "Pastry"
             ]
           },
-          "Friday": {
-            "hours": 8.63,
-            "items": 16,
-            "itemsPerHour": 1.8,
+          "Sunday": {
+            "hours": 7.84,
+            "items": 64,
+            "itemsPerHour": 8.21,
             "families": [
               "Pastry"
             ]
@@ -54869,83 +53410,15 @@
         }
       },
       {
-        "label": "Angela R.",
-        "position": "Pastry",
-        "families": [
-          "Pastry"
-        ],
-        "weekHours": 19.17,
-        "weekItems": 41,
-        "weekItemsPerHour": 2.14,
-        "days": {
-          "Wednesday": {
-            "hours": 7.67,
-            "items": 13,
-            "itemsPerHour": 1.63,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Thursday": {
-            "hours": 8.02,
-            "items": 13,
-            "itemsPerHour": 1.62,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Friday": {
-            "hours": 3.48,
-            "items": 16,
-            "itemsPerHour": 4.45,
-            "families": [
-              "Pastry"
-            ]
-          }
-        }
-      },
-      {
         "label": "Nicson B.",
         "position": "Prep",
         "families": [
           "Prep"
         ],
-        "weekHours": 31.98,
+        "weekHours": 6.46,
         "weekItems": 0,
         "weekItemsPerHour": 0,
         "days": {
-          "Monday": {
-            "hours": 6.94,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Wednesday": {
-            "hours": 4.72,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Thursday": {
-            "hours": 6.89,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Friday": {
-            "hours": 6.97,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
           "Saturday": {
             "hours": 6.46,
             "items": 0,
@@ -54962,34 +53435,10 @@
         "families": [
           "Prep"
         ],
-        "weekHours": 30.61,
+        "weekHours": 10.85,
         "weekItems": 0,
         "weekItemsPerHour": 0,
         "days": {
-          "Monday": {
-            "hours": 6.11,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Tuesday": {
-            "hours": 6.57,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Thursday": {
-            "hours": 7.08,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
           "Saturday": {
             "hours": 6.1,
             "items": 0,
@@ -55014,34 +53463,10 @@
         "families": [
           "Prep"
         ],
-        "weekHours": 32.77,
+        "weekHours": 12.29,
         "weekItems": 0,
         "weekItemsPerHour": 0,
         "days": {
-          "Monday": {
-            "hours": 7.82,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Wednesday": {
-            "hours": 4.82,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Friday": {
-            "hours": 7.84,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
           "Saturday": {
             "hours": 5.54,
             "items": 0,
@@ -55061,49 +53486,25 @@
         }
       },
       {
-        "label": "Fernando M.",
+        "label": "Yasmin L.",
         "position": "Prep",
         "families": [
           "Prep"
         ],
-        "weekHours": 34.59,
+        "weekHours": 13.35,
         "weekItems": 0,
         "weekItemsPerHour": 0,
         "days": {
-          "Monday": {
-            "hours": 6.65,
+          "Saturday": {
+            "hours": 6.07,
             "items": 0,
             "itemsPerHour": 0,
             "families": [
               "Prep"
             ]
           },
-          "Tuesday": {
-            "hours": 6.56,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Wednesday": {
-            "hours": 6.08,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Thursday": {
-            "hours": 7.16,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Friday": {
-            "hours": 8.14,
+          "Sunday": {
+            "hours": 7.28,
             "items": 0,
             "itemsPerHour": 0,
             "families": [
@@ -55118,26 +53519,10 @@
         "families": [
           "Prep"
         ],
-        "weekHours": 24.59,
+        "weekHours": 11.29,
         "weekItems": 0,
         "weekItemsPerHour": 0,
         "days": {
-          "Monday": {
-            "hours": 6.77,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Tuesday": {
-            "hours": 6.53,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
           "Saturday": {
             "hours": 6.87,
             "items": 0,
@@ -55162,34 +53547,10 @@
         "families": [
           "Prep"
         ],
-        "weekHours": 27.44,
+        "weekHours": 8.76,
         "weekItems": 0,
         "weekItemsPerHour": 0,
         "days": {
-          "Tuesday": {
-            "hours": 5.85,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Thursday": {
-            "hours": 6.08,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Friday": {
-            "hours": 6.75,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
           "Saturday": {
             "hours": 5.35,
             "items": 0,
@@ -55200,58 +53561,6 @@
           },
           "Sunday": {
             "hours": 3.41,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Yasmin L.",
-        "position": "Prep",
-        "families": [
-          "Prep"
-        ],
-        "weekHours": 35.32,
-        "weekItems": 0,
-        "weekItemsPerHour": 0,
-        "days": {
-          "Wednesday": {
-            "hours": 6.78,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Thursday": {
-            "hours": 7.89,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Friday": {
-            "hours": 7.3,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Saturday": {
-            "hours": 6.07,
-            "items": 0,
-            "itemsPerHour": 0,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Sunday": {
-            "hours": 7.28,
             "items": 0,
             "itemsPerHour": 0,
             "families": [

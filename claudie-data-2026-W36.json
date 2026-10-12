@@ -69179,7 +69179,7 @@
   "staffing": {
     "venue": "claudie",
     "weekLabel": "2026-W36",
-    "builtAt": "2026-09-11T20:48:43.001Z",
+    "builtAt": "2026-10-12T17:20:26.035Z",
     "matchStats": {
       "laborShiftsMatched": 138,
       "laborShiftsUnmatched": 329,
@@ -69189,7 +69189,10 @@
       "bohLaborShiftsUnmatched": 10,
       "bohMatchRate": 0.932,
       "rosterCoverage": 0.829,
-      "noStationPeopleCount": 2
+      "noStationPeopleCount": 2,
+      "excludedEarlyWeekdayClockIns": 0,
+      "excludedEarlyWeekdayHours": 0,
+      "earlyClockInExcludeRule": "Claudie: keep all punches (no Mon–Fri 5–10am filter)"
     },
     "guestsSeated": {
       "total": 1991,
@@ -69410,11 +69413,11 @@
             "signal": {
               "label": "Operational bottleneck",
               "code": "process_issue",
-              "source": "peer",
-              "nPeer": 13,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 2
+              "source": "history",
+              "nPeer": 28,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.91
             }
           },
           "Tuesday": {
@@ -69647,13 +69650,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Balanced",
-              "code": "in_band",
-              "source": "peer",
-              "nPeer": 16,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 3.75
+              "label": "Operational bottleneck",
+              "code": "process_issue",
+              "source": "history",
+              "nPeer": 37,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.88
             }
           },
           "Wednesday": {
@@ -69964,13 +69967,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Likely overstaffed",
-              "code": "overstaffed_slack",
-              "source": "peer",
-              "nPeer": 17,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 3.33
+              "label": "Balanced",
+              "code": "in_band",
+              "source": "history",
+              "nPeer": 38,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.95
             }
           },
           "Thursday": {
@@ -70281,13 +70284,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Likely overstaffed",
-              "code": "overstaffed_slack",
-              "source": "peer",
-              "nPeer": 17,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 2.5
+              "label": "Balanced",
+              "code": "in_band",
+              "source": "history",
+              "nPeer": 38,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.93
             }
           },
           "Friday": {
@@ -70572,11 +70575,11 @@
             "signal": {
               "label": "Balanced",
               "code": "in_band",
-              "source": "peer",
-              "nPeer": 17,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 1.25
+              "source": "history",
+              "nPeer": 38,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.83
             }
           },
           "Saturday": {
@@ -70859,13 +70862,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Balanced",
-              "code": "in_band",
-              "source": "peer",
-              "nPeer": 17,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 1.5
+              "label": "Likely understaffed",
+              "code": "understaffed_pressure",
+              "source": "history",
+              "nPeer": 38,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.79
             }
           },
           "Sunday": {
@@ -70994,11 +70997,11 @@
             "signal": {
               "label": "Balanced",
               "code": "in_band",
-              "source": "peer",
-              "nPeer": 17,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.67
+              "source": "history",
+              "nPeer": 38,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.33
             }
           }
         }
@@ -71199,13 +71202,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Strong performance",
-              "code": "efficient_busy",
-              "source": "peer",
-              "nPeer": 10,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.61
+              "label": "Balanced",
+              "code": "in_band",
+              "source": "history",
+              "nPeer": 24,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1.33
             }
           },
           "Tuesday": {
@@ -71391,13 +71394,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Strong performance",
-              "code": "efficient_busy",
-              "source": "peer",
-              "nPeer": 13,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.42
+              "label": "Balanced",
+              "code": "in_band",
+              "source": "history",
+              "nPeer": 32,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1.43
             }
           },
           "Wednesday": {
@@ -71534,10 +71537,10 @@
               "label": "Strong performance",
               "code": "efficient_busy",
               "source": "peer",
-              "nPeer": 15,
-              "nHist": 0,
+              "nPeer": 36,
+              "nHist": 5,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.22
+              "staffingRatio": 0.34
             }
           },
           "Thursday": {
@@ -71671,13 +71674,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Strong performance",
-              "code": "efficient_busy",
-              "source": "peer",
-              "nPeer": 16,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.18
+              "label": "Likely understaffed",
+              "code": "understaffed_pressure",
+              "source": "history",
+              "nPeer": 37,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.5
             }
           },
           "Friday": {
@@ -71923,13 +71926,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Strong performance",
-              "code": "efficient_busy",
-              "source": "peer",
-              "nPeer": 18,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.47
+              "label": "Operational bottleneck",
+              "code": "process_issue",
+              "source": "history",
+              "nPeer": 39,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1.11
             }
           },
           "Saturday": {
@@ -72177,11 +72180,11 @@
             "signal": {
               "label": "Balanced",
               "code": "in_band",
-              "source": "peer",
-              "nPeer": 18,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.6
+              "source": "history",
+              "nPeer": 39,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1.2
             }
           },
           "Sunday": {
@@ -72378,11 +72381,11 @@
             "signal": {
               "label": "Balanced",
               "code": "in_band",
-              "source": "peer",
-              "nPeer": 18,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 1
+              "source": "history",
+              "nPeer": 39,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.71
             }
           }
         }
@@ -72510,13 +72513,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Likely understaffed",
-              "code": "understaffed_pressure",
-              "source": "peer",
-              "nPeer": 8,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.77
+              "label": "Operational bottleneck",
+              "code": "process_issue",
+              "source": "history",
+              "nPeer": 18,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1.11
             }
           },
           "Tuesday": {
@@ -72629,13 +72632,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Balanced",
-              "code": "in_band",
-              "source": "peer",
-              "nPeer": 11,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.48
+              "label": "Operational bottleneck",
+              "code": "process_issue",
+              "source": "history",
+              "nPeer": 24,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1
             }
           },
           "Wednesday": {
@@ -72827,11 +72830,11 @@
             "signal": {
               "label": "Balanced",
               "code": "in_band",
-              "source": "peer",
-              "nPeer": 15,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.8
+              "source": "history",
+              "nPeer": 32,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1.67
             }
           },
           "Thursday": {
@@ -73021,13 +73024,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Strong performance",
-              "code": "efficient_busy",
-              "source": "peer",
-              "nPeer": 14,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.63
+              "label": "Balanced",
+              "code": "in_band",
+              "source": "history",
+              "nPeer": 34,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.95
             }
           },
           "Friday": {
@@ -73182,13 +73185,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Strong performance",
-              "code": "efficient_busy",
-              "source": "peer",
-              "nPeer": 16,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.29
+              "label": "Balanced",
+              "code": "in_band",
+              "source": "history",
+              "nPeer": 37,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.71
             }
           },
           "Saturday": {
@@ -73338,11 +73341,11 @@
             "signal": {
               "label": "Balanced",
               "code": "in_band",
-              "source": "peer",
-              "nPeer": 16,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.26
+              "source": "history",
+              "nPeer": 36,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.71
             }
           },
           "Sunday": {
@@ -73488,13 +73491,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Balanced",
-              "code": "in_band",
-              "source": "peer",
-              "nPeer": 16,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.74
+              "label": "Likely understaffed",
+              "code": "understaffed_pressure",
+              "source": "history",
+              "nPeer": 36,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.63
             }
           }
         }
@@ -75411,13 +75414,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Building benchmark",
-              "code": "insufficient_data",
-              "source": null,
-              "nPeer": 4,
-              "nHist": 1,
-              "note": "Need 6 history or 3 peer cells (≥2 venues)",
-              "staffingRatio": null
+              "label": "Likely overstaffed",
+              "code": "overstaffed_slack",
+              "source": "history",
+              "nPeer": 16,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1.48
             }
           },
           "Tuesday": {
@@ -75656,13 +75659,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Likely overstaffed",
-              "code": "overstaffed_slack",
-              "source": "peer",
-              "nPeer": 8,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 2
+              "label": "Balanced",
+              "code": "in_band",
+              "source": "history",
+              "nPeer": 23,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.94
             }
           },
           "Wednesday": {
@@ -76003,11 +76006,11 @@
             "signal": {
               "label": "Likely overstaffed",
               "code": "overstaffed_slack",
-              "source": "peer",
-              "nPeer": 8,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 3.57
+              "source": "history",
+              "nPeer": 25,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1.19
             }
           },
           "Thursday": {
@@ -76313,11 +76316,11 @@
             "signal": {
               "label": "Balanced",
               "code": "in_band",
-              "source": "peer",
-              "nPeer": 8,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 2.86
+              "source": "history",
+              "nPeer": 25,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.89
             }
           },
           "Friday": {
@@ -76597,11 +76600,11 @@
             "signal": {
               "label": "Balanced",
               "code": "in_band",
-              "source": "peer",
-              "nPeer": 8,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 1.25
+              "source": "history",
+              "nPeer": 25,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.77
             }
           },
           "Saturday": {
@@ -76891,13 +76894,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Balanced",
-              "code": "in_band",
-              "source": "peer",
-              "nPeer": 8,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 1.43
+              "label": "Strong performance",
+              "code": "efficient_busy",
+              "source": "history",
+              "nPeer": 25,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.7
             }
           },
           "Sunday": {
@@ -77162,13 +77165,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Likely overstaffed",
-              "code": "overstaffed_slack",
-              "source": "peer",
-              "nPeer": 8,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 3
+              "label": "Balanced",
+              "code": "in_band",
+              "source": "history",
+              "nPeer": 25,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.71
             }
           }
         }
@@ -79826,13 +79829,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Strong performance",
-              "code": "efficient_busy",
-              "source": "peer",
-              "nPeer": 14,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.56
+              "label": "Balanced",
+              "code": "in_band",
+              "source": "history",
+              "nPeer": 28,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1.11
             }
           },
           "Tuesday": {
@@ -80030,11 +80033,11 @@
             "signal": {
               "label": "Balanced",
               "code": "in_band",
-              "source": "peer",
-              "nPeer": 17,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 1.05
+              "source": "history",
+              "nPeer": 36,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.83
             }
           },
           "Wednesday": {
@@ -80279,13 +80282,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Balanced",
-              "code": "in_band",
-              "source": "peer",
-              "nPeer": 18,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 1.11
+              "label": "Likely overstaffed",
+              "code": "overstaffed_slack",
+              "source": "history",
+              "nPeer": 39,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1.25
             }
           },
           "Thursday": {
@@ -80506,11 +80509,11 @@
             "signal": {
               "label": "Balanced",
               "code": "in_band",
-              "source": "peer",
-              "nPeer": 18,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.88
+              "source": "history",
+              "nPeer": 39,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1.07
             }
           },
           "Friday": {
@@ -80787,10 +80790,10 @@
             "signal": {
               "label": "Balanced",
               "code": "in_band",
-              "source": "peer",
-              "nPeer": 18,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
+              "source": "history",
+              "nPeer": 39,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
               "staffingRatio": 1.03
             }
           },
@@ -81087,13 +81090,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Balanced",
-              "code": "in_band",
-              "source": "peer",
-              "nPeer": 18,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 1.07
+              "label": "Operational bottleneck",
+              "code": "process_issue",
+              "source": "history",
+              "nPeer": 39,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 1.15
             }
           },
           "Sunday": {
@@ -81222,10 +81225,10 @@
             "signal": {
               "label": "Strong performance",
               "code": "efficient_busy",
-              "source": "peer",
-              "nPeer": 18,
-              "nHist": 1,
-              "note": "vs RDG peer same-DOW",
+              "source": "history",
+              "nPeer": 39,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
               "staffingRatio": 0.67
             }
           }
@@ -81234,20 +81237,26 @@
       "Expo": {
         "family": "Expo",
         "rosterCount": 0,
-        "weekHeadsUnique": 0,
-        "weekHours": 0,
+        "weekHeadsUnique": 1,
+        "weekHours": 7,
         "weekItemCount": 1009,
         "weekTicketCount": 3748,
-        "weekItemsPerHeadDay": null,
-        "weekItemsPerStaffHour": null,
+        "weekItemsPerHeadDay": 144.1,
+        "weekItemsPerStaffHour": 144.14,
         "weekServiceHours": 69,
         "weekItemsPerServiceHour": 14.62,
         "weekAvgFulSec": 413.6,
         "days": {
           "Monday": {
-            "heads": 0,
-            "hours": 0,
-            "staff": [],
+            "heads": 1,
+            "hours": 1,
+            "staff": [
+              {
+                "label": "(unassigned 1.",
+                "hours": null,
+                "position": "Imputed"
+              }
+            ],
             "headsByHour": {
               "10-11": 0,
               "11-12": 0,
@@ -81289,29 +81298,35 @@
             "volume": 109,
             "volumeSource": "itemQty",
             "itemCount": 109,
-            "itemsPerHead": null,
+            "itemsPerHead": 109,
             "serviceHours": 10,
             "itemsPerServiceHour": 10.9,
-            "itemsPerStaffHour": null,
+            "itemsPerStaffHour": 109,
             "avgFulSec": 443.1,
             "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
+              "eligible": true,
+              "denyReason": null
             },
             "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
+              "label": "Attribution caution",
+              "code": "weak_attribution",
               "source": null,
               "nPeer": 0,
               "nHist": 0,
-              "note": "No staff clocked",
+              "note": "Expo volume/labor attribution is often imperfect",
               "staffingRatio": null
             }
           },
           "Tuesday": {
-            "heads": 0,
-            "hours": 0,
-            "staff": [],
+            "heads": 1,
+            "hours": 1,
+            "staff": [
+              {
+                "label": "(unassigned 1.",
+                "hours": null,
+                "position": "Imputed"
+              }
+            ],
             "headsByHour": {
               "10-11": 0,
               "11-12": 0,
@@ -81353,29 +81368,35 @@
             "volume": 95,
             "volumeSource": "itemQty",
             "itemCount": 95,
-            "itemsPerHead": null,
+            "itemsPerHead": 95,
             "serviceHours": 11,
             "itemsPerServiceHour": 8.64,
-            "itemsPerStaffHour": null,
+            "itemsPerStaffHour": 95,
             "avgFulSec": 435.8,
             "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
+              "eligible": true,
+              "denyReason": null
             },
             "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
+              "label": "Attribution caution",
+              "code": "weak_attribution",
               "source": null,
               "nPeer": 0,
               "nHist": 0,
-              "note": "No staff clocked",
+              "note": "Expo volume/labor attribution is often imperfect",
               "staffingRatio": null
             }
           },
           "Wednesday": {
-            "heads": 0,
-            "hours": 0,
-            "staff": [],
+            "heads": 1,
+            "hours": 1,
+            "staff": [
+              {
+                "label": "(unassigned 1.",
+                "hours": null,
+                "position": "Imputed"
+              }
+            ],
             "headsByHour": {
               "10-11": 0,
               "11-12": 0,
@@ -81417,29 +81438,35 @@
             "volume": 101,
             "volumeSource": "itemQty",
             "itemCount": 101,
-            "itemsPerHead": null,
+            "itemsPerHead": 101,
             "serviceHours": 10,
             "itemsPerServiceHour": 10.1,
-            "itemsPerStaffHour": null,
+            "itemsPerStaffHour": 101,
             "avgFulSec": 387.4,
             "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
+              "eligible": true,
+              "denyReason": null
             },
             "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
+              "label": "Attribution caution",
+              "code": "weak_attribution",
               "source": null,
               "nPeer": 0,
               "nHist": 0,
-              "note": "No staff clocked",
+              "note": "Expo volume/labor attribution is often imperfect",
               "staffingRatio": null
             }
           },
           "Thursday": {
-            "heads": 0,
-            "hours": 0,
-            "staff": [],
+            "heads": 1,
+            "hours": 1,
+            "staff": [
+              {
+                "label": "(unassigned 1.",
+                "hours": null,
+                "position": "Imputed"
+              }
+            ],
             "headsByHour": {
               "10-11": 0,
               "11-12": 0,
@@ -81481,29 +81508,35 @@
             "volume": 144,
             "volumeSource": "itemQty",
             "itemCount": 144,
-            "itemsPerHead": null,
+            "itemsPerHead": 144,
             "serviceHours": 11,
             "itemsPerServiceHour": 13.09,
-            "itemsPerStaffHour": null,
+            "itemsPerStaffHour": 144,
             "avgFulSec": 387.6,
             "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
+              "eligible": true,
+              "denyReason": null
             },
             "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
+              "label": "Attribution caution",
+              "code": "weak_attribution",
               "source": null,
               "nPeer": 0,
               "nHist": 0,
-              "note": "No staff clocked",
+              "note": "Expo volume/labor attribution is often imperfect",
               "staffingRatio": null
             }
           },
           "Friday": {
-            "heads": 0,
-            "hours": 0,
-            "staff": [],
+            "heads": 1,
+            "hours": 1,
+            "staff": [
+              {
+                "label": "(unassigned 1.",
+                "hours": null,
+                "position": "Imputed"
+              }
+            ],
             "headsByHour": {
               "10-11": 0,
               "11-12": 0,
@@ -81545,29 +81578,35 @@
             "volume": 197,
             "volumeSource": "itemQty",
             "itemCount": 197,
-            "itemsPerHead": null,
+            "itemsPerHead": 197,
             "serviceHours": 11,
             "itemsPerServiceHour": 17.91,
-            "itemsPerStaffHour": null,
+            "itemsPerStaffHour": 197,
             "avgFulSec": 376.9,
             "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
+              "eligible": true,
+              "denyReason": null
             },
             "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
+              "label": "Attribution caution",
+              "code": "weak_attribution",
               "source": null,
               "nPeer": 0,
               "nHist": 0,
-              "note": "No staff clocked",
+              "note": "Expo volume/labor attribution is often imperfect",
               "staffingRatio": null
             }
           },
           "Saturday": {
-            "heads": 0,
-            "hours": 0,
-            "staff": [],
+            "heads": 1,
+            "hours": 1,
+            "staff": [
+              {
+                "label": "(unassigned 1.",
+                "hours": null,
+                "position": "Imputed"
+              }
+            ],
             "headsByHour": {
               "10-11": 0,
               "11-12": 0,
@@ -81609,29 +81648,35 @@
             "volume": 218,
             "volumeSource": "itemQty",
             "itemCount": 218,
-            "itemsPerHead": null,
+            "itemsPerHead": 218,
             "serviceHours": 8,
             "itemsPerServiceHour": 27.25,
-            "itemsPerStaffHour": null,
+            "itemsPerStaffHour": 218,
             "avgFulSec": 451.3,
             "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
+              "eligible": true,
+              "denyReason": null
             },
             "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
+              "label": "Attribution caution",
+              "code": "weak_attribution",
               "source": null,
               "nPeer": 0,
               "nHist": 0,
-              "note": "No staff clocked",
+              "note": "Expo volume/labor attribution is often imperfect",
               "staffingRatio": null
             }
           },
           "Sunday": {
-            "heads": 0,
-            "hours": 0,
-            "staff": [],
+            "heads": 1,
+            "hours": 1,
+            "staff": [
+              {
+                "label": "(unassigned 1.",
+                "hours": null,
+                "position": "Imputed"
+              }
+            ],
             "headsByHour": {
               "10-11": 0,
               "11-12": 0,
@@ -81673,22 +81718,22 @@
             "volume": 145,
             "volumeSource": "itemQty",
             "itemCount": 145,
-            "itemsPerHead": null,
+            "itemsPerHead": 145,
             "serviceHours": 8,
             "itemsPerServiceHour": 18.13,
-            "itemsPerStaffHour": null,
+            "itemsPerStaffHour": 145,
             "avgFulSec": 418.5,
             "qc": {
-              "eligible": false,
-              "denyReason": "No staff"
+              "eligible": true,
+              "denyReason": null
             },
             "signal": {
-              "label": "—",
-              "code": "closed_or_empty",
+              "label": "Attribution caution",
+              "code": "weak_attribution",
               "source": null,
               "nPeer": 0,
               "nHist": 0,
-              "note": "No staff clocked",
+              "note": "Expo volume/labor attribution is often imperfect",
               "staffingRatio": null
             }
           }
@@ -81696,6 +81741,74 @@
       }
     },
     "players": [
+      {
+        "label": "(unassigned 1.",
+        "position": "Imputed",
+        "families": [
+          "Expo"
+        ],
+        "weekHours": 0,
+        "weekItems": 1009,
+        "weekItemsPerHour": null,
+        "days": {
+          "Monday": {
+            "hours": 0,
+            "items": 109,
+            "itemsPerHour": null,
+            "families": [
+              "Expo"
+            ]
+          },
+          "Tuesday": {
+            "hours": 0,
+            "items": 95,
+            "itemsPerHour": null,
+            "families": [
+              "Expo"
+            ]
+          },
+          "Wednesday": {
+            "hours": 0,
+            "items": 101,
+            "itemsPerHour": null,
+            "families": [
+              "Expo"
+            ]
+          },
+          "Thursday": {
+            "hours": 0,
+            "items": 144,
+            "itemsPerHour": null,
+            "families": [
+              "Expo"
+            ]
+          },
+          "Friday": {
+            "hours": 0,
+            "items": 197,
+            "itemsPerHour": null,
+            "families": [
+              "Expo"
+            ]
+          },
+          "Saturday": {
+            "hours": 0,
+            "items": 218,
+            "itemsPerHour": null,
+            "families": [
+              "Expo"
+            ]
+          },
+          "Sunday": {
+            "hours": 0,
+            "items": 145,
+            "itemsPerHour": null,
+            "families": [
+              "Expo"
+            ]
+          }
+        }
+      },
       {
         "label": "Terrin P.",
         "position": "Robata",

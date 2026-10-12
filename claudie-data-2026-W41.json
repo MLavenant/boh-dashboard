@@ -62216,7 +62216,7 @@
   "staffing": {
     "venue": "claudie",
     "weekLabel": "2026-W41",
-    "builtAt": "2026-10-12T16:34:03.332Z",
+    "builtAt": "2026-10-12T17:19:08.682Z",
     "matchStats": {
       "laborShiftsMatched": 159,
       "laborShiftsUnmatched": 335,
@@ -62226,7 +62226,10 @@
       "bohLaborShiftsUnmatched": 3,
       "bohMatchRate": 0.981,
       "rosterCoverage": 1,
-      "noStationPeopleCount": 2
+      "noStationPeopleCount": 2,
+      "excludedEarlyWeekdayClockIns": 0,
+      "excludedEarlyWeekdayHours": 0,
+      "earlyClockInExcludeRule": "Claudie: keep all punches (no Mon–Fri 5–10am filter)"
     },
     "guestsSeated": {
       "total": 0,

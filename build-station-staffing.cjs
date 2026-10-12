@@ -23,8 +23,12 @@ const {
 
 const ROOT = process.env.BOH_ROOT || __dirname;
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const WEEKDAYS = new Set(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
 const MIN_HOURS = 0.25;
 const FOOD_SET = new Set(FOOD_FAMILIES);
+/** Non-Claudie: drop Mon–Fri punches whose clock-in is 5:00–9:59 (prep before service). */
+const EARLY_CLOCKIN_EXCLUDE_START = 5;
+const EARLY_CLOCKIN_EXCLUDE_END = 10; // exclusive
 // Expo/Prep/Fry qty↔labor joins are often imperfect — label caution, do not invent volumes
 const WEAK_ATTR_FAMILIES = new Set(['Expo', 'Prep', 'Fry']);
 
@@ -41,6 +45,26 @@ const GUARDS = {
 
 function loadJson(p) {
   return JSON.parse(fs.readFileSync(p, 'utf8'));
+}
+
+/** Atomic-ish write (temp + rename/copy) to avoid Windows UNKNOWN open on large JSON. */
+function writeJsonAtomic(filePath, obj) {
+  const dir = path.dirname(filePath);
+  fs.mkdirSync(dir, { recursive: true });
+  const tmp = path.join(dir, `.${path.basename(filePath)}.${process.pid}.${Date.now()}.tmp`);
+  const body = JSON.stringify(obj, null, 2);
+  fs.writeFileSync(tmp, body);
+  try {
+    fs.renameSync(tmp, filePath);
+  } catch (err) {
+    try {
+      fs.copyFileSync(tmp, filePath);
+      fs.unlinkSync(tmp);
+    } catch (err2) {
+      try { fs.unlinkSync(tmp); } catch (_) { /* ignore */ }
+      throw err2;
+    }
+  }
 }
 
 function stripDiacritics(s) {
@@ -120,6 +144,33 @@ function parseLaborInstant(s) {
   const normalized = str.replace(/([+-]\d{2})(\d{2})$/, '$1:$2');
   const d = new Date(normalized);
   return Number.isNaN(d.getTime()) ? null : d;
+}
+
+/** Clock-in hour in America/New_York. Naive ISO (Harri) is already local wall time. */
+function clockInHourNy(inDate) {
+  if (!inDate) return null;
+  const str = String(inDate).trim();
+  if (!str) return null;
+  const naive = str.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+  if (naive && !/[zZ]|[+-]\d{2}:?\d{2}$/.test(str)) {
+    return parseInt(naive[4], 10);
+  }
+  const d = parseLaborInstant(str);
+  if (!d) return null;
+  return nyParts(d).h;
+}
+
+/**
+ * Exclude Mon–Fri prep clock-ins (5am–10am) from staffing totals for every
+ * location except Claudie (Claudie keeps all punches).
+ */
+function shouldExcludeEarlyWeekdayClockIn(venue, entry) {
+  if (!entry) return false;
+  if (String(venue) === 'claudie') return false;
+  if (!WEEKDAYS.has(entry.day)) return false;
+  const h = clockInHourNy(entry.inDate);
+  if (h == null) return false;
+  return h >= EARLY_CLOCKIN_EXCLUDE_START && h < EARLY_CLOCKIN_EXCLUDE_END;
 }
 
 function nyParts(date) {
@@ -559,8 +610,15 @@ function buildVenue(venueRaw, weekLabel) {
   }));
 
   const laborByEmpDay = new Map();
+  let excludedEarlyWeekdayClockIns = 0;
+  let excludedEarlyWeekdayHours = 0;
   for (const e of laborFile.entries || []) {
     if ((e.hours || 0) < MIN_HOURS) continue;
+    if (shouldExcludeEarlyWeekdayClockIn(venue, e)) {
+      excludedEarlyWeekdayClockIns += 1;
+      excludedEarlyWeekdayHours += e.hours || 0;
+      continue;
+    }
     const id = e.employeeGuid || e.employeeName || e.payrollName;
     const k = `${id}|${e.date}`;
     if (!laborByEmpDay.has(k)) {
@@ -895,6 +953,12 @@ function buildVenue(venueRaw, weekLabel) {
       bohMatchRate: +bohMatchRate.toFixed(3),
       rosterCoverage: +rosterCoverage.toFixed(3),
       noStationPeopleCount: noStationPeople.length,
+      excludedEarlyWeekdayClockIns,
+      excludedEarlyWeekdayHours: +excludedEarlyWeekdayHours.toFixed(2),
+      earlyClockInExcludeRule:
+        venue === 'claudie'
+          ? 'Claudie: keep all punches (no Mon–Fri 5–10am filter)'
+          : 'Non-Claudie: exclude Mon–Fri punches with clock-in 5:00–9:59 ET',
     },
     guestsSeated: venueData.guestsSeated || null,
     toastStationFamily,
@@ -978,7 +1042,7 @@ function buildVenue(venueRaw, weekLabel) {
     noStationPeople,
     foodFamiliesOnly: true,
   };
-  fs.writeFileSync(venueDataPath, JSON.stringify(venueData, null, 2));
+  writeJsonAtomic(venueDataPath, venueData);
 
   // Also refresh plain {venue}-data.json if present
   const plainPath = path.join(ROOT, `${venue}-data.json`);
@@ -988,14 +1052,14 @@ function buildVenue(venueRaw, weekLabel) {
       plain.staffing = venueData.staffing;
       if (venueData.guestsSeated) plain.guestsSeated = venueData.guestsSeated;
       if (venueData.stationDayVolume) plain.stationDayVolume = venueData.stationDayVolume;
-      fs.writeFileSync(plainPath, JSON.stringify(plain, null, 2));
+      writeJsonAtomic(plainPath, plain);
     } catch (_) { /* optional */ }
   }
 
   const outDir = path.join(ROOT, 'data', weekLabel);
   fs.mkdirSync(outDir, { recursive: true });
   const outPath = path.join(outDir, `staffing-${venue}.json`);
-  fs.writeFileSync(outPath, JSON.stringify(staffing, null, 2));
+  writeJsonAtomic(outPath, staffing);
 
   console.log(`Wrote ${outPath}`);
   console.log(`Updated ${venueDataPath}`);
