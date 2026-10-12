@@ -254,10 +254,15 @@ let html = htmlPart
     sidebarShellHtml
   );
 
-// Stations tab: one clean table (DA-style) + station filter
-html = html.replace(
-  /<div class="section-title">Station Selector<\/div>\r?\n<div class="station-pills" id="stationPills"><\/div>[\s\S]*?<div class="station-detail" id="stationDetail">[\s\S]*?<\/div>(\r?\n\r?\n<div class="section-title"[^>]*>All Stations)/,
-  `<div class="section-title">Stations</div>
+// Stations tab: portfolio compare chart + hour×day×location table (station filter)
+{
+  const stationsTabRe = /<div class="section-title">Station Selector<\/div>\r?\n<div class="station-pills" id="stationPills"><\/div>[\s\S]*?<div class="section-title"[^>]*>All Stations — Performance Chart<\/div>\r?\n<div class="card">[\s\S]*?<\/div>(\r?\n<div class="coming-note">[\s\S]*?<\/div>)?/;
+  if (!stationsTabRe.test(html)) {
+    console.warn('WARN: Stations tab block not found for DA board replace');
+  } else {
+    html = html.replace(
+      stationsTabRe,
+      `<div class="section-title">Stations</div>
 <div class="card stations-da-card" id="itemsPerStaffCard" style="margin:0 0 18px">
   <div class="stations-da-head">
     <div>
@@ -266,11 +271,14 @@ html = html.replace(
     </div>
     <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf()" class="stations-da-pdf" style="display:none">Export PDF</button>
   </div>
+  <div id="stationsCompareChartWrap" style="display:none;height:380px;margin:0 0 18px;position:relative">
+    <canvas id="cPortfolioStations"></canvas>
+  </div>
   <div id="stationsDaFilters" class="stations-da-filters">
     <div class="stations-da-filter-label">Stations</div>
     <div id="stationsFamilyChips" class="stations-da-chips"></div>
     <div class="stations-da-chip-actions">
-      <span class="note" style="margin:0;font-size:12px">Pick one station family</span>
+      <span class="note" style="margin:0;font-size:12px">Pick one station family for the hour × day table</span>
     </div>
   </div>
   <div id="stationsDaMetricBar" class="stations-da-metrics" style="display:none">
@@ -299,13 +307,15 @@ html = html.replace(
   </div>
 </div>
 <div class="card" id="portfolioStationsPanel" style="display:none">
-  <canvas id="cPortfolioStations" style="display:none"></canvas>
   <div id="portfolioStationsDayTable" style="display:none"></div>
 </div>
+<canvas id="cStations" style="display:none"></canvas>
 <div id="stationKpiBar" style="display:none"></div>
 <div class="station-pills" id="stationPills" style="display:none"></div>
-<div class="station-detail" id="stationDetail" style="display:none"></div>$1`
-);
+<div class="station-detail" id="stationDetail" style="display:none"></div>`
+    );
+  }
+}
 
 // Top tab bar moved into left sidebar (Data Analysis + Admin)
 {
@@ -327,42 +337,32 @@ html = html.replace(
 }
 
 // Remove Visual 3 (Load vs Performance) — Breaking Point only on overview
-html = html.replace(
-  `<!-- Visual 2+3 -->
-<div class="row two">
-  <div class="card">
-    <h2>Visual 2 — Breaking Point</h2>
-    <p class="note">Avg fulfillment vs how many <strong>production station tickets</strong> are open at once (Saute, Pastry, Fry… each count while unfulfilled; Expo excluded).</p>
-    <div class="row two" style="margin-bottom:12px;gap:8px">
-      <div class="bpbox"><div class="big">26</div><div class="l">tickets → kitchen falls behind</div></div>
-      <div class="bpbox"><div class="big">141</div><div class="l">guests → kitchen falls behind</div></div>
-    </div>
-    <canvas id="cBreaking" style="max-height:260px"></canvas>
-    <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
-  </div>
-  <div class="card">
-    <h2>Visual 3 — Load vs Performance</h2>
-    <p class="note">Bucketed view (10-ticket steps): avg fulfillment time per band. <span style="color:#9aa0aa;font-size:11px">Buckets group all concurrent ticket counts in that range.</span></p>
-    <canvas id="cLoadPerf" style="max-height:260px"></canvas>
-    <div class="legend">
-      <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
-      <span><span class="sw" style="background:#e2706a"></span>15-min target</span>
-    </div>
-    <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
-  </div>
-</div>`,
-  `<!-- Visual 2 -->
+{
+  const v23Re = /<!-- Visual 2\+3 -->\r?\n<div class="row two">[\s\S]*?<h2>Visual 3 — Load vs Performance<\/h2>[\s\S]*?<\/div>\r?\n<\/div>/;
+  if (!v23Re.test(html)) {
+    console.warn('WARN: Visual 2+3 block not found — Visual 3 may remain');
+  } else {
+    html = html.replace(
+      v23Re,
+      `<!-- Visual 2 -->
 <div class="card">
   <h2>Visual 2 — Breaking Point</h2>
-    <p class="note">Avg fulfillment vs how many <strong>production station tickets</strong> are open at once (Saute, Pastry, Fry… each count while unfulfilled; Expo excluded).</p>
+  <p class="note">Avg fulfillment vs how many <strong>production station tickets</strong> are open at once (Saute, Pastry, Fry… each count while unfulfilled; Expo excluded).</p>
   <div class="row two" style="margin-bottom:12px;gap:8px">
-    <div class="bpbox"><div class="big">26</div><div class="l">tickets → kitchen falls behind</div></div>
-    <div class="bpbox"><div class="big">141</div><div class="l">guests → kitchen falls behind</div></div>
+    <div class="bpbox"><div class="big" id="kpiBP1">26</div><div class="l">tickets → kitchen falls behind</div></div>
+    <div class="bpbox"><div class="big" id="kpiBP2">141</div><div class="l">guests → kitchen falls behind</div></div>
   </div>
-  <canvas id="cBreaking" style="max-height:260px"></canvas>
-  <div><span class="trend-badge">📊 Trend vs prior 3 weeks: available from Jul 14</span></div>
+  <canvas id="cBreaking" style="max-height:320px"></canvas>
+  <div class="legend">
+    <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment (min)</span>
+    <span><span class="sw" style="background:#5aa9e6"></span>Avg guests seated</span>
+    <span><span class="sw" style="background:#e2706a"></span>15-min / breaking point</span>
+  </div>
+  <div><span class="trend-badge">Trend vs prior 3 weeks: available from Jul 14</span></div>
 </div>`
-);
+    );
+  }
+}
 
 // Add Stations Recap + Visual 4 (WoW heatmap) after Visual 2+3 row
 html = html.replace(
@@ -772,6 +772,19 @@ body.theme-daylight .stations-da-table tr.total td{background:#f3ebe0;color:#3f2
 body.theme-daylight .section-title{color:#2c241c}
 body.theme-daylight footer{color:#7a6a58}
 body.theme-daylight .sidebar-theme{border-top-color:#ddd2c0}
+body.theme-daylight .bpbox{background:#f7f1e7;border:1px solid #e2d6c4;border-radius:12px;padding:14px 16px}
+body.theme-daylight .bpbox .big{color:#b45309}
+body.theme-daylight .bpbox .l{color:#7a6a58}
+body.theme-daylight .trend-badge{background:#f7f1e7;border:1px solid #e2d6c4;color:#7a6a58}
+body.theme-daylight .legend{color:#7a6a58}
+body.theme-daylight #pageSummary{color:#7a6a58!important}
+body.theme-daylight .stations-compare-note{color:#7a6a58}
+body.theme-daylight .ps-screen-compare h2{color:#2c241c;font-size:18px;margin:0 0 6px}
+body.theme-daylight .ps-screen-compare .ps-sub{color:#7a6a58;font-size:12px;margin:0 0 12px}
+body.theme-daylight .ps-screen-compare table{width:100%;border-collapse:collapse;font-size:12px;min-width:920px}
+body.theme-daylight .ps-screen-compare th{background:#efe8dc;color:#7a6a58;border-bottom:1px solid #e2d6c4;padding:6px 4px;font-weight:700}
+body.theme-daylight .ps-screen-compare td{border-bottom:1px solid #efe6d8;padding:5px 3px;text-align:center;font-weight:700}
+body.theme-daylight .ps-screen-compare td:first-child{text-align:left;color:#7a6a58;background:#fffdf8;position:sticky;left:0;z-index:1}
 /* Venue pills */
 .venue-pill{padding:5px 14px;border:1px solid #2d3448;background:#1e2533;color:#9aa0aa;border-radius:20px;cursor:pointer;font-size:13px;font-family:inherit;transition:all .15s}
 .venue-pill:hover{border-color:#d9a441;color:#e8eaed}
@@ -1789,7 +1802,30 @@ function getThreshold() { return 15; }
 const THRESHOLD = 15;
 const gc = '#262a33';
 function chartGridColor() {
-  return (typeof isDaylightTheme === 'function' && isDaylightTheme()) ? '#e2d6c4' : gc;
+  return (typeof isDaylightTheme === 'function' && isDaylightTheme()) ? 'rgba(226,214,196,0.55)' : 'rgba(38,42,51,0.45)';
+}
+/** Prefer no vertical grid (dense category charts); light horizontal only. */
+function chartScalesNoVerticalGrid(extraX, extraY, extraY1) {
+  const g = chartGridColor();
+  const tick = (typeof isDaylightTheme === 'function' && isDaylightTheme()) ? '#7a6a58' : '#9aa0aa';
+  function mergeAxis(base, extra) {
+    const e = extra || {};
+    const out = Object.assign({}, base, e);
+    out.grid = Object.assign({}, base.grid || {}, e.grid || {});
+    out.ticks = Object.assign({}, base.ticks || {}, e.ticks || {});
+    if (e.title || base.title) {
+      out.title = Object.assign({}, base.title || {}, e.title || {});
+      if (out.title.display && !out.title.color) out.title.color = tick;
+    }
+    if (!out.ticks.color) out.ticks.color = tick;
+    return out;
+  }
+  const out = {
+    x: mergeAxis({ grid: { display: false }, ticks: { color: tick } }, extraX),
+    y: mergeAxis({ grid: { color: g, drawBorder: false }, ticks: { color: tick } }, extraY),
+  };
+  if (extraY1) out.y1 = mergeAxis({ grid: { display: false }, ticks: { color: tick } }, extraY1);
+  return out;
 }
 
 const HM_HRS = ["11-12","12-13","13-14","14-15","15-16","16-17","17-18","18-19","19-20","20-21","21-22","22-23","23-24","0-1"];
@@ -1977,14 +2013,21 @@ function renderPressure() {
   };
   const existing = Chart.getChart('cPressure');
   if (existing) existing.destroy();
-  const gridC = chartGridColor();
   const dayTheme = typeof isDaylightTheme === 'function' && isDaylightTheme();
   new Chart(document.getElementById('cPressure'),{
     data:{labels,datasets:[
       {type:'bar',label:'Occurrences',data:CURVE.map(d=>d.occ),backgroundColor:labels.map(l=>BP!=null&&l>=BP?'rgba(196,75,63,0.65)':'rgba(74,159,255,0.55)'),borderColor:labels.map(l=>BP!=null&&l>=BP?'#c44b3f':'#4a9eff'),borderWidth:1,yAxisID:'y',order:2,borderRadius:2},
       {type:'line',label:'Avg fulfillment (min)',data:CURVE.map(d=>d.ful),borderColor: dayTheme ? '#b8860b' : '#d9a441',backgroundColor:'rgba(217,164,65,0.0)',tension:0.3,pointRadius:2,pointHoverRadius:5,borderWidth:2.5,yAxisID:'y1',order:1}
     ]},
-    options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent production tickets open'},grid:{color:gridC}},y:{position:'left',title:{display:true,text:'Occurrences'},grid:{color:gridC},min:0},y1:{position:'right',title:{display:true,text:'Fulfillment time (min)'},grid:{display:false},min:0,suggestedMax:24}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
+    options:{
+      interaction:{mode:'index',intersect:false},
+      scales: chartScalesNoVerticalGrid(
+        { title: { display: true, text: 'Concurrent production tickets open' } },
+        { position: 'left', title: { display: true, text: 'Occurrences' }, min: 0 },
+        { position: 'right', title: { display: true, text: 'Fulfillment time (min)' }, min: 0, suggestedMax: 24 }
+      ),
+      plugins:{legend:{position:'top',labels:{boxWidth:12}}},
+    },
     plugins:[bpPlugin]
   });
   const dayLabel = pressureDay === 'Total' ? 'all days' : pressureDay;
@@ -2085,11 +2128,11 @@ function renderHourProfile() {
     },
     options: {
       interaction: { mode: 'index', intersect: false },
-      scales: {
-        x: { title: { display: true, text: 'Hour of day (10am → 4am)' }, grid: { color: gc } },
-        y: { position: 'left', title: { display: true, text: 'Avg occurrences / day' }, grid: { color: gc }, min: 0 },
-        y1: { position: 'right', title: { display: true, text: 'Fulfillment time (min)' }, grid: { display: false }, min: 0, suggestedMax: 24 },
-      },
+      scales: chartScalesNoVerticalGrid(
+        { title: { display: true, text: 'Hour of day (10am → 4am)' } },
+        { position: 'left', title: { display: true, text: 'Avg occurrences / day' }, min: 0 },
+        { position: 'right', title: { display: true, text: 'Fulfillment time (min)' }, min: 0, suggestedMax: 24 }
+      ),
       plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
     },
     plugins: [thrPlugin],
@@ -2146,10 +2189,14 @@ function renderServiceBreakTimeline() {
   }
 
   if (pillsEl) {
+    const dayTheme = typeof isDaylightTheme === 'function' && isDaylightTheme();
     pillsEl.innerHTML = days.map(d => {
       const broken = byDay[d].brokenMinutes || 0;
       const active = d === _serviceBreakDay;
-      return '<button type="button" data-day="'+d+'" style="padding:5px 12px;border-radius:16px;cursor:pointer;font-size:12px;font-family:inherit;border:1px solid '+(active?'#d9a441':'#2d3448')+';background:'+(active?'#262a33':'#1e2533')+';color:'+(active?'#e8eaed':'#9aa0aa')+'">'+d.slice(0,3)+(broken?' · '+broken+'m':'')+'</button>';
+      const border = active ? (dayTheme ? '#3f2a1d' : '#d9a441') : (dayTheme ? '#d9cbb6' : '#2d3448');
+      const bg = active ? (dayTheme ? '#3f2a1d' : '#262a33') : (dayTheme ? '#fff' : '#1e2533');
+      const fg = active ? (dayTheme ? '#f7f1e7' : '#e8eaed') : (dayTheme ? '#6b5b4b' : '#9aa0aa');
+      return '<button type="button" data-day="'+d+'" style="padding:5px 12px;border-radius:16px;cursor:pointer;font-size:12px;font-family:inherit;border:1px solid '+border+';background:'+bg+';color:'+fg+'">'+d.slice(0,3)+(broken?' · '+broken+'m':'')+'</button>';
     }).join('');
     pillsEl.querySelectorAll('button').forEach(btn => {
       btn.onclick = () => { _serviceBreakDay = btn.dataset.day; renderServiceBreakTimeline(); };
@@ -2231,10 +2278,9 @@ function renderServiceBreakTimeline() {
     },
     options: {
       interaction: { mode: 'index', intersect: false },
-      scales: {
-        x: {
+      scales: chartScalesNoVerticalGrid(
+        {
           title: { display: true, text: 'Time of day (1-min)' },
-          grid: { color: gc },
           ticks: {
             maxRotation: 0,
             autoSkip: false,
@@ -2244,9 +2290,9 @@ function renderServiceBreakTimeline() {
             },
           },
         },
-        y: { position: 'left', title: { display: true, text: 'Concurrent tickets open' }, grid: { color: gc }, min: 0 },
-        y1: { position: 'right', title: { display: true, text: 'Avg fulfillment (min)' }, grid: { display: false }, min: 0, suggestedMax: Math.max(22, thr + 4) },
-      },
+        { position: 'left', title: { display: true, text: 'Concurrent tickets open' }, min: 0 },
+        { position: 'right', title: { display: true, text: 'Avg fulfillment (min)' }, min: 0, suggestedMax: Math.max(22, thr + 4) }
+      ),
       plugins: {
         legend: { position: 'top', labels: { boxWidth: 12 } },
         tooltip: {
@@ -2305,7 +2351,15 @@ function renderBreaking() {
       {type:'line',label:'Avg fulfillment (min)',data:CURVE.map(d=>d.ful),borderColor:'#d9a441',backgroundColor:'rgba(217,164,65,0.12)',fill:true,tension:0.3,pointRadius:0,yAxisID:'y',order:1},
       {type:'line',label:'Avg guests seated',data:CURVE.map(d=>d.guests),borderColor:'#5aa9e6',backgroundColor:'rgba(90,169,230,0.08)',fill:true,tension:0.3,pointRadius:0,yAxisID:'y1',order:2}
     ]},
-    options:{interaction:{mode:'index',intersect:false},scales:{x:{title:{display:true,text:'Concurrent tickets open'},grid:{color:gc}},y:{position:'left',title:{display:true,text:'Avg fulfillment (min)'},grid:{color:gc},suggestedMax:22},y1:{position:'right',title:{display:true,text:'Avg guests seated'},grid:{display:false},suggestedMax:200}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}},
+    options:{
+      interaction:{mode:'index',intersect:false},
+      scales: chartScalesNoVerticalGrid(
+        { title: { display: true, text: 'Concurrent tickets open' } },
+        { position: 'left', title: { display: true, text: 'Avg fulfillment (min)' }, suggestedMax: 22 },
+        { position: 'right', title: { display: true, text: 'Avg guests seated' }, suggestedMax: 200 }
+      ),
+      plugins:{legend:{position:'top',labels:{boxWidth:12}}},
+    },
     plugins:[refLines]
   });
 }
@@ -2650,12 +2704,156 @@ function stationsHourHeatTable(title, grid, band, days, clickMode) {
   t += '</tbody></table></div>';
   return t;
 }
+function renderStationsCompareChart(weekKey) {
+  const wrap = document.getElementById('stationsCompareChartWrap');
+  const canvas = document.getElementById('cPortfolioStations');
+  if (!wrap || !canvas || typeof Chart === 'undefined') return;
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
+  const families = PORTFOLIO_STATION_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
+  const existing = Chart.getChart('cPortfolioStations');
+  if (existing) existing.destroy();
+  if (!families.length) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = '';
+  const day = typeof isDaylightTheme === 'function' && isDaylightTheme();
+  const tick = day ? '#7a6a58' : '#9aa0aa';
+  const labelColor = day ? '#2c241c' : '#e8eaed';
+  const bandEven = day ? 'rgba(243,235,224,0.85)' : 'rgba(30, 37, 51, 0.55)';
+  const bandOdd = day ? 'rgba(255,253,248,0.35)' : 'rgba(19, 22, 28, 0.35)';
+  const bandLine = day ? 'rgba(217, 164, 65, 0.28)' : 'rgba(217, 164, 65, 0.22)';
+  const valueFill = day ? '#2c241c' : '#f3f4f6';
+  const valueStroke = day ? 'rgba(255,253,248,0.9)' : 'rgba(13,17,23,0.85)';
+
+  const familyBandPlugin = {
+    id: 'portfolioFamilyBands',
+    beforeDraw(chart) {
+      const xAxis = chart.scales.x;
+      const area = chart.chartArea;
+      if (!xAxis || !area) return;
+      const ctx = chart.ctx;
+      const n = families.length;
+      for (let i = 0; i < n; i++) {
+        const x = xAxis.getPixelForTick(i);
+        const left = i === 0 ? area.left : (xAxis.getPixelForTick(i - 1) + x) / 2;
+        const right = i === n - 1 ? area.right : (x + xAxis.getPixelForTick(i + 1)) / 2;
+        ctx.save();
+        ctx.fillStyle = i % 2 === 0 ? bandEven : bandOdd;
+        ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+        if (i > 0) {
+          ctx.strokeStyle = bandLine;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(left, area.top);
+          ctx.lineTo(left, area.bottom);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    },
+  };
+  const barValueLabelsPlugin = {
+    id: 'portfolioBarValueLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      chart.data.datasets.forEach((ds, di) => {
+        const meta = chart.getDatasetMeta(di);
+        if (!meta || meta.hidden) return;
+        meta.data.forEach((el, i) => {
+          const raw = ds.data[i];
+          if (raw == null || !(Number(raw) > 0)) return;
+          const props = el.getProps(['x', 'y'], true);
+          const label = String(Math.round(Number(raw)));
+          ctx.save();
+          ctx.font = '700 9px ui-sans-serif, system-ui, sans-serif';
+          ctx.fillStyle = valueFill;
+          ctx.strokeStyle = valueStroke;
+          ctx.lineWidth = 3;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.strokeText(label, props.x, props.y - 2);
+          ctx.fillText(label, props.x, props.y - 2);
+          ctx.restore();
+        });
+      });
+    },
+  };
+  const ipshBars = venueRows.map(v => ({
+    type: 'bar',
+    label: (v.label || v.key),
+    data: families.map(f => {
+      const st = v.familyStats[f] || {};
+      const vIpsh = st.ipsh != null ? Number(st.ipsh) : (st.iph != null ? Number(st.iph) : null);
+      return (vIpsh != null && vIpsh > 0) ? vIpsh : null;
+    }),
+    backgroundColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
+    borderColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
+    borderWidth: 0,
+    borderRadius: 3,
+    yAxisID: 'y',
+    barPercentage: 0.85,
+    categoryPercentage: 0.62,
+    order: 1,
+    skipNull: true,
+  }));
+  new Chart(canvas, {
+    data: { labels: families, datasets: ipshBars },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      layout: { padding: { top: 22, bottom: 4 } },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 12, boxHeight: 10, font: { size: 11 }, padding: 12, color: tick },
+        },
+        tooltip: {
+          filter(item) {
+            const v = item.parsed && item.parsed.y;
+            return v != null && Number(v) > 0;
+          },
+          callbacks: {
+            title(items) { return items[0] ? String(items[0].label) : ''; },
+            label(ctx) {
+              const v = ctx.parsed.y;
+              if (v == null || !(Number(v) > 0)) return null;
+              return ctx.dataset.label + ': ' + Math.round(Number(v)) + ' items/staff-hr';
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          stacked: false,
+          offset: true,
+          ticks: { maxRotation: 0, minRotation: 0, autoSkip: false, font: { size: 15, weight: '700' }, color: labelColor, padding: 10 },
+          grid: { display: false },
+        },
+        y: {
+          type: 'linear',
+          position: 'left',
+          title: { display: true, text: 'Items / staff-hour', font: { size: 12, weight: '600' }, color: '#d9a441' },
+          grid: { color: chartGridColor(), drawBorder: false },
+          beginAtZero: true,
+          ticks: { font: { size: 11 }, color: tick },
+          grace: '8%',
+        },
+      },
+    },
+    plugins: [familyBandPlugin, barValueLabelsPlugin],
+  });
+}
+
 function renderStationsBoard() {
   const card = document.getElementById('itemsPerStaffCard');
   const tableEl = document.getElementById('stationsDaTable');
   const metricBar = document.getElementById('stationsDaMetricBar');
   const pdfBtn = document.getElementById('portfolioStationsPdfBtn');
   const port = document.getElementById('portfolioStationsPanel');
+  const chartWrap = document.getElementById('stationsCompareChartWrap');
   const ovCard = document.getElementById('overviewStaffingCard');
   if (ovCard) ovCard.style.display = 'none';
   if (port) port.style.display = 'none';
@@ -2674,68 +2872,34 @@ function renderStationsBoard() {
   }
 
   if (kicker) kicker.textContent = weekLabel + ' · ' + (portfolio ? 'All locations' : venueLabel);
-  if (title) title.textContent = portfolio ? 'Station benchmark' : 'Stations';
-  if (metricBar) metricBar.style.display = portfolio ? '' : 'none';
+  if (title) title.textContent = portfolio ? 'RDG Stations — items / staff-hr' : 'Stations';
+  if (metricBar) metricBar.style.display = 'none';
   if (pdfBtn) pdfBtn.style.display = portfolio ? '' : 'none';
 
   renderStationsFamilyChips(stationsSelectedFamily);
 
   if (!tableEl) return;
   if (!weekKey) {
+    if (chartWrap) chartWrap.style.display = 'none';
     tableEl.innerHTML = '<p class="note" style="margin:0;font-size:14px">Pick a week in the sidebar.</p>';
     return;
   }
 
   if (portfolio) {
-    const venueKeys = (typeof PORTFOLIO_VENUE_KEYS !== 'undefined' && PORTFOLIO_VENUE_KEYS)
-      ? PORTFOLIO_VENUE_KEYS
-      : ['claudie', 'casaneos', 'ava_cg', 'ava_wp', 'mila'];
-    const venues = venueKeys.map((k) => ({ key: k, label: labels[k] || k }));
-    const metric = stationsDaMetric || 'ipsh';
-    const metricLabel = metric === 'people' ? 'People' : (metric === 'items' ? 'Items' : 'Items / staff-hr');
-    const selected = allFamilies;
-    let html = '<table class="stations-da-table"><thead><tr><th>Station</th>';
-    venues.forEach((v) => { html += '<th>' + v.label + '</th>'; });
-    html += '<th>RDG</th></tr></thead><tbody>';
-    let totPeople = 0, totItems = 0, totHours = 0;
-    const colPeople = Object.fromEntries(venues.map((v) => [v.key, 0]));
-    const colItems = Object.fromEntries(venues.map((v) => [v.key, 0]));
-    const colHours = Object.fromEntries(venues.map((v) => [v.key, 0]));
-    selected.forEach((family) => {
-      html += '<tr><td>' + family + '<div class="muted">' + metricLabel + '</div></td>';
-      let rowPeople = 0, rowItems = 0, rowHours = 0;
-      venues.forEach((v) => {
-        const m = getStationWeekMetrics(v.key, weekKey, family);
-        rowPeople += m.people; rowItems += m.items; rowHours += m.hours;
-        colPeople[v.key] += m.people; colItems[v.key] += m.items; colHours[v.key] += m.hours;
-        let val = '—';
-        if (metric === 'people' && m.people > 0) val = String(m.people);
-        else if (metric === 'items' && m.items > 0) val = m.items.toLocaleString();
-        else if (metric === 'ipsh' && m.ipsh != null) val = String(m.ipsh);
-        html += '<td>' + val + '</td>';
-      });
-      totPeople += rowPeople; totItems += rowItems; totHours += rowHours;
-      let rdg = '—';
-      if (metric === 'people' && rowPeople > 0) rdg = String(rowPeople);
-      else if (metric === 'items' && rowItems > 0) rdg = rowItems.toLocaleString();
-      else if (metric === 'ipsh' && rowHours > 0 && rowItems > 0) rdg = String(Math.round(rowItems / rowHours));
-      html += '<td>' + rdg + '</td></tr>';
-    });
-    html += '<tr class="total"><td>Total<div class="muted">' + metricLabel + '</div></td>';
-    venues.forEach((v) => {
-      let val = '—';
-      if (metric === 'people' && colPeople[v.key] > 0) val = String(colPeople[v.key]);
-      else if (metric === 'items' && colItems[v.key] > 0) val = colItems[v.key].toLocaleString();
-      else if (metric === 'ipsh' && colHours[v.key] > 0 && colItems[v.key] > 0) val = String(Math.round(colItems[v.key] / colHours[v.key]));
-      html += '<td>' + val + '</td>';
-    });
-    let grand = '—';
-    if (metric === 'people' && totPeople > 0) grand = String(totPeople);
-    else if (metric === 'items' && totItems > 0) grand = totItems.toLocaleString();
-    else if (metric === 'ipsh' && totHours > 0 && totItems > 0) grand = String(Math.round(totItems / totHours));
-    html += '<td>' + grand + '</td></tr></tbody></table>';
+    renderStationsCompareChart(weekKey);
+    const venues = PORTFOLIO_VENUE_KEYS.map((k) => ({ key: k, label: labels[k] || k }));
+    const family = stationsSelectedFamily;
+    const compare = buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, { forScreen: true });
+    let html = '<p class="note stations-compare-note" style="margin:0 0 14px"><strong>'+family+'</strong> · hours ↓ · days → · locations under each day (CL · CN · ACG · AWP · MILA). Values = items / staff-hour.</p>';
+    html += compare || '<p class="note">No hour×day items/staff-hr for '+family+' this week.</p>';
     tableEl.innerHTML = html;
     return;
+  }
+
+  if (chartWrap) {
+    const existing = typeof Chart !== 'undefined' ? Chart.getChart('cPortfolioStations') : null;
+    if (existing) existing.destroy();
+    chartWrap.style.display = 'none';
   }
 
   // Venue: 3 hour×day tables (10:00 → 02:00)
@@ -4322,160 +4486,9 @@ function portfolioVenuesForFamily(family, weekKey) {
 }
 
 function renderPortfolioStations() {
-  // Portfolio Stations now uses the same DA board as venue Stations.
   if (currentVenue === 'rdg_portfolio') renderStationsBoard();
   const panel = document.getElementById('portfolioStationsPanel');
   if (panel) panel.style.display = 'none';
-  if (currentVenue !== 'rdg_portfolio') return;
-
-  const weekKey = WEEKS[currentWeekIdx]?.key;
-  const labels = ${JSON.stringify(VENUE_LABELS)};
-  const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
-  const families = PORTFOLIO_STATION_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
-  // Keep chart helpers available for PDF export; do not show the old dense UI.
-  if (true) return;
-  const ips = document.getElementById('itemsPerStaffCard');
-  if (ips) ips.style.display = '';
-
-  const canvas = document.getElementById('cPortfolioStations');
-  if (canvas && typeof Chart !== 'undefined') {
-    const existing = Chart.getChart('cPortfolioStations');
-    if (existing) existing.destroy();
-
-    const familyBandPlugin = {
-      id: 'portfolioFamilyBands',
-      beforeDraw(chart) {
-        const xAxis = chart.scales.x;
-        const area = chart.chartArea;
-        if (!xAxis || !area) return;
-        const ctx = chart.ctx;
-        const n = families.length;
-        if (!n) return;
-        for (let i = 0; i < n; i++) {
-          const x = xAxis.getPixelForTick(i);
-          const left = i === 0 ? area.left : (xAxis.getPixelForTick(i - 1) + x) / 2;
-          const right = i === n - 1 ? area.right : (x + xAxis.getPixelForTick(i + 1)) / 2;
-          ctx.save();
-          ctx.fillStyle = i % 2 === 0 ? 'rgba(30, 37, 51, 0.55)' : 'rgba(19, 22, 28, 0.35)';
-          ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
-          if (i > 0) {
-            ctx.strokeStyle = 'rgba(217, 164, 65, 0.22)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(left, area.top);
-            ctx.lineTo(left, area.bottom);
-            ctx.stroke();
-          }
-          ctx.restore();
-        }
-      },
-    };
-
-    const barValueLabelsPlugin = {
-      id: 'portfolioBarValueLabels',
-      afterDatasetsDraw(chart) {
-        const { ctx } = chart;
-        chart.data.datasets.forEach((ds, di) => {
-          const meta = chart.getDatasetMeta(di);
-          if (!meta || meta.hidden) return;
-          meta.data.forEach((el, i) => {
-            const raw = ds.data[i];
-            if (raw == null || !(Number(raw) > 0)) return;
-            const props = el.getProps(['x', 'y'], true);
-            const label = String(Math.round(Number(raw)));
-            ctx.save();
-            ctx.font = '700 9px ui-sans-serif, system-ui, sans-serif';
-            ctx.fillStyle = '#f3f4f6';
-            ctx.strokeStyle = 'rgba(13,17,23,0.85)';
-            ctx.lineWidth = 3;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            ctx.strokeText(label, props.x, props.y - 2);
-            ctx.fillText(label, props.x, props.y - 2);
-            ctx.restore();
-          });
-        });
-      },
-    };
-
-    const ipshBars = venueRows.map(v => ({
-      type: 'bar',
-      label: (v.label || v.key),
-      data: families.map(f => {
-        const st = v.familyStats[f] || {};
-        const vIpsh = st.ipsh != null ? Number(st.ipsh) : (st.iph != null ? Number(st.iph) : null);
-        return (vIpsh != null && vIpsh > 0) ? vIpsh : null;
-      }),
-      backgroundColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
-      borderColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
-      borderWidth: 0,
-      borderRadius: 3,
-      yAxisID: 'y',
-      barPercentage: 0.85,
-      categoryPercentage: 0.62,
-      order: 1,
-      skipNull: true,
-    }));
-
-    new Chart(canvas, {
-      data: { labels: families, datasets: ipshBars },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        layout: { padding: { top: 22, bottom: 4 } },
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { boxWidth: 12, boxHeight: 10, font: { size: 11 }, padding: 12 },
-          },
-          tooltip: {
-            filter(item) {
-              const v = item.parsed && item.parsed.y;
-              return v != null && Number(v) > 0;
-            },
-            callbacks: {
-              title(items) {
-                return items[0] ? String(items[0].label) : '';
-              },
-              label(ctx) {
-                const v = ctx.parsed.y;
-                if (v == null || !(Number(v) > 0)) return null;
-                return ctx.dataset.label + ': ' + Math.round(Number(v)) + ' items/staff-hr';
-              },
-            },
-          },
-        },
-        scales: {
-          x: {
-            stacked: false,
-            offset: true,
-            ticks: {
-              maxRotation: 0,
-              minRotation: 0,
-              autoSkip: false,
-              font: { size: 15, weight: '700' },
-              color: '#e8eaed',
-              padding: 10,
-            },
-            grid: { display: false },
-          },
-          y: {
-            type: 'linear',
-            position: 'left',
-            title: { display: true, text: 'Items / staff-hour', font: { size: 12, weight: '600' }, color: '#d9a441' },
-            grid: { color: 'rgba(38,42,51,0.9)' },
-            beginAtZero: true,
-            ticks: { font: { size: 11 } },
-            grace: '8%',
-          },
-        },
-      },
-      plugins: [familyBandPlugin, barValueLabelsPlugin],
-    });
-  }
-
-  renderPortfolioStationsDayTable();
 }
 
 function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
@@ -5546,8 +5559,11 @@ function buildStationDividerPageHtml(familyName) {
 }
 
 /** Hours on Y once; days on X; locations under each day. */
-function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues) {
+function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, opts) {
   if (!venues || !venues.length) return '';
+  opts = opts || {};
+  const forScreen = !!opts.forScreen;
+  const dayTheme = forScreen && typeof isDaylightTheme === 'function' && isDaylightTheme();
   const labels = ${JSON.stringify(VENUE_LABELS)};
   const short = (k) => {
     const l = labels[k] || k;
@@ -5601,20 +5617,28 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues) {
   const vmin = allVals.length ? Math.min(...allVals) : 0;
   const vmax = allVals.length ? Math.max(...allVals) : 0;
   const nLoc = venues.length;
-  const locSep = 'border-left:2px solid #3d4458;';
+  const locSep = dayTheme ? 'border-left:2px solid #d9cbb6;' : 'border-left:2px solid #3d4458;';
+  const dayHeadBg = dayTheme ? '#efe8dc' : '#1e2533';
+  const dayHeadFg = dayTheme ? '#2c241c' : '#ffffff';
+  const locHeadBg = dayTheme ? '#f7f1e7' : '#13161c';
+  const locHeadFg = dayTheme ? '#7a6a58' : '#9aa0aa';
+  const emptyBg = dayTheme ? '#f7f1e7' : '#13161c';
+  const emptyFg = dayTheme ? '#b5a48f' : '#4b5563';
+  const hourFg = dayTheme ? '#7a6a58' : '#9aa0aa';
+  const hourBg = dayTheme ? '#fffdf8' : 'transparent';
 
-  let html = '<div class="ps-hourly-block">'+
-    '<h2>'+family+' - all locations</h2>'+
-    '<p class="ps-sub">Items / staff-hour | rows = hours (once) | columns = day, then location under each day</p>'+
-    '<table class="ps-v2-compare"><thead>'+
-    '<tr><th rowspan="2" style="vertical-align:bottom;text-align:left">Hour</th>';
+  let html = '<div class="'+(forScreen ? 'ps-screen-compare' : 'ps-hourly-block')+'">'+
+    (forScreen ? '' : '<h2>'+family+' - all locations</h2>')+
+    (forScreen ? '' : '<p class="ps-sub">Items / staff-hour | rows = hours (once) | columns = day, then location under each day</p>')+
+    '<div style="overflow-x:auto"><table class="ps-v2-compare"><thead>'+
+    '<tr><th rowspan="2" style="vertical-align:bottom;text-align:left;background:'+dayHeadBg+';color:'+hourFg+'">Hour</th>';
   HOURLY_DAYS.forEach(day => {
-    html += '<th colspan="'+nLoc+'" style="text-align:center;'+locSep+'background:#1e2533;color:#ffffff;font-weight:700;padding:6px 4px">'+day.slice(0,3)+'</th>';
+    html += '<th colspan="'+nLoc+'" style="text-align:center;'+locSep+'background:'+dayHeadBg+';color:'+dayHeadFg+';font-weight:700;padding:6px 4px">'+day.slice(0,3)+'</th>';
   });
   html += '</tr><tr>';
   HOURLY_DAYS.forEach(() => {
     venues.forEach((v, vi) => {
-      html += '<th style="text-align:center;font-size:8px;color:#9aa0aa;background:#13161c;padding:3px 2px;'+(vi===0?locSep:'')+'">'+short(v.key)+'</th>';
+      html += '<th style="text-align:center;font-size:10px;color:'+locHeadFg+';background:'+locHeadBg+';padding:3px 2px;'+(vi===0?locSep:'')+'">'+short(v.key)+'</th>';
     });
   });
   html += '</tr></thead><tbody>';
@@ -5622,17 +5646,18 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues) {
   HOURLY_BAND.forEach(hk => {
     const has = HOURLY_DAYS.some(day => venues.some(v => grid[day][hk][v.key] != null));
     if (!has) return;
-    html += '<tr><td style="text-align:left;white-space:nowrap;font-weight:600;color:#9aa0aa">'+hourBandLabel(hk)+'</td>';
+    html += '<tr><td style="text-align:left;white-space:nowrap;font-weight:600;color:'+hourFg+';background:'+hourBg+'">'+hourBandLabel(hk)+'</td>';
     HOURLY_DAYS.forEach(day => {
       venues.forEach((v, vi) => {
         const val = grid[day][hk][v.key];
-        const heat = val != null && val > 0 ? columnRelativeHeat(val, vmin, vmax) : { bg: '#13161c', fg: '#4b5563' };
-        html += '<td class="ps-ipsh-heat" style="background:'+heat.bg+';color:#ffffff;font-weight:700;padding:3px 2px;text-align:center;'+(vi===0?locSep:'')+'">'+(val != null ? val : '—')+'</td>';
+        const heat = val != null && val > 0 ? columnRelativeHeat(val, vmin, vmax) : { bg: emptyBg, fg: emptyFg };
+        const fg = val != null && val > 0 ? (dayTheme ? heat.fg : '#ffffff') : emptyFg;
+        html += '<td class="ps-ipsh-heat" style="background:'+heat.bg+';color:'+fg+';font-weight:700;padding:4px 3px;text-align:center;'+(vi===0?locSep:'')+'">'+(val != null ? val : '—')+'</td>';
       });
     });
     html += '</tr>';
   });
-  html += '</tbody></table></div>';
+  html += '</tbody></table></div></div>';
   return html;
 }
 
