@@ -5804,16 +5804,16 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, opts) {
   return html;
 }
 
-/** PDF page 1: Stations Analysis — compare bar chart (full landscape). */
+/** PDF page after cover: Overview compare bar chart (items / staff-hour). */
 function buildStationsPdfChartPageHtml(weekLabel, chartImg) {
   let html = '<div class="ps-print-page ps-intro ps-chart-only">'+
     '<div class="ps-intro-top">'+
-      '<div><h1>Stations Analysis</h1>'+
-      '<p class="ps-sub" style="margin:6px 0 0">'+weekLabel+' · items / staff-hour by station · all locations</p></div>'+
+      '<div><h1>Overview</h1>'+
+      '<p class="ps-sub" style="margin:6px 0 0">'+weekLabel+' · all locations · items / staff-hour by station</p></div>'+
       rdgLogoHtml('light')+
     '</div>';
   if (chartImg && chartImg.length > 100) {
-    html += '<div class="ps-chart-wrap ps-chart-wrap-full"><img class="ps-chart" src="'+chartImg+'" alt="Stations Analysis chart"></div>';
+    html += '<div class="ps-chart-wrap ps-chart-wrap-full"><img class="ps-chart" src="'+chartImg+'" alt="Stations Overview chart"></div>';
   } else {
     html += '<p class="ps-sub" style="color:#e2706a;font-size:14px;padding:40px 0">Chart could not be captured. Stay on Stations Overview and try Export PDF again.</p>';
   }
@@ -5984,19 +5984,27 @@ function exportPortfolioStationsPdf() {
   renderPortfolioStations();
 
   const finish = () => {
-    // PDF only: STATIONS ANALYSIS cover → per station divider → hour×day table (nothing else)
+    // PDF: STATIONS ANALYSIS cover → Overview bar chart → per station divider → hour×day table
     const coverPage = buildStationDividerPageHtml('Stations Analysis');
+    let chartImg = captureStationsCompareChartPng(weekKey);
+    if (!chartImg) {
+      try {
+        const canvas = document.getElementById('cPortfolioStations');
+        if (canvas && canvas.toDataURL) chartImg = canvas.toDataURL('image/png');
+      } catch (e) { chartImg = ''; }
+    }
+    const chartPage = buildStationsPdfChartPageHtml(weekLabel, chartImg);
     const detailPages = families.map(f => {
       const hourPage = buildStationsPdfFamilyHourPageHtml(f, weekKey, weekLabel);
       if (!hourPage) return '';
       return buildStationDividerPageHtml(f) + hourPage;
     }).join('');
 
-    runStationsPdfPrint(printRoot, coverPage + detailPages);
+    runStationsPdfPrint(printRoot, coverPage + chartPage + detailPages);
   };
 
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => setTimeout(finish, 200));
+    requestAnimationFrame(() => setTimeout(finish, 350));
   });
 }
 
