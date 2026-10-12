@@ -662,7 +662,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <aside id="appSidebar" class="app-sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-title">BOH Dashboard</div>
-    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W41 · Built 2026-10-12T15:21:28.286Z</div>
+    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W41 · Built 2026-10-12T15:40:35.104Z</div>
   </div>
   <div class="sidebar-block">
     <label class="sidebar-label" for="venueSelect">Location</label>
@@ -1668,7 +1668,12 @@ function switchTab(name, btn) {
   const sec = document.getElementById('tab-' + name);
   if (sec) sec.classList.add('active');
   if (btn) btn.classList.add('active');
-  if (name === 'stations') renderStationsBoard();
+  if (name === 'stations') {
+    const ips = document.getElementById('itemsPerStaffCard');
+    if (ips) ips.style.display = '';
+    try { renderStationsBoard(); }
+    catch (err) { console.error('renderStationsBoard failed', err); }
+  }
 }
 
 // ============================================================
@@ -2474,18 +2479,46 @@ function stationsHourHeatTable(title, grid, band, days, clickMode) {
 }
 function renderStationsCompareChart(weekKey) {
   const wrap = document.getElementById('stationsCompareChartWrap');
-  const canvas = document.getElementById('cPortfolioStations');
-  if (!wrap || !canvas || typeof Chart === 'undefined') return;
+  if (!wrap || typeof Chart === 'undefined') return;
+  let canvas = document.getElementById('cPortfolioStations');
+  if (!canvas) {
+    wrap.innerHTML = '<canvas id="cPortfolioStations"></canvas>';
+    canvas = document.getElementById('cPortfolioStations');
+  }
+  if (!canvas) return;
   const labels = {"claudie":"Claudie","casaneos":"Casa Neos","ava_cg":"AVA Coconut Grove","ava_wp":"AVA Winter Park","mila":"MILA"};
-  const venueRows = PORTFOLIO_VENUE_KEYS.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
-  const families = PORTFOLIO_STATION_FAMILIES.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
-  const existing = Chart.getChart('cPortfolioStations');
+  const venueKeys = (typeof PORTFOLIO_VENUE_KEYS !== 'undefined' && PORTFOLIO_VENUE_KEYS)
+    ? PORTFOLIO_VENUE_KEYS
+    : ['claudie', 'casaneos', 'ava_cg', 'ava_wp', 'mila'];
+  const colors = (typeof PORTFOLIO_STATION_COLORS !== 'undefined' && PORTFOLIO_STATION_COLORS) || {
+    claudie: '#60a5fa', casaneos: '#f472b6', ava_cg: '#fbbf24', ava_wp: '#34d399', mila: '#c084fc',
+  };
+  const famList = (typeof PORTFOLIO_STATION_FAMILIES !== 'undefined' && PORTFOLIO_STATION_FAMILIES)
+    ? PORTFOLIO_STATION_FAMILIES
+    : ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Pizza'];
+  const venueRows = venueKeys.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
+  const families = famList.filter(f =>
+    (typeof portfolioFamilyHasItemsStaff === 'function')
+      ? portfolioFamilyHasItemsStaff(venueRows, f)
+      : venueRows.some(v => {
+          const st = v.familyStats[f] || {};
+          return (st.ipsh != null && st.ipsh > 0) || (st.iph != null && st.iph > 0) || (st.volume > 0);
+        })
+  );
+  const existing = Chart.getChart(canvas);
   if (existing) existing.destroy();
   if (!families.length) {
-    wrap.style.display = 'none';
+    wrap.style.display = '';
+    wrap.innerHTML = '<p class="note" style="padding:20px 0;margin:0">No station items/staff-hr for this week yet.</p><canvas id="cPortfolioStations" style="display:none"></canvas>';
     return;
   }
-  wrap.style.display = '';
+  wrap.style.display = 'block';
+  wrap.style.height = '380px';
+  wrap.style.position = 'relative';
+  if (!document.getElementById('cPortfolioStations')) {
+    wrap.innerHTML = '<canvas id="cPortfolioStations"></canvas>';
+    canvas = document.getElementById('cPortfolioStations');
+  }
   const day = typeof isDaylightTheme === 'function' && isDaylightTheme();
   const tick = day ? '#7a6a58' : '#9aa0aa';
   const labelColor = day ? '#2c241c' : '#e8eaed';
@@ -2556,8 +2589,8 @@ function renderStationsCompareChart(weekKey) {
       const vIpsh = st.ipsh != null ? Number(st.ipsh) : (st.iph != null ? Number(st.iph) : null);
       return (vIpsh != null && vIpsh > 0) ? vIpsh : null;
     }),
-    backgroundColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
-    borderColor: PORTFOLIO_STATION_COLORS[v.key] || '#d9a441',
+    backgroundColor: colors[v.key] || '#d9a441',
+    borderColor: colors[v.key] || '#d9a441',
     borderWidth: 0,
     borderRadius: 3,
     yAxisID: 'y',
@@ -2654,10 +2687,27 @@ function renderStationsBoard() {
   }
 
   if (portfolio) {
-    renderStationsCompareChart(weekKey);
-    const venues = PORTFOLIO_VENUE_KEYS.map((k) => ({ key: k, label: labels[k] || k }));
+    if (card) card.style.display = '';
+    const venueKeys = (typeof PORTFOLIO_VENUE_KEYS !== 'undefined' && PORTFOLIO_VENUE_KEYS)
+      ? PORTFOLIO_VENUE_KEYS
+      : ['claudie', 'casaneos', 'ava_cg', 'ava_wp', 'mila'];
+    const venues = venueKeys.map((k) => ({ key: k, label: labels[k] || k }));
     const family = stationsSelectedFamily;
-    const compare = buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, { forScreen: true });
+    try {
+      renderStationsCompareChart(weekKey);
+    } catch (err) {
+      console.error('renderStationsCompareChart failed', err);
+      if (chartWrap) {
+        chartWrap.style.display = '';
+        chartWrap.innerHTML = '<p class="note" style="padding:24px">Could not draw compare chart — see console.</p><canvas id="cPortfolioStations"></canvas>';
+      }
+    }
+    let compare = '';
+    try {
+      compare = buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, { forScreen: true }) || '';
+    } catch (err) {
+      console.error('buildFamilyAllLocationsIpshCompareHtml failed', err);
+    }
     let html = '<p class="note stations-compare-note" style="margin:0 0 14px"><strong>'+family+'</strong> · hours ↓ · days → · locations under each day (CL · CN · ACG · AWP · MILA). Values = items / staff-hour.</p>';
     html += compare || '<p class="note">No hour×day items/staff-hr for '+family+' this week.</p>';
     tableEl.innerHTML = html;
@@ -6057,10 +6107,14 @@ function renderAll() {
     if (ov) ov.style.display = 'none';
     const oh = document.getElementById('overviewHourlyHint');
     if (oh) oh.style.display = 'none';
-    const ips = document.getElementById('itemsPerStaffCard');
-    if (ips) ips.style.display = 'none';
+    // Do NOT hide #itemsPerStaffCard here — it lives inside #tab-stations.
+    // Hiding it blanked Portfolio → Stations after every week/venue refresh.
     const kpi = document.getElementById('stationKpiBar');
     if (kpi) kpi.style.display = 'none';
+    const stationsTab = document.getElementById('tab-stations');
+    if (stationsTab && stationsTab.classList.contains('active') && typeof renderStationsBoard === 'function') {
+      renderStationsBoard();
+    }
     return;
   }
   applyDerivedStationTargets();
