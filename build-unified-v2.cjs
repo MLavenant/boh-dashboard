@@ -981,6 +981,21 @@ body.printing-stations-pdf .ps-print-page.ps-family.ps-family-large th.ps-loc-he
   font-size:17px !important;
   padding:14px 10px !important;
 }
+body.printing-stations-pdf .ps-print-page.ps-hourly.ps-hourly-large h1 {
+  font-size:26px;
+  margin:0 0 6px;
+  color:#d9a441;
+}
+body.printing-stations-pdf .ps-print-page.ps-hourly .ps-avg-banner {
+  border:3px solid #d9a441 !important;
+}
+body.printing-stations-pdf .ps-print-page.ps-hourly.ps-hourly-large table.ps-v2-compare td,
+body.printing-stations-pdf .ps-print-page.ps-hourly.ps-hourly-large table.ps-v2-compare th {
+  font-size:12px !important;
+}
+body.theme-daylight .ps-avg-banner {
+  border-color:#d9a441 !important;
+}
 body.printing-stations-pdf .ps-print-page.ps-intro table {
   width:100%;
   border-collapse:collapse;
@@ -2965,7 +2980,7 @@ function renderStationsBoard() {
     }
     let compare = '';
     try {
-      compare = buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, { forScreen: true }) || '';
+      compare = buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, { forScreen: true, showAvg: true }) || '';
     } catch (err) {
       console.error('buildFamilyAllLocationsIpshCompareHtml failed', err);
     }
@@ -5591,8 +5606,8 @@ function fitPrintPagesToSheet(pages, maxW, maxH) {
     page.style.height = '';
   });
   pages.forEach(page => {
-    // Title divider pages stay full-size (branded white sheets)
-    if (page.classList.contains('ps-divider')) {
+    // Title divider + chart overview stay full-size
+    if (page.classList.contains('ps-divider') || page.classList.contains('ps-chart-only')) {
       page.style.zoom = '1';
       return;
     }
@@ -5645,6 +5660,9 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, opts) {
   if (!venues || !venues.length) return '';
   opts = opts || {};
   const forScreen = !!opts.forScreen;
+  const forPrint = !!opts.forPrint;
+  const showAvg = !!opts.showAvg;
+  const large = !!opts.large || forPrint;
   const dayTheme = forScreen && typeof isDaylightTheme === 'function' && isDaylightTheme();
   const labels = ${JSON.stringify(VENUE_LABELS)};
   const short = (k) => {
@@ -5708,19 +5726,56 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, opts) {
   const emptyFg = dayTheme ? '#b5a48f' : '#4b5563';
   const hourFg = dayTheme ? '#7a6a58' : '#9aa0aa';
   const hourBg = dayTheme ? '#fffdf8' : 'transparent';
+  const cellPad = large ? '7px 5px' : '4px 3px';
+  const hourFont = large ? '13px' : '12px';
+  const locFont = large ? '11px' : '10px';
 
-  let html = '<div class="'+(forScreen ? 'ps-screen-compare' : 'ps-hourly-block')+'">'+
-    (forScreen ? '' : '<h2>'+family+' - all locations</h2>')+
-    (forScreen ? '' : '<p class="ps-sub">Items / staff-hour | rows = hours (once) | columns = day, then location under each day</p>')+
-    '<div style="overflow-x:auto"><table class="ps-v2-compare"><thead>'+
-    '<tr><th rowspan="2" style="vertical-align:bottom;text-align:left;background:'+dayHeadBg+';color:'+hourFg+'">Hour</th>';
+  // Week AVG items/staff-hr (overall + per location) for the bordered banner
+  let avgBanner = '';
+  if (showAvg) {
+    const locAvgs = [];
+    let totItems = 0, totHours = 0;
+    venues.forEach(v => {
+      const m = typeof getStationWeekMetrics === 'function'
+        ? getStationWeekMetrics(v.key, weekKey, family)
+        : { items: 0, hours: 0, ipsh: null };
+      const ipsh = m.ipsh != null ? Number(m.ipsh) : (m.hours > 0 && m.items > 0 ? Math.round(m.items / m.hours) : null);
+      if (m.items > 0) totItems += Number(m.items) || 0;
+      if (m.hours > 0) totHours += Number(m.hours) || 0;
+      locAvgs.push({ key: v.key, label: short(v.key), ipsh: ipsh != null && ipsh > 0 ? ipsh : null });
+    });
+    const overall = totHours > 0 && totItems > 0 ? Math.round(totItems / totHours) : null;
+    const avgBg = dayTheme ? '#fffdf8' : '#1a1408';
+    const avgBorder = '#d9a441';
+    const avgFg = dayTheme ? '#2c241c' : '#f5e6c8';
+    const avgMuted = dayTheme ? '#7a6a58' : '#9aa0aa';
+    avgBanner = '<div class="ps-avg-banner" style="display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin:0 0 14px;padding:12px 14px;background:'+avgBg+';border:3px solid '+avgBorder+';border-radius:12px;box-shadow:inset 0 0 0 1px rgba(217,164,65,0.35)">'+
+      '<div style="min-width:160px;padding:8px 14px;border:2px solid '+avgBorder+';border-radius:10px;background:rgba(217,164,65,0.12);text-align:center">'+
+        '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;color:'+avgBorder+';margin-bottom:4px">AVG</div>'+
+        '<div style="font-size:28px;font-weight:800;line-height:1;color:'+avgFg+'">'+(overall != null ? overall : '—')+'</div>'+
+        '<div style="font-size:11px;color:'+avgMuted+';margin-top:4px">items / staff-hr · week</div>'+
+      '</div>'+
+      locAvgs.map(a => (
+        '<div style="flex:1;min-width:72px;padding:8px 10px;border:2px solid '+avgBorder+';border-radius:10px;text-align:center;background:rgba(217,164,65,0.06)">'+
+          '<div style="font-size:11px;font-weight:800;color:'+avgBorder+';letter-spacing:0.06em">'+a.label+'</div>'+
+          '<div style="font-size:20px;font-weight:800;color:'+avgFg+';margin-top:2px">'+(a.ipsh != null ? a.ipsh : '—')+'</div>'+
+        '</div>'
+      )).join('')+
+      '</div>';
+  }
+
+  let html = '<div class="'+(forScreen ? 'ps-screen-compare' : 'ps-hourly-block')+(large ? ' ps-hourly-print-large' : '')+'">'+
+    (forScreen ? '' : '<h2 style="display:none">'+family+'</h2>')+
+    avgBanner+
+    '<div style="overflow-x:auto"><table class="ps-v2-compare" style="font-size:'+hourFont+'"><thead>'+
+    '<tr><th rowspan="2" style="vertical-align:bottom;text-align:left;background:'+dayHeadBg+';color:'+hourFg+';padding:'+cellPad+';font-size:'+hourFont+'">Hour</th>';
   HOURLY_DAYS.forEach(day => {
-    html += '<th colspan="'+nLoc+'" style="text-align:center;'+locSep+'background:'+dayHeadBg+';color:'+dayHeadFg+';font-weight:700;padding:6px 4px">'+day.slice(0,3)+'</th>';
+    html += '<th colspan="'+nLoc+'" style="text-align:center;'+locSep+'background:'+dayHeadBg+';color:'+dayHeadFg+';font-weight:700;padding:'+cellPad+'">'+day.slice(0,3)+'</th>';
   });
   html += '</tr><tr>';
   HOURLY_DAYS.forEach(() => {
     venues.forEach((v, vi) => {
-      html += '<th style="text-align:center;font-size:10px;color:'+locHeadFg+';background:'+locHeadBg+';padding:3px 2px;'+(vi===0?locSep:'')+'">'+short(v.key)+'</th>';
+      html += '<th style="text-align:center;font-size:'+locFont+';color:'+locHeadFg+';background:'+locHeadBg+';padding:3px 2px;'+(vi===0?locSep:'')+'">'+short(v.key)+'</th>';
     });
   });
   html += '</tr></thead><tbody>';
@@ -5728,13 +5783,13 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, opts) {
   HOURLY_BAND.forEach(hk => {
     const has = HOURLY_DAYS.some(day => venues.some(v => grid[day][hk][v.key] != null));
     if (!has) return;
-    html += '<tr><td style="text-align:left;white-space:nowrap;font-weight:600;color:'+hourFg+';background:'+hourBg+'">'+hourBandLabel(hk)+'</td>';
+    html += '<tr><td style="text-align:left;white-space:nowrap;font-weight:600;color:'+hourFg+';background:'+hourBg+';padding:'+cellPad+';font-size:'+hourFont+'">'+hourBandLabel(hk)+'</td>';
     HOURLY_DAYS.forEach(day => {
       venues.forEach((v, vi) => {
         const val = grid[day][hk][v.key];
         const heat = val != null && val > 0 ? columnRelativeHeat(val, vmin, vmax) : { bg: emptyBg, fg: emptyFg };
         const fg = val != null && val > 0 ? (dayTheme ? heat.fg : '#ffffff') : emptyFg;
-        html += '<td class="ps-ipsh-heat" style="background:'+heat.bg+';color:'+fg+';font-weight:700;padding:4px 3px;text-align:center;'+(vi===0?locSep:'')+'">'+(val != null ? val : '—')+'</td>';
+        html += '<td class="ps-ipsh-heat" style="background:'+heat.bg+';color:'+fg+';font-weight:700;padding:'+cellPad+';text-align:center;font-size:'+hourFont+';'+(vi===0?locSep:'')+'">'+(val != null ? val : '—')+'</td>';
       });
     });
     html += '</tr>';
@@ -5743,37 +5798,125 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, opts) {
   return html;
 }
 
-/** PDF page 1: compare bar chart only (full landscape). */
+/** PDF page 1: Stations Analysis — compare bar chart (full landscape). */
 function buildStationsPdfChartPageHtml(weekLabel, chartImg) {
   let html = '<div class="ps-print-page ps-intro ps-chart-only">'+
     '<div class="ps-intro-top">'+
-      '<div><h1>RDG Portfolio — Stations</h1>'+
-      '<p class="ps-sub" style="margin:6px 0 0">'+weekLabel+' · items / staff-hour by station</p></div>'+
+      '<div><h1>Stations Analysis</h1>'+
+      '<p class="ps-sub" style="margin:6px 0 0">'+weekLabel+' · items / staff-hour by station · all locations</p></div>'+
       rdgLogoHtml('light')+
     '</div>';
-  if (chartImg) {
-    html += '<div class="ps-chart-wrap ps-chart-wrap-full"><img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart"></div>';
+  if (chartImg && chartImg.length > 100) {
+    html += '<div class="ps-chart-wrap ps-chart-wrap-full"><img class="ps-chart" src="'+chartImg+'" alt="Stations Analysis chart"></div>';
   } else {
-    html += '<p class="ps-sub">Chart unavailable — open Stations Overview, then Export PDF again.</p>';
+    html += '<p class="ps-sub" style="color:#e2706a;font-size:14px;padding:40px 0">Chart could not be captured. Stay on Stations Overview and try Export PDF again.</p>';
   }
   html += '</div>';
   return html;
 }
 
-/** Per-station PDF page: large day × location table (Ful · Items/staff-hr · Items/person). */
+/** Capture the portfolio compare chart into a stable PNG (off-DOM if needed). */
+function captureStationsCompareChartPng(weekKey) {
+  try {
+    if (typeof Chart === 'undefined') return '';
+    const labels = ${JSON.stringify(VENUE_LABELS)};
+    const venueKeys = PORTFOLIO_VENUE_KEYS.slice();
+    const colors = (typeof PORTFOLIO_STATION_COLORS !== 'undefined' && PORTFOLIO_STATION_COLORS) || {
+      claudie: '#60a5fa', casaneos: '#f472b6', ava_cg: '#fbbf24', ava_wp: '#34d399', mila: '#c084fc',
+    };
+    const famList = (typeof PORTFOLIO_STATION_FAMILIES !== 'undefined' && PORTFOLIO_STATION_FAMILIES)
+      ? PORTFOLIO_STATION_FAMILIES
+      : ['Saute','Fry','Garde Manger','Raw','Sushi','Robata','Pastry','Pizza'];
+    const venueRows = venueKeys.map(k => buildVenueWeekScorecard(k, labels[k] || k, weekKey));
+    const families = famList.filter(f => portfolioFamilyHasItemsStaff(venueRows, f));
+    if (!families.length) return '';
+
+    const host = document.createElement('div');
+    host.style.cssText = 'position:fixed;left:-9999px;top:0;width:1100px;height:520px;background:#0d1117;z-index:-1;';
+    const canvas = document.createElement('canvas');
+    canvas.width = 1100;
+    canvas.height = 520;
+    host.appendChild(canvas);
+    document.body.appendChild(host);
+
+    const ipshBars = venueRows.map(v => ({
+      type: 'bar',
+      label: (v.label || v.key),
+      data: families.map(f => {
+        const st = v.familyStats[f] || {};
+        const vIpsh = st.ipsh != null ? Number(st.ipsh) : (st.iph != null ? Number(st.iph) : null);
+        return (vIpsh != null && vIpsh > 0) ? vIpsh : null;
+      }),
+      backgroundColor: colors[v.key] || '#d9a441',
+      borderWidth: 0,
+      borderRadius: 3,
+      barPercentage: 0.85,
+      categoryPercentage: 0.62,
+      skipNull: true,
+    }));
+    const chart = new Chart(canvas, {
+      data: { labels: families, datasets: ipshBars },
+      options: {
+        responsive: false,
+        animation: false,
+        layout: { padding: { top: 28, bottom: 8, left: 8, right: 8 } },
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 12, color: '#e8eaed', font: { size: 12 }, padding: 14 } },
+        },
+        scales: {
+          x: {
+            ticks: { color: '#e8eaed', font: { size: 15, weight: '700' }, maxRotation: 0, autoSkip: false },
+            grid: { display: false },
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Items / staff-hour', color: '#d9a441', font: { size: 13, weight: '600' } },
+            ticks: { color: '#9aa0aa', font: { size: 11 } },
+            grid: { color: 'rgba(255,255,255,0.08)' },
+            grace: '8%',
+          },
+        },
+      },
+    });
+    const img = chart.toBase64Image('image/png', 1);
+    chart.destroy();
+    document.body.removeChild(host);
+    return img || '';
+  } catch (err) {
+    console.error('captureStationsCompareChartPng failed', err);
+    return '';
+  }
+}
+
+/** Per-station PDF: large day × location table. */
 function buildStationsPdfFamilyDayPageHtml(family, weekKey, weekLabel) {
-  const labels = ${JSON.stringify(VENUE_LABELS)};
   const allVenueKeys = PORTFOLIO_VENUE_KEYS.slice();
   const table = buildPortfolioStationsFamilyTableHtml(family, weekKey, {
     forPrint: true,
     large: true,
     forceVenueKeys: allVenueKeys,
-    venueKeys: allVenueKeys,
   });
   if (!table) return '';
   return '<div class="ps-print-page ps-family ps-family-large">'+
     '<h1>'+String(family).toUpperCase()+'</h1>'+
     '<p class="ps-sub">'+weekLabel+' · locations side by side · Ful · Items/staff-hr · Items/person</p>'+
+    table+
+    '</div>';
+}
+
+/** Per-station PDF: hour × day × location heatmap with visible AVG banner. */
+function buildStationsPdfFamilyHourPageHtml(family, weekKey, weekLabel) {
+  const allVenues = PORTFOLIO_VENUE_KEYS.map(k => ({ key: k, label: (${JSON.stringify(VENUE_LABELS)})[k] || k }));
+  const table = buildFamilyAllLocationsIpshCompareHtml(family, weekKey, allVenues, {
+    forScreen: false,
+    forPrint: true,
+    showAvg: true,
+    large: true,
+  });
+  if (!table) return '';
+  return '<div class="ps-print-page ps-hourly ps-hourly-large">'+
+    '<h1>'+String(family).toUpperCase()+' · Hour × Day</h1>'+
+    '<p class="ps-sub">'+weekLabel+' · hours ↓ · days → · locations under each day · items / staff-hour</p>'+
     table+
     '</div>';
 }
@@ -5835,25 +5978,29 @@ function exportPortfolioStationsPdf() {
   renderPortfolioStations();
 
   const finish = () => {
-    const canvas = document.getElementById('cPortfolioStations');
-    let chartImg = '';
-    try {
-      if (canvas && canvas.toDataURL) chartImg = canvas.toDataURL('image/png');
-    } catch (e) { chartImg = ''; }
+    // Always capture from a dedicated off-DOM chart so page 1 is never blank
+    let chartImg = captureStationsCompareChartPng(weekKey);
+    if (!chartImg) {
+      try {
+        const canvas = document.getElementById('cPortfolioStations');
+        if (canvas && canvas.toDataURL) chartImg = canvas.toDataURL('image/png');
+      } catch (e) { chartImg = ''; }
+    }
 
-    // PDF: (1) chart page (2) per station: divider + large day×location table
+    // PDF: (1) Stations Analysis chart (2) per station: divider → day table → hour×day + AVG
     const chartPage = buildStationsPdfChartPageHtml(weekLabel, chartImg);
     const detailPages = families.map(f => {
       const dayPage = buildStationsPdfFamilyDayPageHtml(f, weekKey, weekLabel);
-      if (!dayPage) return '';
-      return buildStationDividerPageHtml(f) + dayPage;
+      const hourPage = buildStationsPdfFamilyHourPageHtml(f, weekKey, weekLabel);
+      if (!dayPage && !hourPage) return '';
+      return buildStationDividerPageHtml(f) + (dayPage || '') + (hourPage || '');
     }).join('');
 
     runStationsPdfPrint(printRoot, chartPage + detailPages);
   };
 
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => setTimeout(finish, 320));
+    requestAnimationFrame(() => setTimeout(finish, 450));
   });
 }
 

@@ -9,26 +9,18 @@ Single button: **Export Stations PDF** on Portfolio → Stations (`exportPortfol
 
 ## Screen (Stations tab)
 
-**Overview** = compare bar chart (items/staff-hr by station × location) + station chips + one hour×day×location table for the selected station.
+**Overview** = compare bar chart + station chips + hour×day×location table with a bordered **AVG** banner (week overall + per location).
 
 ## PDF structure
 
-1. **Chart page** — RDG logo + full-page items/staff-hr bar chart only (no week matrix, no multi-station portfolio pages).
-2. **Per station** — white **title divider** (dark RDG logo top-right, navy pill with station name, navy footer).
-3. **Day × location table** (one station per page, large type):
-   - **Rows (Y)** = days Mon…Sun + Week
-   - **Columns (X)** = locations (Claudie / Casa Neos / AVA CG / AVA WP / MILA)
-   - Each location: **Ful · Items/staff-hr · Items/person**
+1. **Stations Analysis** — full-page items/staff-hr bar chart (captured via off-DOM canvas so page 1 is never blank).
+2. **Per station** — white **title divider** (dark RDG logo, navy pill, navy footer).
+3. **Day × location table** (large): Mon…Sun + Week · Ful · Items/staff-hr · Items/person · all 5 locations.
+4. **Hour × day × location table** (large) with bordered **AVG** banner on top (overall week AVG + CL/CN/ACG/AWP/MILA).
 
 Do **not** emit former “Portfolio - Stations 1-3 / 7-8” multi-family pages.
 
 ## Logo assets
 
-- Source: official RDG mark (waves + mountains, RDG, riviera dining group).
-- Processed: `assets/rdg-logo-light.png` (white on transparent) and `assets/rdg-logo-dark.png` (navy on transparent).
-- Never embed the raw dark-on-black JPEG alone — it reads as a blank black box.
+- Processed: `assets/rdg-logo-light.png` / `assets/rdg-logo-dark.png`.
 - Rebuild embeds base64 via `RDG_LOGO_LIGHT_DATA_URL` / `RDG_LOGO_DARK_DATA_URL`.
-
-## History
-
-- Former multi-station portfolio pages and hour×day PDF pages were removed from the PDF; hour×day stays on the screen Overview only.
