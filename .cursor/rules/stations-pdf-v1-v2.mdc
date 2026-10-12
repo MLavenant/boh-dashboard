@@ -3,18 +3,24 @@ description: RDG Stations PDF export structure and branding
 alwaysApply: true
 ---
 
-# Stations PDF (current = former V2)
+# Stations PDF (current)
 
 Single button: **Export Stations PDF** on Portfolio → Stations (`exportPortfolioStationsPdf` in `build-unified-v2.cjs`).
 
-## Structure
+## Screen (Stations tab)
 
-1. **Front / overview** — official RDG logo (light PNG on dark), chart, week matrix; full landscape page.
-2. **Portfolio compare** — up to **3 station families per page**, locations side by side (Ful · Items/staff-hr · Items/person).
-3. **Per station** — white **title divider** (dark RDG logo top-right, navy pill with station name, navy footer).
-4. **One compare table per station**:
-   - **Rows (Y)** = hours once
-   - **Columns (X)** = days (Mon…Sun), each with **location sub-columns** (CL / CN / ACG / AWP / MILA)
+**Overview** = compare bar chart (items/staff-hr by station × location) + station chips + one hour×day×location table for the selected station.
+
+## PDF structure
+
+1. **Chart page** — RDG logo + full-page items/staff-hr bar chart only (no week matrix, no multi-station portfolio pages).
+2. **Per station** — white **title divider** (dark RDG logo top-right, navy pill with station name, navy footer).
+3. **Day × location table** (one station per page, large type):
+   - **Rows (Y)** = days Mon…Sun + Week
+   - **Columns (X)** = locations (Claudie / Casa Neos / AVA CG / AVA WP / MILA)
+   - Each location: **Ful · Items/staff-hr · Items/person**
+
+Do **not** emit former “Portfolio - Stations 1-3 / 7-8” multi-family pages.
 
 ## Logo assets
 
@@ -25,4 +31,4 @@ Single button: **Export Stations PDF** on Portfolio → Stations (`exportPortfol
 
 ## History
 
-- Former **V1** (one hour×day table per location) was removed; do not bring it back unless the user asks.
+- Former multi-station portfolio pages and hour×day PDF pages were removed from the PDF; hour×day stays on the screen Overview only.

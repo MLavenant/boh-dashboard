@@ -352,6 +352,11 @@ body.printing-stations-pdf .ps-print-page.ps-intro .ps-chart-wrap {
   min-height:280px;
   margin:0 0 14px;
 }
+body.printing-stations-pdf .ps-print-page.ps-intro.ps-chart-only .ps-chart-wrap-full {
+  flex:1 1 auto;
+  min-height:520px;
+  margin:0;
+}
 body.printing-stations-pdf .ps-print-page.ps-intro img.ps-chart {
   width:100%;
   max-height:340px;
@@ -361,8 +366,32 @@ body.printing-stations-pdf .ps-print-page.ps-intro img.ps-chart {
   border-radius:6px;
   margin:0;
 }
-body.printing-stations-pdf .ps-print-page.ps-intro .ps-matrix-wrap {
-  margin-top:auto;
+body.printing-stations-pdf .ps-print-page.ps-intro.ps-chart-only img.ps-chart {
+  max-height:560px;
+}
+body.printing-stations-pdf .ps-print-page.ps-family.ps-family-large {
+  padding:18px 22px 20px;
+}
+body.printing-stations-pdf .ps-print-page.ps-family.ps-family-large h1 {
+  font-size:32px;
+  margin:0 0 8px;
+}
+body.printing-stations-pdf .ps-print-page.ps-family.ps-family-large .ps-sub {
+  font-size:13px;
+  margin:0 0 14px;
+}
+body.printing-stations-pdf .ps-print-page.ps-family.ps-family-large table {
+  font-size:16px !important;
+}
+body.printing-stations-pdf .ps-print-page.ps-family.ps-family-large th,
+body.printing-stations-pdf .ps-print-page.ps-family.ps-family-large td {
+  padding:12px 14px !important;
+  font-size:16px !important;
+  line-height:1.3;
+}
+body.printing-stations-pdf .ps-print-page.ps-family.ps-family-large th.ps-loc-head {
+  font-size:17px !important;
+  padding:14px 10px !important;
 }
 body.printing-stations-pdf .ps-print-page.ps-intro table {
   width:100%;
@@ -662,7 +691,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <aside id="appSidebar" class="app-sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-title">BOH Dashboard</div>
-    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W41 · Built 2026-10-12T15:40:35.104Z</div>
+    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W41 · Built 2026-10-12T16:03:50.721Z</div>
   </div>
   <div class="sidebar-block">
     <label class="sidebar-label" for="venueSelect">Location</label>
@@ -802,7 +831,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
     <div class="stations-da-filter-label">Stations</div>
     <div id="stationsFamilyChips" class="stations-da-chips"></div>
     <div class="stations-da-chip-actions">
-      <span class="note" style="margin:0;font-size:12px">Pick one station family for the hour × day table</span>
+      <span class="note" style="margin:0;font-size:12px">Overview: pick a station for the hour × day table · Export PDF for chart + day tables</span>
     </div>
   </div>
   <div id="stationsDaMetricBar" class="stations-da-metrics" style="display:none">
@@ -2673,7 +2702,7 @@ function renderStationsBoard() {
   }
 
   if (kicker) kicker.textContent = weekLabel + ' · ' + (portfolio ? 'All locations' : venueLabel);
-  if (title) title.textContent = portfolio ? 'RDG Stations — items / staff-hr' : 'Stations';
+  if (title) title.textContent = portfolio ? 'Overview' : 'Stations';
   if (metricBar) metricBar.style.display = 'none';
   if (pdfBtn) pdfBtn.style.display = portfolio ? '' : 'none';
 
@@ -4328,15 +4357,16 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
         });
       })
     : portfolioVenuesForFamily(family, weekKey);
-  // Placeholder / forced single-venue: still render shell even if empty
+  // Placeholder / forced venues (PDF): always show all locations even if empty
   const forceVenues = Array.isArray(opts.forceVenueKeys) && opts.forceVenueKeys.length
     ? opts.forceVenueKeys.map(k => ({ key: k, label: labels[k] || k }))
     : null;
-  const useVenues = (venues.length ? venues : (forceVenues || []));
+  const useVenues = (forceVenues && forceVenues.length) ? forceVenues : venues;
   if (!useVenues.length) return '';
 
   const compact = !!opts.compact;
   const forPrint = !!opts.forPrint;
+  const large = !!opts.large || forPrint;
   const ipshVals = [];
   const dayRows = HOURLY_DAYS.map(day => {
     const cells = useVenues.map(v => {
@@ -4358,13 +4388,15 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
   });
   const ipshMin = ipshVals.length ? Math.min(...ipshVals) : 0;
   const ipshMax = ipshVals.length ? Math.max(...ipshVals) : 0;
-  const pad = forPrint ? '7px 9px' : (compact ? '2px 4px' : '6px 8px');
-  const headPad = forPrint ? '6px 9px' : (compact ? '2px 4px' : '5px 8px');
-  const dayPad = forPrint ? '7px 10px' : (compact ? '2px 6px' : '8px 12px');
-  const fontSz = forPrint ? '12px' : (compact ? '9px' : '12px');
-  const headSz = forPrint ? '11px' : (compact ? '8px' : '11px');
-  const metricCell = 'padding:'+pad+';text-align:right;font-size:'+fontSz+';font-weight:600;min-width:'+(forPrint?72:(compact?54:72))+'px;box-sizing:border-box;';
-  const metricHead = 'padding:'+headPad+';text-align:right;background:#1e2533;font-size:'+headSz+';font-weight:600;min-width:'+(forPrint?72:(compact?54:72))+'px;box-sizing:border-box;white-space:nowrap;color:#9aa0aa;';
+  const pad = large ? '12px 14px' : (compact ? '2px 4px' : '6px 8px');
+  const headPad = large ? '10px 12px' : (compact ? '2px 4px' : '5px 8px');
+  const dayPad = large ? '12px 14px' : (compact ? '2px 6px' : '8px 12px');
+  const fontSz = large ? '16px' : (compact ? '9px' : '12px');
+  const headSz = large ? '13px' : (compact ? '8px' : '11px');
+  const locHeadSz = large ? '16px' : (forPrint ? '14px' : '13px');
+  const metricMin = large ? 88 : (forPrint ? 72 : (compact ? 54 : 72));
+  const metricCell = 'padding:'+pad+';text-align:right;font-size:'+fontSz+';font-weight:700;min-width:'+metricMin+'px;box-sizing:border-box;';
+  const metricHead = 'padding:'+headPad+';text-align:right;background:#1e2533;font-size:'+headSz+';font-weight:700;min-width:'+metricMin+'px;box-sizing:border-box;white-space:nowrap;color:#9aa0aa;';
   const locSep = 'border-left:3px solid #3d4458;';
   const blockMargin = forPrint ? '0' : '0 0 36px';
 
@@ -4372,10 +4404,10 @@ function buildPortfolioStationsFamilyTableHtml(family, weekKey, opts) {
   if (!forPrint) {
     html += '<h3 style="margin:0 0 12px;font-size:20px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:#d9a441">'+family+'</h3>';
   }
-  html += '<div style="overflow:auto"><table class="ps-family-table" style="width:100%;border-collapse:collapse;font-size:'+fontSz+';min-width:'+(80+useVenues.length*(forPrint?230:220))+'px"><thead>'+
-    '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:'+dayPad+';background:#1e2533;position:sticky;left:0;z-index:1;width:64px">Day</th>';
+  html += '<div style="overflow:auto"><table class="ps-family-table" style="width:100%;border-collapse:collapse;font-size:'+fontSz+';min-width:'+(80+useVenues.length*(large?280:220))+'px"><thead>'+
+    '<tr style="color:#9aa0aa;border-bottom:1px solid #262a33"><th style="text-align:left;padding:'+dayPad+';background:#1e2533;position:sticky;left:0;z-index:1;width:'+(large?88:64)+'px;font-size:'+fontSz+'">Day</th>';
   useVenues.forEach(v => {
-    html += '<th colspan="3" class="ps-loc-head" style="text-align:center;padding:'+(forPrint?'10px 8px':'10px 8px')+';background:#1e2533;'+locSep+'color:#ffffff;font-size:'+(forPrint?'14px':'13px')+';font-weight:700">'+v.label+'</th>';
+    html += '<th colspan="3" class="ps-loc-head" style="text-align:center;padding:'+(large?'14px 10px':'10px 8px')+';background:#1e2533;'+locSep+'color:#ffffff;font-size:'+locHeadSz+';font-weight:700">'+v.label+'</th>';
   });
   html += '</tr><tr style="color:#6b7280;border-bottom:1px solid #262a33"><th style="padding:'+headPad+';background:#13161c;position:sticky;left:0;z-index:1"></th>';
   useVenues.forEach(() => {
@@ -5479,41 +5511,39 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, opts) {
   return html;
 }
 
-function buildStationsPdfIntroHtml(weekLabel, chartImg, families, venueRows, versionTag) {
-  let intro = '<div class="ps-print-page ps-intro">'+
+/** PDF page 1: compare bar chart only (full landscape). */
+function buildStationsPdfChartPageHtml(weekLabel, chartImg) {
+  let html = '<div class="ps-print-page ps-intro ps-chart-only">'+
     '<div class="ps-intro-top">'+
-      '<div><h1>RDG Portfolio - Stations</h1>'+
-      '<p class="ps-sub" style="margin:6px 0 0">'+weekLabel+' | '+versionTag+'</p></div>'+
+      '<div><h1>RDG Portfolio — Stations</h1>'+
+      '<p class="ps-sub" style="margin:6px 0 0">'+weekLabel+' · items / staff-hour by station</p></div>'+
       rdgLogoHtml('light')+
     '</div>';
-  if (chartImg) intro += '<div class="ps-chart-wrap"><img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart"></div>';
-  intro += '<div class="ps-matrix-wrap"><h2>Week matrix — items / staff-hour</h2><table><thead><tr><th>Station</th>';
-  venueRows.forEach(v => { intro += '<th>'+(v.label || v.key)+'</th>'; });
-  intro += '</tr></thead><tbody>';
-  families.forEach(f => {
-    intro += '<tr><td>'+f+'</td>';
-    venueRows.forEach(v => {
-      const st = v.familyStats[f] || {};
-      const ipsh = st.ipsh != null ? Number(st.ipsh) : (st.iph != null ? Number(st.iph) : null);
-      intro += '<td>'+(ipsh != null && ipsh > 0 ? ipsh : '')+'</td>';
-    });
-    intro += '</tr>';
-  });
-  intro += '</tbody></table></div></div>';
-  return intro;
+  if (chartImg) {
+    html += '<div class="ps-chart-wrap ps-chart-wrap-full"><img class="ps-chart" src="'+chartImg+'" alt="Stations compare chart"></div>';
+  } else {
+    html += '<p class="ps-sub">Chart unavailable — open Stations Overview, then Export PDF again.</p>';
+  }
+  html += '</div>';
+  return html;
 }
 
-function buildStationsPdfPortfolioPagesHtml(families, weekKey, weekLabel) {
-  const FAMILIES_PER_PAGE = 3;
-  return chunkArray(families, FAMILIES_PER_PAGE).map((chunk, idx) => {
-    const tables = chunk.map(f => buildPortfolioStationsFamilyTableHtml(f, weekKey, { compact: false })).filter(Boolean).join('');
-    if (!tables) return '';
-    return '<div class="ps-print-page ps-family ps-multi">'+
-      '<h1>Portfolio - Stations '+(idx * FAMILIES_PER_PAGE + 1)+'-'+(idx * FAMILIES_PER_PAGE + chunk.length)+'</h1>'+
-      '<p class="ps-sub">'+weekLabel+' | locations side by side | Ful | Items/staff-hr | Items/person</p>'+
-      tables+
-      '</div>';
-  }).join('');
+/** Per-station PDF page: large day × location table (Ful · Items/staff-hr · Items/person). */
+function buildStationsPdfFamilyDayPageHtml(family, weekKey, weekLabel) {
+  const labels = {"claudie":"Claudie","casaneos":"Casa Neos","ava_cg":"AVA Coconut Grove","ava_wp":"AVA Winter Park","mila":"MILA"};
+  const allVenueKeys = PORTFOLIO_VENUE_KEYS.slice();
+  const table = buildPortfolioStationsFamilyTableHtml(family, weekKey, {
+    forPrint: true,
+    large: true,
+    forceVenueKeys: allVenueKeys,
+    venueKeys: allVenueKeys,
+  });
+  if (!table) return '';
+  return '<div class="ps-print-page ps-family ps-family-large">'+
+    '<h1>'+String(family).toUpperCase()+'</h1>'+
+    '<p class="ps-sub">'+weekLabel+' · locations side by side · Ful · Items/staff-hr · Items/person</p>'+
+    table+
+    '</div>';
 }
 
 function runStationsPdfPrint(printRoot, html) {
@@ -5579,23 +5609,15 @@ function exportPortfolioStationsPdf() {
       if (canvas && canvas.toDataURL) chartImg = canvas.toDataURL('image/png');
     } catch (e) { chartImg = ''; }
 
-    const versionTag = 'overview + 3 stations/page + one all-locations hour x day table per station';
-    const intro = buildStationsPdfIntroHtml(weekLabel, chartImg, families, venueRows, versionTag);
-    const portfolioPages = buildStationsPdfPortfolioPagesHtml(families, weekKey, weekLabel);
-
+    // PDF: (1) chart page (2) per station: divider + large day×location table
+    const chartPage = buildStationsPdfChartPageHtml(weekLabel, chartImg);
     const detailPages = families.map(f => {
-      const venues = portfolioVenuesForFamily(f, weekKey);
-      if (!venues.length) return '';
-      const combined = buildFamilyAllLocationsIpshCompareHtml(f, weekKey, venues);
-      if (!combined) return '';
-      return buildStationDividerPageHtml(f)+
-        '<div class="ps-print-page ps-hourly">'+
-          '<h1>'+String(f).toUpperCase()+'</h1>'+
-          combined+
-        '</div>';
+      const dayPage = buildStationsPdfFamilyDayPageHtml(f, weekKey, weekLabel);
+      if (!dayPage) return '';
+      return buildStationDividerPageHtml(f) + dayPage;
     }).join('');
 
-    runStationsPdfPrint(printRoot, intro + portfolioPages + detailPages);
+    runStationsPdfPrint(printRoot, chartPage + detailPages);
   };
 
   requestAnimationFrame(() => {
