@@ -69179,7 +69179,7 @@
   "staffing": {
     "venue": "claudie",
     "weekLabel": "2026-W36",
-    "builtAt": "2026-10-12T17:20:26.035Z",
+    "builtAt": "2026-10-12T17:26:09.644Z",
     "matchStats": {
       "laborShiftsMatched": 138,
       "laborShiftsUnmatched": 329,
@@ -69190,9 +69190,11 @@
       "bohMatchRate": 0.932,
       "rosterCoverage": 0.829,
       "noStationPeopleCount": 2,
+      "excludedEarlyClockIns": 0,
+      "excludedEarlyHours": 0,
       "excludedEarlyWeekdayClockIns": 0,
       "excludedEarlyWeekdayHours": 0,
-      "earlyClockInExcludeRule": "Claudie: keep all punches (no Mon–Fri 5–10am filter)"
+      "earlyClockInExcludeRule": "Claudie: keep all punches (no 5–10am filter)"
     },
     "guestsSeated": {
       "total": 1991,
@@ -69414,7 +69416,7 @@
               "label": "Operational bottleneck",
               "code": "process_issue",
               "source": "history",
-              "nPeer": 28,
+              "nPeer": 29,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.91
@@ -69653,7 +69655,7 @@
               "label": "Operational bottleneck",
               "code": "process_issue",
               "source": "history",
-              "nPeer": 37,
+              "nPeer": 38,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.88
@@ -69970,7 +69972,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 38,
+              "nPeer": 39,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.95
@@ -70287,7 +70289,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 38,
+              "nPeer": 39,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.93
@@ -70576,7 +70578,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 38,
+              "nPeer": 39,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.83
@@ -70865,7 +70867,7 @@
               "label": "Likely understaffed",
               "code": "understaffed_pressure",
               "source": "history",
-              "nPeer": 38,
+              "nPeer": 39,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.79
@@ -70998,7 +71000,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 38,
+              "nPeer": 39,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.33
@@ -71205,7 +71207,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 24,
+              "nPeer": 26,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.33
@@ -71397,7 +71399,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 32,
+              "nPeer": 35,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.43
@@ -71534,13 +71536,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Strong performance",
-              "code": "efficient_busy",
-              "source": "peer",
-              "nPeer": 36,
-              "nHist": 5,
-              "note": "vs RDG peer same-DOW",
-              "staffingRatio": 0.34
+              "label": "Balanced",
+              "code": "in_band",
+              "source": "history",
+              "nPeer": 38,
+              "nHist": 6,
+              "note": "vs own same-DOW history",
+              "staffingRatio": 0.91
             }
           },
           "Thursday": {
@@ -71677,7 +71679,7 @@
               "label": "Likely understaffed",
               "code": "understaffed_pressure",
               "source": "history",
-              "nPeer": 37,
+              "nPeer": 39,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.5
@@ -71929,7 +71931,7 @@
               "label": "Operational bottleneck",
               "code": "process_issue",
               "source": "history",
-              "nPeer": 39,
+              "nPeer": 40,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.11
@@ -72181,7 +72183,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 39,
+              "nPeer": 40,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.2
@@ -72382,7 +72384,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 39,
+              "nPeer": 40,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.71
@@ -72516,7 +72518,7 @@
               "label": "Operational bottleneck",
               "code": "process_issue",
               "source": "history",
-              "nPeer": 18,
+              "nPeer": 19,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.11
@@ -72635,7 +72637,7 @@
               "label": "Operational bottleneck",
               "code": "process_issue",
               "source": "history",
-              "nPeer": 24,
+              "nPeer": 25,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1
@@ -72831,7 +72833,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 32,
+              "nPeer": 34,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.67
@@ -73027,7 +73029,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 34,
+              "nPeer": 35,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.95
@@ -73188,7 +73190,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 37,
+              "nPeer": 39,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.71
@@ -73342,7 +73344,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 36,
+              "nPeer": 38,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.71
@@ -73494,7 +73496,7 @@
               "label": "Likely understaffed",
               "code": "understaffed_pressure",
               "source": "history",
-              "nPeer": 36,
+              "nPeer": 38,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.63
@@ -75417,7 +75419,7 @@
               "label": "Likely overstaffed",
               "code": "overstaffed_slack",
               "source": "history",
-              "nPeer": 16,
+              "nPeer": 19,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.48
@@ -75662,7 +75664,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 23,
+              "nPeer": 26,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.94
@@ -76007,7 +76009,7 @@
               "label": "Likely overstaffed",
               "code": "overstaffed_slack",
               "source": "history",
-              "nPeer": 25,
+              "nPeer": 28,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.19
@@ -76317,7 +76319,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 25,
+              "nPeer": 28,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.89
@@ -76601,7 +76603,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 25,
+              "nPeer": 28,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.77
@@ -76897,7 +76899,7 @@
               "label": "Strong performance",
               "code": "efficient_busy",
               "source": "history",
-              "nPeer": 25,
+              "nPeer": 28,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.7
@@ -77168,7 +77170,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 25,
+              "nPeer": 28,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.71
@@ -79832,7 +79834,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 28,
+              "nPeer": 29,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.11
@@ -80034,7 +80036,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 36,
+              "nPeer": 37,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.83
@@ -80285,7 +80287,7 @@
               "label": "Likely overstaffed",
               "code": "overstaffed_slack",
               "source": "history",
-              "nPeer": 39,
+              "nPeer": 40,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.25
@@ -80510,7 +80512,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 39,
+              "nPeer": 40,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.07
@@ -80791,7 +80793,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 39,
+              "nPeer": 40,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.03
@@ -81093,7 +81095,7 @@
               "label": "Operational bottleneck",
               "code": "process_issue",
               "source": "history",
-              "nPeer": 39,
+              "nPeer": 40,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.15
@@ -81226,7 +81228,7 @@
               "label": "Strong performance",
               "code": "efficient_busy",
               "source": "history",
-              "nPeer": 39,
+              "nPeer": 40,
               "nHist": 6,
               "note": "vs own same-DOW history",
               "staffingRatio": 0.67

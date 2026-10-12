@@ -59060,20 +59060,22 @@
   "staffing": {
     "venue": "casa_neos",
     "weekLabel": "2026-W40",
-    "builtAt": "2026-10-12T17:19:27.301Z",
+    "builtAt": "2026-10-12T17:25:41.820Z",
     "matchStats": {
-      "laborShiftsMatched": 205,
-      "laborShiftsUnmatched": 499,
-      "rosterUnused": 1,
+      "laborShiftsMatched": 162,
+      "laborShiftsUnmatched": 466,
+      "rosterUnused": 18,
       "rosterTotal": 60,
-      "matchRate": 0.291,
+      "matchRate": 0.258,
       "bohLaborShiftsUnmatched": 1,
-      "bohMatchRate": 0.995,
-      "rosterCoverage": 0.983,
+      "bohMatchRate": 0.994,
+      "rosterCoverage": 0.7,
       "noStationPeopleCount": 1,
-      "excludedEarlyWeekdayClockIns": 60,
-      "excludedEarlyWeekdayHours": 522.81,
-      "earlyClockInExcludeRule": "Non-Claudie: exclude Mon–Fri punches with clock-in 5:00–9:59 ET"
+      "excludedEarlyClockIns": 136,
+      "excludedEarlyHours": 1210.29,
+      "excludedEarlyWeekdayClockIns": 136,
+      "excludedEarlyWeekdayHours": 1210.29,
+      "earlyClockInExcludeRule": "Non-Claudie: exclude punches with clock-in 5:00–9:59 ET (any day)"
     },
     "guestsSeated": {
       "total": 2531,
@@ -59120,12 +59122,12 @@
       "Prep": {
         "family": "Prep",
         "rosterCount": 14,
-        "weekHeadsUnique": 14,
-        "weekHours": 174.91,
+        "weekHeadsUnique": 2,
+        "weekHours": 10.05,
         "weekItemCount": 48,
         "weekTicketCount": 37,
-        "weekItemsPerHeadDay": 1.7,
-        "weekItemsPerStaffHour": 0.27,
+        "weekItemsPerHeadDay": 8,
+        "weekItemsPerStaffHour": 4.78,
         "weekServiceHours": 24,
         "weekItemsPerServiceHour": 2,
         "weekAvgFulSec": 186.4,
@@ -59475,82 +59477,22 @@
             }
           },
           "Saturday": {
-            "heads": 13,
-            "hours": 95.07,
+            "heads": 1,
+            "hours": 5.05,
             "staff": [
-              {
-                "label": "Gousmann A.",
-                "hours": 7.97,
-                "position": "Butcher"
-              },
-              {
-                "label": "Wisnel B.",
-                "hours": 7.48,
-                "position": "Prep"
-              },
-              {
-                "label": "Lony C.",
-                "hours": 7.62,
-                "position": "Prep"
-              },
-              {
-                "label": "Tyrone C.",
-                "hours": 7.8,
-                "position": "Butcher"
-              },
               {
                 "label": "Travis D.",
                 "hours": 5.05,
                 "position": "Prep"
-              },
-              {
-                "label": "Hudson D.",
-                "hours": 7.33,
-                "position": "Prep"
-              },
-              {
-                "label": "Jenny C.",
-                "hours": 7.9,
-                "position": "Prep"
-              },
-              {
-                "label": "Mandorliny J.",
-                "hours": 7.6,
-                "position": "Prep"
-              },
-              {
-                "label": "Claudia G.",
-                "hours": 7.75,
-                "position": "Prep"
-              },
-              {
-                "label": "Claudia N.",
-                "hours": 7.82,
-                "position": "Prep"
-              },
-              {
-                "label": "Lesly O.",
-                "hours": 7.6,
-                "position": "Prep"
-              },
-              {
-                "label": "Sylve L.",
-                "hours": 7.55,
-                "position": "Prep"
-              },
-              {
-                "label": "Jovan T.",
-                "hours": 5.6,
-                "position": "Prep"
               }
             ],
             "headsByHour": {
-              "10-11": 13,
-              "11-12": 13,
-              "12-13": 13,
-              "13-14": 12,
-              "14-15": 12,
-              "15-16": 11,
+              "10-11": 1,
+              "11-12": 1,
+              "12-13": 1,
+              "13-14": 1,
+              "14-15": 1,
+              "15-16": 1,
               "16-17": 0,
               "17-18": 0,
               "18-19": 0,
@@ -59565,458 +59507,50 @@
             "staffByHour": {
               "10-11": [
                 {
-                  "label": "Claudia G.",
-                  "position": "Prep",
-                  "in": "7:30a",
-                  "out": "3:15p"
-                },
-                {
-                  "label": "Claudia N.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "3:15p"
-                },
-                {
-                  "label": "Gousmann A.",
-                  "position": "Butcher",
-                  "in": "7:26a",
-                  "out": "3:24p"
-                },
-                {
-                  "label": "Hudson D.",
-                  "position": "Prep",
-                  "in": "8:05a",
-                  "out": "3:25p"
-                },
-                {
-                  "label": "Jenny C.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "3:23p"
-                },
-                {
-                  "label": "Jovan T.",
-                  "position": "Prep",
-                  "in": "6:52a",
-                  "out": "12:28p"
-                },
-                {
-                  "label": "Lesly O.",
-                  "position": "Prep",
-                  "in": "7:28a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Lony C.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "3:02p"
-                },
-                {
-                  "label": "Mandorliny J.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "3:02p"
-                },
-                {
-                  "label": "Sylve L.",
-                  "position": "Prep",
-                  "in": "7:28a",
-                  "out": "3:01p"
-                },
-                {
                   "label": "Travis D.",
                   "position": "Prep",
                   "in": "10:41a",
                   "out": "3:44p"
-                },
-                {
-                  "label": "Tyrone C.",
-                  "position": "Butcher",
-                  "in": "7:33a",
-                  "out": "3:21p"
-                },
-                {
-                  "label": "Wisnel B.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "2:55p"
                 }
               ],
               "11-12": [
                 {
-                  "label": "Claudia G.",
-                  "position": "Prep",
-                  "in": "7:30a",
-                  "out": "3:15p"
-                },
-                {
-                  "label": "Claudia N.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "3:15p"
-                },
-                {
-                  "label": "Gousmann A.",
-                  "position": "Butcher",
-                  "in": "7:26a",
-                  "out": "3:24p"
-                },
-                {
-                  "label": "Hudson D.",
-                  "position": "Prep",
-                  "in": "8:05a",
-                  "out": "3:25p"
-                },
-                {
-                  "label": "Jenny C.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "3:23p"
-                },
-                {
-                  "label": "Jovan T.",
-                  "position": "Prep",
-                  "in": "6:52a",
-                  "out": "12:28p"
-                },
-                {
-                  "label": "Lesly O.",
-                  "position": "Prep",
-                  "in": "7:28a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Lony C.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "3:02p"
-                },
-                {
-                  "label": "Mandorliny J.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "3:02p"
-                },
-                {
-                  "label": "Sylve L.",
-                  "position": "Prep",
-                  "in": "7:28a",
-                  "out": "3:01p"
-                },
-                {
                   "label": "Travis D.",
                   "position": "Prep",
                   "in": "10:41a",
                   "out": "3:44p"
-                },
-                {
-                  "label": "Tyrone C.",
-                  "position": "Butcher",
-                  "in": "7:33a",
-                  "out": "3:21p"
-                },
-                {
-                  "label": "Wisnel B.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "2:55p"
                 }
               ],
               "12-13": [
                 {
-                  "label": "Claudia G.",
-                  "position": "Prep",
-                  "in": "7:30a",
-                  "out": "3:15p"
-                },
-                {
-                  "label": "Claudia N.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "3:15p"
-                },
-                {
-                  "label": "Gousmann A.",
-                  "position": "Butcher",
-                  "in": "7:26a",
-                  "out": "3:24p"
-                },
-                {
-                  "label": "Hudson D.",
-                  "position": "Prep",
-                  "in": "8:05a",
-                  "out": "3:25p"
-                },
-                {
-                  "label": "Jenny C.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "3:23p"
-                },
-                {
-                  "label": "Jovan T.",
-                  "position": "Prep",
-                  "in": "6:52a",
-                  "out": "12:28p"
-                },
-                {
-                  "label": "Lesly O.",
-                  "position": "Prep",
-                  "in": "7:28a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Lony C.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "3:02p"
-                },
-                {
-                  "label": "Mandorliny J.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "3:02p"
-                },
-                {
-                  "label": "Sylve L.",
-                  "position": "Prep",
-                  "in": "7:28a",
-                  "out": "3:01p"
-                },
-                {
                   "label": "Travis D.",
                   "position": "Prep",
                   "in": "10:41a",
                   "out": "3:44p"
-                },
-                {
-                  "label": "Tyrone C.",
-                  "position": "Butcher",
-                  "in": "7:33a",
-                  "out": "3:21p"
-                },
-                {
-                  "label": "Wisnel B.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "2:55p"
                 }
               ],
               "13-14": [
                 {
-                  "label": "Claudia G.",
-                  "position": "Prep",
-                  "in": "7:30a",
-                  "out": "3:15p"
-                },
-                {
-                  "label": "Claudia N.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "3:15p"
-                },
-                {
-                  "label": "Gousmann A.",
-                  "position": "Butcher",
-                  "in": "7:26a",
-                  "out": "3:24p"
-                },
-                {
-                  "label": "Hudson D.",
-                  "position": "Prep",
-                  "in": "8:05a",
-                  "out": "3:25p"
-                },
-                {
-                  "label": "Jenny C.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "3:23p"
-                },
-                {
-                  "label": "Lesly O.",
-                  "position": "Prep",
-                  "in": "7:28a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Lony C.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "3:02p"
-                },
-                {
-                  "label": "Mandorliny J.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "3:02p"
-                },
-                {
-                  "label": "Sylve L.",
-                  "position": "Prep",
-                  "in": "7:28a",
-                  "out": "3:01p"
-                },
-                {
                   "label": "Travis D.",
                   "position": "Prep",
                   "in": "10:41a",
                   "out": "3:44p"
-                },
-                {
-                  "label": "Tyrone C.",
-                  "position": "Butcher",
-                  "in": "7:33a",
-                  "out": "3:21p"
-                },
-                {
-                  "label": "Wisnel B.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "2:55p"
                 }
               ],
               "14-15": [
                 {
-                  "label": "Claudia G.",
-                  "position": "Prep",
-                  "in": "7:30a",
-                  "out": "3:15p"
-                },
-                {
-                  "label": "Claudia N.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "3:15p"
-                },
-                {
-                  "label": "Gousmann A.",
-                  "position": "Butcher",
-                  "in": "7:26a",
-                  "out": "3:24p"
-                },
-                {
-                  "label": "Hudson D.",
-                  "position": "Prep",
-                  "in": "8:05a",
-                  "out": "3:25p"
-                },
-                {
-                  "label": "Jenny C.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "3:23p"
-                },
-                {
-                  "label": "Lesly O.",
-                  "position": "Prep",
-                  "in": "7:28a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Lony C.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "3:02p"
-                },
-                {
-                  "label": "Mandorliny J.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "3:02p"
-                },
-                {
-                  "label": "Sylve L.",
-                  "position": "Prep",
-                  "in": "7:28a",
-                  "out": "3:01p"
-                },
-                {
                   "label": "Travis D.",
                   "position": "Prep",
                   "in": "10:41a",
                   "out": "3:44p"
-                },
-                {
-                  "label": "Tyrone C.",
-                  "position": "Butcher",
-                  "in": "7:33a",
-                  "out": "3:21p"
-                },
-                {
-                  "label": "Wisnel B.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "2:55p"
                 }
               ],
               "15-16": [
                 {
-                  "label": "Claudia G.",
-                  "position": "Prep",
-                  "in": "7:30a",
-                  "out": "3:15p"
-                },
-                {
-                  "label": "Claudia N.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "3:15p"
-                },
-                {
-                  "label": "Gousmann A.",
-                  "position": "Butcher",
-                  "in": "7:26a",
-                  "out": "3:24p"
-                },
-                {
-                  "label": "Hudson D.",
-                  "position": "Prep",
-                  "in": "8:05a",
-                  "out": "3:25p"
-                },
-                {
-                  "label": "Jenny C.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "3:23p"
-                },
-                {
-                  "label": "Lesly O.",
-                  "position": "Prep",
-                  "in": "7:28a",
-                  "out": "3:04p"
-                },
-                {
-                  "label": "Lony C.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "3:02p"
-                },
-                {
-                  "label": "Mandorliny J.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "3:02p"
-                },
-                {
-                  "label": "Sylve L.",
-                  "position": "Prep",
-                  "in": "7:28a",
-                  "out": "3:01p"
-                },
-                {
                   "label": "Travis D.",
                   "position": "Prep",
                   "in": "10:41a",
                   "out": "3:44p"
-                },
-                {
-                  "label": "Tyrone C.",
-                  "position": "Butcher",
-                  "in": "7:33a",
-                  "out": "3:21p"
                 }
               ],
               "16-17": [],
@@ -60035,10 +59569,10 @@
             "volume": 22,
             "volumeSource": "itemQty",
             "itemCount": 22,
-            "itemsPerHead": 1.7,
+            "itemsPerHead": 22,
             "serviceHours": 8,
             "itemsPerServiceHour": 2.75,
-            "itemsPerStaffHour": 0.23,
+            "itemsPerStaffHour": 4.36,
             "avgFulSec": 178.2,
             "qc": {
               "eligible": false,
@@ -60055,77 +59589,22 @@
             }
           },
           "Sunday": {
-            "heads": 12,
-            "hours": 75.84,
+            "heads": 1,
+            "hours": 1,
             "staff": [
               {
-                "label": "Gousmann A.",
-                "hours": 6.15,
-                "position": "Butcher"
-              },
-              {
-                "label": "Wisnel B.",
-                "hours": 6.15,
-                "position": "Prep"
-              },
-              {
-                "label": "Lony C.",
-                "hours": 6.12,
-                "position": "Prep"
-              },
-              {
-                "label": "Tyrone C.",
-                "hours": 5.87,
-                "position": "Butcher"
-              },
-              {
-                "label": "Travis D.",
-                "hours": 8.08,
-                "position": "Prep"
-              },
-              {
-                "label": "Hudson D.",
-                "hours": 6.1,
-                "position": "Prep"
-              },
-              {
-                "label": "Jenny C.",
-                "hours": 6.52,
-                "position": "Prep"
-              },
-              {
-                "label": "Mandorliny J.",
-                "hours": 6.12,
-                "position": "Prep"
-              },
-              {
-                "label": "Claudia N.",
-                "hours": 6.43,
-                "position": "Prep"
-              },
-              {
-                "label": "Lesly O.",
-                "hours": 6.23,
-                "position": "Prep"
-              },
-              {
-                "label": "Sylve L.",
-                "hours": 6.1,
-                "position": "Prep"
-              },
-              {
-                "label": "Jovan T.",
-                "hours": 5.97,
-                "position": "Prep"
+                "label": "(unassigned 1.",
+                "hours": null,
+                "position": "Imputed"
               }
             ],
             "headsByHour": {
-              "10-11": 12,
-              "11-12": 12,
-              "12-13": 12,
-              "13-14": 12,
-              "14-15": 2,
-              "15-16": 1,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 0,
               "16-17": 0,
               "17-18": 0,
               "18-19": 0,
@@ -60138,324 +59617,12 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Claudia N.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "1:51p"
-                },
-                {
-                  "label": "Gousmann A.",
-                  "position": "Butcher",
-                  "in": "7:25a",
-                  "out": "1:34p"
-                },
-                {
-                  "label": "Hudson D.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "1:32p"
-                },
-                {
-                  "label": "Jenny C.",
-                  "position": "Prep",
-                  "in": "7:30a",
-                  "out": "2:01p"
-                },
-                {
-                  "label": "Jovan T.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "1:24p"
-                },
-                {
-                  "label": "Lesly O.",
-                  "position": "Prep",
-                  "in": "7:31a",
-                  "out": "1:45p"
-                },
-                {
-                  "label": "Lony C.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "1:33p"
-                },
-                {
-                  "label": "Mandorliny J.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "1:32p"
-                },
-                {
-                  "label": "Sylve L.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "1:35p"
-                },
-                {
-                  "label": "Travis D.",
-                  "position": "Prep",
-                  "in": "7:31a",
-                  "out": "3:36p"
-                },
-                {
-                  "label": "Tyrone C.",
-                  "position": "Butcher",
-                  "in": "7:28a",
-                  "out": "1:20p"
-                },
-                {
-                  "label": "Wisnel B.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "1:38p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Claudia N.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "1:51p"
-                },
-                {
-                  "label": "Gousmann A.",
-                  "position": "Butcher",
-                  "in": "7:25a",
-                  "out": "1:34p"
-                },
-                {
-                  "label": "Hudson D.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "1:32p"
-                },
-                {
-                  "label": "Jenny C.",
-                  "position": "Prep",
-                  "in": "7:30a",
-                  "out": "2:01p"
-                },
-                {
-                  "label": "Jovan T.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "1:24p"
-                },
-                {
-                  "label": "Lesly O.",
-                  "position": "Prep",
-                  "in": "7:31a",
-                  "out": "1:45p"
-                },
-                {
-                  "label": "Lony C.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "1:33p"
-                },
-                {
-                  "label": "Mandorliny J.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "1:32p"
-                },
-                {
-                  "label": "Sylve L.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "1:35p"
-                },
-                {
-                  "label": "Travis D.",
-                  "position": "Prep",
-                  "in": "7:31a",
-                  "out": "3:36p"
-                },
-                {
-                  "label": "Tyrone C.",
-                  "position": "Butcher",
-                  "in": "7:28a",
-                  "out": "1:20p"
-                },
-                {
-                  "label": "Wisnel B.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "1:38p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Claudia N.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "1:51p"
-                },
-                {
-                  "label": "Gousmann A.",
-                  "position": "Butcher",
-                  "in": "7:25a",
-                  "out": "1:34p"
-                },
-                {
-                  "label": "Hudson D.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "1:32p"
-                },
-                {
-                  "label": "Jenny C.",
-                  "position": "Prep",
-                  "in": "7:30a",
-                  "out": "2:01p"
-                },
-                {
-                  "label": "Jovan T.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "1:24p"
-                },
-                {
-                  "label": "Lesly O.",
-                  "position": "Prep",
-                  "in": "7:31a",
-                  "out": "1:45p"
-                },
-                {
-                  "label": "Lony C.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "1:33p"
-                },
-                {
-                  "label": "Mandorliny J.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "1:32p"
-                },
-                {
-                  "label": "Sylve L.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "1:35p"
-                },
-                {
-                  "label": "Travis D.",
-                  "position": "Prep",
-                  "in": "7:31a",
-                  "out": "3:36p"
-                },
-                {
-                  "label": "Tyrone C.",
-                  "position": "Butcher",
-                  "in": "7:28a",
-                  "out": "1:20p"
-                },
-                {
-                  "label": "Wisnel B.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "1:38p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Claudia N.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "1:51p"
-                },
-                {
-                  "label": "Gousmann A.",
-                  "position": "Butcher",
-                  "in": "7:25a",
-                  "out": "1:34p"
-                },
-                {
-                  "label": "Hudson D.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "1:32p"
-                },
-                {
-                  "label": "Jenny C.",
-                  "position": "Prep",
-                  "in": "7:30a",
-                  "out": "2:01p"
-                },
-                {
-                  "label": "Jovan T.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "1:24p"
-                },
-                {
-                  "label": "Lesly O.",
-                  "position": "Prep",
-                  "in": "7:31a",
-                  "out": "1:45p"
-                },
-                {
-                  "label": "Lony C.",
-                  "position": "Prep",
-                  "in": "7:26a",
-                  "out": "1:33p"
-                },
-                {
-                  "label": "Mandorliny J.",
-                  "position": "Prep",
-                  "in": "7:25a",
-                  "out": "1:32p"
-                },
-                {
-                  "label": "Sylve L.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "1:35p"
-                },
-                {
-                  "label": "Travis D.",
-                  "position": "Prep",
-                  "in": "7:31a",
-                  "out": "3:36p"
-                },
-                {
-                  "label": "Tyrone C.",
-                  "position": "Butcher",
-                  "in": "7:28a",
-                  "out": "1:20p"
-                },
-                {
-                  "label": "Wisnel B.",
-                  "position": "Prep",
-                  "in": "7:29a",
-                  "out": "1:38p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Jenny C.",
-                  "position": "Prep",
-                  "in": "7:30a",
-                  "out": "2:01p"
-                },
-                {
-                  "label": "Travis D.",
-                  "position": "Prep",
-                  "in": "7:31a",
-                  "out": "3:36p"
-                }
-              ],
-              "15-16": [
-                {
-                  "label": "Travis D.",
-                  "position": "Prep",
-                  "in": "7:31a",
-                  "out": "3:36p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
+              "15-16": [],
               "16-17": [],
               "17-18": [],
               "18-19": [],
@@ -60472,10 +59639,10 @@
             "volume": 12,
             "volumeSource": "itemQty",
             "itemCount": 12,
-            "itemsPerHead": 1,
+            "itemsPerHead": 12,
             "serviceHours": 7,
             "itemsPerServiceHour": 1.71,
-            "itemsPerStaffHour": 0.16,
+            "itemsPerStaffHour": 12,
             "avgFulSec": 197.5,
             "qc": {
               "eligible": false,
@@ -60496,12 +59663,12 @@
       "Pastry": {
         "family": "Pastry",
         "rosterCount": 6,
-        "weekHeadsUnique": 7,
-        "weekHours": 163.67,
+        "weekHeadsUnique": 5,
+        "weekHours": 124.86,
         "weekItemCount": 578,
         "weekTicketCount": 416,
-        "weekItemsPerHeadDay": 26.3,
-        "weekItemsPerStaffHour": 3.53,
+        "weekItemsPerHeadDay": 32.1,
+        "weekItemsPerStaffHour": 4.63,
         "weekServiceHours": 54,
         "weekItemsPerServiceHour": 10.7,
         "weekAvgFulSec": 320.9,
@@ -60640,10 +59807,10 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 29,
-              "nHist": 8,
+              "nPeer": 32,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.28
+              "staffingRatio": 0.34
             }
           },
           "Wednesday": {
@@ -60710,10 +59877,10 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 32,
-              "nHist": 8,
+              "nPeer": 35,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.25
+              "staffingRatio": 0.32
             }
           },
           "Thursday": {
@@ -60947,13 +60114,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Strong performance",
-              "code": "efficient_busy",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "history",
-              "nPeer": 34,
-              "nHist": 8,
+              "nPeer": 36,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.79
+              "staffingRatio": 1.11
             }
           },
           "Friday": {
@@ -61277,18 +60444,18 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Likely understaffed",
-              "code": "understaffed_pressure",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "history",
-              "nPeer": 36,
-              "nHist": 8,
+              "nPeer": 37,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.82
+              "staffingRatio": 0.95
             }
           },
           "Saturday": {
-            "heads": 6,
-            "hours": 54.59,
+            "heads": 4,
+            "hours": 35.09,
             "staff": [
               {
                 "label": "Robin A.",
@@ -61306,32 +60473,22 @@
                 "position": "Pastry"
               },
               {
-                "label": "Karina R.",
-                "hours": 8.32,
-                "position": "Pastry"
-              },
-              {
                 "label": "Yamila G.",
                 "hours": 9.4,
-                "position": "Pastry"
-              },
-              {
-                "label": "Made R.",
-                "hours": 11.18,
                 "position": "Pastry"
               }
             ],
             "headsByHour": {
-              "10-11": 2,
-              "11-12": 2,
-              "12-13": 2,
-              "13-14": 2,
-              "14-15": 2,
-              "15-16": 3,
-              "16-17": 5,
-              "17-18": 4,
-              "18-19": 4,
-              "19-20": 5,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 1,
+              "16-17": 3,
+              "17-18": 3,
+              "18-19": 3,
+              "19-20": 4,
               "20-21": 4,
               "21-22": 4,
               "22-23": 4,
@@ -61340,89 +60497,12 @@
               "1-2": 4
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:56a",
-                  "out": "4:15p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "7:11p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:56a",
-                  "out": "4:15p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "7:11p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:56a",
-                  "out": "4:15p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "7:11p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:56a",
-                  "out": "4:15p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "7:11p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:56a",
-                  "out": "4:15p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "7:11p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
               "15-16": [
-                {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:56a",
-                  "out": "4:15p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "7:11p"
-                },
                 {
                   "label": "Mariah G.",
                   "position": "Pastry",
@@ -61431,18 +60511,6 @@
                 }
               ],
               "16-17": [
-                {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:56a",
-                  "out": "4:15p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "7:11p"
-                },
                 {
                   "label": "Mariah G.",
                   "position": "Pastry",
@@ -61464,12 +60532,6 @@
               ],
               "17-18": [
                 {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "7:11p"
-                },
-                {
                   "label": "Mariah G.",
                   "position": "Pastry",
                   "in": "3:58p",
@@ -61489,12 +60551,6 @@
                 }
               ],
               "18-19": [
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "7:11p"
-                },
                 {
                   "label": "Mariah G.",
                   "position": "Pastry",
@@ -61520,12 +60576,6 @@
                   "position": "Pastry",
                   "in": "7:02p",
                   "out": "1:53a"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "8:00a",
-                  "out": "7:11p"
                 },
                 {
                   "label": "Mariah G.",
@@ -61708,28 +60758,28 @@
             "volume": 135,
             "volumeSource": "itemQty",
             "itemCount": 135,
-            "itemsPerHead": 22.5,
+            "itemsPerHead": 33.8,
             "serviceHours": 12,
             "itemsPerServiceHour": 11.25,
-            "itemsPerStaffHour": 2.47,
+            "itemsPerStaffHour": 3.85,
             "avgFulSec": 293.3,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Likely overstaffed",
-              "code": "overstaffed_slack",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "history",
-              "nPeer": 36,
-              "nHist": 8,
+              "nPeer": 37,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.18
+              "staffingRatio": 0.78
             }
           },
           "Sunday": {
-            "heads": 6,
-            "hours": 49.71,
+            "heads": 4,
+            "hours": 30.4,
             "staff": [
               {
                 "label": "Robin A.",
@@ -61747,31 +60797,21 @@
                 "position": "Pastry"
               },
               {
-                "label": "Karina R.",
-                "hours": 8.88,
-                "position": "Pastry"
-              },
-              {
                 "label": "Yamila G.",
                 "hours": 8.37,
-                "position": "Pastry"
-              },
-              {
-                "label": "Made R.",
-                "hours": 10.43,
                 "position": "Pastry"
               }
             ],
             "headsByHour": {
-              "10-11": 2,
-              "11-12": 3,
-              "12-13": 3,
-              "13-14": 3,
-              "14-15": 3,
-              "15-16": 3,
-              "16-17": 4,
-              "17-18": 4,
-              "18-19": 5,
+              "10-11": 0,
+              "11-12": 1,
+              "12-13": 1,
+              "13-14": 1,
+              "14-15": 1,
+              "15-16": 1,
+              "16-17": 2,
+              "17-18": 3,
+              "18-19": 4,
               "19-20": 4,
               "20-21": 4,
               "21-22": 3,
@@ -61781,33 +60821,8 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "4:48p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "6:21p"
-                }
-              ],
+              "10-11": [],
               "11-12": [
-                {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "4:48p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "6:21p"
-                },
                 {
                   "label": "Mariah G.",
                   "position": "Pastry",
@@ -61817,18 +60832,6 @@
               ],
               "12-13": [
                 {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "4:48p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "6:21p"
-                },
-                {
                   "label": "Mariah G.",
                   "position": "Pastry",
                   "in": "11:56a",
@@ -61836,18 +60839,6 @@
                 }
               ],
               "13-14": [
-                {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "4:48p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "6:21p"
-                },
                 {
                   "label": "Mariah G.",
                   "position": "Pastry",
@@ -61857,18 +60848,6 @@
               ],
               "14-15": [
                 {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "4:48p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "6:21p"
-                },
-                {
                   "label": "Mariah G.",
                   "position": "Pastry",
                   "in": "11:56a",
@@ -61877,18 +60856,6 @@
               ],
               "15-16": [
                 {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "4:48p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "6:21p"
-                },
-                {
                   "label": "Mariah G.",
                   "position": "Pastry",
                   "in": "11:56a",
@@ -61896,18 +60863,6 @@
                 }
               ],
               "16-17": [
-                {
-                  "label": "Karina R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "4:48p"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "6:21p"
-                },
                 {
                   "label": "Mariah G.",
                   "position": "Pastry",
@@ -61929,12 +60884,6 @@
                   "out": "12:53a"
                 },
                 {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "6:21p"
-                },
-                {
                   "label": "Mariah G.",
                   "position": "Pastry",
                   "in": "11:56a",
@@ -61953,12 +60902,6 @@
                   "position": "Pastry",
                   "in": "5:02p",
                   "out": "12:53a"
-                },
-                {
-                  "label": "Made R.",
-                  "position": "Pastry",
-                  "in": "7:55a",
-                  "out": "6:21p"
                 },
                 {
                   "label": "Mariah G.",
@@ -62118,23 +61061,23 @@
             "volume": 172,
             "volumeSource": "itemQty",
             "itemCount": 172,
-            "itemsPerHead": 28.7,
+            "itemsPerHead": 43,
             "serviceHours": 14,
             "itemsPerServiceHour": 12.29,
-            "itemsPerStaffHour": 3.46,
+            "itemsPerStaffHour": 5.66,
             "avgFulSec": 329.3,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Likely overstaffed",
-              "code": "overstaffed_slack",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "history",
-              "nPeer": 36,
-              "nHist": 8,
+              "nPeer": 37,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.3
+              "staffingRatio": 0.98
             }
           }
         }
@@ -62142,12 +61085,12 @@
       "Sushi": {
         "family": "Sushi",
         "rosterCount": 6,
-        "weekHeadsUnique": 6,
-        "weekHours": 144.2,
+        "weekHeadsUnique": 3,
+        "weekHours": 104.8,
         "weekItemCount": 518,
         "weekTicketCount": 335,
-        "weekItemsPerHeadDay": 28.8,
-        "weekItemsPerStaffHour": 3.59,
+        "weekItemsPerHeadDay": 43.2,
+        "weekItemsPerStaffHour": 4.94,
         "weekServiceHours": 42,
         "weekItemsPerServiceHour": 12.33,
         "weekAvgFulSec": 489.7,
@@ -62596,13 +61539,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Balanced",
-              "code": "in_band",
+              "label": "Likely overstaffed",
+              "code": "overstaffed_slack",
               "source": "history",
               "nPeer": 7,
-              "nHist": 6,
+              "nHist": 7,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.87
+              "staffingRatio": 1.11
             }
           },
           "Thursday": {
@@ -62787,9 +61730,9 @@
               "code": "efficient_busy",
               "source": "history",
               "nPeer": 7,
-              "nHist": 8,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.31
+              "staffingRatio": 0.5
             }
           },
           "Friday": {
@@ -62970,37 +61913,22 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Strong performance",
-              "code": "efficient_busy",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "history",
               "nPeer": 7,
-              "nHist": 8,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.53
+              "staffingRatio": 0.74
             }
           },
           "Saturday": {
-            "heads": 5,
-            "hours": 39.97,
+            "heads": 2,
+            "hours": 16.99,
             "staff": [
               {
                 "label": "Freddy V.",
                 "hours": 9.52,
-                "position": "Sushi"
-              },
-              {
-                "label": "Maria B.",
-                "hours": 6.63,
-                "position": "Sushi"
-              },
-              {
-                "label": "Erika G.",
-                "hours": 8.8,
-                "position": "Sushi"
-              },
-              {
-                "label": "Justin T.",
-                "hours": 7.55,
                 "position": "Sushi"
               },
               {
@@ -63010,13 +61938,13 @@
               }
             ],
             "headsByHour": {
-              "10-11": 3,
-              "11-12": 3,
-              "12-13": 3,
-              "13-14": 3,
-              "14-15": 3,
-              "15-16": 4,
-              "16-17": 4,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 2,
+              "16-17": 2,
               "17-18": 2,
               "18-19": 2,
               "19-20": 2,
@@ -63028,124 +61956,17 @@
               "1-2": 1
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Erika G.",
-                  "position": "Sushi",
-                  "in": "7:55a",
-                  "out": "4:43p"
-                },
-                {
-                  "label": "Justin T.",
-                  "position": "Sushi",
-                  "in": "9:03a",
-                  "out": "4:36p"
-                },
-                {
-                  "label": "Maria B.",
-                  "position": "Sushi",
-                  "in": "8:15a",
-                  "out": "2:53p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Erika G.",
-                  "position": "Sushi",
-                  "in": "7:55a",
-                  "out": "4:43p"
-                },
-                {
-                  "label": "Justin T.",
-                  "position": "Sushi",
-                  "in": "9:03a",
-                  "out": "4:36p"
-                },
-                {
-                  "label": "Maria B.",
-                  "position": "Sushi",
-                  "in": "8:15a",
-                  "out": "2:53p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Erika G.",
-                  "position": "Sushi",
-                  "in": "7:55a",
-                  "out": "4:43p"
-                },
-                {
-                  "label": "Justin T.",
-                  "position": "Sushi",
-                  "in": "9:03a",
-                  "out": "4:36p"
-                },
-                {
-                  "label": "Maria B.",
-                  "position": "Sushi",
-                  "in": "8:15a",
-                  "out": "2:53p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Erika G.",
-                  "position": "Sushi",
-                  "in": "7:55a",
-                  "out": "4:43p"
-                },
-                {
-                  "label": "Justin T.",
-                  "position": "Sushi",
-                  "in": "9:03a",
-                  "out": "4:36p"
-                },
-                {
-                  "label": "Maria B.",
-                  "position": "Sushi",
-                  "in": "8:15a",
-                  "out": "2:53p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Erika G.",
-                  "position": "Sushi",
-                  "in": "7:55a",
-                  "out": "4:43p"
-                },
-                {
-                  "label": "Justin T.",
-                  "position": "Sushi",
-                  "in": "9:03a",
-                  "out": "4:36p"
-                },
-                {
-                  "label": "Maria B.",
-                  "position": "Sushi",
-                  "in": "8:15a",
-                  "out": "2:53p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
               "15-16": [
-                {
-                  "label": "Erika G.",
-                  "position": "Sushi",
-                  "in": "7:55a",
-                  "out": "4:43p"
-                },
                 {
                   "label": "Freddy V.",
                   "position": "Sushi",
                   "in": "3:56p",
                   "out": "1:27a"
-                },
-                {
-                  "label": "Justin T.",
-                  "position": "Sushi",
-                  "in": "9:03a",
-                  "out": "4:36p"
                 },
                 {
                   "label": "Victor V.",
@@ -63156,22 +61977,10 @@
               ],
               "16-17": [
                 {
-                  "label": "Erika G.",
-                  "position": "Sushi",
-                  "in": "7:55a",
-                  "out": "4:43p"
-                },
-                {
                   "label": "Freddy V.",
                   "position": "Sushi",
                   "in": "3:56p",
                   "out": "1:27a"
-                },
-                {
-                  "label": "Justin T.",
-                  "position": "Sushi",
-                  "in": "9:03a",
-                  "out": "4:36p"
                 },
                 {
                   "label": "Victor V.",
@@ -63294,10 +62103,10 @@
             "volume": 170,
             "volumeSource": "itemQty",
             "itemCount": 170,
-            "itemsPerHead": 34,
+            "itemsPerHead": 85,
             "serviceHours": 13,
             "itemsPerServiceHour": 13.08,
-            "itemsPerStaffHour": 4.25,
+            "itemsPerStaffHour": 10.01,
             "avgFulSec": 523.3,
             "qc": {
               "eligible": true,
@@ -63308,33 +62117,18 @@
               "code": "in_band",
               "source": "history",
               "nPeer": 7,
-              "nHist": 8,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.96
+              "staffingRatio": 0.34
             }
           },
           "Sunday": {
-            "heads": 5,
-            "hours": 39.1,
+            "heads": 2,
+            "hours": 22.68,
             "staff": [
               {
                 "label": "Freddy V.",
                 "hours": 12.3,
-                "position": "Sushi"
-              },
-              {
-                "label": "Maria B.",
-                "hours": 5.55,
-                "position": "Sushi"
-              },
-              {
-                "label": "Erika G.",
-                "hours": 2.95,
-                "position": "Sushi"
-              },
-              {
-                "label": "Aniele S.",
-                "hours": 7.92,
                 "position": "Sushi"
               },
               {
@@ -63344,13 +62138,13 @@
               }
             ],
             "headsByHour": {
-              "10-11": 3,
-              "11-12": 3,
-              "12-13": 4,
-              "13-14": 4,
-              "14-15": 3,
-              "15-16": 3,
-              "16-17": 3,
+              "10-11": 0,
+              "11-12": 1,
+              "12-13": 2,
+              "13-14": 2,
+              "14-15": 2,
+              "15-16": 2,
+              "16-17": 2,
               "17-18": 2,
               "18-19": 2,
               "19-20": 2,
@@ -63362,54 +62156,17 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Aniele S.",
-                  "position": "Sushi",
-                  "in": "8:15a",
-                  "out": "4:10p"
-                },
-                {
-                  "label": "Erika G.",
-                  "position": "Sushi",
-                  "in": "7:55a",
-                  "out": "10:52a"
-                },
-                {
-                  "label": "Maria B.",
-                  "position": "Sushi",
-                  "in": "8:03a",
-                  "out": "1:36p"
-                }
-              ],
+              "10-11": [],
               "11-12": [
-                {
-                  "label": "Aniele S.",
-                  "position": "Sushi",
-                  "in": "8:15a",
-                  "out": "4:10p"
-                },
                 {
                   "label": "Justin T.",
                   "position": "Sushi",
                   "in": "11:00a",
                   "out": "9:23p"
-                },
-                {
-                  "label": "Maria B.",
-                  "position": "Sushi",
-                  "in": "8:03a",
-                  "out": "1:36p"
                 }
               ],
               "12-13": [
                 {
-                  "label": "Aniele S.",
-                  "position": "Sushi",
-                  "in": "8:15a",
-                  "out": "4:10p"
-                },
-                {
                   "label": "Freddy V.",
                   "position": "Sushi",
                   "in": "12:06p",
@@ -63420,22 +62177,10 @@
                   "position": "Sushi",
                   "in": "11:00a",
                   "out": "9:23p"
-                },
-                {
-                  "label": "Maria B.",
-                  "position": "Sushi",
-                  "in": "8:03a",
-                  "out": "1:36p"
                 }
               ],
               "13-14": [
                 {
-                  "label": "Aniele S.",
-                  "position": "Sushi",
-                  "in": "8:15a",
-                  "out": "4:10p"
-                },
-                {
                   "label": "Freddy V.",
                   "position": "Sushi",
                   "in": "12:06p",
@@ -63446,21 +62191,9 @@
                   "position": "Sushi",
                   "in": "11:00a",
                   "out": "9:23p"
-                },
-                {
-                  "label": "Maria B.",
-                  "position": "Sushi",
-                  "in": "8:03a",
-                  "out": "1:36p"
                 }
               ],
               "14-15": [
-                {
-                  "label": "Aniele S.",
-                  "position": "Sushi",
-                  "in": "8:15a",
-                  "out": "4:10p"
-                },
                 {
                   "label": "Freddy V.",
                   "position": "Sushi",
@@ -63476,12 +62209,6 @@
               ],
               "15-16": [
                 {
-                  "label": "Aniele S.",
-                  "position": "Sushi",
-                  "in": "8:15a",
-                  "out": "4:10p"
-                },
-                {
                   "label": "Freddy V.",
                   "position": "Sushi",
                   "in": "12:06p",
@@ -63495,12 +62222,6 @@
                 }
               ],
               "16-17": [
-                {
-                  "label": "Aniele S.",
-                  "position": "Sushi",
-                  "in": "8:15a",
-                  "out": "4:10p"
-                },
                 {
                   "label": "Freddy V.",
                   "position": "Sushi",
@@ -63615,23 +62336,23 @@
             "volume": 160,
             "volumeSource": "itemQty",
             "itemCount": 160,
-            "itemsPerHead": 32,
+            "itemsPerHead": 80,
             "serviceHours": 14,
             "itemsPerServiceHour": 11.43,
-            "itemsPerStaffHour": 4.09,
+            "itemsPerStaffHour": 7.05,
             "avgFulSec": 482.1,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Balanced",
-              "code": "in_band",
+              "label": "Strong performance",
+              "code": "efficient_busy",
               "source": "history",
               "nPeer": 7,
-              "nHist": 8,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.04
+              "staffingRatio": 0.4
             }
           }
         }
@@ -63640,11 +62361,11 @@
         "family": "Garde Manger",
         "rosterCount": 5,
         "weekHeadsUnique": 5,
-        "weekHours": 191.35,
+        "weekHours": 155.71,
         "weekItemCount": 638,
         "weekTicketCount": 682,
-        "weekItemsPerHeadDay": 26.6,
-        "weekItemsPerStaffHour": 3.33,
+        "weekItemsPerHeadDay": 30.4,
+        "weekItemsPerStaffHour": 4.1,
         "weekServiceHours": 52,
         "weekItemsPerServiceHour": 12.27,
         "weekAvgFulSec": 314.9,
@@ -63953,10 +62674,10 @@
               "label": "Likely overstaffed",
               "code": "overstaffed_slack",
               "source": "history",
-              "nPeer": 34,
-              "nHist": 7,
+              "nPeer": 35,
+              "nHist": 8,
               "note": "vs own same-DOW history",
-              "staffingRatio": 2.31
+              "staffingRatio": 2
             }
           },
           "Wednesday": {
@@ -64182,10 +62903,10 @@
               "label": "Likely overstaffed",
               "code": "overstaffed_slack",
               "source": "history",
-              "nPeer": 36,
-              "nHist": 8,
+              "nPeer": 37,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.25
+              "staffingRatio": 1.36
             }
           },
           "Thursday": {
@@ -64494,10 +63215,10 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 36,
-              "nHist": 8,
+              "nPeer": 37,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.6
+              "staffingRatio": 1.38
             }
           },
           "Friday": {
@@ -64847,24 +63568,19 @@
               "label": "Likely overstaffed",
               "code": "overstaffed_slack",
               "source": "history",
-              "nPeer": 36,
-              "nHist": 8,
+              "nPeer": 37,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.72
+              "staffingRatio": 1.47
             }
           },
           "Saturday": {
-            "heads": 5,
-            "hours": 48.55,
+            "heads": 3,
+            "hours": 22.98,
             "staff": [
               {
                 "label": "Yaniri B.",
                 "hours": 8.13,
-                "position": "Garde Manger"
-              },
-              {
-                "label": "Dixa R.",
-                "hours": 12.67,
                 "position": "Garde Manger"
               },
               {
@@ -64876,148 +63592,40 @@
                 "label": "Jennifer C.",
                 "hours": 7.4,
                 "position": "Garde Manger"
-              },
-              {
-                "label": "Amalia T.",
-                "hours": 12.9,
-                "position": "Garde Manger"
               }
             ],
             "headsByHour": {
-              "10-11": 2,
-              "11-12": 2,
-              "12-13": 2,
-              "13-14": 2,
-              "14-15": 2,
-              "15-16": 2,
-              "16-17": 2,
-              "17-18": 5,
-              "18-19": 5,
-              "19-20": 5,
-              "20-21": 5,
-              "21-22": 5,
-              "22-23": 5,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 0,
+              "16-17": 0,
+              "17-18": 3,
+              "18-19": 3,
+              "19-20": 3,
+              "20-21": 3,
+              "21-22": 3,
+              "22-23": 3,
               "23-24": 3,
               "0-1": 3,
               "1-2": 2
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
-                }
-              ],
-              "15-16": [
-                {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
-                }
-              ],
-              "16-17": [
-                {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
+              "15-16": [],
+              "16-17": [],
               "17-18": [
-                {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
                 {
                   "label": "Daniel J.",
                   "position": "Garde Manger",
                   "in": "5:59p",
                   "out": "1:26a"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
                 },
                 {
                   "label": "Jennifer C.",
@@ -65034,22 +63642,10 @@
               ],
               "18-19": [
                 {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
-                {
                   "label": "Daniel J.",
                   "position": "Garde Manger",
                   "in": "5:59p",
                   "out": "1:26a"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
                 },
                 {
                   "label": "Jennifer C.",
@@ -65066,22 +63662,10 @@
               ],
               "19-20": [
                 {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
-                {
                   "label": "Daniel J.",
                   "position": "Garde Manger",
                   "in": "5:59p",
                   "out": "1:26a"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
                 },
                 {
                   "label": "Jennifer C.",
@@ -65098,22 +63682,10 @@
               ],
               "20-21": [
                 {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
-                {
                   "label": "Daniel J.",
                   "position": "Garde Manger",
                   "in": "5:59p",
                   "out": "1:26a"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
                 },
                 {
                   "label": "Jennifer C.",
@@ -65130,22 +63702,10 @@
               ],
               "21-22": [
                 {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
-                {
                   "label": "Daniel J.",
                   "position": "Garde Manger",
                   "in": "5:59p",
                   "out": "1:26a"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
                 },
                 {
                   "label": "Jennifer C.",
@@ -65162,22 +63722,10 @@
               ],
               "22-23": [
                 {
-                  "label": "Amalia T.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:51p"
-                },
-                {
                   "label": "Daniel J.",
                   "position": "Garde Manger",
                   "in": "5:59p",
                   "out": "1:26a"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:57a",
-                  "out": "10:37p"
                 },
                 {
                   "label": "Jennifer C.",
@@ -65252,37 +63800,32 @@
             "volume": 158,
             "volumeSource": "itemQty",
             "itemCount": 158,
-            "itemsPerHead": 31.6,
+            "itemsPerHead": 52.7,
             "serviceHours": 13,
             "itemsPerServiceHour": 12.15,
-            "itemsPerStaffHour": 3.25,
+            "itemsPerStaffHour": 6.88,
             "avgFulSec": 313.7,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Likely overstaffed",
-              "code": "overstaffed_slack",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "history",
-              "nPeer": 36,
-              "nHist": 8,
+              "nPeer": 37,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.47
+              "staffingRatio": 1.2
             }
           },
           "Sunday": {
-            "heads": 4,
-            "hours": 32.09,
+            "heads": 3,
+            "hours": 22.02,
             "staff": [
               {
                 "label": "Yaniri B.",
                 "hours": 8.47,
-                "position": "Garde Manger"
-              },
-              {
-                "label": "Dixa R.",
-                "hours": 10.07,
                 "position": "Garde Manger"
               },
               {
@@ -65297,16 +63840,16 @@
               }
             ],
             "headsByHour": {
-              "10-11": 2,
-              "11-12": 2,
-              "12-13": 2,
-              "13-14": 2,
-              "14-15": 2,
-              "15-16": 2,
-              "16-17": 3,
-              "17-18": 3,
-              "18-19": 3,
-              "19-20": 3,
+              "10-11": 1,
+              "11-12": 1,
+              "12-13": 1,
+              "13-14": 1,
+              "14-15": 1,
+              "15-16": 1,
+              "16-17": 2,
+              "17-18": 2,
+              "18-19": 2,
+              "19-20": 2,
               "20-21": 2,
               "21-22": 2,
               "22-23": 2,
@@ -65321,12 +63864,6 @@
                   "position": "Garde Manger",
                   "in": "10:07a",
                   "out": "5:07p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:56a",
-                  "out": "8:00p"
                 }
               ],
               "11-12": [
@@ -65335,12 +63872,6 @@
                   "position": "Garde Manger",
                   "in": "10:07a",
                   "out": "5:07p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:56a",
-                  "out": "8:00p"
                 }
               ],
               "12-13": [
@@ -65349,12 +63880,6 @@
                   "position": "Garde Manger",
                   "in": "10:07a",
                   "out": "5:07p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:56a",
-                  "out": "8:00p"
                 }
               ],
               "13-14": [
@@ -65363,12 +63888,6 @@
                   "position": "Garde Manger",
                   "in": "10:07a",
                   "out": "5:07p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:56a",
-                  "out": "8:00p"
                 }
               ],
               "14-15": [
@@ -65377,12 +63896,6 @@
                   "position": "Garde Manger",
                   "in": "10:07a",
                   "out": "5:07p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:56a",
-                  "out": "8:00p"
                 }
               ],
               "15-16": [
@@ -65391,12 +63904,6 @@
                   "position": "Garde Manger",
                   "in": "10:07a",
                   "out": "5:07p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:56a",
-                  "out": "8:00p"
                 }
               ],
               "16-17": [
@@ -65405,12 +63912,6 @@
                   "position": "Garde Manger",
                   "in": "10:07a",
                   "out": "5:07p"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:56a",
-                  "out": "8:00p"
                 },
                 {
                   "label": "Yaniri B.",
@@ -65427,12 +63928,6 @@
                   "out": "5:07p"
                 },
                 {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:56a",
-                  "out": "8:00p"
-                },
-                {
                   "label": "Yaniri B.",
                   "position": "Garde Manger",
                   "in": "4:05p",
@@ -65447,12 +63942,6 @@
                   "out": "12:38a"
                 },
                 {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:56a",
-                  "out": "8:00p"
-                },
-                {
                   "label": "Yaniri B.",
                   "position": "Garde Manger",
                   "in": "4:05p",
@@ -65465,12 +63954,6 @@
                   "position": "Garde Manger",
                   "in": "6:05p",
                   "out": "12:38a"
-                },
-                {
-                  "label": "Dixa R.",
-                  "position": "Garde Manger",
-                  "in": "9:56a",
-                  "out": "8:00p"
                 },
                 {
                   "label": "Yaniri B.",
@@ -65556,10 +64039,10 @@
             "volume": 195,
             "volumeSource": "itemQty",
             "itemCount": 195,
-            "itemsPerHead": 48.8,
+            "itemsPerHead": 65,
             "serviceHours": 15,
             "itemsPerServiceHour": 13,
-            "itemsPerStaffHour": 6.08,
+            "itemsPerStaffHour": 8.86,
             "avgFulSec": 306.1,
             "qc": {
               "eligible": true,
@@ -65569,10 +64052,10 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 36,
-              "nHist": 8,
+              "nPeer": 37,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.85
+              "staffingRatio": 0.6
             }
           }
         }
@@ -65581,11 +64064,11 @@
         "family": "Saute",
         "rosterCount": 10,
         "weekHeadsUnique": 10,
-        "weekHours": 339.9,
+        "weekHours": 315.36,
         "weekItemCount": 643,
         "weekTicketCount": 668,
-        "weekItemsPerHeadDay": 16.5,
-        "weekItemsPerStaffHour": 1.89,
+        "weekItemsPerHeadDay": 17.4,
+        "weekItemsPerStaffHour": 2.04,
         "weekServiceHours": 50,
         "weekItemsPerServiceHour": 12.86,
         "weekAvgFulSec": 638.7,
@@ -65906,10 +64389,10 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 34,
-              "nHist": 8,
+              "nPeer": 35,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.88
+              "staffingRatio": 0.7
             }
           },
           "Wednesday": {
@@ -66186,10 +64669,10 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 35,
-              "nHist": 8,
+              "nPeer": 36,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.14
+              "staffingRatio": 1.48
             }
           },
           "Thursday": {
@@ -66673,10 +65156,10 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 35,
-              "nHist": 8,
+              "nPeer": 36,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.32
+              "staffingRatio": 1.67
             }
           },
           "Friday": {
@@ -67207,24 +65690,19 @@
               "label": "Operational bottleneck",
               "code": "process_issue",
               "source": "history",
-              "nPeer": 35,
-              "nHist": 8,
+              "nPeer": 36,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.35
+              "staffingRatio": 1.52
             }
           },
           "Saturday": {
-            "heads": 9,
-            "hours": 95.15,
+            "heads": 8,
+            "hours": 81.63,
             "staff": [
               {
                 "label": "Seleny B.",
                 "hours": 8.42,
-                "position": "Saute"
-              },
-              {
-                "label": "Maria E.",
-                "hours": 13.52,
                 "position": "Saute"
               },
               {
@@ -67264,20 +65742,20 @@
               }
             ],
             "headsByHour": {
-              "10-11": 4,
-              "11-12": 4,
-              "12-13": 4,
-              "13-14": 4,
-              "14-15": 4,
-              "15-16": 5,
-              "16-17": 7,
-              "17-18": 8,
-              "18-19": 9,
-              "19-20": 9,
-              "20-21": 9,
-              "21-22": 9,
-              "22-23": 9,
-              "23-24": 8,
+              "10-11": 3,
+              "11-12": 3,
+              "12-13": 3,
+              "13-14": 3,
+              "14-15": 3,
+              "15-16": 4,
+              "16-17": 6,
+              "17-18": 7,
+              "18-19": 8,
+              "19-20": 8,
+              "20-21": 8,
+              "21-22": 8,
+              "22-23": 8,
+              "23-24": 7,
               "0-1": 6,
               "1-2": 5
             },
@@ -67294,12 +65772,6 @@
                   "position": "Saute",
                   "in": "10:09a",
                   "out": "11:29p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
                 },
                 {
                   "label": "Roberto H.",
@@ -67322,12 +65794,6 @@
                   "out": "11:29p"
                 },
                 {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
-                },
-                {
                   "label": "Roberto H.",
                   "position": "Saute",
                   "in": "10:04a",
@@ -67346,12 +65812,6 @@
                   "position": "Saute",
                   "in": "10:09a",
                   "out": "11:29p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
                 },
                 {
                   "label": "Roberto H.",
@@ -67374,12 +65834,6 @@
                   "out": "11:29p"
                 },
                 {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
-                },
-                {
                   "label": "Roberto H.",
                   "position": "Saute",
                   "in": "10:04a",
@@ -67398,12 +65852,6 @@
                   "position": "Saute",
                   "in": "10:09a",
                   "out": "11:29p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
                 },
                 {
                   "label": "Roberto H.",
@@ -67430,12 +65878,6 @@
                   "position": "Saute",
                   "in": "3:25p",
                   "out": "11:00p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
                 },
                 {
                   "label": "Roberto H.",
@@ -67468,12 +65910,6 @@
                   "position": "Saute",
                   "in": "3:25p",
                   "out": "11:00p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
                 },
                 {
                   "label": "Roberto H.",
@@ -67512,12 +65948,6 @@
                   "position": "Saute",
                   "in": "3:25p",
                   "out": "11:00p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
                 },
                 {
                   "label": "Robert S.",
@@ -67570,12 +66000,6 @@
                   "out": "11:00p"
                 },
                 {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
-                },
-                {
                   "label": "Robert S.",
                   "position": "Saute",
                   "in": "5:55p",
@@ -67624,12 +66048,6 @@
                   "position": "Saute",
                   "in": "3:25p",
                   "out": "11:00p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
                 },
                 {
                   "label": "Robert S.",
@@ -67682,12 +66100,6 @@
                   "out": "11:00p"
                 },
                 {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
-                },
-                {
                   "label": "Robert S.",
                   "position": "Saute",
                   "in": "5:55p",
@@ -67736,12 +66148,6 @@
                   "position": "Saute",
                   "in": "3:25p",
                   "out": "11:00p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
                 },
                 {
                   "label": "Robert S.",
@@ -67794,12 +66200,6 @@
                   "out": "11:00p"
                 },
                 {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
-                },
-                {
                   "label": "Robert S.",
                   "position": "Saute",
                   "in": "5:55p",
@@ -67842,12 +66242,6 @@
                   "position": "Saute",
                   "in": "10:09a",
                   "out": "11:29p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:55a",
-                  "out": "11:26p"
                 },
                 {
                   "label": "Robert S.",
@@ -67944,10 +66338,10 @@
             "volume": 202,
             "volumeSource": "itemQty",
             "itemCount": 202,
-            "itemsPerHead": 22.4,
+            "itemsPerHead": 25.3,
             "serviceHours": 12,
             "itemsPerServiceHour": 16.83,
-            "itemsPerStaffHour": 2.12,
+            "itemsPerStaffHour": 2.47,
             "avgFulSec": 597.1,
             "qc": {
               "eligible": true,
@@ -67957,24 +66351,19 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 35,
-              "nHist": 8,
+              "nPeer": 36,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.05
+              "staffingRatio": 1.03
             }
           },
           "Sunday": {
-            "heads": 9,
-            "hours": 74.53,
+            "heads": 8,
+            "hours": 63.51,
             "staff": [
               {
                 "label": "Seleny B.",
                 "hours": 7.37,
-                "position": "Saute"
-              },
-              {
-                "label": "Maria E.",
-                "hours": 11.02,
                 "position": "Saute"
               },
               {
@@ -68014,17 +66403,17 @@
               }
             ],
             "headsByHour": {
-              "10-11": 3,
-              "11-12": 4,
-              "12-13": 4,
-              "13-14": 5,
-              "14-15": 6,
-              "15-16": 6,
-              "16-17": 8,
-              "17-18": 9,
-              "18-19": 9,
-              "19-20": 7,
-              "20-21": 7,
+              "10-11": 2,
+              "11-12": 3,
+              "12-13": 3,
+              "13-14": 4,
+              "14-15": 5,
+              "15-16": 5,
+              "16-17": 7,
+              "17-18": 8,
+              "18-19": 8,
+              "19-20": 6,
+              "20-21": 6,
               "21-22": 4,
               "22-23": 4,
               "23-24": 4,
@@ -68038,12 +66427,6 @@
                   "position": "Saute",
                   "in": "10:08a",
                   "out": "8:24p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:57a",
-                  "out": "8:58p"
                 },
                 {
                   "label": "Roberto H.",
@@ -68066,12 +66449,6 @@
                   "out": "6:01p"
                 },
                 {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:57a",
-                  "out": "8:58p"
-                },
-                {
                   "label": "Roberto H.",
                   "position": "Saute",
                   "in": "10:03a",
@@ -68090,12 +66467,6 @@
                   "position": "Saute",
                   "in": "11:05a",
                   "out": "6:01p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:57a",
-                  "out": "8:58p"
                 },
                 {
                   "label": "Roberto H.",
@@ -68122,12 +66493,6 @@
                   "position": "Saute",
                   "in": "11:05a",
                   "out": "6:01p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:57a",
-                  "out": "8:58p"
                 },
                 {
                   "label": "Roberto H.",
@@ -68162,12 +66527,6 @@
                   "out": "6:01p"
                 },
                 {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:57a",
-                  "out": "8:58p"
-                },
-                {
                   "label": "Roberto H.",
                   "position": "Saute",
                   "in": "10:03a",
@@ -68200,12 +66559,6 @@
                   "out": "6:01p"
                 },
                 {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:57a",
-                  "out": "8:58p"
-                },
-                {
                   "label": "Roberto H.",
                   "position": "Saute",
                   "in": "10:03a",
@@ -68236,12 +66589,6 @@
                   "position": "Saute",
                   "in": "11:05a",
                   "out": "6:01p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:57a",
-                  "out": "8:58p"
                 },
                 {
                   "label": "Robert S.",
@@ -68294,12 +66641,6 @@
                   "out": "6:01p"
                 },
                 {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:57a",
-                  "out": "8:58p"
-                },
-                {
                   "label": "Robert S.",
                   "position": "Saute",
                   "in": "4:27p",
@@ -68350,12 +66691,6 @@
                   "out": "6:01p"
                 },
                 {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:57a",
-                  "out": "8:58p"
-                },
-                {
                   "label": "Robert S.",
                   "position": "Saute",
                   "in": "4:27p",
@@ -68400,12 +66735,6 @@
                   "out": "8:39p"
                 },
                 {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:57a",
-                  "out": "8:58p"
-                },
-                {
                   "label": "Robert S.",
                   "position": "Saute",
                   "in": "4:27p",
@@ -68442,12 +66771,6 @@
                   "position": "Saute",
                   "in": "1:56p",
                   "out": "8:39p"
-                },
-                {
-                  "label": "Maria E.",
-                  "position": "Saute",
-                  "in": "9:57a",
-                  "out": "8:58p"
                 },
                 {
                   "label": "Robert S.",
@@ -68573,23 +66896,23 @@
             "volume": 201,
             "volumeSource": "itemQty",
             "itemCount": 201,
-            "itemsPerHead": 22.3,
+            "itemsPerHead": 25.1,
             "serviceHours": 13,
             "itemsPerServiceHour": 15.46,
-            "itemsPerStaffHour": 2.7,
+            "itemsPerStaffHour": 3.16,
             "avgFulSec": 616.9,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Likely overstaffed",
-              "code": "overstaffed_slack",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "history",
-              "nPeer": 35,
-              "nHist": 8,
+              "nPeer": 36,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.2
+              "staffingRatio": 1.1
             }
           }
         }
@@ -68598,11 +66921,11 @@
         "family": "Robata",
         "rosterCount": 8,
         "weekHeadsUnique": 8,
-        "weekHours": 248.92,
+        "weekHours": 222.3,
         "weekItemCount": 414,
         "weekTicketCount": 473,
-        "weekItemsPerHeadDay": 14.8,
-        "weekItemsPerStaffHour": 1.66,
+        "weekItemsPerHeadDay": 15.9,
+        "weekItemsPerStaffHour": 1.86,
         "weekServiceHours": 51,
         "weekItemsPerServiceHour": 8.12,
         "weekAvgFulSec": 680.3,
@@ -68940,10 +67263,10 @@
               "label": "Likely overstaffed",
               "code": "overstaffed_slack",
               "source": "peer",
-              "nPeer": 25,
+              "nPeer": 26,
               "nHist": 5,
               "note": "vs RDG peer same-DOW",
-              "staffingRatio": 6.67
+              "staffingRatio": 5.71
             }
           },
           "Wednesday": {
@@ -69179,10 +67502,10 @@
               "label": "Operational bottleneck",
               "code": "process_issue",
               "source": "history",
-              "nPeer": 31,
-              "nHist": 6,
+              "nPeer": 33,
+              "nHist": 7,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.11
+              "staffingRatio": 1.3
             }
           },
           "Thursday": {
@@ -69485,10 +67808,10 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 31,
-              "nHist": 8,
+              "nPeer": 32,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.82
+              "staffingRatio": 0.89
             }
           },
           "Friday": {
@@ -69946,15 +68269,15 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 34,
-              "nHist": 8,
+              "nPeer": 36,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.2
+              "staffingRatio": 1.28
             }
           },
           "Saturday": {
-            "heads": 5,
-            "hours": 59.04,
+            "heads": 4,
+            "hours": 44.52,
             "staff": [
               {
                 "label": "Julian G.",
@@ -69972,42 +68295,31 @@
                 "position": "Robata"
               },
               {
-                "label": "Jorge G.",
-                "hours": 14.52,
-                "position": "Robata"
-              },
-              {
                 "label": "Winkers M.",
                 "hours": 8.53,
                 "position": "Robata"
               }
             ],
             "headsByHour": {
-              "10-11": 2,
-              "11-12": 3,
-              "12-13": 3,
-              "13-14": 3,
-              "14-15": 3,
-              "15-16": 3,
-              "16-17": 4,
-              "17-18": 5,
-              "18-19": 5,
-              "19-20": 5,
-              "20-21": 5,
-              "21-22": 5,
-              "22-23": 5,
-              "23-24": 5,
+              "10-11": 1,
+              "11-12": 2,
+              "12-13": 2,
+              "13-14": 2,
+              "14-15": 2,
+              "15-16": 2,
+              "16-17": 3,
+              "17-18": 4,
+              "18-19": 4,
+              "19-20": 4,
+              "20-21": 4,
+              "21-22": 4,
+              "22-23": 4,
+              "23-24": 4,
               "0-1": 3,
               "1-2": 3
             },
             "staffByHour": {
               "10-11": [
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
-                },
                 {
                   "label": "Julian G.",
                   "position": "Robata",
@@ -70021,12 +68333,6 @@
                   "position": "Robata",
                   "in": "11:11a",
                   "out": "1:13a"
-                },
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
                 },
                 {
                   "label": "Julian G.",
@@ -70043,12 +68349,6 @@
                   "out": "1:13a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:00a",
@@ -70061,12 +68361,6 @@
                   "position": "Robata",
                   "in": "11:11a",
                   "out": "1:13a"
-                },
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
                 },
                 {
                   "label": "Julian G.",
@@ -70083,12 +68377,6 @@
                   "out": "1:13a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:00a",
@@ -70103,12 +68391,6 @@
                   "out": "1:13a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:00a",
@@ -70121,12 +68403,6 @@
                   "position": "Robata",
                   "in": "11:11a",
                   "out": "1:13a"
-                },
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
                 },
                 {
                   "label": "Julian G.",
@@ -70155,12 +68431,6 @@
                   "out": "1:13a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:00a",
@@ -70185,12 +68455,6 @@
                   "position": "Robata",
                   "in": "11:11a",
                   "out": "1:13a"
-                },
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
                 },
                 {
                   "label": "Julian G.",
@@ -70219,12 +68483,6 @@
                   "out": "1:13a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:00a",
@@ -70249,12 +68507,6 @@
                   "position": "Robata",
                   "in": "11:11a",
                   "out": "1:13a"
-                },
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
                 },
                 {
                   "label": "Julian G.",
@@ -70283,12 +68535,6 @@
                   "out": "1:13a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:00a",
@@ -70315,12 +68561,6 @@
                   "out": "1:13a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:00a",
@@ -70345,12 +68585,6 @@
                   "position": "Robata",
                   "in": "11:11a",
                   "out": "1:13a"
-                },
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "9:05a",
-                  "out": "11:36p"
                 },
                 {
                   "label": "Julian G.",
@@ -70411,28 +68645,28 @@
             "volume": 122,
             "volumeSource": "itemQty",
             "itemCount": 122,
-            "itemsPerHead": 24.4,
+            "itemsPerHead": 30.5,
             "serviceHours": 13,
             "itemsPerServiceHour": 9.38,
-            "itemsPerStaffHour": 2.07,
+            "itemsPerStaffHour": 2.74,
             "avgFulSec": 600.2,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Likely overstaffed",
-              "code": "overstaffed_slack",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "history",
-              "nPeer": 33,
-              "nHist": 8,
+              "nPeer": 35,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.14
+              "staffingRatio": 1
             }
           },
           "Sunday": {
-            "heads": 6,
-            "hours": 60.26,
+            "heads": 5,
+            "hours": 48.16,
             "staff": [
               {
                 "label": "Frank J.",
@@ -70455,29 +68689,24 @@
                 "position": "Robata"
               },
               {
-                "label": "Jorge G.",
-                "hours": 12.1,
-                "position": "Robata"
-              },
-              {
                 "label": "Winkers M.",
                 "hours": 8.08,
                 "position": "Robata"
               }
             ],
             "headsByHour": {
-              "10-11": 3,
-              "11-12": 3,
-              "12-13": 3,
-              "13-14": 3,
-              "14-15": 3,
-              "15-16": 3,
-              "16-17": 4,
-              "17-18": 6,
-              "18-19": 6,
-              "19-20": 6,
-              "20-21": 6,
-              "21-22": 6,
+              "10-11": 2,
+              "11-12": 2,
+              "12-13": 2,
+              "13-14": 2,
+              "14-15": 2,
+              "15-16": 2,
+              "16-17": 3,
+              "17-18": 5,
+              "18-19": 5,
+              "19-20": 5,
+              "20-21": 5,
+              "21-22": 5,
               "22-23": 4,
               "23-24": 4,
               "0-1": 4,
@@ -70490,12 +68719,6 @@
                   "position": "Robata",
                   "in": "10:15a",
                   "out": "12:18a"
-                },
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "8:55a",
-                  "out": "9:01p"
                 },
                 {
                   "label": "Julian G.",
@@ -70512,12 +68735,6 @@
                   "out": "12:18a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "8:55a",
-                  "out": "9:01p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:01a",
@@ -70530,12 +68747,6 @@
                   "position": "Robata",
                   "in": "10:15a",
                   "out": "12:18a"
-                },
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "8:55a",
-                  "out": "9:01p"
                 },
                 {
                   "label": "Julian G.",
@@ -70552,12 +68763,6 @@
                   "out": "12:18a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "8:55a",
-                  "out": "9:01p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:01a",
@@ -70570,12 +68775,6 @@
                   "position": "Robata",
                   "in": "10:15a",
                   "out": "12:18a"
-                },
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "8:55a",
-                  "out": "9:01p"
                 },
                 {
                   "label": "Julian G.",
@@ -70592,12 +68791,6 @@
                   "out": "12:18a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "8:55a",
-                  "out": "9:01p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:01a",
@@ -70610,12 +68803,6 @@
                   "position": "Robata",
                   "in": "10:15a",
                   "out": "12:18a"
-                },
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "8:55a",
-                  "out": "9:01p"
                 },
                 {
                   "label": "Julian G.",
@@ -70650,12 +68837,6 @@
                   "out": "12:18a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "8:55a",
-                  "out": "9:01p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:01a",
@@ -70686,12 +68867,6 @@
                   "position": "Robata",
                   "in": "10:15a",
                   "out": "12:18a"
-                },
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "8:55a",
-                  "out": "9:01p"
                 },
                 {
                   "label": "Julian G.",
@@ -70726,12 +68901,6 @@
                   "out": "12:18a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "8:55a",
-                  "out": "9:01p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:01a",
@@ -70764,12 +68933,6 @@
                   "out": "12:18a"
                 },
                 {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "8:55a",
-                  "out": "9:01p"
-                },
-                {
                   "label": "Julian G.",
                   "position": "Robata",
                   "in": "10:01a",
@@ -70800,12 +68963,6 @@
                   "position": "Robata",
                   "in": "10:15a",
                   "out": "12:18a"
-                },
-                {
-                  "label": "Jorge G.",
-                  "position": "Robata",
-                  "in": "8:55a",
-                  "out": "9:01p"
                 },
                 {
                   "label": "Julian G.",
@@ -70918,10 +69075,10 @@
             "volume": 136,
             "volumeSource": "itemQty",
             "itemCount": 136,
-            "itemsPerHead": 22.7,
+            "itemsPerHead": 27.2,
             "serviceHours": 13,
             "itemsPerServiceHour": 10.46,
-            "itemsPerStaffHour": 2.26,
+            "itemsPerStaffHour": 2.82,
             "avgFulSec": 759.8,
             "qc": {
               "eligible": true,
@@ -70931,10 +69088,10 @@
               "label": "Operational bottleneck",
               "code": "process_issue",
               "source": "history",
-              "nPeer": 33,
-              "nHist": 8,
+              "nPeer": 35,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.13
+              "staffingRatio": 1.04
             }
           }
         }
@@ -71202,10 +69359,10 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 19,
-              "nHist": 8,
+              "nPeer": 23,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.11
+              "staffingRatio": 1.33
             }
           },
           "Wednesday": {
@@ -71420,13 +69577,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Strong performance",
-              "code": "efficient_busy",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "history",
-              "nPeer": 21,
-              "nHist": 8,
+              "nPeer": 25,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.7
+              "staffingRatio": 0.81
             }
           },
           "Thursday": {
@@ -71655,13 +69812,13 @@
               "denyReason": null
             },
             "signal": {
-              "label": "Strong performance",
-              "code": "efficient_busy",
+              "label": "Balanced",
+              "code": "in_band",
               "source": "history",
-              "nPeer": 21,
-              "nHist": 8,
+              "nPeer": 25,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.73
+              "staffingRatio": 0.88
             }
           },
           "Friday": {
@@ -71951,8 +70108,8 @@
               "label": "Likely overstaffed",
               "code": "overstaffed_slack",
               "source": "history",
-              "nPeer": 21,
-              "nHist": 8,
+              "nPeer": 25,
+              "nHist": 9,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.14
             }
@@ -72352,10 +70509,10 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 21,
-              "nHist": 8,
+              "nPeer": 25,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.83
+              "staffingRatio": 1.18
             }
           },
           "Sunday": {
@@ -72692,10 +70849,10 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 21,
-              "nHist": 8,
+              "nPeer": 25,
+              "nHist": 9,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.11
+              "staffingRatio": 1.14
             }
           }
         }
@@ -74787,11 +72944,11 @@
         "family": "Fry",
         "rosterCount": 3,
         "weekHeadsUnique": 3,
-        "weekHours": 111.63,
+        "weekHours": 86.44,
         "weekItemCount": 729,
         "weekTicketCount": 691,
-        "weekItemsPerHeadDay": 52.1,
-        "weekItemsPerStaffHour": 6.53,
+        "weekItemsPerHeadDay": 60.8,
+        "weekItemsPerStaffHour": 8.43,
         "weekServiceHours": 52,
         "weekItemsPerServiceHour": 14.02,
         "weekAvgFulSec": 535.1,
@@ -75590,17 +73747,12 @@
             }
           },
           "Saturday": {
-            "heads": 3,
-            "hours": 28.88,
+            "heads": 2,
+            "hours": 15.71,
             "staff": [
               {
                 "label": "Eliezer O.",
                 "hours": 7.43,
-                "position": "Fry"
-              },
-              {
-                "label": "Makinzy L.",
-                "hours": 13.17,
                 "position": "Fry"
               },
               {
@@ -75610,92 +73762,37 @@
               }
             ],
             "headsByHour": {
-              "10-11": 1,
-              "11-12": 1,
-              "12-13": 1,
-              "13-14": 1,
-              "14-15": 1,
-              "15-16": 1,
-              "16-17": 1,
-              "17-18": 2,
-              "18-19": 3,
-              "19-20": 3,
-              "20-21": 3,
-              "21-22": 3,
-              "22-23": 3,
-              "23-24": 3,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 0,
+              "16-17": 0,
+              "17-18": 1,
+              "18-19": 2,
+              "19-20": 2,
+              "20-21": 2,
+              "21-22": 2,
+              "22-23": 2,
+              "23-24": 2,
               "0-1": 2,
               "1-2": 2
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
-                }
-              ],
-              "15-16": [
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
-                }
-              ],
-              "16-17": [
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
+              "15-16": [],
+              "16-17": [],
               "17-18": [
                 {
                   "label": "Anthony S.",
                   "position": "Fry",
                   "in": "5:04p",
                   "out": "1:21a"
-                },
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
                 }
               ],
               "18-19": [
@@ -75710,12 +73807,6 @@
                   "position": "Fry",
                   "in": "6:04p",
                   "out": "1:30a"
-                },
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
                 }
               ],
               "19-20": [
@@ -75730,12 +73821,6 @@
                   "position": "Fry",
                   "in": "6:04p",
                   "out": "1:30a"
-                },
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
                 }
               ],
               "20-21": [
@@ -75750,12 +73835,6 @@
                   "position": "Fry",
                   "in": "6:04p",
                   "out": "1:30a"
-                },
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
                 }
               ],
               "21-22": [
@@ -75770,12 +73849,6 @@
                   "position": "Fry",
                   "in": "6:04p",
                   "out": "1:30a"
-                },
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
                 }
               ],
               "22-23": [
@@ -75790,12 +73863,6 @@
                   "position": "Fry",
                   "in": "6:04p",
                   "out": "1:30a"
-                },
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
                 }
               ],
               "23-24": [
@@ -75810,12 +73877,6 @@
                   "position": "Fry",
                   "in": "6:04p",
                   "out": "1:30a"
-                },
-                {
-                  "label": "Makinzy L.",
-                  "position": "Fry",
-                  "in": "9:56a",
-                  "out": "11:06p"
                 }
               ],
               "0-1": [
@@ -75852,10 +73913,10 @@
             "volume": 241,
             "volumeSource": "itemQty",
             "itemCount": 241,
-            "itemsPerHead": 80.3,
+            "itemsPerHead": 120.5,
             "serviceHours": 13,
             "itemsPerServiceHour": 18.54,
-            "itemsPerStaffHour": 8.34,
+            "itemsPerStaffHour": 15.34,
             "avgFulSec": 501,
             "qc": {
               "eligible": true,
@@ -75872,14 +73933,9 @@
             }
           },
           "Sunday": {
-            "heads": 3,
-            "hours": 23.96,
+            "heads": 2,
+            "hours": 11.94,
             "staff": [
-              {
-                "label": "Eliezer O.",
-                "hours": 12.02,
-                "position": "Fry"
-              },
               {
                 "label": "Makinzy L.",
                 "hours": 4.47,
@@ -75892,17 +73948,17 @@
               }
             ],
             "headsByHour": {
-              "10-11": 1,
-              "11-12": 1,
-              "12-13": 1,
-              "13-14": 1,
-              "14-15": 1,
-              "15-16": 1,
-              "16-17": 1,
-              "17-18": 2,
-              "18-19": 2,
-              "19-20": 2,
-              "20-21": 2,
+              "10-11": 0,
+              "11-12": 0,
+              "12-13": 0,
+              "13-14": 0,
+              "14-15": 0,
+              "15-16": 0,
+              "16-17": 0,
+              "17-18": 1,
+              "18-19": 1,
+              "19-20": 1,
+              "20-21": 1,
               "21-22": 1,
               "22-23": 1,
               "23-24": 1,
@@ -75910,74 +73966,19 @@
               "1-2": 0
             },
             "staffByHour": {
-              "10-11": [
-                {
-                  "label": "Eliezer O.",
-                  "position": "Fry",
-                  "in": "8:57a",
-                  "out": "8:58p"
-                }
-              ],
-              "11-12": [
-                {
-                  "label": "Eliezer O.",
-                  "position": "Fry",
-                  "in": "8:57a",
-                  "out": "8:58p"
-                }
-              ],
-              "12-13": [
-                {
-                  "label": "Eliezer O.",
-                  "position": "Fry",
-                  "in": "8:57a",
-                  "out": "8:58p"
-                }
-              ],
-              "13-14": [
-                {
-                  "label": "Eliezer O.",
-                  "position": "Fry",
-                  "in": "8:57a",
-                  "out": "8:58p"
-                }
-              ],
-              "14-15": [
-                {
-                  "label": "Eliezer O.",
-                  "position": "Fry",
-                  "in": "8:57a",
-                  "out": "8:58p"
-                }
-              ],
-              "15-16": [
-                {
-                  "label": "Eliezer O.",
-                  "position": "Fry",
-                  "in": "8:57a",
-                  "out": "8:58p"
-                }
-              ],
-              "16-17": [
-                {
-                  "label": "Eliezer O.",
-                  "position": "Fry",
-                  "in": "8:57a",
-                  "out": "8:58p"
-                }
-              ],
+              "10-11": [],
+              "11-12": [],
+              "12-13": [],
+              "13-14": [],
+              "14-15": [],
+              "15-16": [],
+              "16-17": [],
               "17-18": [
                 {
                   "label": "Anthony S.",
                   "position": "Fry",
                   "in": "5:13p",
                   "out": "12:41a"
-                },
-                {
-                  "label": "Eliezer O.",
-                  "position": "Fry",
-                  "in": "8:57a",
-                  "out": "8:58p"
                 }
               ],
               "18-19": [
@@ -75986,12 +73987,6 @@
                   "position": "Fry",
                   "in": "5:13p",
                   "out": "12:41a"
-                },
-                {
-                  "label": "Eliezer O.",
-                  "position": "Fry",
-                  "in": "8:57a",
-                  "out": "8:58p"
                 }
               ],
               "19-20": [
@@ -76000,12 +73995,6 @@
                   "position": "Fry",
                   "in": "5:13p",
                   "out": "12:41a"
-                },
-                {
-                  "label": "Eliezer O.",
-                  "position": "Fry",
-                  "in": "8:57a",
-                  "out": "8:58p"
                 }
               ],
               "20-21": [
@@ -76014,12 +74003,6 @@
                   "position": "Fry",
                   "in": "5:13p",
                   "out": "12:41a"
-                },
-                {
-                  "label": "Eliezer O.",
-                  "position": "Fry",
-                  "in": "8:57a",
-                  "out": "8:58p"
                 }
               ],
               "21-22": [
@@ -76061,10 +74044,10 @@
             "volume": 205,
             "volumeSource": "itemQty",
             "itemCount": 205,
-            "itemsPerHead": 68.3,
+            "itemsPerHead": 102.5,
             "serviceHours": 15,
             "itemsPerServiceHour": 13.67,
-            "itemsPerStaffHour": 8.56,
+            "itemsPerStaffHour": 17.17,
             "avgFulSec": 594.2,
             "qc": {
               "eligible": true,
@@ -76181,6 +74164,58 @@
         }
       },
       {
+        "label": "Anthony S.",
+        "position": "Fry",
+        "families": [
+          "Fry"
+        ],
+        "weekHours": 37.2,
+        "weekItems": 329,
+        "weekItemsPerHour": 8.84,
+        "days": {
+          "Wednesday": {
+            "hours": 6.88,
+            "items": 31,
+            "itemsPerHour": 4.43,
+            "families": [
+              "Fry"
+            ]
+          },
+          "Thursday": {
+            "hours": 6.87,
+            "items": 29,
+            "itemsPerHour": 4.27,
+            "families": [
+              "Fry"
+            ]
+          },
+          "Friday": {
+            "hours": 7.7,
+            "items": 46,
+            "itemsPerHour": 5.97,
+            "families": [
+              "Fry"
+            ]
+          },
+          "Saturday": {
+            "hours": 8.28,
+            "items": 121,
+            "itemsPerHour": 14.55,
+            "families": [
+              "Fry"
+            ]
+          },
+          "Sunday": {
+            "hours": 7.47,
+            "items": 103,
+            "itemsPerHour": 13.72,
+            "families": [
+              "Fry"
+            ]
+          }
+        }
+      },
+      {
         "label": "(unassigned 1.",
         "position": "Imputed",
         "families": [
@@ -76189,7 +74224,7 @@
           "Prep"
         ],
         "weekHours": 0,
-        "weekItems": 280,
+        "weekItems": 292,
         "weekItemsPerHour": null,
         "days": {
           "Tuesday": {
@@ -76222,6 +74257,14 @@
           "Friday": {
             "hours": 0,
             "items": 1,
+            "itemsPerHour": null,
+            "families": [
+              "Prep"
+            ]
+          },
+          "Sunday": {
+            "hours": 0,
+            "items": 12,
             "itemsPerHour": null,
             "families": [
               "Prep"
@@ -76447,53 +74490,53 @@
         }
       },
       {
-        "label": "Anthony S.",
-        "position": "Fry",
+        "label": "Freddy V.",
+        "position": "Sushi",
         "families": [
-          "Fry"
+          "Sushi"
         ],
-        "weekHours": 37.2,
-        "weekItems": 255,
-        "weekItemsPerHour": 6.84,
+        "weekHours": 48.25,
+        "weekItems": 224,
+        "weekItemsPerHour": 4.64,
         "days": {
-          "Wednesday": {
-            "hours": 6.88,
-            "items": 31,
-            "itemsPerHour": 4.43,
+          "Tuesday": {
+            "hours": 8.53,
+            "items": 12,
+            "itemsPerHour": 1.35,
             "families": [
-              "Fry"
+              "Sushi"
             ]
           },
-          "Thursday": {
-            "hours": 6.87,
-            "items": 29,
-            "itemsPerHour": 4.27,
+          "Wednesday": {
+            "hours": 8.93,
+            "items": 15,
+            "itemsPerHour": 1.62,
             "families": [
-              "Fry"
+              "Sushi"
             ]
           },
           "Friday": {
-            "hours": 7.7,
-            "items": 46,
-            "itemsPerHour": 5.97,
+            "hours": 8.97,
+            "items": 33,
+            "itemsPerHour": 3.68,
             "families": [
-              "Fry"
+              "Sushi"
             ]
           },
           "Saturday": {
-            "hours": 8.28,
-            "items": 80,
-            "itemsPerHour": 9.7,
+            "hours": 9.52,
+            "items": 85,
+            "itemsPerHour": 8.93,
             "families": [
-              "Fry"
+              "Sushi"
             ]
           },
           "Sunday": {
-            "hours": 7.47,
-            "items": 68,
-            "itemsPerHour": 9.15,
+            "hours": 12.3,
+            "items": 80,
+            "itemsPerHour": 6.5,
             "families": [
-              "Fry"
+              "Sushi"
             ]
           }
         }
@@ -76504,9 +74547,9 @@
         "families": [
           "Fry"
         ],
-        "weekHours": 41.93,
-        "weekItems": 251,
-        "weekItemsPerHour": 5.97,
+        "weekHours": 28.76,
+        "weekItems": 204,
+        "weekItemsPerHour": 7.1,
         "days": {
           "Tuesday": {
             "hours": 8.77,
@@ -76532,18 +74575,10 @@
               "Fry"
             ]
           },
-          "Saturday": {
-            "hours": 13.17,
-            "items": 80,
-            "itemsPerHour": 6.1,
-            "families": [
-              "Fry"
-            ]
-          },
           "Sunday": {
             "hours": 4.47,
-            "items": 68,
-            "itemsPerHour": 15.29,
+            "items": 103,
+            "itemsPerHour": 22.93,
             "families": [
               "Fry"
             ]
@@ -76556,9 +74591,9 @@
         "families": [
           "Fry"
         ],
-        "weekHours": 32.5,
-        "weekItems": 224,
-        "weekItemsPerHour": 6.89,
+        "weekHours": 20.48,
+        "weekItems": 196,
+        "weekItemsPerHour": 9.56,
         "days": {
           "Thursday": {
             "hours": 6.15,
@@ -76578,16 +74613,8 @@
           },
           "Saturday": {
             "hours": 7.43,
-            "items": 80,
-            "itemsPerHour": 10.81,
-            "families": [
-              "Fry"
-            ]
-          },
-          "Sunday": {
-            "hours": 12.02,
-            "items": 68,
-            "itemsPerHour": 5.68,
+            "items": 121,
+            "itemsPerHour": 16.22,
             "families": [
               "Fry"
             ]
@@ -76601,8 +74628,8 @@
           "Garde Manger"
         ],
         "weekHours": 33.3,
-        "weekItems": 143,
-        "weekItemsPerHour": 4.28,
+        "weekItems": 180,
+        "weekItemsPerHour": 5.4,
         "days": {
           "Wednesday": {
             "hours": 6.08,
@@ -76630,172 +74657,16 @@
           },
           "Saturday": {
             "hours": 7.45,
-            "items": 32,
-            "itemsPerHour": 4.24,
+            "items": 53,
+            "itemsPerHour": 7.07,
             "families": [
               "Garde Manger"
             ]
           },
           "Sunday": {
             "hours": 6.55,
-            "items": 49,
-            "itemsPerHour": 7.44,
-            "families": [
-              "Garde Manger"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Yaniri B.",
-        "position": "Garde Manger",
-        "families": [
-          "Garde Manger"
-        ],
-        "weekHours": 41.07,
-        "weekItems": 136,
-        "weekItemsPerHour": 3.3,
-        "days": {
-          "Tuesday": {
-            "hours": 8.67,
-            "items": 12,
-            "itemsPerHour": 1.35,
-            "families": [
-              "Garde Manger"
-            ]
-          },
-          "Thursday": {
-            "hours": 7.7,
-            "items": 24,
-            "itemsPerHour": 3.12,
-            "families": [
-              "Garde Manger"
-            ]
-          },
-          "Friday": {
-            "hours": 8.1,
-            "items": 20,
-            "itemsPerHour": 2.42,
-            "families": [
-              "Garde Manger"
-            ]
-          },
-          "Saturday": {
-            "hours": 8.13,
-            "items": 32,
-            "itemsPerHour": 3.89,
-            "families": [
-              "Garde Manger"
-            ]
-          },
-          "Sunday": {
-            "hours": 8.47,
-            "items": 49,
-            "itemsPerHour": 5.76,
-            "families": [
-              "Garde Manger"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Amalia T.",
-        "position": "Garde Manger",
-        "families": [
-          "Garde Manger"
-        ],
-        "weekHours": 41.49,
-        "weekItems": 136,
-        "weekItemsPerHour": 3.27,
-        "days": {
-          "Tuesday": {
-            "hours": 6.88,
-            "items": 12,
-            "itemsPerHour": 1.7,
-            "families": [
-              "Garde Manger"
-            ]
-          },
-          "Thursday": {
-            "hours": 8.18,
-            "items": 24,
-            "itemsPerHour": 2.93,
-            "families": [
-              "Garde Manger"
-            ]
-          },
-          "Friday": {
-            "hours": 6.53,
-            "items": 20,
-            "itemsPerHour": 3,
-            "families": [
-              "Garde Manger"
-            ]
-          },
-          "Saturday": {
-            "hours": 12.9,
-            "items": 32,
-            "itemsPerHour": 2.45,
-            "families": [
-              "Garde Manger"
-            ]
-          },
-          "Sunday": {
-            "hours": 7,
-            "items": 49,
-            "itemsPerHour": 6.96,
-            "families": [
-              "Garde Manger"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Dixa R.",
-        "position": "Garde Manger",
-        "families": [
-          "Garde Manger"
-        ],
-        "weekHours": 44.17,
-        "weekItems": 130,
-        "weekItemsPerHour": 2.95,
-        "days": {
-          "Tuesday": {
-            "hours": 7.75,
-            "items": 12,
-            "itemsPerHour": 1.51,
-            "families": [
-              "Garde Manger"
-            ]
-          },
-          "Wednesday": {
-            "hours": 6.58,
-            "items": 19,
-            "itemsPerHour": 2.84,
-            "families": [
-              "Garde Manger"
-            ]
-          },
-          "Friday": {
-            "hours": 7.1,
-            "items": 20,
-            "itemsPerHour": 2.76,
-            "families": [
-              "Garde Manger"
-            ]
-          },
-          "Saturday": {
-            "hours": 12.67,
-            "items": 32,
-            "itemsPerHour": 2.49,
-            "families": [
-              "Garde Manger"
-            ]
-          },
-          "Sunday": {
-            "hours": 10.07,
-            "items": 49,
-            "itemsPerHour": 4.84,
+            "items": 65,
+            "itemsPerHour": 9.92,
             "families": [
               "Garde Manger"
             ]
@@ -76809,8 +74680,8 @@
           "Sushi"
         ],
         "weekHours": 39.62,
-        "weekItems": 128,
-        "weekItemsPerHour": 3.23,
+        "weekItems": 179,
+        "weekItemsPerHour": 4.52,
         "days": {
           "Tuesday": {
             "hours": 8.67,
@@ -76846,8 +74717,8 @@
           },
           "Saturday": {
             "hours": 7.47,
-            "items": 34,
-            "itemsPerHour": 4.55,
+            "items": 85,
+            "itemsPerHour": 11.38,
             "families": [
               "Sushi"
             ]
@@ -76855,98 +74726,53 @@
         }
       },
       {
-        "label": "Freddy V.",
-        "position": "Sushi",
+        "label": "Yaniri B.",
+        "position": "Garde Manger",
         "families": [
-          "Sushi"
+          "Garde Manger"
         ],
-        "weekHours": 48.25,
-        "weekItems": 125,
-        "weekItemsPerHour": 2.59,
+        "weekHours": 41.07,
+        "weekItems": 173,
+        "weekItemsPerHour": 4.21,
         "days": {
           "Tuesday": {
-            "hours": 8.53,
+            "hours": 8.67,
             "items": 12,
             "itemsPerHour": 1.35,
             "families": [
-              "Sushi"
+              "Garde Manger"
             ]
           },
-          "Wednesday": {
-            "hours": 8.93,
-            "items": 15,
-            "itemsPerHour": 1.62,
+          "Thursday": {
+            "hours": 7.7,
+            "items": 24,
+            "itemsPerHour": 3.12,
             "families": [
-              "Sushi"
+              "Garde Manger"
             ]
           },
           "Friday": {
-            "hours": 8.97,
-            "items": 33,
-            "itemsPerHour": 3.68,
+            "hours": 8.1,
+            "items": 20,
+            "itemsPerHour": 2.42,
             "families": [
-              "Sushi"
+              "Garde Manger"
             ]
           },
           "Saturday": {
-            "hours": 9.52,
-            "items": 34,
-            "itemsPerHour": 3.57,
+            "hours": 8.13,
+            "items": 53,
+            "itemsPerHour": 6.48,
             "families": [
-              "Sushi"
+              "Garde Manger"
             ]
           },
           "Sunday": {
-            "hours": 12.3,
-            "items": 32,
-            "itemsPerHour": 2.6,
+            "hours": 8.47,
+            "items": 65,
+            "itemsPerHour": 7.67,
             "families": [
-              "Sushi"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Justin T.",
-        "position": "Sushi",
-        "families": [
-          "Robata",
-          "Sushi"
-        ],
-        "weekHours": 25.36,
-        "weekItems": 107,
-        "weekItemsPerHour": 4.23,
-        "days": {
-          "Thursday": {
-            "hours": 6.55,
-            "items": 35,
-            "itemsPerHour": 5.34,
-            "families": [
-              "Sushi"
-            ]
-          },
-          "Saturday": {
-            "hours": 7.55,
-            "items": 34,
-            "itemsPerHour": 4.5,
-            "families": [
-              "Sushi"
-            ]
-          },
-          "Sunday": {
-            "hours": 10.38,
-            "items": 32,
-            "itemsPerHour": 3.08,
-            "families": [
-              "Sushi"
-            ]
-          },
-          "Tuesday": {
-            "hours": 0.88,
-            "items": 6,
-            "itemsPerHour": 7.1,
-            "families": [
-              "Robata"
+              "Garde Manger"
             ]
           }
         }
@@ -76958,8 +74784,8 @@
           "Pastry"
         ],
         "weekHours": 28.39,
-        "weekItems": 99,
-        "weekItemsPerHour": 3.48,
+        "weekItems": 124,
+        "weekItemsPerHour": 4.38,
         "days": {
           "Thursday": {
             "hours": 6,
@@ -76979,16 +74805,16 @@
           },
           "Saturday": {
             "hours": 8.92,
-            "items": 23,
-            "itemsPerHour": 2.52,
+            "items": 34,
+            "itemsPerHour": 3.78,
             "families": [
               "Pastry"
             ]
           },
           "Sunday": {
             "hours": 5.95,
-            "items": 29,
-            "itemsPerHour": 4.82,
+            "items": 43,
+            "itemsPerHour": 7.23,
             "families": [
               "Pastry"
             ]
@@ -77002,8 +74828,8 @@
           "Pastry"
         ],
         "weekHours": 32.96,
-        "weekItems": 99,
-        "weekItemsPerHour": 3,
+        "weekItems": 124,
+        "weekItemsPerHour": 3.77,
         "days": {
           "Thursday": {
             "hours": 8.88,
@@ -77023,16 +74849,16 @@
           },
           "Saturday": {
             "hours": 6.85,
-            "items": 23,
-            "itemsPerHour": 3.28,
+            "items": 34,
+            "itemsPerHour": 4.93,
             "families": [
               "Pastry"
             ]
           },
           "Sunday": {
             "hours": 7.85,
-            "items": 29,
-            "itemsPerHour": 3.65,
+            "items": 43,
+            "itemsPerHour": 5.48,
             "families": [
               "Pastry"
             ]
@@ -77046,8 +74872,8 @@
           "Pastry"
         ],
         "weekHours": 35.27,
-        "weekItems": 99,
-        "weekItemsPerHour": 2.8,
+        "weekItems": 124,
+        "weekItemsPerHour": 3.53,
         "days": {
           "Thursday": {
             "hours": 7.6,
@@ -77067,18 +74893,99 @@
           },
           "Saturday": {
             "hours": 9.92,
-            "items": 23,
-            "itemsPerHour": 2.27,
+            "items": 34,
+            "itemsPerHour": 3.4,
             "families": [
               "Pastry"
             ]
           },
           "Sunday": {
             "hours": 8.23,
-            "items": 29,
-            "itemsPerHour": 3.48,
+            "items": 43,
+            "itemsPerHour": 5.22,
             "families": [
               "Pastry"
+            ]
+          }
+        }
+      },
+      {
+        "label": "Justin T.",
+        "position": "Sushi",
+        "families": [
+          "Robata",
+          "Sushi"
+        ],
+        "weekHours": 17.81,
+        "weekItems": 121,
+        "weekItemsPerHour": 6.81,
+        "days": {
+          "Thursday": {
+            "hours": 6.55,
+            "items": 35,
+            "itemsPerHour": 5.34,
+            "families": [
+              "Sushi"
+            ]
+          },
+          "Sunday": {
+            "hours": 10.38,
+            "items": 80,
+            "itemsPerHour": 7.71,
+            "families": [
+              "Sushi"
+            ]
+          },
+          "Tuesday": {
+            "hours": 0.88,
+            "items": 6,
+            "itemsPerHour": 7.1,
+            "families": [
+              "Robata"
+            ]
+          }
+        }
+      },
+      {
+        "label": "Amalia T.",
+        "position": "Garde Manger",
+        "families": [
+          "Garde Manger"
+        ],
+        "weekHours": 28.59,
+        "weekItems": 120,
+        "weekItemsPerHour": 4.21,
+        "days": {
+          "Tuesday": {
+            "hours": 6.88,
+            "items": 12,
+            "itemsPerHour": 1.7,
+            "families": [
+              "Garde Manger"
+            ]
+          },
+          "Thursday": {
+            "hours": 8.18,
+            "items": 24,
+            "itemsPerHour": 2.93,
+            "families": [
+              "Garde Manger"
+            ]
+          },
+          "Friday": {
+            "hours": 6.53,
+            "items": 20,
+            "itemsPerHour": 3,
+            "families": [
+              "Garde Manger"
+            ]
+          },
+          "Sunday": {
+            "hours": 7,
+            "items": 65,
+            "itemsPerHour": 9.29,
+            "families": [
+              "Garde Manger"
             ]
           }
         }
@@ -77090,8 +74997,8 @@
           "Garde Manger"
         ],
         "weekHours": 31.32,
-        "weekItems": 94,
-        "weekItemsPerHour": 3,
+        "weekItems": 115,
+        "weekItemsPerHour": 3.67,
         "days": {
           "Wednesday": {
             "hours": 7.92,
@@ -77119,10 +75026,46 @@
           },
           "Saturday": {
             "hours": 7.4,
-            "items": 32,
-            "itemsPerHour": 4.27,
+            "items": 53,
+            "itemsPerHour": 7.12,
             "families": [
               "Garde Manger"
+            ]
+          }
+        }
+      },
+      {
+        "label": "Yamila G.",
+        "position": "Pastry",
+        "families": [
+          "Pastry"
+        ],
+        "weekHours": 25.24,
+        "weekItems": 95,
+        "weekItemsPerHour": 3.76,
+        "days": {
+          "Friday": {
+            "hours": 7.47,
+            "items": 18,
+            "itemsPerHour": 2.44,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Saturday": {
+            "hours": 9.4,
+            "items": 34,
+            "itemsPerHour": 3.59,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Sunday": {
+            "hours": 8.37,
+            "items": 43,
+            "itemsPerHour": 5.14,
+            "families": [
+              "Pastry"
             ]
           }
         }
@@ -77134,8 +75077,8 @@
           "Saute"
         ],
         "weekHours": 42.86,
-        "weekItems": 81,
-        "weekItemsPerHour": 1.89,
+        "weekItems": 86,
+        "weekItemsPerHour": 2.02,
         "days": {
           "Tuesday": {
             "hours": 8.77,
@@ -77163,16 +75106,16 @@
           },
           "Saturday": {
             "hours": 8.33,
-            "items": 22,
-            "itemsPerHour": 2.69,
+            "items": 25,
+            "itemsPerHour": 3.03,
             "families": [
               "Saute"
             ]
           },
           "Sunday": {
             "hours": 9.67,
-            "items": 22,
-            "itemsPerHour": 2.31,
+            "items": 25,
+            "itemsPerHour": 2.6,
             "families": [
               "Saute"
             ]
@@ -77186,8 +75129,8 @@
           "Saute"
         ],
         "weekHours": 35.21,
-        "weekItems": 81,
-        "weekItemsPerHour": 2.3,
+        "weekItems": 86,
+        "weekItemsPerHour": 2.46,
         "days": {
           "Tuesday": {
             "hours": 7.73,
@@ -77215,16 +75158,16 @@
           },
           "Saturday": {
             "hours": 7.58,
-            "items": 22,
-            "itemsPerHour": 2.96,
+            "items": 25,
+            "itemsPerHour": 3.33,
             "families": [
               "Saute"
             ]
           },
           "Sunday": {
             "hours": 6.93,
-            "items": 22,
-            "itemsPerHour": 3.22,
+            "items": 25,
+            "itemsPerHour": 3.63,
             "families": [
               "Saute"
             ]
@@ -77238,8 +75181,8 @@
           "Saute"
         ],
         "weekHours": 44.26,
-        "weekItems": 78,
-        "weekItemsPerHour": 1.76,
+        "weekItems": 83,
+        "weekItemsPerHour": 1.88,
         "days": {
           "Wednesday": {
             "hours": 5.77,
@@ -77267,16 +75210,16 @@
           },
           "Saturday": {
             "hours": 13.97,
-            "items": 22,
-            "itemsPerHour": 1.61,
+            "items": 25,
+            "itemsPerHour": 1.81,
             "families": [
               "Saute"
             ]
           },
           "Sunday": {
             "hours": 8.15,
-            "items": 22,
-            "itemsPerHour": 2.74,
+            "items": 25,
+            "itemsPerHour": 3.08,
             "families": [
               "Saute"
             ]
@@ -77290,8 +75233,8 @@
           "Saute"
         ],
         "weekHours": 36.33,
-        "weekItems": 78,
-        "weekItemsPerHour": 2.14,
+        "weekItems": 83,
+        "weekItemsPerHour": 2.29,
         "days": {
           "Wednesday": {
             "hours": 7.47,
@@ -77319,96 +75262,16 @@
           },
           "Saturday": {
             "hours": 7.42,
-            "items": 22,
-            "itemsPerHour": 3.02,
+            "items": 25,
+            "itemsPerHour": 3.4,
             "families": [
               "Saute"
             ]
           },
           "Sunday": {
             "hours": 7.97,
-            "items": 22,
-            "itemsPerHour": 2.8,
-            "families": [
-              "Saute"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Yamila G.",
-        "position": "Pastry",
-        "families": [
-          "Pastry"
-        ],
-        "weekHours": 25.24,
-        "weekItems": 69,
-        "weekItemsPerHour": 2.75,
-        "days": {
-          "Friday": {
-            "hours": 7.47,
-            "items": 18,
-            "itemsPerHour": 2.44,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Saturday": {
-            "hours": 9.4,
-            "items": 23,
-            "itemsPerHour": 2.39,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Sunday": {
-            "hours": 8.37,
-            "items": 29,
-            "itemsPerHour": 3.42,
-            "families": [
-              "Pastry"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Aura M.",
-        "position": "Saute",
-        "families": [
-          "Saute"
-        ],
-        "weekHours": 35.33,
-        "weekItems": 68,
-        "weekItemsPerHour": 1.93,
-        "days": {
-          "Wednesday": {
-            "hours": 7.82,
-            "items": 12,
-            "itemsPerHour": 1.47,
-            "families": [
-              "Saute"
-            ]
-          },
-          "Friday": {
-            "hours": 13.75,
-            "items": 12,
-            "itemsPerHour": 0.87,
-            "families": [
-              "Saute"
-            ]
-          },
-          "Saturday": {
-            "hours": 7.33,
-            "items": 22,
-            "itemsPerHour": 3.06,
-            "families": [
-              "Saute"
-            ]
-          },
-          "Sunday": {
-            "hours": 6.43,
-            "items": 22,
-            "itemsPerHour": 3.47,
+            "items": 25,
+            "itemsPerHour": 3.15,
             "families": [
               "Saute"
             ]
@@ -77422,8 +75285,8 @@
           "Robata"
         ],
         "weekHours": 30.26,
-        "weekItems": 68,
-        "weekItemsPerHour": 2.23,
+        "weekItems": 78,
+        "weekItemsPerHour": 2.58,
         "days": {
           "Wednesday": {
             "hours": 7.88,
@@ -77443,60 +75306,16 @@
           },
           "Saturday": {
             "hours": 8.23,
-            "items": 24,
-            "itemsPerHour": 2.96,
+            "items": 31,
+            "itemsPerHour": 3.71,
             "families": [
               "Robata"
             ]
           },
           "Sunday": {
             "hours": 7.28,
-            "items": 23,
-            "itemsPerHour": 3.11,
-            "families": [
-              "Robata"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Jorge G.",
-        "position": "Robata",
-        "families": [
-          "Robata"
-        ],
-        "weekHours": 42.69,
-        "weekItems": 67,
-        "weekItemsPerHour": 1.57,
-        "days": {
-          "Thursday": {
-            "hours": 7.72,
-            "items": 9,
-            "itemsPerHour": 1.2,
-            "families": [
-              "Robata"
-            ]
-          },
-          "Friday": {
-            "hours": 8.35,
-            "items": 11,
-            "itemsPerHour": 1.3,
-            "families": [
-              "Robata"
-            ]
-          },
-          "Saturday": {
-            "hours": 14.52,
-            "items": 24,
-            "itemsPerHour": 1.68,
-            "families": [
-              "Robata"
-            ]
-          },
-          "Sunday": {
-            "hours": 12.1,
-            "items": 23,
-            "itemsPerHour": 1.87,
+            "items": 27,
+            "itemsPerHour": 3.74,
             "families": [
               "Robata"
             ]
@@ -77510,8 +75329,8 @@
           "Robata"
         ],
         "weekHours": 32.9,
-        "weekItems": 67,
-        "weekItemsPerHour": 2.04,
+        "weekItems": 78,
+        "weekItemsPerHour": 2.36,
         "days": {
           "Thursday": {
             "hours": 8.22,
@@ -77531,162 +75350,18 @@
           },
           "Saturday": {
             "hours": 8.53,
-            "items": 24,
-            "itemsPerHour": 2.86,
+            "items": 31,
+            "itemsPerHour": 3.58,
             "families": [
               "Robata"
             ]
           },
           "Sunday": {
             "hours": 8.08,
-            "items": 23,
-            "itemsPerHour": 2.81,
+            "items": 27,
+            "itemsPerHour": 3.37,
             "families": [
               "Robata"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Maria B.",
-        "position": "Sushi",
-        "families": [
-          "Sushi"
-        ],
-        "weekHours": 12.18,
-        "weekItems": 66,
-        "weekItemsPerHour": 5.42,
-        "days": {
-          "Saturday": {
-            "hours": 6.63,
-            "items": 34,
-            "itemsPerHour": 5.13,
-            "families": [
-              "Sushi"
-            ]
-          },
-          "Sunday": {
-            "hours": 5.55,
-            "items": 32,
-            "itemsPerHour": 5.77,
-            "families": [
-              "Sushi"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Erika G.",
-        "position": "Sushi",
-        "families": [
-          "Sushi"
-        ],
-        "weekHours": 11.75,
-        "weekItems": 66,
-        "weekItemsPerHour": 5.62,
-        "days": {
-          "Saturday": {
-            "hours": 8.8,
-            "items": 34,
-            "itemsPerHour": 3.86,
-            "families": [
-              "Sushi"
-            ]
-          },
-          "Sunday": {
-            "hours": 2.95,
-            "items": 32,
-            "itemsPerHour": 10.85,
-            "families": [
-              "Sushi"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Seleny B.",
-        "position": "Saute",
-        "families": [
-          "Saute"
-        ],
-        "weekHours": 35.17,
-        "weekItems": 66,
-        "weekItemsPerHour": 1.88,
-        "days": {
-          "Thursday": {
-            "hours": 9.55,
-            "items": 9,
-            "itemsPerHour": 0.99,
-            "families": [
-              "Saute"
-            ]
-          },
-          "Friday": {
-            "hours": 9.83,
-            "items": 12,
-            "itemsPerHour": 1.22,
-            "families": [
-              "Saute"
-            ]
-          },
-          "Saturday": {
-            "hours": 8.42,
-            "items": 22,
-            "itemsPerHour": 2.67,
-            "families": [
-              "Saute"
-            ]
-          },
-          "Sunday": {
-            "hours": 7.37,
-            "items": 22,
-            "itemsPerHour": 3.03,
-            "families": [
-              "Saute"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Maria E.",
-        "position": "Saute",
-        "families": [
-          "Saute"
-        ],
-        "weekHours": 42.29,
-        "weekItems": 66,
-        "weekItemsPerHour": 1.57,
-        "days": {
-          "Thursday": {
-            "hours": 9.32,
-            "items": 9,
-            "itemsPerHour": 1.01,
-            "families": [
-              "Saute"
-            ]
-          },
-          "Friday": {
-            "hours": 8.43,
-            "items": 12,
-            "itemsPerHour": 1.42,
-            "families": [
-              "Saute"
-            ]
-          },
-          "Saturday": {
-            "hours": 13.52,
-            "items": 22,
-            "itemsPerHour": 1.66,
-            "families": [
-              "Saute"
-            ]
-          },
-          "Sunday": {
-            "hours": 11.02,
-            "items": 22,
-            "itemsPerHour": 2.03,
-            "families": [
-              "Saute"
             ]
           }
         }
@@ -77698,8 +75373,8 @@
           "Robata"
         ],
         "weekHours": 42.09,
-        "weekItems": 64,
-        "weekItemsPerHour": 1.52,
+        "weekItems": 75,
+        "weekItemsPerHour": 1.78,
         "days": {
           "Tuesday": {
             "hours": 8.72,
@@ -77719,16 +75394,16 @@
           },
           "Saturday": {
             "hours": 13.73,
-            "items": 24,
-            "itemsPerHour": 1.78,
+            "items": 31,
+            "itemsPerHour": 2.22,
             "families": [
               "Robata"
             ]
           },
           "Sunday": {
             "hours": 11.42,
-            "items": 23,
-            "itemsPerHour": 1.98,
+            "items": 27,
+            "itemsPerHour": 2.38,
             "families": [
               "Robata"
             ]
@@ -77742,8 +75417,8 @@
           "Robata"
         ],
         "weekHours": 44.39,
-        "weekItems": 64,
-        "weekItemsPerHour": 1.45,
+        "weekItems": 75,
+        "weekItemsPerHour": 1.68,
         "days": {
           "Tuesday": {
             "hours": 7.68,
@@ -77763,18 +75438,106 @@
           },
           "Saturday": {
             "hours": 14.03,
-            "items": 24,
-            "itemsPerHour": 1.74,
+            "items": 31,
+            "itemsPerHour": 2.17,
             "families": [
               "Robata"
             ]
           },
           "Sunday": {
             "hours": 14.05,
-            "items": 23,
-            "itemsPerHour": 1.61,
+            "items": 27,
+            "itemsPerHour": 1.94,
             "families": [
               "Robata"
+            ]
+          }
+        }
+      },
+      {
+        "label": "Aura M.",
+        "position": "Saute",
+        "families": [
+          "Saute"
+        ],
+        "weekHours": 35.33,
+        "weekItems": 74,
+        "weekItemsPerHour": 2.09,
+        "days": {
+          "Wednesday": {
+            "hours": 7.82,
+            "items": 12,
+            "itemsPerHour": 1.47,
+            "families": [
+              "Saute"
+            ]
+          },
+          "Friday": {
+            "hours": 13.75,
+            "items": 12,
+            "itemsPerHour": 0.87,
+            "families": [
+              "Saute"
+            ]
+          },
+          "Saturday": {
+            "hours": 7.33,
+            "items": 25,
+            "itemsPerHour": 3.44,
+            "families": [
+              "Saute"
+            ]
+          },
+          "Sunday": {
+            "hours": 6.43,
+            "items": 25,
+            "itemsPerHour": 3.91,
+            "families": [
+              "Saute"
+            ]
+          }
+        }
+      },
+      {
+        "label": "Seleny B.",
+        "position": "Saute",
+        "families": [
+          "Saute"
+        ],
+        "weekHours": 35.17,
+        "weekItems": 72,
+        "weekItemsPerHour": 2.04,
+        "days": {
+          "Thursday": {
+            "hours": 9.55,
+            "items": 9,
+            "itemsPerHour": 0.99,
+            "families": [
+              "Saute"
+            ]
+          },
+          "Friday": {
+            "hours": 9.83,
+            "items": 12,
+            "itemsPerHour": 1.22,
+            "families": [
+              "Saute"
+            ]
+          },
+          "Saturday": {
+            "hours": 8.42,
+            "items": 25,
+            "itemsPerHour": 3,
+            "families": [
+              "Saute"
+            ]
+          },
+          "Sunday": {
+            "hours": 7.37,
+            "items": 25,
+            "itemsPerHour": 3.41,
+            "families": [
+              "Saute"
             ]
           }
         }
@@ -77786,8 +75549,8 @@
           "Saute"
         ],
         "weekHours": 28.77,
-        "weekItems": 59,
-        "weekItemsPerHour": 2.07,
+        "weekItems": 65,
+        "weekItemsPerHour": 2.26,
         "days": {
           "Tuesday": {
             "hours": 8.72,
@@ -77799,16 +75562,16 @@
           },
           "Saturday": {
             "hours": 13.33,
-            "items": 22,
-            "itemsPerHour": 1.68,
+            "items": 25,
+            "itemsPerHour": 1.89,
             "families": [
               "Saute"
             ]
           },
           "Sunday": {
             "hours": 6.72,
-            "items": 22,
-            "itemsPerHour": 3.32,
+            "items": 25,
+            "itemsPerHour": 3.74,
             "families": [
               "Saute"
             ]
@@ -77816,57 +75579,37 @@
         }
       },
       {
-        "label": "Karina R.",
-        "position": "Pastry",
+        "label": "Dixa R.",
+        "position": "Garde Manger",
         "families": [
-          "Pastry"
+          "Garde Manger"
         ],
-        "weekHours": 17.2,
-        "weekItems": 51,
-        "weekItemsPerHour": 2.97,
+        "weekHours": 21.43,
+        "weekItems": 50,
+        "weekItemsPerHour": 2.33,
         "days": {
-          "Saturday": {
-            "hours": 8.32,
-            "items": 23,
-            "itemsPerHour": 2.7,
+          "Tuesday": {
+            "hours": 7.75,
+            "items": 12,
+            "itemsPerHour": 1.51,
             "families": [
-              "Pastry"
+              "Garde Manger"
             ]
           },
-          "Sunday": {
-            "hours": 8.88,
-            "items": 29,
-            "itemsPerHour": 3.23,
+          "Wednesday": {
+            "hours": 6.58,
+            "items": 19,
+            "itemsPerHour": 2.84,
             "families": [
-              "Pastry"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Made R.",
-        "position": "Pastry",
-        "families": [
-          "Pastry"
-        ],
-        "weekHours": 21.61,
-        "weekItems": 51,
-        "weekItemsPerHour": 2.37,
-        "days": {
-          "Saturday": {
-            "hours": 11.18,
-            "items": 23,
-            "itemsPerHour": 2.01,
-            "families": [
-              "Pastry"
+              "Garde Manger"
             ]
           },
-          "Sunday": {
-            "hours": 10.43,
-            "items": 29,
-            "itemsPerHour": 2.75,
+          "Friday": {
+            "hours": 7.1,
+            "items": 20,
+            "itemsPerHour": 2.76,
             "families": [
-              "Pastry"
+              "Garde Manger"
             ]
           }
         }
@@ -77878,21 +75621,21 @@
           "Saute"
         ],
         "weekHours": 25.52,
-        "weekItems": 45,
-        "weekItemsPerHour": 1.75,
+        "weekItems": 50,
+        "weekItemsPerHour": 1.97,
         "days": {
           "Saturday": {
             "hours": 15.25,
-            "items": 22,
-            "itemsPerHour": 1.47,
+            "items": 25,
+            "itemsPerHour": 1.66,
             "families": [
               "Saute"
             ]
           },
           "Sunday": {
             "hours": 10.27,
-            "items": 22,
-            "itemsPerHour": 2.17,
+            "items": 25,
+            "itemsPerHour": 2.45,
             "families": [
               "Saute"
             ]
@@ -77906,8 +75649,8 @@
           "Robata"
         ],
         "weekHours": 20.98,
-        "weekItems": 42,
-        "weekItemsPerHour": 1.98,
+        "weekItems": 46,
+        "weekItemsPerHour": 2.2,
         "days": {
           "Wednesday": {
             "hours": 6.43,
@@ -77927,8 +75670,8 @@
           },
           "Sunday": {
             "hours": 7.33,
-            "items": 23,
-            "itemsPerHour": 3.09,
+            "items": 27,
+            "itemsPerHour": 3.71,
             "families": [
               "Robata"
             ]
@@ -77980,21 +75723,21 @@
         }
       },
       {
-        "label": "Aniele S.",
-        "position": "Sushi",
+        "label": "Travis D.",
+        "position": "Prep",
         "families": [
-          "Sushi"
+          "Prep"
         ],
-        "weekHours": 7.92,
-        "weekItems": 32,
-        "weekItemsPerHour": 4.04,
+        "weekHours": 5.05,
+        "weekItems": 22,
+        "weekItemsPerHour": 4.36,
         "days": {
-          "Sunday": {
-            "hours": 7.92,
-            "items": 32,
-            "itemsPerHour": 4.04,
+          "Saturday": {
+            "hours": 5.05,
+            "items": 22,
+            "itemsPerHour": 4.36,
             "families": [
-              "Sushi"
+              "Prep"
             ]
           }
         }
@@ -78028,357 +75771,57 @@
         }
       },
       {
-        "label": "Gousmann A.",
-        "position": "Butcher",
+        "label": "Maria E.",
+        "position": "Saute",
         "families": [
-          "Prep"
+          "Saute"
         ],
-        "weekHours": 14.12,
-        "weekItems": 3,
-        "weekItemsPerHour": 0.19,
+        "weekHours": 17.75,
+        "weekItems": 21,
+        "weekItemsPerHour": 1.21,
         "days": {
-          "Saturday": {
-            "hours": 7.97,
-            "items": 2,
-            "itemsPerHour": 0.21,
+          "Thursday": {
+            "hours": 9.32,
+            "items": 9,
+            "itemsPerHour": 1.01,
             "families": [
-              "Prep"
+              "Saute"
             ]
           },
-          "Sunday": {
-            "hours": 6.15,
-            "items": 1,
-            "itemsPerHour": 0.16,
+          "Friday": {
+            "hours": 8.43,
+            "items": 12,
+            "itemsPerHour": 1.42,
             "families": [
-              "Prep"
+              "Saute"
             ]
           }
         }
       },
       {
-        "label": "Wisnel B.",
-        "position": "Prep",
+        "label": "Jorge G.",
+        "position": "Robata",
         "families": [
-          "Prep"
+          "Robata"
         ],
-        "weekHours": 13.63,
-        "weekItems": 3,
-        "weekItemsPerHour": 0.2,
+        "weekHours": 16.07,
+        "weekItems": 20,
+        "weekItemsPerHour": 1.25,
         "days": {
-          "Saturday": {
-            "hours": 7.48,
-            "items": 2,
-            "itemsPerHour": 0.23,
+          "Thursday": {
+            "hours": 7.72,
+            "items": 9,
+            "itemsPerHour": 1.2,
             "families": [
-              "Prep"
+              "Robata"
             ]
           },
-          "Sunday": {
-            "hours": 6.15,
-            "items": 1,
-            "itemsPerHour": 0.16,
+          "Friday": {
+            "hours": 8.35,
+            "items": 11,
+            "itemsPerHour": 1.3,
             "families": [
-              "Prep"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Lony C.",
-        "position": "Prep",
-        "families": [
-          "Prep"
-        ],
-        "weekHours": 13.74,
-        "weekItems": 3,
-        "weekItemsPerHour": 0.2,
-        "days": {
-          "Saturday": {
-            "hours": 7.62,
-            "items": 2,
-            "itemsPerHour": 0.22,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Sunday": {
-            "hours": 6.12,
-            "items": 1,
-            "itemsPerHour": 0.16,
-            "families": [
-              "Prep"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Tyrone C.",
-        "position": "Butcher",
-        "families": [
-          "Prep"
-        ],
-        "weekHours": 13.67,
-        "weekItems": 3,
-        "weekItemsPerHour": 0.2,
-        "days": {
-          "Saturday": {
-            "hours": 7.8,
-            "items": 2,
-            "itemsPerHour": 0.22,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Sunday": {
-            "hours": 5.87,
-            "items": 1,
-            "itemsPerHour": 0.17,
-            "families": [
-              "Prep"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Travis D.",
-        "position": "Prep",
-        "families": [
-          "Prep"
-        ],
-        "weekHours": 13.13,
-        "weekItems": 3,
-        "weekItemsPerHour": 0.21,
-        "days": {
-          "Saturday": {
-            "hours": 5.05,
-            "items": 2,
-            "itemsPerHour": 0.34,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Sunday": {
-            "hours": 8.08,
-            "items": 1,
-            "itemsPerHour": 0.12,
-            "families": [
-              "Prep"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Hudson D.",
-        "position": "Prep",
-        "families": [
-          "Prep"
-        ],
-        "weekHours": 13.43,
-        "weekItems": 3,
-        "weekItemsPerHour": 0.2,
-        "days": {
-          "Saturday": {
-            "hours": 7.33,
-            "items": 2,
-            "itemsPerHour": 0.23,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Sunday": {
-            "hours": 6.1,
-            "items": 1,
-            "itemsPerHour": 0.16,
-            "families": [
-              "Prep"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Jenny C.",
-        "position": "Prep",
-        "families": [
-          "Prep"
-        ],
-        "weekHours": 14.42,
-        "weekItems": 3,
-        "weekItemsPerHour": 0.19,
-        "days": {
-          "Saturday": {
-            "hours": 7.9,
-            "items": 2,
-            "itemsPerHour": 0.21,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Sunday": {
-            "hours": 6.52,
-            "items": 1,
-            "itemsPerHour": 0.15,
-            "families": [
-              "Prep"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Mandorliny J.",
-        "position": "Prep",
-        "families": [
-          "Prep"
-        ],
-        "weekHours": 13.72,
-        "weekItems": 3,
-        "weekItemsPerHour": 0.2,
-        "days": {
-          "Saturday": {
-            "hours": 7.6,
-            "items": 2,
-            "itemsPerHour": 0.22,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Sunday": {
-            "hours": 6.12,
-            "items": 1,
-            "itemsPerHour": 0.16,
-            "families": [
-              "Prep"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Claudia N.",
-        "position": "Prep",
-        "families": [
-          "Prep"
-        ],
-        "weekHours": 14.25,
-        "weekItems": 3,
-        "weekItemsPerHour": 0.19,
-        "days": {
-          "Saturday": {
-            "hours": 7.82,
-            "items": 2,
-            "itemsPerHour": 0.22,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Sunday": {
-            "hours": 6.43,
-            "items": 1,
-            "itemsPerHour": 0.16,
-            "families": [
-              "Prep"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Lesly O.",
-        "position": "Prep",
-        "families": [
-          "Prep"
-        ],
-        "weekHours": 13.83,
-        "weekItems": 3,
-        "weekItemsPerHour": 0.19,
-        "days": {
-          "Saturday": {
-            "hours": 7.6,
-            "items": 2,
-            "itemsPerHour": 0.22,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Sunday": {
-            "hours": 6.23,
-            "items": 1,
-            "itemsPerHour": 0.16,
-            "families": [
-              "Prep"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Sylve L.",
-        "position": "Prep",
-        "families": [
-          "Prep"
-        ],
-        "weekHours": 13.65,
-        "weekItems": 3,
-        "weekItemsPerHour": 0.2,
-        "days": {
-          "Saturday": {
-            "hours": 7.55,
-            "items": 2,
-            "itemsPerHour": 0.22,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Sunday": {
-            "hours": 6.1,
-            "items": 1,
-            "itemsPerHour": 0.16,
-            "families": [
-              "Prep"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Jovan T.",
-        "position": "Prep",
-        "families": [
-          "Prep"
-        ],
-        "weekHours": 11.57,
-        "weekItems": 3,
-        "weekItemsPerHour": 0.23,
-        "days": {
-          "Saturday": {
-            "hours": 5.6,
-            "items": 2,
-            "itemsPerHour": 0.3,
-            "families": [
-              "Prep"
-            ]
-          },
-          "Sunday": {
-            "hours": 5.97,
-            "items": 1,
-            "itemsPerHour": 0.17,
-            "families": [
-              "Prep"
-            ]
-          }
-        }
-      },
-      {
-        "label": "Claudia G.",
-        "position": "Prep",
-        "families": [
-          "Prep"
-        ],
-        "weekHours": 7.75,
-        "weekItems": 2,
-        "weekItemsPerHour": 0.22,
-        "days": {
-          "Saturday": {
-            "hours": 7.75,
-            "items": 2,
-            "itemsPerHour": 0.22,
-            "families": [
-              "Prep"
+              "Robata"
             ]
           }
         }

@@ -205,7 +205,7 @@ const summary = {
     'FTE roster (Viktor) → name match → station family',
     'items/staff-hr = day volume ÷ concurrent staff hours (punch overlap)',
     'Harri lounge brands excluded from kitchen labor',
-    'Non-Claudie: Mon–Fri clock-ins 5:00–9:59 ET excluded from staffing (prep); Claudie keeps all punches',
+    'Non-Claudie: clock-ins 5:00–9:59 ET excluded from staffing any day (prep); Claudie keeps all punches',
   ],
 };
 

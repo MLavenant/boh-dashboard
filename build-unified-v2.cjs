@@ -2597,10 +2597,11 @@ function buildStaffingTableHtml(staffing, guests) {
   let note = ms
     ? 'Food families only · closed food tickets · matched '+ms.laborShiftsMatched+' labor days · unmatched '+ms.laborShiftsUnmatched
     : 'Food families only · closed food tickets';
-  if (ms && ms.excludedEarlyWeekdayClockIns > 0) {
-    note += ' · excluded '+ms.excludedEarlyWeekdayClockIns+' Mon–Fri 5–10am clock-ins (prep)';
+  const earlyN = (ms && (ms.excludedEarlyClockIns != null ? ms.excludedEarlyClockIns : ms.excludedEarlyWeekdayClockIns)) || 0;
+  if (earlyN > 0) {
+    note += ' · excluded '+earlyN+' 5–10am clock-ins (prep)';
   } else if (ms && ms.earlyClockInExcludeRule && /Claudie/.test(ms.earlyClockInExcludeRule)) {
-    note += ' · Claudie keeps Mon–Fri early clock-ins';
+    note += ' · Claudie keeps early clock-ins';
   }
   return { html, note };
 }

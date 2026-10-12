@@ -23,10 +23,9 @@ const {
 
 const ROOT = process.env.BOH_ROOT || __dirname;
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const WEEKDAYS = new Set(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
 const MIN_HOURS = 0.25;
 const FOOD_SET = new Set(FOOD_FAMILIES);
-/** Non-Claudie: drop Mon–Fri punches whose clock-in is 5:00–9:59 (prep before service). */
+/** Non-Claudie: drop punches whose clock-in is 5:00–9:59 (prep before service), any day. */
 const EARLY_CLOCKIN_EXCLUDE_START = 5;
 const EARLY_CLOCKIN_EXCLUDE_END = 10; // exclusive
 // Expo/Prep/Fry qty↔labor joins are often imperfect — label caution, do not invent volumes
@@ -161,13 +160,12 @@ function clockInHourNy(inDate) {
 }
 
 /**
- * Exclude Mon–Fri prep clock-ins (5am–10am) from staffing totals for every
+ * Exclude prep clock-ins (5am–10am, any day) from staffing totals for every
  * location except Claudie (Claudie keeps all punches).
  */
-function shouldExcludeEarlyWeekdayClockIn(venue, entry) {
+function shouldExcludeEarlyClockIn(venue, entry) {
   if (!entry) return false;
   if (String(venue) === 'claudie') return false;
-  if (!WEEKDAYS.has(entry.day)) return false;
   const h = clockInHourNy(entry.inDate);
   if (h == null) return false;
   return h >= EARLY_CLOCKIN_EXCLUDE_START && h < EARLY_CLOCKIN_EXCLUDE_END;
@@ -610,13 +608,13 @@ function buildVenue(venueRaw, weekLabel) {
   }));
 
   const laborByEmpDay = new Map();
-  let excludedEarlyWeekdayClockIns = 0;
-  let excludedEarlyWeekdayHours = 0;
+  let excludedEarlyClockIns = 0;
+  let excludedEarlyHours = 0;
   for (const e of laborFile.entries || []) {
     if ((e.hours || 0) < MIN_HOURS) continue;
-    if (shouldExcludeEarlyWeekdayClockIn(venue, e)) {
-      excludedEarlyWeekdayClockIns += 1;
-      excludedEarlyWeekdayHours += e.hours || 0;
+    if (shouldExcludeEarlyClockIn(venue, e)) {
+      excludedEarlyClockIns += 1;
+      excludedEarlyHours += e.hours || 0;
       continue;
     }
     const id = e.employeeGuid || e.employeeName || e.payrollName;
@@ -953,12 +951,15 @@ function buildVenue(venueRaw, weekLabel) {
       bohMatchRate: +bohMatchRate.toFixed(3),
       rosterCoverage: +rosterCoverage.toFixed(3),
       noStationPeopleCount: noStationPeople.length,
-      excludedEarlyWeekdayClockIns,
-      excludedEarlyWeekdayHours: +excludedEarlyWeekdayHours.toFixed(2),
+      excludedEarlyClockIns,
+      excludedEarlyHours: +excludedEarlyHours.toFixed(2),
+      // legacy keys kept for older dashboard notes
+      excludedEarlyWeekdayClockIns: excludedEarlyClockIns,
+      excludedEarlyWeekdayHours: +excludedEarlyHours.toFixed(2),
       earlyClockInExcludeRule:
         venue === 'claudie'
-          ? 'Claudie: keep all punches (no Mon–Fri 5–10am filter)'
-          : 'Non-Claudie: exclude Mon–Fri punches with clock-in 5:00–9:59 ET',
+          ? 'Claudie: keep all punches (no 5–10am filter)'
+          : 'Non-Claudie: exclude punches with clock-in 5:00–9:59 ET (any day)',
     },
     guestsSeated: venueData.guestsSeated || null,
     toastStationFamily,
