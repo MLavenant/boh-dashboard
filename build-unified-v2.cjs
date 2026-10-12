@@ -986,14 +986,15 @@ body.printing-stations-pdf .ps-print-page.ps-hourly.ps-hourly-large h1 {
   margin:0 0 6px;
   color:#d9a441;
 }
-body.printing-stations-pdf .ps-print-page.ps-hourly .ps-avg-banner {
-  border:3px solid #d9a441 !important;
+body.printing-stations-pdf .ps-print-page.ps-hourly .ps-avg-caption {
+  border:1px solid #d9a441 !important;
+  font-size:12px !important;
 }
 body.printing-stations-pdf .ps-print-page.ps-hourly.ps-hourly-large table.ps-v2-compare td,
 body.printing-stations-pdf .ps-print-page.ps-hourly.ps-hourly-large table.ps-v2-compare th {
   font-size:12px !important;
 }
-body.theme-daylight .ps-avg-banner {
+body.theme-daylight .ps-avg-caption {
   border-color:#d9a441 !important;
 }
 body.printing-stations-pdf .ps-print-page.ps-intro table {
@@ -5730,8 +5731,9 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, opts) {
   const hourFont = large ? '13px' : '12px';
   const locFont = large ? '11px' : '10px';
 
-  // Week AVG items/staff-hr (overall + per location) for the bordered banner
-  let avgBanner = '';
+  // Compact week AVG row: "Avg Number Per Staff per hours" + per-location values
+  let avgRow = '';
+  let avgCaption = '';
   if (showAvg) {
     const locAvgs = [];
     let totItems = 0, totHours = 0;
@@ -5745,28 +5747,31 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, opts) {
       locAvgs.push({ key: v.key, label: short(v.key), ipsh: ipsh != null && ipsh > 0 ? ipsh : null });
     });
     const overall = totHours > 0 && totItems > 0 ? Math.round(totItems / totHours) : null;
-    const avgBg = dayTheme ? '#fffdf8' : '#1a1408';
+    const avgBg = dayTheme ? '#f7f1e7' : '#1a1408';
     const avgBorder = '#d9a441';
     const avgFg = dayTheme ? '#2c241c' : '#f5e6c8';
     const avgMuted = dayTheme ? '#7a6a58' : '#9aa0aa';
-    avgBanner = '<div class="ps-avg-banner" style="display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin:0 0 14px;padding:12px 14px;background:'+avgBg+';border:3px solid '+avgBorder+';border-radius:12px;box-shadow:inset 0 0 0 1px rgba(217,164,65,0.35)">'+
-      '<div style="min-width:160px;padding:8px 14px;border:2px solid '+avgBorder+';border-radius:10px;background:rgba(217,164,65,0.12);text-align:center">'+
-        '<div style="font-size:11px;font-weight:800;letter-spacing:0.12em;color:'+avgBorder+';margin-bottom:4px">AVG</div>'+
-        '<div style="font-size:28px;font-weight:800;line-height:1;color:'+avgFg+'">'+(overall != null ? overall : '—')+'</div>'+
-        '<div style="font-size:11px;color:'+avgMuted+';margin-top:4px">items / staff-hr · week</div>'+
-      '</div>'+
-      locAvgs.map(a => (
-        '<div style="flex:1;min-width:72px;padding:8px 10px;border:2px solid '+avgBorder+';border-radius:10px;text-align:center;background:rgba(217,164,65,0.06)">'+
-          '<div style="font-size:11px;font-weight:800;color:'+avgBorder+';letter-spacing:0.06em">'+a.label+'</div>'+
-          '<div style="font-size:20px;font-weight:800;color:'+avgFg+';margin-top:2px">'+(a.ipsh != null ? a.ipsh : '—')+'</div>'+
-        '</div>'
-      )).join('')+
+    avgCaption = '<div class="ps-avg-caption" style="margin:0 0 8px;padding:8px 12px;border:1px solid '+avgBorder+';border-radius:8px;background:'+avgBg+';font-size:12px;line-height:1.4;color:'+avgFg+'">'+
+      '<strong style="color:'+avgBorder+'">Avg Number Per Staff per hours</strong>'+
+      '<span style="color:'+avgMuted+'"> (week) — sold items ÷ staff hours</span>'+
+      '<span style="margin-left:10px;font-weight:800">RDG '+(overall != null ? overall : '—')+'</span>'+
+      locAvgs.map(a => ' · <strong>'+a.label+'</strong> '+(a.ipsh != null ? a.ipsh : '—')).join('')+
       '</div>';
+    // Also embed as first body row under each day (same AVG repeated per location column)
+    avgRow = '<tr class="ps-avg-row"><td style="text-align:left;white-space:nowrap;font-weight:700;color:'+avgBorder+';background:'+avgBg+';padding:'+cellPad+';font-size:'+locFont+';border-bottom:2px solid '+avgBorder+'">Week AVG</td>';
+    HOURLY_DAYS.forEach(() => {
+      venues.forEach((v, vi) => {
+        const a = locAvgs.find(x => x.key === v.key);
+        const val = a && a.ipsh != null ? a.ipsh : null;
+        avgRow += '<td style="background:'+avgBg+';color:'+avgFg+';font-weight:800;padding:'+cellPad+';text-align:center;font-size:'+locFont+';border-bottom:2px solid '+avgBorder+';'+(vi===0?locSep:'')+'">'+(val != null ? val : '—')+'</td>';
+      });
+    });
+    avgRow += '</tr>';
   }
 
   let html = '<div class="'+(forScreen ? 'ps-screen-compare' : 'ps-hourly-block')+(large ? ' ps-hourly-print-large' : '')+'">'+
     (forScreen ? '' : '<h2 style="display:none">'+family+'</h2>')+
-    avgBanner+
+    avgCaption+
     '<div style="overflow-x:auto"><table class="ps-v2-compare" style="font-size:'+hourFont+'"><thead>'+
     '<tr><th rowspan="2" style="vertical-align:bottom;text-align:left;background:'+dayHeadBg+';color:'+hourFg+';padding:'+cellPad+';font-size:'+hourFont+'">Hour</th>';
   HOURLY_DAYS.forEach(day => {
@@ -5779,6 +5784,7 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, opts) {
     });
   });
   html += '</tr></thead><tbody>';
+  html += avgRow;
 
   HOURLY_BAND.forEach(hk => {
     const has = HOURLY_DAYS.some(day => venues.some(v => grid[day][hk][v.key] != null));
@@ -5978,29 +5984,19 @@ function exportPortfolioStationsPdf() {
   renderPortfolioStations();
 
   const finish = () => {
-    // Always capture from a dedicated off-DOM chart so page 1 is never blank
-    let chartImg = captureStationsCompareChartPng(weekKey);
-    if (!chartImg) {
-      try {
-        const canvas = document.getElementById('cPortfolioStations');
-        if (canvas && canvas.toDataURL) chartImg = canvas.toDataURL('image/png');
-      } catch (e) { chartImg = ''; }
-    }
-
-    // PDF: (1) Stations Analysis chart (2) per station: divider → day table → hour×day + AVG
-    const chartPage = buildStationsPdfChartPageHtml(weekLabel, chartImg);
+    // PDF only: STATIONS ANALYSIS cover → per station divider → hour×day table (nothing else)
+    const coverPage = buildStationDividerPageHtml('Stations Analysis');
     const detailPages = families.map(f => {
-      const dayPage = buildStationsPdfFamilyDayPageHtml(f, weekKey, weekLabel);
       const hourPage = buildStationsPdfFamilyHourPageHtml(f, weekKey, weekLabel);
-      if (!dayPage && !hourPage) return '';
-      return buildStationDividerPageHtml(f) + (dayPage || '') + (hourPage || '');
+      if (!hourPage) return '';
+      return buildStationDividerPageHtml(f) + hourPage;
     }).join('');
 
-    runStationsPdfPrint(printRoot, chartPage + detailPages);
+    runStationsPdfPrint(printRoot, coverPage + detailPages);
   };
 
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => setTimeout(finish, 450));
+    requestAnimationFrame(() => setTimeout(finish, 200));
   });
 }
 
@@ -6769,5 +6765,18 @@ finalHtml = finalHtml
 
 // ── Write output ──────────────────────────────────────────────────────────────
 const outPath = path.join(DIR, 'dashboard.html');
-fs.writeFileSync(outPath, finalHtml, 'utf8');
+const tmpPath = outPath + '.tmp-' + process.pid;
+fs.writeFileSync(tmpPath, finalHtml, 'utf8');
+try {
+  fs.renameSync(tmpPath, outPath);
+} catch (err) {
+  // Windows lock: overwrite in place if rename can't replace
+  try {
+    fs.copyFileSync(tmpPath, outPath);
+    fs.unlinkSync(tmpPath);
+  } catch (err2) {
+    fs.unlinkSync(tmpPath);
+    throw err2;
+  }
+}
 console.log('✅ Written:', outPath, '(' + Math.round(fs.statSync(outPath).size / 1024) + ' KB)');

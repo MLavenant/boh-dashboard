@@ -9,16 +9,16 @@ Single button: **Export Stations PDF** on Portfolio → Stations (`exportPortfol
 
 ## Screen (Stations tab)
 
-**Overview** = compare bar chart + station chips + hour×day×location table with a bordered **AVG** banner (week overall + per location).
+**Overview** = compare bar chart + station chips + hour×day×location table.
+Week averages use a compact caption **Avg Number Per Staff per hours** plus a **Week AVG** row inside the table (not large KPI cards).
 
 ## PDF structure
 
-1. **Stations Analysis** — full-page items/staff-hr bar chart (captured via off-DOM canvas so page 1 is never blank).
-2. **Per station** — white **title divider** (dark RDG logo, navy pill, navy footer).
-3. **Day × location table** (large): Mon…Sun + Week · Ful · Items/staff-hr · Items/person · all 5 locations.
-4. **Hour × day × location table** (large) with bordered **AVG** banner on top (overall week AVG + CL/CN/ACG/AWP/MILA).
+1. **Cover** — white divider page with navy pill **STATIONS ANALYSIS** (same style as station break pages).
+2. **Per station** — white **title divider** (navy pill with station name).
+3. **Hour × day × location table only** (with Avg Number Per Staff per hours caption + Week AVG row).
 
-Do **not** emit former “Portfolio - Stations 1-3 / 7-8” multi-family pages.
+Do **not** include: bar-chart page, day×location Ful tables, or multi-station “Portfolio 1-3 / 7-8” pages.
 
 ## Logo assets
 
