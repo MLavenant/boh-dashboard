@@ -79,9 +79,15 @@ async function refreshAssignment({ venue, week }) {
   console.log('venue=', venue, 'scrape=', scrapeKey, 'process=', processKey, 'week=', weekKey);
 
   // 1) Refresh prep stations
-  // MILA: Toast API menus (reliable). Others: Bulk Editor scrape (named stations).
+  // MILA: Toast API menus (reliable) + cocktail Bulk Editor when session works.
+  // Others: Bulk Editor scrape (named stations).
   if (scrapeKey === 'mila') {
     await run('node', ['refresh-prep-from-api.cjs', 'mila']);
+    try {
+      await run('node', ['scrape-prep-stations-all.cjs', 'mila_beverage']);
+    } catch (e) {
+      console.warn('MILA cocktail Bulk Editor scrape failed — keeping last beverage prep map:', e.message.slice(0, 200));
+    }
   } else {
     try {
       await run('node', ['scrape-prep-stations-all.cjs', scrapeKey]);

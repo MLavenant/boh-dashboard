@@ -1,8 +1,13 @@
 'use strict';
 /**
- * Shared BOH food-station name filter.
- * Keeps cook / expo / prep stations; drops FOH bars & beverage.
- * Explicitly keeps "Sushi Bar" / "Sushi Bar, Cold" (contain the word "bar").
+ * Shared BOH station name filters.
+ *
+ * Food: cook / expo / prep — drops FOH bars & beverage.
+ *   Explicitly keeps "Sushi Bar" / "Sushi Bar, Cold" (contain the word "bar").
+ *
+ * Beverage (MILA cocktails first): cocktail KDS lanes only.
+ *   Allowlist: Bar Central, Bar Central 2.0 only.
+ *   Drops wine/lounge/POS/barista noise.
  */
 function cleanStationName(s) {
   return String(s || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
@@ -25,4 +30,21 @@ function isFoodStationName(name) {
   return !EXCL.some((w) => n.includes(w));
 }
 
-module.exports = { cleanStationName, isFoodStationName };
+/** MILA cocktail KDS stations (Beverage mode). */
+function isCocktailStationName(name) {
+  const n = cleanStationName(name).toLowerCase();
+  if (!n) return false;
+  // Primary cocktail lane
+  if (/^bar\s*central(\s*2\.0\s*only)?$/i.test(n)) return true;
+  if (n === 'bar central' || n === 'bar central 2.0 only') return true;
+  // Normalized: "barcentral", "barcentral20only"
+  const compact = n.replace(/[^a-z0-9]/g, '');
+  if (compact === 'barcentral' || compact === 'barcentral20only') return true;
+  return false;
+}
+
+module.exports = {
+  cleanStationName,
+  isFoodStationName,
+  isCocktailStationName,
+};

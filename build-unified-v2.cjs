@@ -214,6 +214,15 @@ const sidebarShellHtml = [
   '    </div>',
   '  </div>',
   '  <div class="sidebar-block">',
+  '    <div class="sidebar-label">Kitchen mode</div>',
+  '    <div class="mode-switch" id="analysisModeSwitch" role="tablist" aria-label="Food or Beverage">',
+  '      <span class="mode-switch-thumb" id="analysisModeThumb" aria-hidden="true"></span>',
+  '      <button type="button" class="mode-switch-btn active" data-mode="food" onclick="setAnalysisMode(\'food\',this)">Food</button>',
+  '      <button type="button" class="mode-switch-btn" data-mode="beverage" onclick="setAnalysisMode(\'beverage\',this)">Beverage</button>',
+  '    </div>',
+  '    <p class="mode-switch-hint" id="analysisModeHint">Food · BOH stations</p>',
+  '  </div>',
+  '  <div class="sidebar-block">',
   '    <div class="sidebar-label">Data Analysis</div>',
   '    <nav class="sidebar-nav" id="navDataAnalysis">',
   "      <button type=\"button\" class=\"tab-btn active\" onclick=\"switchTab('overview',this)\">Overview</button>",
@@ -236,6 +245,7 @@ const sidebarShellHtml = [
   '  </div>',
   '</aside>',
   '<main class="app-main">',
+  '<div id="beverageEmptyBanner" role="status"></div>',
   '<header>',
   '  <h1 id="dashTitle">BOH Dashboard</h1>',
   '</header>',
@@ -697,6 +707,19 @@ html = html.replace('</style>', `
 .sidebar-week-btn{flex:0 0 auto;background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:7px 10px;cursor:pointer;font:13px inherit}
 .sidebar-week-btn:hover{border-color:#d9a441;color:#e8eaed}
 .sidebar-venue-pills{display:none}
+.mode-switch{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:0;padding:3px;background:#0d1117;border:1px solid #2d3448;border-radius:999px;overflow:hidden}
+.mode-switch-thumb{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);background:linear-gradient(135deg,#d9a441 0%,#c4922f 100%);border-radius:999px;transition:transform 0.32s cubic-bezier(0.22,1,0.36,1);z-index:0;box-shadow:0 2px 8px rgba(217,164,65,0.35)}
+.mode-switch[data-mode="beverage"] .mode-switch-thumb{transform:translateX(100%)}
+.mode-switch-btn{position:relative;z-index:1;border:none;background:transparent;color:#9aa0aa;font:700 12px/1.2 inherit;padding:9px 8px;cursor:pointer;border-radius:999px;transition:color 0.25s ease}
+.mode-switch-btn.active{color:#0c0e13}
+.mode-switch-hint{font-size:11px;color:#6b7280;margin:8px 2px 0;line-height:1.35;min-height:28px;transition:opacity 0.22s ease,transform 0.22s ease}
+.app-main.mode-switching{animation:modeContentSwap 0.38s cubic-bezier(0.22,1,0.36,1)}
+@keyframes modeContentSwap{
+  0%{opacity:0.35;transform:translateY(6px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+#beverageEmptyBanner{display:none;margin:14px 0 0;padding:16px 18px;border-radius:12px;border:1px solid #5b3a12;background:linear-gradient(135deg,#1a140c,#13161c);color:#fde68a}
+#beverageEmptyBanner strong{color:#f59e0b}
 .sidebar-nav{display:flex;flex-direction:column;gap:2px}
 .app-sidebar .tab-btn{width:100%;text-align:left;padding:9px 12px;border:none;border-radius:8px;border-bottom:none;margin:0;background:transparent;color:#9aa0aa;font:600 13px/1.2 inherit;cursor:pointer}
 .app-sidebar .tab-btn:hover{background:#1a1f28;color:#e8eaed}
@@ -1351,6 +1374,79 @@ let currentWeekIdx = (() => {
   return WEEKS.length ? best : 0;
 })();
 let currentVenue = 'claudie';
+let analysisMode = (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('bohAnalysisMode') === 'beverage')
+  ? 'beverage'
+  : 'food';
+
+function hasBeverageData(data) {
+  return !!(data && data.beverage && Array.isArray(data.beverage.stations) && data.beverage.stations.length);
+}
+
+function syncAnalysisModeUi() {
+  const sw = document.getElementById('analysisModeSwitch');
+  const hint = document.getElementById('analysisModeHint');
+  if (sw) {
+    sw.dataset.mode = analysisMode;
+    sw.querySelectorAll('.mode-switch-btn').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-mode') === analysisMode);
+    });
+  }
+  if (hint) {
+    hint.style.opacity = '0';
+    hint.style.transform = 'translateY(3px)';
+    setTimeout(() => {
+      if (analysisMode === 'beverage') {
+        if (currentVenue === 'rdg_portfolio') {
+          hint.textContent = 'Beverage · MILA cocktails only (pick MILA)';
+        } else if (currentVenue === 'mila') {
+          hint.textContent = 'Beverage · MILA cocktails (Bar Central)';
+        } else {
+          hint.textContent = 'Beverage · MILA cocktails first';
+        }
+      } else {
+        hint.textContent = 'Food · BOH stations';
+      }
+      hint.style.opacity = '1';
+      hint.style.transform = 'translateY(0)';
+    }, 120);
+  }
+  const banner = document.getElementById('beverageEmptyBanner');
+  if (banner) {
+    const d = ALL_DATA[currentVenue]?.[WEEKS[currentWeekIdx]?.key] || {};
+    const show = analysisMode === 'beverage' && currentVenue !== 'rdg_portfolio' && !hasBeverageData(d);
+    banner.style.display = show ? '' : 'none';
+    if (show) {
+      banner.innerHTML = '<strong>Cocktail Beverage — MILA first.</strong> Switch location to <em>MILA</em> (or wait for cocktail data). Food mode stays unchanged for other restaurants.';
+    }
+  }
+}
+
+function setAnalysisMode(mode, btn) {
+  const next = mode === 'beverage' ? 'beverage' : 'food';
+  if (next === analysisMode) return;
+  analysisMode = next;
+  try { sessionStorage.setItem('bohAnalysisMode', analysisMode); } catch (_) { /* ignore */ }
+  if (btn) {
+    const sw = document.getElementById('analysisModeSwitch');
+    if (sw) sw.querySelectorAll('.mode-switch-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  syncAnalysisModeUi();
+  const main = document.querySelector('.app-main');
+  if (main) {
+    main.classList.remove('mode-switching');
+    void main.offsetWidth;
+    main.classList.add('mode-switching');
+    setTimeout(() => main.classList.remove('mode-switching'), 400);
+  }
+  // Portfolio has no beverage staffing — bounce to Overview food or stay
+  if (analysisMode === 'beverage' && currentVenue === 'rdg_portfolio') {
+    selectVenue('mila');
+    return;
+  }
+  renderAll();
+}
+
 function refreshWeekDropdown() {
   const dd = document.getElementById('weekDropdown');
   if (!dd) return;
@@ -1464,9 +1560,52 @@ function ensureServiceThroughput(data) {
 }
 function getD() {
   const weekKey = WEEKS[currentWeekIdx]?.key;
-  return ensureServiceThroughput(
-    ALL_DATA[currentVenue]?.[weekKey] || ALL_DATA[currentVenue]?.['latest'] || {}
-  );
+  const raw = ALL_DATA[currentVenue]?.[weekKey] || ALL_DATA[currentVenue]?.['latest'] || {};
+  const data = ensureServiceThroughput(raw);
+  if (analysisMode !== 'beverage') {
+    data._analysisMode = 'food';
+    data._beverageUnavailable = false;
+    return data;
+  }
+  if (!hasBeverageData(data)) {
+    return {
+      ...data,
+      _analysisMode: 'beverage',
+      _beverageUnavailable: true,
+      stations: [],
+      stationDetails: {},
+      stationHourItems: {},
+      stationItemsArr: [],
+      summary: [],
+      staffing: null,
+      hourProfile: [],
+      curve: [],
+      curveByDay: {},
+      hmFul: {},
+      tbk: [],
+      breakingPoint: null,
+      breakingPointGuests: null,
+    };
+  }
+  const b = data.beverage;
+  return {
+    ...data,
+    _analysisMode: 'beverage',
+    _beverageUnavailable: false,
+    stations: b.stations,
+    stationDetails: b.stationDetails || {},
+    stationHourItems: b.stationHourItems || {},
+    stationItemsArr: b.stationItemsArr || [],
+    summary: b.summary || [],
+    staffing: null,
+    hourProfile: b.hourProfile || [],
+    curve: b.curve || [],
+    curveByDay: b.curveByDay || {},
+    hmFul: b.hmFul || {},
+    breakingPoint: b.breakingPoint != null ? b.breakingPoint : null,
+    breakingPointGuests: b.breakingPointGuests != null ? b.breakingPointGuests : null,
+    ticketSummary: b.ticketSummary || data.ticketSummary,
+  };
 }
 
 function weekShortLabel(weekKey) {
@@ -1635,12 +1774,24 @@ async function loadBohFromFirebase() {
 // ============================================================
 // FOOD STATION FILTER
 // ============================================================
-// Keep Sushi Bar / Raw Bar; drop FOH beverage bars (mirrors food-station.cjs)
+// Cocktail KDS lanes (Beverage mode — MILA first). Mirrors food-station.cjs.
+function isCocktailStation(name) {
+  const n = String(name || '').toLowerCase().replace(/\\u00a0/g, ' ').replace(/\\s+/g, ' ').trim();
+  if (!n) return false;
+  if (/^bar\\s*central(\\s*2\\.0\\s*only)?$/i.test(n)) return true;
+  const compact = n.replace(/[^a-z0-9]/g, '');
+  return compact === 'barcentral' || compact === 'barcentral20only';
+}
+// Keep Sushi Bar / Raw Bar; drop FOH beverage bars (mirrors food-station.cjs).
+// In Beverage mode, allow cocktail stations instead.
 function isFoodStation(name) {
+  if (typeof analysisMode !== 'undefined' && analysisMode === 'beverage') {
+    return isCocktailStation(name);
+  }
   const n = String(name || '').toLowerCase().trim();
   if (!n) return false;
   // Prep is not shown on Stations (exec line-production views only)
-  if (/\bprep\b/.test(n) || n === 'back kitchen') return false;
+  if (/\\bprep\\b/.test(n) || n === 'back kitchen') return false;
   if (/\\bsushi\\s*bar\\b/.test(n) || /\\braw\\s*bar\\b/.test(n)) return true;
   if (/(^|[^a-z])bar([^a-z]|$)/i.test(n)) return false;
   return !['champagne','wine','btg','pos','barista','somm','water','service','beach','btl','drink','no print','lounge'].some(p => n.includes(p));
@@ -6563,6 +6714,7 @@ function exportPeopleAssignments() {
 // RENDER ALL
 // ============================================================
 function renderAll() {
+  syncAnalysisModeUi();
   // RDG Portfolio is not a real venue week — only render Group aggregator + settings
   if (currentVenue === 'rdg_portfolio') {
     renderGroup();
@@ -6690,12 +6842,18 @@ function selectVenue(key) {
   _serviceBreakDay = null;
   const label = key === 'rdg_portfolio' ? 'RDG Portfolio' : (VENUE_LABELS[key] || key);
   const title = document.getElementById('dashTitle');
-  if (title) title.textContent = label + ' · BOH Dashboard';
+  const modeTag = (typeof analysisMode !== 'undefined' && analysisMode === 'beverage') ? ' · Beverage' : '';
+  if (title) title.textContent = label + ' · BOH Dashboard' + modeTag;
   const sel = document.getElementById('venueSelect');
   if (sel && sel.value !== key) sel.value = key;
   document.querySelectorAll('.venue-pill').forEach(b => {
     b.classList.toggle('active', b.dataset.venue === key);
   });
+  // Portfolio has no beverage staffing — keep Food for portfolio compare
+  if (key === 'rdg_portfolio' && analysisMode === 'beverage') {
+    analysisMode = 'food';
+    try { sessionStorage.setItem('bohAnalysisMode', 'food'); } catch (_) { /* ignore */ }
+  }
   // RDG Portfolio stays on the current tab (Stations = station×venue benchmark).
   renderAll();
 }

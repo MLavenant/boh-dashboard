@@ -3,7 +3,9 @@
  * Scrape Toast Advanced Properties Bulk Editor prep stations for RDG venues.
  * Merges stations into item-station-map.json — never overwrites REF/TARGET targetSec.
  *
- * Usage: node scrape-prep-stations-all.cjs [claudie ava_cg ava_wp casa_neos]
+ * Usage:
+ *   node scrape-prep-stations-all.cjs [claudie ava_cg ava_wp casa_neos mila]
+ *   node scrape-prep-stations-all.cjs mila_beverage   # MILA cocktails only
  */
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -72,15 +74,42 @@ const VENUE_CONFIGS = {
       return sample.some(s => /mila/i.test(s));
     },
   },
+  /** MILA cocktail Beverage mode — M-BAR CENTRAL cocktail groups only. */
+  mila_beverage: {
+    mapKey: 'mila',
+    outSuffix: 'beverage',
+    selectedSet: '500000000001501691',
+    beverage: true,
+    menuMatch(name) {
+      const n = clean(name);
+      return /^m-bar\s*central$/i.test(n) || /^m-?\s*bar\s*central$/i.test(n);
+    },
+    groupMatch(name) {
+      const n = clean(name);
+      // Cocktails only — skip wine/beer/bottle/water subgroups under Bar Central
+      if (/wine|beer|sake|champagne|water|bottle|liquor|spirit|mocktail/i.test(n) && !/cocktail/i.test(n)) {
+        return false;
+      }
+      return /cocktail/i.test(n);
+    },
+    confirmSample(sample) {
+      return sample.some(s => /mila/i.test(s));
+    },
+  },
 };
 
-const { isFoodStationName, cleanStationName } = require('./food-station.cjs');
+const { isFoodStationName, isCocktailStationName, cleanStationName } = require('./food-station.cjs');
 
 function clean(s) {
   return cleanStationName(s);
 }
 
 function isFoodStation(name) {
+  return isFoodStationName(name);
+}
+
+function keepPrepStation(name, cfg) {
+  if (cfg && cfg.beverage) return isCocktailStationName(name);
   return isFoodStationName(name);
 }
 
@@ -205,7 +234,9 @@ async function switchVenue(page, cfg) {
   return { stationMap, top };
 }
 
-async function walkMenus(page, stationIdToName, menuMatch) {
+async function walkMenus(page, stationIdToName, cfg) {
+  const menuMatch = cfg.menuMatch;
+  const groupMatch = typeof cfg.groupMatch === 'function' ? cfg.groupMatch : () => true;
   const items = [];
   const top = await listChildren(page, 'Restaurant');
   if (!top?.children) throw new Error('listchildren Restaurant failed');
@@ -224,6 +255,10 @@ async function walkMenus(page, stationIdToName, menuMatch) {
       groupsResp = await listChildren(page, menu.entityType, menu.masterIdString);
       groups = (groupsResp.children || []).filter(c => c?.entityType === 'MenuGroup' && c.entityIdString);
     }
+    // Beverage: only cocktail subgroups (and nested items under those groups)
+    if (cfg.beverage) {
+      groups = groups.filter(g => groupMatch(g.name || ''));
+    }
     console.log(`  ${menuName}: ${groups.length} groups`);
 
     for (const group of groups) {
@@ -235,6 +270,10 @@ async function walkMenus(page, stationIdToName, menuMatch) {
       while (queue.length) {
         const node = queue.shift();
         if (node.entityType === 'MenuGroup' && node.hasChildren) {
+          // Nested groups under cocktail parents stay in scope for beverage
+          if (cfg.beverage && !groupMatch(node.name || '') && !/cocktail/i.test(node.name || '')) {
+            continue;
+          }
           const nested = await listChildren(page, node.entityType, node.entityIdString);
           for (const ch of (nested.children || [])) {
             if (ch?.name && ch.entityIdString) {
@@ -247,14 +286,14 @@ async function walkMenus(page, stationIdToName, menuMatch) {
 
         const ids = Array.isArray(node['prep-station']) ? node['prep-station'] : [];
         const stationsRaw = ids.map(id => stationIdToName[String(id)] || String(id));
-        const stations = [...new Set(stationsRaw.map(clean).filter(isFoodStation))];
+        const stations = [...new Set(stationsRaw.map(clean).filter(s => keepPrepStation(s, cfg)))];
         items.push({
           menuItem: clean(node.name),
           guid: String(node.entityIdString || node.masterIdString || ''),
           menu: node._menu,
           group: node._group,
           stations,
-          stationsRaw,
+          stationsRaw: stationsRaw.map(clean),
         });
       }
     }
@@ -303,10 +342,14 @@ async function scrapeVenue(page, cfg) {
   if (Object.keys(stationMap).length < 3) {
     throw new Error(`${cfg.mapKey}: prep station name map missing`);
   }
-  const items = await walkMenus(page, stationMap, cfg.menuMatch);
-  const outFile = path.join(ROOT, 'data', `prep-stations-${cfg.mapKey}.json`);
+  const items = await walkMenus(page, stationMap, cfg);
+  const outName = cfg.outSuffix
+    ? `prep-stations-${cfg.mapKey}-${cfg.outSuffix}.json`
+    : `prep-stations-${cfg.mapKey}.json`;
+  const outFile = path.join(ROOT, 'data', outName);
   const payload = {
     venue: cfg.mapKey,
+    scope: cfg.beverage ? 'cocktails' : 'food',
     scrapedAt: new Date().toISOString(),
     source: BULK_URL,
     itemCount: items.length,
@@ -317,10 +360,19 @@ async function scrapeVenue(page, cfg) {
   console.log(`✅ Wrote ${outFile} (${items.length} items)`);
   if (items.length) {
     console.log('Sample:', items.slice(0, 3).map(i =>
-      `${i.menuItem} → ${i.stations.join(', ')} [${i.menu}/${i.group}]`
+      `${i.menuItem} → ${(i.stations.length ? i.stations : i.stationsRaw || []).join(', ')} [${i.menu}/${i.group}]`
     ).join('\n  '));
   }
-  mergeIntoMap(cfg.mapKey, items);
+  // For beverage, also keep items that only have cocktail stationsRaw if filter was too tight
+  const mergeItems = items.map(it => {
+    if (it.stations.length) return it;
+    if (cfg.beverage && Array.isArray(it.stationsRaw)) {
+      const kept = it.stationsRaw.filter(s => keepPrepStation(s, cfg));
+      return { ...it, stations: kept };
+    }
+    return it;
+  });
+  mergeIntoMap(cfg.mapKey, mergeItems);
   return items.length;
 }
 

@@ -58,9 +58,12 @@ if (fs.existsSync(itemDetailsPath)) {
 }
 
 // ---- Station filter (shared; keeps Sushi Bar, drops FOH bars) ----
-const { isFoodStationName } = require('./food-station.cjs');
+const { isFoodStationName, isCocktailStationName } = require('./food-station.cjs');
 function isFood(name) {
   return isFoodStationName(name);
+}
+function isCocktail(name) {
+  return isCocktailStationName(name);
 }
 
 // ---- Parse fulfillment time ----
@@ -911,6 +914,213 @@ Object.values(stationHourItems).forEach(days => {
   });
 });
 
+// ---- Beverage slice (MILA cocktails first) ----
+function buildBeverageSlice() {
+  if (venueArg !== 'mila') return null;
+
+  let skippedOpenBev = 0;
+  let skippedLongBev = 0;
+  let skippedNonCocktail = 0;
+  const cocktailTickets = tickets.filter(t => {
+    if (!isCocktail(t['Station'])) { skippedNonCocktail++; return false; }
+    const fired = parseDate(t['Fired Date']);
+    const fulSecRaw = parseFulTime(t['Fulfillment Time']);
+    const fulSec = adjustFulSec(fulSecRaw);
+    const fulfilledAt = parseDate(t['Fulfilled Date']);
+    if (!fired || fulSecRaw == null || fulSecRaw <= 0) { skippedOpenBev++; return false; }
+    if (!fulfilledAt && !t['Fulfilled Date']) { skippedOpenBev++; return false; }
+    if (fulSecRaw > MAX_FUL_SEC) { skippedLongBev++; return false; }
+    return true;
+  }).map(t => {
+    const fired = parseDate(t['Fired Date']);
+    const fulSec = adjustFulSec(parseFulTime(t['Fulfillment Time']));
+    const fulfilled = fired && fulSec != null ? new Date(fired.getTime() + fulSec * 1000) : null;
+    return { ...t, _fired: fired, _fulfilled: fulfilled, _fulSec: fulSec };
+  }).filter(t => t._fired && t._fulSec != null && t._fulfilled);
+
+  const bevStationAgg = {};
+  cocktailTickets.forEach(t => {
+    const st = t['Station'];
+    if (!bevStationAgg[st]) bevStationAgg[st] = { count: 0, totalSec: 0 };
+    bevStationAgg[st].count++;
+    bevStationAgg[st].totalSec += t._fulSec;
+  });
+  const bevStations = Object.entries(bevStationAgg).map(([station, d]) => ({
+    station,
+    count: d.count,
+    avg_sec: +(d.totalSec / d.count).toFixed(2),
+    exp_sec: 0,
+    bp_tickets: null,
+    bp_curve: [],
+  })).sort((a, b) => b.count - a.count);
+
+  const bevStationTicketsMap = {};
+  cocktailTickets.forEach(t => {
+    const st = t['Station'];
+    if (!st) return;
+    if (!bevStationTicketsMap[st]) bevStationTicketsMap[st] = new Map();
+    const key = `${t['Check #']}||${t['Fired Date']}||${t['Fulfillment Time']}`;
+    if (!bevStationTicketsMap[st].has(key)) bevStationTicketsMap[st].set(key, t);
+  });
+  bevStations.forEach(stRow => {
+    const stTickets = bevStationTicketsMap[stRow.station]
+      ? [...bevStationTicketsMap[stRow.station].values()]
+      : [];
+    if (!stTickets.length) return;
+    const stCurve = buildIntervalCurve(stTickets);
+    const bpRow = stCurve.find((r, i) => i >= 5 && r.occ >= 3 && r.ful > 15);
+    stRow.bp_tickets = bpRow ? bpRow.conc : null;
+    stRow.bp_curve = stCurve;
+  });
+
+  const bevDetails = {};
+  cocktailTickets.forEach(t => {
+    const st = t['Station'];
+    const day = DAYS[t._fired.getDay()];
+    const hr = t._fired.getHours();
+    const hrKey = `${hr}-${hr + 1}`;
+    if (!bevDetails[st]) bevDetails[st] = {};
+    if (!bevDetails[st][day]) bevDetails[st][day] = {};
+    if (!bevDetails[st][day][hrKey]) bevDetails[st][day][hrKey] = { count: 0, totalSec: 0 };
+    bevDetails[st][day][hrKey].count++;
+    bevDetails[st][day][hrKey].totalSec += t._fulSec;
+  });
+  const bevStationDetails = {};
+  Object.keys(bevDetails).forEach(st => {
+    const byDayHour = {};
+    const hourlyAgg = {};
+    Object.keys(bevDetails[st]).forEach(day => {
+      byDayHour[day] = {};
+      Object.keys(bevDetails[st][day]).forEach(hr => {
+        const d = bevDetails[st][day][hr];
+        const avg_sec = +(d.totalSec / d.count).toFixed(1);
+        byDayHour[day][hr] = { count: d.count, avg_sec, exp_sec: 0 };
+        if (!hourlyAgg[hr]) hourlyAgg[hr] = { tw: 0, tc: 0 };
+        hourlyAgg[hr].tw += d.totalSec;
+        hourlyAgg[hr].tc += d.count;
+      });
+    });
+    const hourly = {};
+    Object.keys(hourlyAgg).forEach(hr => {
+      const d = hourlyAgg[hr];
+      hourly[hr] = { avg_sec: +(d.tw / d.tc).toFixed(1), exp_sec: 0 };
+    });
+    bevStationDetails[st] = { byDayHour, hourly, breakingHours: [] };
+  });
+
+  const bevDayHourMap = {};
+  cocktailTickets.forEach(t => {
+    const day = DAYS[t._fired.getDay()];
+    const hr = t._fired.getHours();
+    const hrKey = `${hr}-${hr + 1}`;
+    if (!bevDayHourMap[day]) bevDayHourMap[day] = {};
+    if (!bevDayHourMap[day][hrKey]) bevDayHourMap[day][hrKey] = { sumFul: 0, count: 0 };
+    bevDayHourMap[day][hrKey].sumFul += t._fulSec / 60;
+    bevDayHourMap[day][hrKey].count++;
+  });
+  const bevHmFul = {};
+  Object.keys(bevDayHourMap).forEach(day => {
+    bevHmFul[day] = {};
+    Object.keys(bevDayHourMap[day]).forEach(hrKey => {
+      const d = bevDayHourMap[day][hrKey];
+      bevHmFul[day][hrKey] = +(d.sumFul / d.count).toFixed(2);
+    });
+  });
+  const bevHourProfile = SERVICE_HOURS.map(hr => {
+    const hrKey = `${hr}-${hr + 1}`;
+    let sumOcc = 0, sumFulWeighted = 0, daysWithData = 0;
+    Object.keys(bevDayHourMap).forEach(day => {
+      const cell = bevDayHourMap[day][hrKey];
+      if (!cell || !cell.count) return;
+      sumOcc += cell.count;
+      sumFulWeighted += cell.sumFul;
+      daysWithData++;
+    });
+    return {
+      hour: hrKey,
+      label: hr === 0 ? '12a' : hr < 12 ? hr + 'a' : hr === 12 ? '12p' : (hr - 12) + 'p',
+      avgOcc: daysWithData ? +(sumOcc / daysWithData).toFixed(1) : 0,
+      avgFulMin: sumOcc ? +(sumFulWeighted / sumOcc).toFixed(2) : null,
+      days: daysWithData,
+      totalOcc: sumOcc,
+    };
+  });
+
+  const bevPressure = cocktailTickets.filter(t => (t._fulSec || 0) >= MIN_PRESSURE_FUL_SEC);
+  const bevCurve = bevPressure.length ? buildIntervalCurve(bevPressure) : [];
+  const bevCurveByDay = { Total: bevCurve };
+  DAY_ORDER.forEach(day => {
+    const dayTickets = bevPressure.filter(t => DAYS[t._fired.getDay()] === day);
+    bevCurveByDay[day] = dayTickets.length ? buildIntervalCurve(dayTickets) : [];
+  });
+  const bevBpRow = bevCurve.find((r, i) => i >= 10 && r.occ >= 5 && r.ful > 15);
+
+  // Cocktail item volumes from item details (group or name heuristics)
+  const bevSummaryMap = {};
+  itemDetails.forEach(item => {
+    const name = item.menuItem || item['Menu Item'] || '';
+    if (!name) return;
+    const group = String(item['Menu Group'] || item.menuGroup || item.group || '');
+    const isCockGroup = /cocktail/i.test(group);
+    const isCockName = /\b(martini|negroni|spritz|margarita|cocktail|daiquiri|old fashioned|mimosa|bloody mary|aperol)\b/i.test(name);
+    if (!isCockGroup && !isCockName) return;
+    if (!bevSummaryMap[name]) bevSummaryMap[name] = { item: name, qty: 0, stations: [] };
+    bevSummaryMap[name].qty += item.qty || 1;
+    const info = lookupItemAssignment(name);
+    if (info && Array.isArray(info.stations)) {
+      info.stations.filter(isCocktail).forEach(st => {
+        if (!bevSummaryMap[name].stations.includes(st)) bevSummaryMap[name].stations.push(st);
+      });
+    }
+    if (!bevSummaryMap[name].stations.length) bevSummaryMap[name].stations = ['Bar Central'];
+  });
+  const bevSummary = Object.values(bevSummaryMap)
+    .map(r => ({
+      item: r.item,
+      qty: r.qty,
+      avg_sec: fulAvgByItem[r.item] || null,
+      stations: r.stations,
+    }))
+    .sort((a, b) => b.qty - a.qty);
+
+  console.log(
+    `Beverage (cocktails) for ${venueArg}: tickets=${cocktailTickets.length}` +
+    ` stations=${bevStations.map(s => s.station + '(' + s.count + ')').join(', ') || 'none'}` +
+    ` (skipped non-cocktail=${skippedNonCocktail}, open=${skippedOpenBev}, >90min=${skippedLongBev})`
+  );
+
+  if (!bevStations.length) return null;
+
+  return {
+    scope: 'cocktails',
+    venues: ['mila'],
+    stations: bevStations,
+    stationDetails: bevStationDetails,
+    hmFul: bevHmFul,
+    hourProfile: bevHourProfile,
+    curve: bevCurve,
+    curveByDay: bevCurveByDay,
+    breakingPoint: bevBpRow ? bevBpRow.conc : null,
+    breakingPointGuests: bevBpRow ? Math.round(bevBpRow.guests) : null,
+    summary: bevSummary,
+    stationItemsArr: bevStations.map(s => ({ station: s.station, qty: s.count })),
+    stationHourItems: {},
+    ticketSummary: {
+      scope: 'cocktails',
+      rawKitchenRows: tickets.length,
+      cocktailStationTicketRows: cocktailTickets.length,
+      nonCocktailExcluded: skippedNonCocktail,
+      openOrUnclosed: skippedOpenBev,
+      over90MinExcluded: skippedLongBev,
+      stationFireCount: bevStations.reduce((s, st) => s + (st.count || 0), 0),
+      pressureTicketCount: bevPressure.length,
+      fulfillmentAdjustSec: FULFILLMENT_ADJUST_SEC,
+    },
+  };
+}
+
+const beverage = buildBeverageSlice();
+
 // ---- Output ----
 const output = {
   stations,
@@ -952,6 +1162,7 @@ const output = {
     orderMergeVersion: 3,
   },
 };
+if (beverage) output.beverage = beverage;
 
 // Preserve previously joined staffing aggregates if present (rebuilt by weekly-staffing)
 function mergePreserveStaffing(outObj, existingPath, weekKey) {
