@@ -109,12 +109,17 @@ table.menu-tbl tr:hover td{background:#1e2533}
 .sidebar-week-btn{flex:0 0 auto;background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:7px 10px;cursor:pointer;font:13px inherit}
 .sidebar-week-btn:hover{border-color:#d9a441;color:#e8eaed}
 .sidebar-venue-pills{display:none}
-.mode-switch{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:0;padding:3px;background:#0d1117;border:1px solid #2d3448;border-radius:999px;overflow:hidden}
-.mode-switch-thumb{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);background:linear-gradient(135deg,#d9a441 0%,#c4922f 100%);border-radius:999px;transition:transform 0.32s cubic-bezier(0.22,1,0.36,1);z-index:0;box-shadow:0 2px 8px rgba(217,164,65,0.35)}
+.mode-switch{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:0;padding:3px;background:#1e2533;border:1px solid #3d4458;border-radius:999px;overflow:hidden}
+.mode-switch-thumb{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);background:linear-gradient(135deg,#e2b65a 0%,#d9a441 100%);border-radius:999px;transition:transform 0.32s cubic-bezier(0.22,1,0.36,1);z-index:0;box-shadow:0 2px 10px rgba(217,164,65,0.28)}
 .mode-switch[data-mode="beverage"] .mode-switch-thumb{transform:translateX(100%)}
 .mode-switch-btn{position:relative;z-index:1;border:none;background:transparent;color:#9aa0aa;font:700 12px/1.2 inherit;padding:9px 8px;cursor:pointer;border-radius:999px;transition:color 0.25s ease}
-.mode-switch-btn.active{color:#0c0e13}
-.mode-switch-hint{font-size:11px;color:#6b7280;margin:8px 2px 0;line-height:1.35;min-height:28px;transition:opacity 0.22s ease,transform 0.22s ease}
+.mode-switch-btn.active{color:#1a1208}
+.mode-switch-hint{font-size:11px;color:#9aa0aa;margin:8px 2px 0;line-height:1.35;min-height:28px;transition:opacity 0.22s ease,transform 0.22s ease}
+body.theme-daylight .mode-switch{background:#fff;border-color:#d9cbb6;box-shadow:inset 0 1px 2px rgba(63,42,29,0.04)}
+body.theme-daylight .mode-switch-thumb{background:linear-gradient(135deg,#3f2a1d 0%,#5a3d28 100%);box-shadow:0 2px 8px rgba(63,42,29,0.22)}
+body.theme-daylight .mode-switch-btn{color:#8a7a68}
+body.theme-daylight .mode-switch-btn.active{color:#f7f1e7}
+body.theme-daylight .mode-switch-hint{color:#7a6a58}
 .app-main.mode-switching{animation:modeContentSwap 0.38s cubic-bezier(0.22,1,0.36,1)}
 @keyframes modeContentSwap{
   0%{opacity:0.35;transform:translateY(6px)}
@@ -746,7 +751,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <aside id="appSidebar" class="app-sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-title">BOH Dashboard</div>
-    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W41 · Built 2026-10-13T16:09:12.731Z</div>
+    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W41 · Built 2026-10-14T22:59:24.629Z</div>
   </div>
   <div class="sidebar-block">
     <label class="sidebar-label" for="venueSelect">Location</label>
@@ -1644,6 +1649,16 @@ function isPortfolioFoodItem(name, stations, avgSec) {
   if (stations && stations.length && !foodSt.length) return false;
   return true;
 }
+/** Menu / portfolio row allowed for the current Food vs Beverage mode. */
+function isAnalysisMenuItem(name, stations, avgSec) {
+  if (typeof analysisMode !== 'undefined' && analysisMode === 'beverage') {
+    const st = (stations || []).filter(isCocktailStation);
+    if (st.length) return true;
+    // Cocktail names without station map still count in Beverage mode
+    return isPortfolioBeverageName(name) && /martini|negroni|spritz|margarita|cocktail|daiquiri|old fashioned|mimosa|bloody mary|aperol|campari|paloma|sour|mule|collins|gimlet|manhattan|mojito|espresso martini|gs*&s*t|gin.?tonic|hikari|lychee/i.test(String(name || ''));
+  }
+  return isPortfolioFoodItem(name, stations, avgSec);
+}
 
 // Static REF assignment helpers (authoritative item → stations + target)
 function venueSlugForMap() {
@@ -1895,6 +1910,10 @@ function switchTab(name, btn) {
     if (ips) ips.style.display = '';
     try { renderStationsBoard(); }
     catch (err) { console.error('renderStationsBoard failed', err); }
+  }
+  if (name === 'menu') {
+    try { renderMenuItems(); }
+    catch (err) { console.error('renderMenuItems failed', err); }
   }
 }
 
@@ -4686,13 +4705,39 @@ function renderStations() {
   });
 }
 function renderMenuItems() {
-  // ONLY items from static REF assignment; Avg Time from item-fulfillment
+  const bevMode = typeof analysisMode !== 'undefined' && analysisMode === 'beverage';
+  const dNow = getD();
+  // Beverage: use cocktail summary from week payload (not food REF map)
+  // Food: static REF assignment + live fulfillment
   const staticMap = getStaticItemMap();
   const hasStatic = Object.keys(staticMap).length > 0;
   const liveByName = getItemLiveByName();
 
   let SUMMARY;
-  if (hasStatic) {
+  if (bevMode) {
+    SUMMARY = (dNow.summary || []).map(d => ({
+      item: d.item || d.menuItem || '',
+      count: d.count != null ? d.count : (d.qty || 0),
+      avg_sec: d.avg_sec != null ? d.avg_sec : (d.avgFulSec || 0),
+      exp_sec: d.exp_sec || d.targetSec || 0,
+    })).filter(d => d.item);
+    // Fallback: cocktail-mapped items from static map with live qty
+    if (!SUMMARY.length && hasStatic) {
+      SUMMARY = Object.entries(staticMap).map(([item, info]) => {
+        const st = (info.stations || []).filter(isCocktailStation);
+        if (!st.length && !isAnalysisMenuItem(item, info.stations || [], null)) return null;
+        const live = liveByName[item] || {};
+        return {
+          item,
+          count: live.qty || 0,
+          avg_sec: live.avgFulSec || 0,
+          exp_sec: info.targetSec || 0,
+        };
+      }).filter(Boolean);
+    }
+    // Keep rows with volume or a measured time
+    SUMMARY = SUMMARY.filter(d => (d.count || 0) > 0 || (d.avg_sec || 0) > 0);
+  } else if (hasStatic) {
     SUMMARY = Object.entries(staticMap).map(([item, info]) => {
       const live = liveByName[item] || {};
       return {
@@ -4703,7 +4748,7 @@ function renderMenuItems() {
       };
     });
   } else {
-    SUMMARY = (getD().summary || []).map(d => ({
+    SUMMARY = (dNow.summary || []).map(d => ({
       item: d.item || d.menuItem || '',
       count: d.count != null ? d.count : (d.qty || 0),
       avg_sec: d.avg_sec != null ? d.avg_sec : (d.avgFulSec || 0),
@@ -4720,21 +4765,39 @@ function renderMenuItems() {
   let currentSort = 'time';
   let currentSearch = '';
 
-  // Station map from static REF only
+  // Station map — food stations in Food mode; cocktail stations in Beverage mode
   const itemStationMap = {};
   Object.entries(staticMap).forEach(([item, info]) => {
-    const foodSt = (info.stations || []).find(st => isFoodStation(st));
-    if (foodSt) itemStationMap[item] = foodSt;
+    const st = (info.stations || []).find(s => isFoodStation(s));
+    if (st) itemStationMap[item] = st;
   });
+  if (bevMode) {
+    (dNow.summary || []).forEach(row => {
+      const name = row.item || row.menuItem;
+      const st = (row.stations || []).find(isCocktailStation);
+      if (name && st) itemStationMap[name] = st;
+    });
+    Object.entries(staticMap).forEach(([item, info]) => {
+      const st = (info.stations || []).find(isCocktailStation);
+      if (st) itemStationMap[item] = st;
+    });
+  }
+
+  const menuStatsEl = document.getElementById('menuStats');
+  const menuBodyEl = document.getElementById('menuBody');
+  if (!menuStatsEl || !menuBodyEl) return;
 
   if (!SUMMARY.length) {
-    document.getElementById('menuStats').innerHTML = '';
+    menuStatsEl.innerHTML = '';
     const bubbleCard = document.getElementById('menuBubbleCard');
     if (bubbleCard) bubbleCard.style.display = 'none';
-    document.getElementById('menuBody').innerHTML =
-      '<tr><td colspan="7" style="text-align:center;padding:40px 20px;color:#9aa0aa;font-size:14px">' +
-      'Item fulfillment data not yet configured for this venue.<br>' +
-      '<small style="color:#6b7280">Add a custom report ID to <code>CUSTOM_REPORT_IDS</code> in weekly-save.js to enable.</small>' +
+    menuBodyEl.innerHTML =
+      '<tr><td colspan="9" style="text-align:center;padding:40px 20px;color:#9aa0aa;font-size:14px">' +
+      (bevMode
+        ? (dNow._beverageUnavailable
+          ? 'Cocktail Beverage — MILA first. Switch location to <strong>MILA</strong> to see cocktail menu items.'
+          : 'No cocktail menu items with volume for this week yet.')
+        : 'Item fulfillment data not yet configured for this venue.<br><small style="color:#6b7280">Add a custom report ID to <code>CUSTOM_REPORT_IDS</code> in weekly-save.js to enable.</small>') +
       '</td></tr>';
     window.applyMenuFilters = function() {};
     window.setSort = function() {};
@@ -4775,7 +4838,10 @@ function renderMenuItems() {
     '<div class="menu-stat"><div class="v" style="color:#22c55e">'+under10+'</div><div class="l">Under 10 min</div></div>';
 
   // ── Worst Offenders callout (same noise filters as bubble) ──
-  const NOISE_NAME_RE_WORST = /deposit|all\s*in|beo|package|gift\s*card|gratuity|service\s*charge|comp\b|void|water|soda|coke|wine|beer|cocktail|vodka|gin|rum|tequila|whiskey|champagne|prosecco|latte|espresso|coffee|\bstill\b|sparkling|margarita|mimosa|aperol|campari/i;
+  // Beverage mode: do NOT treat cocktail names as noise
+  const NOISE_NAME_RE_WORST = bevMode
+    ? /deposit|all\s*in|beo|package|gift\s*card|gratuity|service\s*charge|comp\b|void/i
+    : /deposit|all\s*in|beo|package|gift\s*card|gratuity|service\s*charge|comp\b|void|water|soda|coke|wine|beer|cocktail|vodka|gin|rum|tequila|whiskey|champagne|prosecco|latte|espresso|coffee|\bstill\b|sparkling|margarita|mimosa|aperol|campari/i;
   const top5worst = [...SUMMARY]
     .filter(d => (d.count||0) >= 3 && d.avg_sec > 0 && d.avg_sec <= 45*60 && d.item && !NOISE_NAME_RE_WORST.test(d.item))
     .sort((a,b)=>b.avg_sec-a.avg_sec)
@@ -4789,16 +4855,20 @@ function renderMenuItems() {
 
   // ── Bubble chart ──
   (function renderBubble() {
-    const existing = Chart.getChart('cMenuBubble');
+    const canvas = document.getElementById('cMenuBubble');
+    if (!canvas || typeof Chart === 'undefined') return;
+    const existing = Chart.getChart(canvas);
     if (existing) existing.destroy();
 
-    const NOISE_NAME_RE = /deposit|all\s*in|beo|package|gift\s*card|gratuity|service\s*charge|comp\b|void|water|soda|coke|wine|beer|cocktail|vodka|gin|rum|tequila|whiskey|champagne|prosecco|latte|espresso|coffee|\bstill\b|sparkling|margarita|mimosa|aperol|campari/i;
+    const NOISE_NAME_RE = bevMode
+      ? /deposit|all\s*in|beo|package|gift\s*card|gratuity|service\s*charge|comp\b|void/i
+      : /deposit|all\s*in|beo|package|gift\s*card|gratuity|service\s*charge|comp\b|void|water|soda|coke|wine|beer|cocktail|vodka|gin|rum|tequila|whiskey|champagne|prosecco|latte|espresso|coffee|\bstill\b|sparkling|margarita|mimosa|aperol|campari/i;
     const food = SUMMARY.filter(d => {
       const st = itemStationMap[d.item];
       if (st && !isFoodStation(st)) return false;
       if (!d.item || NOISE_NAME_RE.test(d.item)) return false;
       // Noise: tiny sample or absurd cook times that crush the Y scale
-      if ((d.count || 0) < 3) return false;
+      if ((d.count || 0) < (bevMode ? 1 : 3)) return false;
       if (!(d.avg_sec > 0) || d.avg_sec > 45 * 60) return false;
       return true;
     });
@@ -4837,18 +4907,16 @@ function renderMenuItems() {
       ctx.strokeStyle='#2d3448';ctx.lineWidth=1;
       ctx.beginPath();ctx.roundRect(bx,by,bw,bh,4);ctx.fill();ctx.stroke();
       ctx.fillStyle='#8a9ab5';ctx.font='10px sans-serif';ctx.textAlign='left';
-      ctx.fillText('3-week trend: available from Week 2 (Jul 14)',bx+6,by+13);
+      ctx.fillText(bevMode ? 'MILA cocktails · Bar Central' : '3-week trend: available from Week 2 (Jul 14)',bx+6,by+13);
       ctx.restore();
     }};
 
-    const existingMb = Chart.getChart('cMenuBubble');
-    if (existingMb) existingMb.destroy();
-    new Chart(document.getElementById('cMenuBubble'), {
+    new Chart(canvas, {
       type: 'bubble',
       data: { datasets },
       options: {
         scales: {
-          x: { title: { display:true, text:'Order count (volume)' }, grid:{color:gc} },
+          x: { title: { display:true, text: bevMode ? 'Sold qty (week)' : 'Order count (volume)' }, grid:{color:gc} },
           y: { title: { display:true, text:'Avg fulfillment (min)' }, grid:{color:gc}, min:0, suggestedMax: 45 }
         },
         plugins: {
@@ -4918,10 +4986,11 @@ function renderMenuItems() {
       const pct = Math.min(100, (d.avg_sec / (tgt * 1.5)) * 100);
       const tgtPct = Math.min(100, (tgt / (tgt * 1.5)) * 100); // always ~66.7%
       const tgtDisplay = itemExpSecMap[d.item] ? fmtSec(itemExpSecMap[d.item]) : '<span style="color:#6b7280">—</span>';
-      const stationName = itemStationMap[d.item] || null;
+      const stationName = itemStationMap[d.item] || (bevMode ? 'Bar Central' : null);
       const stationDot = stationName
         ? (() => {
-            const st = getD().stations.find(s => s.station === stationName);
+            const stList = getD().stations || [];
+            const st = stList.find(s => s.station === stationName);
             const dotColor = st ? perfColorHex(st.avg_sec, st.exp_sec) : '#9aa0aa';
             return '<span title="'+stationName+'" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#9aa0aa"><span style="width:8px;height:8px;border-radius:50%;background:'+dotColor+';display:inline-block"></span>'+stationName+'</span>';
           })()
@@ -6515,24 +6584,29 @@ function renderAll() {
       b.classList.toggle('active', b.getAttribute('data-day') === pressureDay);
     });
   }
-  renderKPIs();
-  renderStationsRecap();
-  renderPressure();
-  renderStaffingGrid();
-  renderServiceBreakTimeline();
-  renderBreaking();
-  renderLoadPerf();
-  renderStationWoW();
-  render3D();
-  renderHeatmaps();
-  renderStations();
-  renderMenuItems();
-  renderAssignment();
-  renderGroup();
-  renderPeople();
-  renderSettings();
-  renderPageSummary();
-  if (typeof runCrossVenueItemSearch === 'function') runCrossVenueItemSearch();
+  const safe = (fn, label) => {
+    try { fn(); } catch (err) { console.error(label + ' failed', err); }
+  };
+  safe(renderKPIs, 'renderKPIs');
+  safe(renderStationsRecap, 'renderStationsRecap');
+  safe(renderPressure, 'renderPressure');
+  safe(renderStaffingGrid, 'renderStaffingGrid');
+  safe(renderServiceBreakTimeline, 'renderServiceBreakTimeline');
+  safe(renderBreaking, 'renderBreaking');
+  safe(renderLoadPerf, 'renderLoadPerf');
+  safe(renderStationWoW, 'renderStationWoW');
+  safe(render3D, 'render3D');
+  safe(renderHeatmaps, 'renderHeatmaps');
+  safe(renderStations, 'renderStations');
+  safe(renderMenuItems, 'renderMenuItems');
+  safe(renderAssignment, 'renderAssignment');
+  safe(renderGroup, 'renderGroup');
+  safe(renderPeople, 'renderPeople');
+  safe(renderSettings, 'renderSettings');
+  safe(renderPageSummary, 'renderPageSummary');
+  if (typeof runCrossVenueItemSearch === 'function') {
+    safe(runCrossVenueItemSearch, 'runCrossVenueItemSearch');
+  }
 }
 
 // ============================================================
