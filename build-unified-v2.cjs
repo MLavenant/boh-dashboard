@@ -725,6 +725,29 @@ body.theme-daylight .mode-switch-hint{color:#7a6a58}
 }
 #beverageEmptyBanner{display:none;margin:14px 0 0;padding:16px 18px;border-radius:12px;border:1px solid #5b3a12;background:linear-gradient(135deg,#1a140c,#13161c);color:#fde68a}
 #beverageEmptyBanner strong{color:#f59e0b}
+.bev-family-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 0 18px}
+@media(max-width:900px){.bev-family-grid{grid-template-columns:1fr}}
+.bev-family-card{background:#13161c;border:1px solid #2d3448;border-radius:14px;padding:18px 20px}
+.bev-family-card h3{margin:0 0 4px;font-size:18px;font-weight:700;color:#e8eaed}
+.bev-family-card .bev-avg{font-size:32px;font-weight:800;line-height:1.1;margin:10px 0 4px;color:#d9a441}
+.bev-family-card .bev-meta{font-size:12px;color:#9aa0aa;margin:0 0 14px}
+.bev-family-card table{width:100%;border-collapse:collapse;font-size:13px}
+.bev-family-card th{text-align:left;color:#6b7280;font-weight:600;padding:6px 4px;border-bottom:1px solid #2d3448;font-size:11px;text-transform:uppercase;letter-spacing:0.04em}
+.bev-family-card td{padding:8px 4px;border-bottom:1px solid #1e2533;color:#e8eaed}
+.bev-family-card td.num{text-align:right;font-variant-numeric:tabular-nums}
+.bev-family-card tr:last-child td{border-bottom:none}
+.bev-section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:14px 4px 8px;margin-top:8px;border-bottom:1px solid #2d3448}
+.bev-section-head .bev-sec-title{font-size:15px;font-weight:700;color:#e8eaed}
+.bev-section-head .bev-sec-avg{font-size:13px;font-weight:700;color:#d9a441}
+body.theme-daylight .bev-family-card{background:#fffdf8;border-color:#e2d6c4}
+body.theme-daylight .bev-family-card h3{color:#2c241c}
+body.theme-daylight .bev-family-card .bev-avg{color:#3f2a1d}
+body.theme-daylight .bev-family-card .bev-meta,body.theme-daylight .bev-family-card th{color:#8a7a68}
+body.theme-daylight .bev-family-card td{color:#2c241c;border-bottom-color:#efe8dc}
+body.theme-daylight .bev-family-card th{border-bottom-color:#e2d6c4}
+body.theme-daylight .bev-section-head{border-bottom-color:#e2d6c4}
+body.theme-daylight .bev-section-head .bev-sec-title{color:#2c241c}
+body.theme-daylight .bev-section-head .bev-sec-avg{color:#5a3d28}
 .sidebar-nav{display:flex;flex-direction:column;gap:2px}
 .app-sidebar .tab-btn{width:100%;text-align:left;padding:9px 12px;border:none;border-radius:8px;border-bottom:none;margin:0;background:transparent;color:#9aa0aa;font:600 13px/1.2 inherit;cursor:pointer}
 .app-sidebar .tab-btn:hover{background:#1a1f28;color:#e8eaed}
@@ -1448,6 +1471,9 @@ function setAnalysisMode(mode, btn) {
   if (analysisMode === 'beverage' && currentVenue === 'rdg_portfolio') {
     selectVenue('mila');
     return;
+  }
+  if (typeof stationsSelectedFamily !== 'undefined') {
+    stationsSelectedFamily = analysisMode === 'beverage' ? 'All' : 'Pastry';
   }
   renderAll();
 }
@@ -2810,7 +2836,116 @@ const STATIONS_BOARD_FAMILIES = ['Saute','Fry','Garde Manger','Raw','Sushi','Rob
 const STATIONS_BOARD_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
 function stationsBoardFamilies() {
+  if (typeof analysisMode !== 'undefined' && analysisMode === 'beverage') {
+    const d = typeof getD === 'function' ? getD() : null;
+    const fromData = (d && d.stations || [])
+      .map(s => s.station)
+      .filter(s => isCocktailStation(s) && !/^bar\s*central/i.test(s));
+    if (fromData.length) return fromData;
+    return ['Special Cocktails', 'Classic Cocktails'];
+  }
   return STATIONS_BOARD_FAMILIES.slice();
+}
+function beverageFamilyItems(stationName) {
+  const d = getD();
+  return (d.summary || [])
+    .filter(r => (r.stations || []).includes(stationName))
+    .map(r => ({
+      item: r.item || r.menuItem || '',
+      qty: r.qty != null ? r.qty : (r.count || 0),
+      avg_sec: r.avg_sec != null ? r.avg_sec : 0,
+    }))
+    .filter(r => r.item)
+    .sort((a, b) => b.qty - a.qty);
+}
+function buildBeverageFamilyCardHtml(stationName) {
+  const d = getD();
+  const st = (d.stations || []).find(s => s.station === stationName);
+  const items = beverageFamilyItems(stationName);
+  const avgSec = st && st.avg_sec > 0 ? st.avg_sec : (
+    items.reduce((s, r) => s + (r.avg_sec || 0) * (r.qty || 0), 0) /
+    Math.max(1, items.reduce((s, r) => s + ((r.avg_sec > 0) ? (r.qty || 0) : 0), 0))
+  );
+  const tickets = st ? (st.count || 0) : items.reduce((s, r) => s + (r.qty || 0), 0);
+  const avgLabel = avgSec > 0 ? fmtMin(avgSec) : '—';
+  let rows = items.map(r =>
+    '<tr><td>' + r.item + '</td>' +
+    '<td class="num">' + (r.qty || 0).toLocaleString() + '</td>' +
+    '<td class="num" style="font-weight:700">' + (r.avg_sec > 0 ? fmtMin(r.avg_sec) : '—') + '</td></tr>'
+  ).join('');
+  if (!rows) rows = '<tr><td colspan="3" style="color:#9aa0aa">No menu items this week</td></tr>';
+  return '<div class="bev-family-card">' +
+    '<h3>' + stationName + '</h3>' +
+    '<div class="bev-avg">' + avgLabel + '</div>' +
+    '<p class="bev-meta">Avg fulfillment · ' + tickets.toLocaleString() + ' tickets · ' + items.length + ' menu items</p>' +
+    '<table><thead><tr><th>Menu item</th><th style="text-align:right">Qty</th><th style="text-align:right">Avg</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody></table></div>';
+}
+function renderBeverageStationsBoard() {
+  const card = document.getElementById('itemsPerStaffCard');
+  const tableEl = document.getElementById('stationsDaTable');
+  const metricBar = document.getElementById('stationsDaMetricBar');
+  const pdfBtn = document.getElementById('portfolioStationsPdfBtn');
+  const port = document.getElementById('portfolioStationsPanel');
+  const chartWrap = document.getElementById('stationsCompareChartWrap');
+  const ovCard = document.getElementById('overviewStaffingCard');
+  if (ovCard) ovCard.style.display = 'none';
+  if (port) port.style.display = 'none';
+  if (metricBar) metricBar.style.display = 'none';
+  if (pdfBtn) pdfBtn.style.display = 'none';
+  if (card) card.style.display = '';
+  if (chartWrap) {
+    const existing = typeof Chart !== 'undefined' ? Chart.getChart('cPortfolioStations') : null;
+    if (existing) existing.destroy();
+    chartWrap.style.display = 'none';
+  }
+
+  const weekKey = WEEKS[currentWeekIdx]?.key;
+  const weekLabel = WEEKS[currentWeekIdx]?.label || (weekKey ? weekKey.replace('2026-', '') : '—');
+  const kicker = document.getElementById('stationsDaKicker');
+  const title = document.getElementById('stationsDaTitle');
+  if (kicker) kicker.textContent = weekLabel + ' · MILA cocktails';
+  if (title) title.textContent = 'Special & Classic Cocktails';
+
+  const families = stationsBoardFamilies();
+  if (!families.includes(stationsSelectedFamily) && stationsSelectedFamily !== 'All') {
+    stationsSelectedFamily = 'All';
+  }
+  const chipEl = document.getElementById('stationsFamilyChips');
+  if (chipEl) {
+    const opts = ['All'].concat(families);
+    chipEl.innerHTML = '';
+    opts.forEach((f) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'stations-da-chip' + (f === stationsSelectedFamily ? ' active' : '');
+      btn.textContent = f;
+      btn.onclick = () => {
+        stationsSelectedFamily = f;
+        renderStationsBoard();
+      };
+      chipEl.appendChild(btn);
+    });
+  }
+
+  if (!tableEl) return;
+  const d = getD();
+  if (d._beverageUnavailable) {
+    tableEl.innerHTML = '<p class="note">Cocktail Beverage is MILA-first. Switch location to MILA.</p>';
+    return;
+  }
+  const show = stationsSelectedFamily === 'All'
+    ? families
+    : families.filter(f => f === stationsSelectedFamily);
+  if (!show.length) {
+    tableEl.innerHTML = '<p class="note">No Special / Classic cocktail stations for this week.</p>';
+    return;
+  }
+  tableEl.innerHTML =
+    '<p class="note" style="margin:0 0 14px">Avg fulfillment from Bar Central tickets remapped by Toast menu group. Item table = sold qty + avg time.</p>' +
+    '<div class="bev-family-grid" style="' + (show.length === 1 ? 'grid-template-columns:1fr' : '') + '">' +
+    show.map(buildBeverageFamilyCardHtml).join('') +
+    '</div>';
 }
 function getSelectedStationFamilies() {
   // Portfolio benchmark can show many families; venue hour tables use the selected chip.
@@ -3130,6 +3265,10 @@ function renderStationsCompareChart(weekKey) {
 }
 
 function renderStationsBoard() {
+  if (typeof analysisMode !== 'undefined' && analysisMode === 'beverage' && currentVenue !== 'rdg_portfolio') {
+    renderBeverageStationsBoard();
+    return;
+  }
   const card = document.getElementById('itemsPerStaffCard');
   const tableEl = document.getElementById('stationsDaTable');
   const metricBar = document.getElementById('stationsDaMetricBar');
@@ -5064,12 +5203,25 @@ function renderMenuItems() {
   const overTarget = SUMMARY.filter(d => d.avg_sec > getItemTarget(d.item)).length;
   const over15 = SUMMARY.filter(d=>d.avg_sec>=900).length;
   const b1015 = SUMMARY.filter(d=>d.avg_sec>=600&&d.avg_sec<900).length;
-  const under10 = SUMMARY.filter(d=>d.avg_sec<600).length;
-  document.getElementById('menuStats').innerHTML =
-    '<div class="menu-stat"><div class="v">'+SUMMARY.length+'</div><div class="l">Total items</div></div>'+
-    '<div class="menu-stat"><div class="v" style="color:#ef4444">'+overTarget+'</div><div class="l">Over target</div></div>'+
-    '<div class="menu-stat"><div class="v" style="color:#f59e0b">'+b1015+'</div><div class="l">10–15 min</div></div>'+
-    '<div class="menu-stat"><div class="v" style="color:#22c55e">'+under10+'</div><div class="l">Under 10 min</div></div>';
+  const under10 = SUMMARY.filter(d=>d.avg_sec<600 && d.avg_sec > 0).length;
+  if (bevMode) {
+    const stRows = (dNow.stations || []).filter(s => isCocktailStation(s.station) && !/^bar\\s*central/i.test(s.station));
+    const special = stRows.find(s => /special/i.test(s.station));
+    const classic = stRows.find(s => /classic/i.test(s.station));
+    const fmtAvg = (s) => (s && s.avg_sec > 0) ? fmtMin(s.avg_sec) : '—';
+    document.getElementById('menuStats').innerHTML =
+      '<div class="menu-stat"><div class="v" style="color:#d9a441">'+fmtAvg(special)+'</div><div class="l">Special Cocktails avg</div></div>'+
+      '<div class="menu-stat"><div class="v" style="color:#d9a441">'+fmtAvg(classic)+'</div><div class="l">Classic Cocktails avg</div></div>'+
+      '<div class="menu-stat"><div class="v">'+(special ? (special.count||0).toLocaleString() : '0')+'</div><div class="l">Special tickets</div></div>'+
+      '<div class="menu-stat"><div class="v">'+(classic ? (classic.count||0).toLocaleString() : '0')+'</div><div class="l">Classic tickets</div></div>'+
+      '<div class="menu-stat"><div class="v">'+SUMMARY.length+'</div><div class="l">Menu items</div></div>';
+  } else {
+    document.getElementById('menuStats').innerHTML =
+      '<div class="menu-stat"><div class="v">'+SUMMARY.length+'</div><div class="l">Total items</div></div>'+
+      '<div class="menu-stat"><div class="v" style="color:#ef4444">'+overTarget+'</div><div class="l">Over target</div></div>'+
+      '<div class="menu-stat"><div class="v" style="color:#f59e0b">'+b1015+'</div><div class="l">10–15 min</div></div>'+
+      '<div class="menu-stat"><div class="v" style="color:#22c55e">'+under10+'</div><div class="l">Under 10 min</div></div>';
+  }
 
   // ── Worst Offenders callout (same noise filters as bubble) ──
   // Beverage mode: do NOT treat cocktail names as noise
@@ -5081,11 +5233,17 @@ function renderMenuItems() {
     .sort((a,b)=>b.avg_sec-a.avg_sec)
     .slice(0,5);
   const worstOffEl = document.getElementById('menuWorstOffenders');
-  if (worstOffEl && top5worst.length > 0) {
-    worstOffEl.style.display = '';
-    worstOffEl.innerHTML = '<div style="font-size:13px;font-weight:700;color:#fca5a5;margin-bottom:8px">🔥 Worst Offenders — Top 5 Slowest Items</div>' +
-      top5worst.map((d,i) => '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid #2d1f1f' + (i===top5worst.length-1?';border-bottom:none':'') + '"><span style="color:#9aa0aa;font-size:11px;width:16px">' + (i+1) + '</span><span style="flex:1;font-weight:600;color:#e8eaed">' + d.item + '</span><span style="color:#ef4444;font-weight:700">' + (d.avg_sec/60).toFixed(1) + ' min</span><span style="color:#9aa0aa;font-size:11px">' + d.count + ' tickets</span></div>').join('');
+  if (worstOffEl) {
+    if (bevMode) {
+      worstOffEl.style.display = 'none';
+      worstOffEl.innerHTML = '';
+    } else if (top5worst.length > 0) {
+      worstOffEl.style.display = '';
+      worstOffEl.innerHTML = '<div style="font-size:13px;font-weight:700;color:#fca5a5;margin-bottom:8px">🔥 Worst Offenders — Top 5 Slowest Items</div>' +
+        top5worst.map((d,i) => '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid #2d1f1f' + (i===top5worst.length-1?';border-bottom:none':'') + '"><span style="color:#9aa0aa;font-size:11px;width:16px">' + (i+1) + '</span><span style="flex:1;font-weight:600;color:#e8eaed">' + d.item + '</span><span style="color:#ef4444;font-weight:700">' + (d.avg_sec/60).toFixed(1) + ' min</span><span style="color:#9aa0aa;font-size:11px">' + d.count + ' tickets</span></div>').join('');
+    }
   }
+  if (bevMode && bubbleCard) bubbleCard.style.display = 'none';
 
   // ── Bubble chart ──
   (function renderBubble() {
@@ -5188,10 +5346,14 @@ function renderMenuItems() {
   // ── Status filter buttons ──
   const menuFilterBar = document.getElementById('menuStatusFilter');
   if (menuFilterBar) {
-    menuFilterBar.innerHTML = ['all','breaking','watch','ok'].map(f =>
-      '<button onclick="setMenuFilter(\\'' + f + '\\',this)" style="padding:4px 12px;background:' + (f==='all'?'#2d3448':'#1e2533') + ';border:1px solid #2d3448;color:' + (f==='all'?'#e8eaed':'#9aa0aa') + ';border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;margin-right:4px">' +
-        (f==='all'?'All':f==='breaking'?'🔴 Breaking':f==='watch'?'🟡 Watch':'🟢 OK') + '</button>'
-    ).join('');
+    if (bevMode) {
+      menuFilterBar.innerHTML = '';
+    } else {
+      menuFilterBar.innerHTML = ['all','breaking','watch','ok'].map(f =>
+        '<button onclick="setMenuFilter(\\'' + f + '\\',this)" style="padding:4px 12px;background:' + (f==='all'?'#2d3448':'#1e2533') + ';border:1px solid #2d3448;color:' + (f==='all'?'#e8eaed':'#9aa0aa') + ';border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;margin-right:4px">' +
+          (f==='all'?'All':f==='breaking'?'🔴 Breaking':f==='watch'?'🟡 Watch':'🟢 OK') + '</button>'
+      ).join('');
+    }
   }
 
   function renderMenu() {
@@ -5207,20 +5369,57 @@ function renderMenuItems() {
         return true;
       });
     }
+
+    // Beverage: group Special then Classic with family avg headers
+    if (bevMode) {
+      const stRows = (dNow.stations || []).filter(s => isCocktailStation(s.station) && !/^bar\\s*central/i.test(s.station));
+      const order = ['Special Cocktails', 'Classic Cocktails'].concat(
+        stRows.map(s => s.station).filter(n => n !== 'Special Cocktails' && n !== 'Classic Cocktails')
+      );
+      const byFam = {};
+      data.forEach(d => {
+        const fam = itemStationMap[d.item] || 'Special Cocktails';
+        if (!byFam[fam]) byFam[fam] = [];
+        byFam[fam].push(d);
+      });
+      const famOrder = order.filter(f => byFam[f] && byFam[f].length);
+      Object.keys(byFam).forEach(f => { if (!famOrder.includes(f)) famOrder.push(f); });
+      let html = '';
+      let idx = 0;
+      famOrder.forEach(fam => {
+        const rows = sorted(byFam[fam]);
+        const st = stRows.find(s => s.station === fam);
+        const famAvg = st && st.avg_sec > 0 ? fmtMin(st.avg_sec) : '—';
+        const famN = st ? (st.count || 0) : rows.reduce((s, r) => s + (r.count || 0), 0);
+        html += '<tr><td colspan="9" style="padding:0;border:none"><div class="bev-section-head">' +
+          '<span class="bev-sec-title">' + fam + '</span>' +
+          '<span class="bev-sec-avg">' + famAvg + ' avg · ' + famN.toLocaleString() + ' tickets · ' + rows.length + ' items</span>' +
+          '</div></td></tr>';
+        rows.forEach(d => {
+          idx++;
+          const barCol = d.avg_sec > 0 ? (d.avg_sec <= 600 ? '#22c55e' : (d.avg_sec <= 900 ? '#f59e0b' : '#ef4444')) : '#9aa0aa';
+          html += '<tr>' +
+            '<td style="color:#9aa0aa">' + idx + '</td>' +
+            '<td style="font-weight:600">' + d.item + '</td>' +
+            '<td style="color:#9aa0aa;text-align:right">' + d.count + '</td>' +
+            '<td style="font-weight:700;color:' + barCol + '">' + (d.avg_sec > 0 ? fmtMin(d.avg_sec) : '—') + '</td>' +
+            '<td colspan="4" style="color:#9aa0aa;font-size:12px">' + fam + '</td>' +
+            '<td></td></tr>';
+        });
+      });
+      document.getElementById('menuBody').innerHTML = html || '<tr><td colspan="9" style="text-align:center;padding:24px;color:#9aa0aa">No cocktail items</td></tr>';
+      return;
+    }
+
     const s = sorted(data);
     document.getElementById('menuBody').innerHTML = s.map((d,i) => {
       const tgt = getItemTarget(d.item);
       const barCol = itemColorByTarget(d.avg_sec, d.item);
       const over = d.avg_sec > tgt;
-      const diff = d.avg_sec - tgt;
-      const diffStr = diff > 0
-        ? '<span class="over">+'+fmtSec(diff)+'</span>'
-        : '<span class="ok">'+fmtSec(-diff)+' under</span>';
-      // Bar shows ratio of avg vs target (capped at 150%)
       const pct = Math.min(100, (d.avg_sec / (tgt * 1.5)) * 100);
-      const tgtPct = Math.min(100, (tgt / (tgt * 1.5)) * 100); // always ~66.7%
+      const tgtPct = Math.min(100, (tgt / (tgt * 1.5)) * 100);
       const tgtDisplay = itemExpSecMap[d.item] ? fmtSec(itemExpSecMap[d.item]) : '<span style="color:#6b7280">—</span>';
-      const stationName = itemStationMap[d.item] || (bevMode ? 'Special Cocktails' : null);
+      const stationName = itemStationMap[d.item] || null;
       const stationDot = stationName
         ? (() => {
             const stList = getD().stations || [];
@@ -6387,17 +6586,49 @@ function renderKPIs() {
 function renderStationsRecap() {
   const el = document.getElementById('stationsRecap');
   if (!el) return;
+  const bevMode = typeof analysisMode !== 'undefined' && analysisMode === 'beverage';
+  const recapCard = document.getElementById('stationsRecapCard');
+  if (recapCard) {
+    const h2 = recapCard.querySelector('h2');
+    const note = recapCard.querySelector('.note');
+    if (h2) h2.textContent = bevMode ? 'Cocktail Stations — This Week' : 'Stations Recap — This Week';
+    if (note) {
+      note.textContent = bevMode
+        ? 'Special vs Classic avg fulfillment. Open Stations for the full item breakdown.'
+        : 'All food stations ranked worst → best vs target. Click a row to open Stations tab.';
+    }
+  }
   const stations = (getD().stations || [])
     .filter(s => isFoodStation(s.station))
     .slice()
     .sort((a, b) => {
+      if (bevMode) {
+        const order = { 'Special Cocktails': 0, 'Classic Cocktails': 1 };
+        return (order[a.station] ?? 9) - (order[b.station] ?? 9);
+      }
       const ra = a.exp_sec > 0 ? a.avg_sec / a.exp_sec : -1;
       const rb = b.exp_sec > 0 ? b.avg_sec / b.exp_sec : -1;
       return rb - ra;
     });
 
   if (!stations.length) {
-    el.innerHTML = '<div style="color:#9aa0aa;padding:12px">No food station data for this week.</div>';
+    el.innerHTML = '<div style="color:#9aa0aa;padding:12px">' +
+      (bevMode ? 'No cocktail station data for this week.' : 'No food station data for this week.') +
+      '</div>';
+    return;
+  }
+
+  if (bevMode) {
+    el.innerHTML = '<div class="bev-family-grid">' +
+      stations.map(s => {
+        const items = beverageFamilyItems(s.station);
+        return '<div class="bev-family-card" style="cursor:pointer" onclick="openStationFromRecap(\\'' +
+          String(s.station).replace(/'/g, '') + '\\')">' +
+          '<h3>' + s.station + '</h3>' +
+          '<div class="bev-avg">' + (s.avg_sec > 0 ? fmtMin(s.avg_sec) : '—') + '</div>' +
+          '<p class="bev-meta">' + (s.count || 0).toLocaleString() + ' tickets · ' +
+          items.length + ' menu items</p></div>';
+      }).join('') + '</div>';
     return;
   }
 
@@ -6443,6 +6674,11 @@ function openStationFromRecap(stationName) {
   const btn = document.querySelector('.tab-btn[onclick*="stations"]');
   if (btn) switchTab('stations', btn);
   setTimeout(() => {
+    if (typeof analysisMode !== 'undefined' && analysisMode === 'beverage') {
+      stationsSelectedFamily = stationName || 'All';
+      if (typeof renderStationsBoard === 'function') renderStationsBoard();
+      return;
+    }
     const pills = document.querySelectorAll('#stationPills .station-pill');
     pills.forEach(p => {
       const nameEl = p.querySelector('.sp-name');

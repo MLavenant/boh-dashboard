@@ -1173,6 +1173,16 @@ function buildBeverageSlice() {
   });
   const bevBpRow = bevCurve.find((r, i) => i >= 10 && r.occ >= 5 && r.ful > 15);
 
+  // Per-item avg from remapped Bar Central tickets (authoritative for Beverage)
+  const bevItemFul = {};
+  cocktailTickets.forEach(t => {
+    const name = t._menuItem;
+    if (!name || t._fulSec == null) return;
+    if (!bevItemFul[name]) bevItemFul[name] = { sum: 0, n: 0 };
+    bevItemFul[name].sum += t._fulSec;
+    bevItemFul[name].n += 1;
+  });
+
   // Cocktail item volumes — only Toast cocktail groups → Special / Classic
   const bevSummaryMap = {};
   itemDetails.forEach(item => {
@@ -1190,12 +1200,18 @@ function buildBeverageSlice() {
     }
   });
   const bevSummary = Object.values(bevSummaryMap)
-    .map(r => ({
-      item: r.item,
-      qty: r.qty,
-      avg_sec: fulAvgByItem[r.item] || null,
-      stations: r.stations,
-    }))
+    .map(r => {
+      const fromJoin = bevItemFul[r.item];
+      const avg_sec = fromJoin && fromJoin.n
+        ? +(fromJoin.sum / fromJoin.n).toFixed(1)
+        : (fulAvgByItem[r.item] || null);
+      return {
+        item: r.item,
+        qty: r.qty,
+        avg_sec,
+        stations: r.stations,
+      };
+    })
     .sort((a, b) => b.qty - a.qty);
 
   // If join found no tickets but we have menu volume, keep empty station shells from summary
