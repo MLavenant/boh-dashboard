@@ -1404,7 +1404,7 @@ function syncAnalysisModeUi() {
         if (currentVenue === 'rdg_portfolio') {
           hint.textContent = 'Beverage · MILA cocktails only (pick MILA)';
         } else if (currentVenue === 'mila') {
-          hint.textContent = 'Beverage · MILA cocktails (Bar Central)';
+          hint.textContent = 'Beverage · Special + Classic Cocktails';
         } else {
           hint.textContent = 'Beverage · MILA cocktails first';
         }
@@ -1779,13 +1779,15 @@ async function loadBohFromFirebase() {
 // ============================================================
 // FOOD STATION FILTER
 // ============================================================
-// Cocktail KDS lanes (Beverage mode — MILA first). Mirrors food-station.cjs.
+// Cocktail stations (Beverage mode — MILA first). Special/Classic + raw Bar Central.
 function isCocktailStation(name) {
   const n = String(name || '').toLowerCase().replace(/\\u00a0/g, ' ').replace(/\\s+/g, ' ').trim();
   if (!n) return false;
+  if (/^(special|classic)\\s+cocktails?$/i.test(n)) return true;
   if (/^bar\\s*central(\\s*2\\.0\\s*only)?$/i.test(n)) return true;
   const compact = n.replace(/[^a-z0-9]/g, '');
-  return compact === 'barcentral' || compact === 'barcentral20only';
+  return compact === 'barcentral' || compact === 'barcentral20only'
+    || compact === 'specialcocktails' || compact === 'classiccocktails';
 }
 // Keep Sushi Bar / Raw Bar; drop FOH beverage bars (mirrors food-station.cjs).
 // In Beverage mode, allow cocktail stations instead.
@@ -5139,7 +5141,7 @@ function renderMenuItems() {
       ctx.strokeStyle='#2d3448';ctx.lineWidth=1;
       ctx.beginPath();ctx.roundRect(bx,by,bw,bh,4);ctx.fill();ctx.stroke();
       ctx.fillStyle='#8a9ab5';ctx.font='10px sans-serif';ctx.textAlign='left';
-      ctx.fillText(bevMode ? 'MILA cocktails · Bar Central' : '3-week trend: available from Week 2 (Jul 14)',bx+6,by+13);
+      ctx.fillText(bevMode ? 'MILA · Special + Classic Cocktails' : '3-week trend: available from Week 2 (Jul 14)',bx+6,by+13);
       ctx.restore();
     }};
 
@@ -5218,7 +5220,7 @@ function renderMenuItems() {
       const pct = Math.min(100, (d.avg_sec / (tgt * 1.5)) * 100);
       const tgtPct = Math.min(100, (tgt / (tgt * 1.5)) * 100); // always ~66.7%
       const tgtDisplay = itemExpSecMap[d.item] ? fmtSec(itemExpSecMap[d.item]) : '<span style="color:#6b7280">—</span>';
-      const stationName = itemStationMap[d.item] || (bevMode ? 'Bar Central' : null);
+      const stationName = itemStationMap[d.item] || (bevMode ? 'Special Cocktails' : null);
       const stationDot = stationName
         ? (() => {
             const stList = getD().stations || [];

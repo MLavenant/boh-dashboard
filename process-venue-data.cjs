@@ -59,6 +59,11 @@ if (fs.existsSync(itemDetailsPath)) {
 
 // ---- Station filter (shared; keeps Sushi Bar, drops FOH bars) ----
 const { isFoodStationName, isCocktailStationName } = require('./food-station.cjs');
+const {
+  SPECIAL_COCKTAILS,
+  CLASSIC_COCKTAILS,
+  classifyCocktailFamily,
+} = require('./cocktail-families.cjs');
 function isFood(name) {
   return isFoodStationName(name);
 }
@@ -915,17 +920,104 @@ Object.values(stationHourItems).forEach(days => {
 });
 
 // ---- Beverage slice (MILA cocktails first) ----
+/** Join Bar Central KDS tickets → Special / Classic via item-details (table + time). */
+function remapBarCentralToCocktailFamilies(rawBarTickets) {
+  // Prefer Toast menu groups only for join (avoids M- food false positives)
+  const cocktailItems = itemDetails
+    .map(item => {
+      const name = item.menuItem || item['Menu Item'] || '';
+      const group = String(item.menuGroup || item['Menu Group'] || item.group || '');
+      let fam = null;
+      if (/mila\s+bar\s*central\s+cocktails/i.test(group)) fam = SPECIAL_COCKTAILS;
+      else if (/mila\s+classic\s+cocktails/i.test(group)) fam = CLASSIC_COCKTAILS;
+      if (!fam) return null;
+      const sent = parseDate(item.sentDate || item['Sent Date']);
+      return {
+        name,
+        group,
+        fam,
+        table: String(item.table || item.Table || ''),
+        sent,
+        qty: item.qty || 1,
+      };
+    })
+    .filter(i => i && i.sent);
+
+  const byTable = {};
+  rawBarTickets.forEach(t => {
+    const k = String(t.Table || '');
+    if (!byTable[k]) byTable[k] = [];
+    byTable[k].push(t);
+  });
+  Object.values(byTable).forEach(arr => arr.sort((a, b) => a._fired - b._fired));
+
+  const used = new Set();
+  const remapped = [];
+  let unmatchedItems = 0;
+
+  cocktailItems.forEach(item => {
+    const candidates = byTable[item.table] || [];
+    let best = null;
+    let bestAbs = Infinity;
+    for (const t of candidates) {
+      const idKey = `${t['Check #']}||${t['Fired Date']}||${t['Fulfillment Time']}`;
+      if (used.has(idKey)) continue;
+      const abs = Math.abs(t._fired - item.sent);
+      if (abs < bestAbs) {
+        bestAbs = abs;
+        best = { t, idKey };
+      }
+    }
+    if (best && bestAbs <= 3 * 60 * 1000) {
+      used.add(best.idKey);
+      remapped.push({
+        ...best.t,
+        Station: item.fam,
+        _menuItem: item.name,
+        _menuGroup: item.group,
+        _fired: best.t._fired,
+        _fulfilled: best.t._fulfilled,
+        _fulSec: best.t._fulSec,
+      });
+    } else {
+      unmatchedItems += item.qty || 1;
+    }
+  });
+
+  return {
+    remapped,
+    matchedTickets: remapped.length,
+    unmatchedItems,
+    unusedBarTickets: rawBarTickets.length - used.size,
+  };
+}
+
+function resolveCocktailStation(name, group) {
+  const fam = classifyCocktailFamily(group, name, venueArg);
+  if (fam) return fam;
+  const info = lookupItemAssignment(name);
+  if (info && Array.isArray(info.stations)) {
+    const hit = info.stations.find(st => isCocktail(st) && !/^bar\s*central/i.test(st));
+    if (hit) return hit;
+    if (info.stations.some(st => /^bar\s*central/i.test(st))) {
+      // Legacy map still says Bar Central — classify by name
+      return classifyCocktailFamily('', name, venueArg) || SPECIAL_COCKTAILS;
+    }
+  }
+  return classifyCocktailFamily('', name, venueArg);
+}
+
 function buildBeverageSlice() {
   if (venueArg !== 'mila') return null;
 
   let skippedOpenBev = 0;
   let skippedLongBev = 0;
   let skippedNonCocktail = 0;
-  const cocktailTickets = tickets.filter(t => {
+  const rawBarTickets = tickets.filter(t => {
+    // Accept raw Bar Central KDS + already-remapped family names
     if (!isCocktail(t['Station'])) { skippedNonCocktail++; return false; }
     const fired = parseDate(t['Fired Date']);
     const fulSecRaw = parseFulTime(t['Fulfillment Time']);
-    const fulSec = adjustFulSec(fulSecRaw);
     const fulfilledAt = parseDate(t['Fulfilled Date']);
     if (!fired || fulSecRaw == null || fulSecRaw <= 0) { skippedOpenBev++; return false; }
     if (!fulfilledAt && !t['Fulfilled Date']) { skippedOpenBev++; return false; }
@@ -938,6 +1030,15 @@ function buildBeverageSlice() {
     return { ...t, _fired: fired, _fulfilled: fulfilled, _fulSec: fulSec };
   }).filter(t => t._fired && t._fulSec != null && t._fulfilled);
 
+  // Split Toast Bar Central into Special / Classic via menu groups on item-details
+  const alreadyFamily = rawBarTickets.filter(t =>
+    /^(special|classic)\s+cocktails?$/i.test(String(t['Station'] || '')));
+  const barCentralOnly = rawBarTickets.filter(t => /^bar\s*central/i.test(String(t['Station'] || '')));
+  const join = remapBarCentralToCocktailFamilies(barCentralOnly);
+  const cocktailTickets = alreadyFamily.length
+    ? alreadyFamily.concat(join.remapped)
+    : join.remapped;
+
   const bevStationAgg = {};
   cocktailTickets.forEach(t => {
     const st = t['Station'];
@@ -945,19 +1046,32 @@ function buildBeverageSlice() {
     bevStationAgg[st].count++;
     bevStationAgg[st].totalSec += t._fulSec;
   });
-  const bevStations = Object.entries(bevStationAgg).map(([station, d]) => ({
-    station,
-    count: d.count,
-    avg_sec: +(d.totalSec / d.count).toFixed(2),
-    exp_sec: 0,
-    bp_tickets: null,
-    bp_curve: [],
-  })).sort((a, b) => b.count - a.count);
+  // Ensure both family chips exist when we have any cocktail volume
+  [SPECIAL_COCKTAILS, CLASSIC_COCKTAILS].forEach(st => {
+    if (!bevStationAgg[st]) bevStationAgg[st] = { count: 0, totalSec: 0 };
+  });
+  const bevStations = Object.entries(bevStationAgg)
+    .filter(([station]) => !/^bar\s*central/i.test(station))
+    .map(([station, d]) => ({
+      station,
+      count: d.count,
+      avg_sec: d.count ? +(d.totalSec / d.count).toFixed(2) : 0,
+      exp_sec: 0,
+      bp_tickets: null,
+      bp_curve: [],
+    }))
+    .sort((a, b) => {
+      const order = { [SPECIAL_COCKTAILS]: 0, [CLASSIC_COCKTAILS]: 1 };
+      const ao = order[a.station] ?? 9;
+      const bo = order[b.station] ?? 9;
+      if (ao !== bo) return ao - bo;
+      return b.count - a.count;
+    });
 
   const bevStationTicketsMap = {};
   cocktailTickets.forEach(t => {
     const st = t['Station'];
-    if (!st) return;
+    if (!st || /^bar\s*central/i.test(st)) return;
     if (!bevStationTicketsMap[st]) bevStationTicketsMap[st] = new Map();
     const key = `${t['Check #']}||${t['Fired Date']}||${t['Fulfillment Time']}`;
     if (!bevStationTicketsMap[st].has(key)) bevStationTicketsMap[st].set(key, t);
@@ -976,6 +1090,7 @@ function buildBeverageSlice() {
   const bevDetails = {};
   cocktailTickets.forEach(t => {
     const st = t['Station'];
+    if (!st || /^bar\s*central/i.test(st)) return;
     const day = DAYS[t._fired.getDay()];
     const hr = t._fired.getHours();
     const hrKey = `${hr}-${hr + 1}`;
@@ -1006,6 +1121,9 @@ function buildBeverageSlice() {
       hourly[hr] = { avg_sec: +(d.tw / d.tc).toFixed(1), exp_sec: 0 };
     });
     bevStationDetails[st] = { byDayHour, hourly, breakingHours: [] };
+  });
+  [SPECIAL_COCKTAILS, CLASSIC_COCKTAILS].forEach(st => {
+    if (!bevStationDetails[st]) bevStationDetails[st] = { byDayHour: {}, hourly: {}, breakingHours: [] };
   });
 
   const bevDayHourMap = {};
@@ -1055,24 +1173,21 @@ function buildBeverageSlice() {
   });
   const bevBpRow = bevCurve.find((r, i) => i >= 10 && r.occ >= 5 && r.ful > 15);
 
-  // Cocktail item volumes from item details (group or name heuristics)
+  // Cocktail item volumes — only Toast cocktail groups → Special / Classic
   const bevSummaryMap = {};
   itemDetails.forEach(item => {
     const name = item.menuItem || item['Menu Item'] || '';
     if (!name) return;
     const group = String(item['Menu Group'] || item.menuGroup || item.group || '');
-    const isCockGroup = /cocktail/i.test(group);
-    const isCockName = /\b(martini|negroni|spritz|margarita|cocktail|daiquiri|old fashioned|mimosa|bloody mary|aperol)\b/i.test(name);
-    if (!isCockGroup && !isCockName) return;
-    if (!bevSummaryMap[name]) bevSummaryMap[name] = { item: name, qty: 0, stations: [] };
+    let station = null;
+    if (/mila\s+bar\s*central\s+cocktails/i.test(group)) station = SPECIAL_COCKTAILS;
+    else if (/mila\s+classic\s+cocktails/i.test(group)) station = CLASSIC_COCKTAILS;
+    if (!station) return;
+    if (!bevSummaryMap[name]) bevSummaryMap[name] = { item: name, qty: 0, stations: [station] };
     bevSummaryMap[name].qty += item.qty || 1;
-    const info = lookupItemAssignment(name);
-    if (info && Array.isArray(info.stations)) {
-      info.stations.filter(isCocktail).forEach(st => {
-        if (!bevSummaryMap[name].stations.includes(st)) bevSummaryMap[name].stations.push(st);
-      });
+    if (!bevSummaryMap[name].stations.includes(station)) {
+      bevSummaryMap[name].stations.push(station);
     }
-    if (!bevSummaryMap[name].stations.length) bevSummaryMap[name].stations = ['Bar Central'];
   });
   const bevSummary = Object.values(bevSummaryMap)
     .map(r => ({
@@ -1083,18 +1198,44 @@ function buildBeverageSlice() {
     }))
     .sort((a, b) => b.qty - a.qty);
 
+  // If join found no tickets but we have menu volume, keep empty station shells from summary
+  if (!cocktailTickets.length && bevSummary.length) {
+    const qtyBySt = {};
+    bevSummary.forEach(r => {
+      (r.stations || []).forEach(st => {
+        qtyBySt[st] = (qtyBySt[st] || 0) + (r.qty || 0);
+      });
+    });
+    bevStations.length = 0;
+    [SPECIAL_COCKTAILS, CLASSIC_COCKTAILS].forEach(st => {
+      if (qtyBySt[st]) {
+        bevStations.push({
+          station: st,
+          count: qtyBySt[st],
+          avg_sec: 0,
+          exp_sec: 0,
+          bp_tickets: null,
+          bp_curve: [],
+        });
+      }
+    });
+  }
+
   console.log(
     `Beverage (cocktails) for ${venueArg}: tickets=${cocktailTickets.length}` +
     ` stations=${bevStations.map(s => s.station + '(' + s.count + ')').join(', ') || 'none'}` +
+    ` join matched=${join.matchedTickets} unmatchedItems=${join.unmatchedItems}` +
+    ` unusedBar=${join.unusedBarTickets}` +
     ` (skipped non-cocktail=${skippedNonCocktail}, open=${skippedOpenBev}, >90min=${skippedLongBev})`
   );
 
-  if (!bevStations.length) return null;
+  if (!bevStations.length && !bevSummary.length) return null;
+  if (!bevStations.some(s => s.count > 0) && !bevSummary.length) return null;
 
   return {
     scope: 'cocktails',
     venues: ['mila'],
-    stations: bevStations,
+    stations: bevStations.filter(s => s.count > 0 || bevSummary.some(r => (r.stations || []).includes(s.station))),
     stationDetails: bevStationDetails,
     hmFul: bevHmFul,
     hourProfile: bevHourProfile,
@@ -1107,8 +1248,13 @@ function buildBeverageSlice() {
     stationHourItems: {},
     ticketSummary: {
       scope: 'cocktails',
+      families: [SPECIAL_COCKTAILS, CLASSIC_COCKTAILS],
       rawKitchenRows: tickets.length,
+      barCentralTicketRows: barCentralOnly.length,
       cocktailStationTicketRows: cocktailTickets.length,
+      joinMatched: join.matchedTickets,
+      joinUnmatchedItems: join.unmatchedItems,
+      unusedBarCentral: join.unusedBarTickets,
       nonCocktailExcluded: skippedNonCocktail,
       openOrUnclosed: skippedOpenBev,
       over90MinExcluded: skippedLongBev,

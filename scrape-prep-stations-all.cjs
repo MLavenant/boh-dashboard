@@ -99,6 +99,7 @@ const VENUE_CONFIGS = {
 };
 
 const { isFoodStationName, isCocktailStationName, cleanStationName } = require('./food-station.cjs');
+const { remapBeverageStations } = require('./cocktail-families.cjs');
 
 function clean(s) {
   return cleanStationName(s);
@@ -286,7 +287,11 @@ async function walkMenus(page, stationIdToName, cfg) {
 
         const ids = Array.isArray(node['prep-station']) ? node['prep-station'] : [];
         const stationsRaw = ids.map(id => stationIdToName[String(id)] || String(id));
-        const stations = [...new Set(stationsRaw.map(clean).filter(s => keepPrepStation(s, cfg)))];
+        let stations = [...new Set(stationsRaw.map(clean).filter(s => keepPrepStation(s, cfg)))];
+        // Beverage: split Toast Bar Central into Special / Classic by menu group
+        if (cfg.beverage) {
+          stations = remapBeverageStations(stations, node._group, node.name, cfg.mapKey);
+        }
         items.push({
           menuItem: clean(node.name),
           guid: String(node.entityIdString || node.masterIdString || ''),
@@ -337,6 +342,36 @@ function mergeIntoMap(mapKey, items) {
   console.log(`${mapKey} total: ${Object.keys(map[mapKey]).length}`);
 }
 
+/** Beverage merge: write Special/Classic cocktail stations with beverage source tag. */
+function mergeBeverageMap(mapKey, items) {
+  let map = {};
+  if (fs.existsSync(MAP_FILE)) map = JSON.parse(fs.readFileSync(MAP_FILE, 'utf8'));
+  if (!map[mapKey]) map[mapKey] = {};
+
+  let added = 0, updated = 0, kept = 0;
+  for (const it of items) {
+    const stations = (it.stations || []).filter(s => s && !/^\d{10,}$/.test(String(s)));
+    if (!stations.length) { kept++; continue; }
+    const existing = map[mapKey][it.menuItem];
+    if (!existing) {
+      map[mapKey][it.menuItem] = { stations, targetSec: 0, source: 'toast-bulkeditor-beverage' };
+      added++;
+      continue;
+    }
+    const prev = existing.stations || [];
+    const same = prev.length === stations.length && prev.every(s => stations.includes(s));
+    if (!same) updated++;
+    map[mapKey][it.menuItem] = {
+      stations,
+      targetSec: existing.targetSec || 0,
+      source: 'toast-bulkeditor-beverage',
+    };
+  }
+  fs.writeFileSync(MAP_FILE, JSON.stringify(map, null, 2));
+  console.log(`${mapKey} beverage merge: +${added} new, ${updated} routes updated, ${kept} empty`);
+  console.log(`${mapKey} total: ${Object.keys(map[mapKey]).length}`);
+}
+
 async function scrapeVenue(page, cfg) {
   const { stationMap } = await switchVenue(page, cfg);
   if (Object.keys(stationMap).length < 3) {
@@ -367,12 +402,18 @@ async function scrapeVenue(page, cfg) {
   const mergeItems = items.map(it => {
     if (it.stations.length) return it;
     if (cfg.beverage && Array.isArray(it.stationsRaw)) {
-      const kept = it.stationsRaw.filter(s => keepPrepStation(s, cfg));
+      let kept = it.stationsRaw.filter(s => keepPrepStation(s, cfg));
+      kept = remapBeverageStations(kept, it.group, it.menuItem, cfg.mapKey);
       return { ...it, stations: kept };
     }
     return it;
   });
-  mergeIntoMap(cfg.mapKey, mergeItems);
+  // Beverage merges use a distinct source tag so Food Bar Central noise does not overwrite
+  if (cfg.beverage) {
+    mergeBeverageMap(cfg.mapKey, mergeItems);
+  } else {
+    mergeIntoMap(cfg.mapKey, mergeItems);
+  }
   return items.length;
 }
 
