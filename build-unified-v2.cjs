@@ -5428,7 +5428,6 @@ function renderMenuItems() {
     });
   })();
 
-  const searchEl = document.getElementById('menuSearch');
   if (searchEl) { searchEl.value = ''; currentSearch = ''; }
 
   function sorted(data) {
@@ -7454,3 +7453,24 @@ try {
   }
 }
 console.log('✅ Written:', outPath, '(' + Math.round(fs.statSync(outPath).size / 1024) + ' KB)');
+
+// Gate publish-quality builds: catch SyntaxError before Pages goes live
+(function smokeCheckDashboard(html) {
+  const sm = html.match(/<script>([\s\S]*)<\/script>/i);
+  if (!sm) throw new Error('smoke: no <script> block in dashboard.html');
+  try {
+    new Function(sm[1]);
+  } catch (e) {
+    throw new Error('smoke: dashboard.js SyntaxError — ' + e.message);
+  }
+  if (!html.includes('id="venueSelect"') || !html.includes('>MILA</option>')) {
+    throw new Error('smoke: venueSelect missing location options');
+  }
+  if (!html.includes('id="weekDropdown"')) {
+    throw new Error('smoke: weekDropdown missing');
+  }
+  if (!sm[1].includes('function setAnalysisMode') || !sm[1].includes('function selectWeek')) {
+    throw new Error('smoke: setAnalysisMode/selectWeek missing');
+  }
+  console.log('✅ Smoke check passed (syntax + venue/week/beverage hooks)');
+})(finalHtml);
