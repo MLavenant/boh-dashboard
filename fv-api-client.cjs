@@ -265,6 +265,84 @@ async function getForecastActuals({ venue = 'all', start, end } = {}) {
   };
 }
 
+/** Art Basel at Casa Neos Beach Club: Friday–Sunday. */
+const BASEL_TRACKER = {
+  venueKey: 'casa_neos_bc',
+  label: 'Art Basel',
+  dates: ['2026-12-04', '2026-12-05', '2026-12-06']
+};
+
+function referrerDisplayName(user) {
+  const profile = (user && user.profile) || {};
+  const first = String(profile.name || '').trim();
+  const last = String(profile.last_name || '').trim();
+  if (first && last && first.toLowerCase().indexOf(last.toLowerCase()) === -1) return (first + ' ' + last).trim();
+  return first || last || '';
+}
+
+/**
+ * Basel Fri–Sun sales, same rule as forecast (accepted + not-completed price),
+ * plus a breakdown by FourVenues referrer (referral_id → user name).
+ */
+async function getBaselTracker() {
+  const venue = VENUES.find(v => v.key === BASEL_TRACKER.venueKey);
+  if (!venue) throw new Error('Basel venue missing');
+  const apiKey = getApiKey(venue);
+  if (!apiKey) throw new Error(`Missing ${venue.envKey}`);
+  const usersData = await apiGet(apiKey, '/users/');
+  const names = new Map();
+  for (const user of (usersData && usersData.data) || []) {
+    const label = referrerDisplayName(user);
+    if (user && user._id && label) names.set(user._id, label);
+  }
+  const nights = [];
+  const refMap = new Map();
+  for (const date of BASEL_TRACKER.dates) {
+    const { bookings } = await listBookings(venue, { date });
+    const keep = (bookings || []).filter(b => isCountableStatus(b.status || b.state));
+    const djs = [...new Set(keep.map(b => String(b.event_name || '').trim()).filter(Boolean))];
+    let revenue = 0;
+    for (const b of keep) {
+      const price = Number(b.price) || 0;
+      revenue += price;
+      const name = (b.referral_id && names.get(b.referral_id)) || 'No referrer';
+      if (!refMap.has(name)) refMap.set(name, { name, totalRevenue: 0, bookings: 0, byDate: {} });
+      const group = refMap.get(name);
+      group.totalRevenue += price;
+      group.bookings += 1;
+      if (!group.byDate[date]) group.byDate[date] = { revenue: 0, bookings: 0 };
+      group.byDate[date].revenue += price;
+      group.byDate[date].bookings += 1;
+    }
+    nights.push({
+      date,
+      dj: djs.join(' / ') || 'TBD',
+      totalRevenue: Math.round(revenue * 100) / 100,
+      bookings: keep.length
+    });
+  }
+  const referrers = [...refMap.values()].map(group => ({
+    name: group.name,
+    totalRevenue: Math.round(group.totalRevenue * 100) / 100,
+    bookings: group.bookings,
+    byDate: Object.fromEntries(Object.entries(group.byDate).map(([date, cell]) => [date, {
+      revenue: Math.round(cell.revenue * 100) / 100,
+      bookings: cell.bookings
+    }]))
+  })).sort((a, b) => (b.totalRevenue - a.totalRevenue) || a.name.localeCompare(b.name));
+  return {
+    updatedAt: new Date().toISOString(),
+    venue: venue.name,
+    label: BASEL_TRACKER.label,
+    dates: BASEL_TRACKER.dates.slice(),
+    methodology: 'FourVenues price · accepted + not completed',
+    totalRevenue: Math.round(nights.reduce((sum, night) => sum + night.totalRevenue, 0) * 100) / 100,
+    totalBookings: nights.reduce((sum, night) => sum + night.bookings, 0),
+    nights,
+    referrers
+  };
+}
+
 module.exports = {
   BASE,
   VENUES,
@@ -275,6 +353,7 @@ module.exports = {
   listBookings,
   forecastFromBookings,
   getForecastActuals,
+  getBaselTracker,
   isCountableStatus,
   defaultDateRange,
   isoDate,

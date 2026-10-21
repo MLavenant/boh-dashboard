@@ -15,7 +15,7 @@
 'use strict';
 
 const https = require('https');
-const { getForecastActuals, venuesWithKeys } = require('./fv-api-client.cjs');
+const { getForecastActuals, getBaselTracker, venuesWithKeys } = require('./fv-api-client.cjs');
 
 const FB_DB = 'rdg-dj-dashboard-default-rtdb.firebaseio.com';
 
@@ -257,6 +257,14 @@ function buildLivePayload(forecastRows, period) {
 
   const code = await fbPutRetry('/rdg/forecastLive', livePayload);
   log(`Firebase forecastLive HTTP ${code} · ${eventCount} events · $${Math.round(revenueSum).toLocaleString()}`);
+
+  try {
+    const basel = await getBaselTracker();
+    const baselCode = await fbPutRetry('/rdg/baselTracker', basel);
+    log(`Firebase baselTracker HTTP ${baselCode} · ${basel.dates[0]}–${basel.dates[basel.dates.length - 1]} · $${Math.round(basel.totalRevenue).toLocaleString()} · ${basel.referrers.length} referrers`);
+  } catch (e) {
+    log(`Basel tracker non-fatal: ${e.code || e.message}`);
+  }
 
   const statusCode = await fbPutRetry('/rdg/scrapeStatus/fourvenues', {
     ok: true,
