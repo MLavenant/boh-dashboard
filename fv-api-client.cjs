@@ -265,9 +265,9 @@ async function getForecastActuals({ venue = 'all', start, end } = {}) {
   };
 }
 
-/** Art Basel at Casa Neos Beach Club: Friday–Sunday. */
+/** Art Basel weekend (Friday–Sunday) across the Miami venues. */
 const BASEL_TRACKER = {
-  venueKey: 'casa_neos_bc',
+  venueKeys: ['casa_neos_bc', 'mila_lounge', 'casa_neos_lounge'],
   label: 'Art Basel',
   dates: ['2026-12-04', '2026-12-05', '2026-12-06']
 };
@@ -280,21 +280,29 @@ function referrerDisplayName(user) {
   return first || last || '';
 }
 
-/**
- * Basel Fri–Sun sales, same rule as forecast (accepted + not-completed price),
- * plus a breakdown by FourVenues referrer (referral_id → user name).
- */
-async function getBaselTracker() {
-  const venue = VENUES.find(v => v.key === BASEL_TRACKER.venueKey);
-  if (!venue) throw new Error('Basel venue missing');
+function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+
+function addCell(map, key, price) {
+  if (!map[key]) map[key] = { revenue: 0, bookings: 0 };
+  map[key].revenue += price;
+  map[key].bookings += 1;
+}
+
+function roundCells(map) {
+  return Object.fromEntries(Object.entries(map).map(([k, c]) => [k, { revenue: round2(c.revenue), bookings: c.bookings }]));
+}
+
+async function baselVenue(venue) {
   const apiKey = getApiKey(venue);
   if (!apiKey) throw new Error(`Missing ${venue.envKey}`);
-  const usersData = await apiGet(apiKey, '/users/');
   const names = new Map();
-  for (const user of (usersData && usersData.data) || []) {
-    const label = referrerDisplayName(user);
-    if (user && user._id && label) names.set(user._id, label);
-  }
+  try {
+    const usersData = await apiGet(apiKey, '/users/');
+    for (const user of (usersData && usersData.data) || []) {
+      const label = referrerDisplayName(user);
+      if (user && user._id && label) names.set(user._id, label);
+    }
+  } catch (e) { /* names fall back to "Unknown referrer" */ }
   const nights = [];
   const refMap = new Map();
   for (const date of BASEL_TRACKER.dates) {
@@ -305,41 +313,91 @@ async function getBaselTracker() {
     for (const b of keep) {
       const price = Number(b.price) || 0;
       revenue += price;
-      const name = (b.referral_id && names.get(b.referral_id)) || 'No referrer';
+      const name = b.referral_id ? (names.get(b.referral_id) || 'Unknown referrer') : 'No referrer';
       if (!refMap.has(name)) refMap.set(name, { name, totalRevenue: 0, bookings: 0, byDate: {} });
       const group = refMap.get(name);
       group.totalRevenue += price;
       group.bookings += 1;
-      if (!group.byDate[date]) group.byDate[date] = { revenue: 0, bookings: 0 };
-      group.byDate[date].revenue += price;
-      group.byDate[date].bookings += 1;
+      addCell(group.byDate, date, price);
     }
-    nights.push({
-      date,
-      dj: djs.join(' / ') || 'TBD',
-      totalRevenue: Math.round(revenue * 100) / 100,
-      bookings: keep.length
-    });
+    nights.push({ date, dj: djs.join(' / ') || 'TBD', totalRevenue: round2(revenue), bookings: keep.length });
   }
-  const referrers = [...refMap.values()].map(group => ({
-    name: group.name,
-    totalRevenue: Math.round(group.totalRevenue * 100) / 100,
-    bookings: group.bookings,
-    byDate: Object.fromEntries(Object.entries(group.byDate).map(([date, cell]) => [date, {
-      revenue: Math.round(cell.revenue * 100) / 100,
-      bookings: cell.bookings
-    }]))
+  const referrers = [...refMap.values()].map(g => ({
+    name: g.name, totalRevenue: round2(g.totalRevenue), bookings: g.bookings, byDate: roundCells(g.byDate)
   })).sort((a, b) => (b.totalRevenue - a.totalRevenue) || a.name.localeCompare(b.name));
   return {
+    key: venue.key,
+    name: venue.name,
+    totalRevenue: round2(nights.reduce((s, n) => s + n.totalRevenue, 0)),
+    totalBookings: nights.reduce((s, n) => s + n.bookings, 0),
+    nights,
+    referrers
+  };
+}
+
+/**
+ * Basel Fri–Sun sales per venue, same rule as forecast (accepted + not-completed price),
+ * plus a breakdown by FourVenues referrer (referral_id → user name). Top-level fields
+ * are the all-venue rollup; `venues` holds each venue's own nights and referrers.
+ */
+async function getBaselTracker() {
+  const venues = [];
+  const errors = [];
+  for (const key of BASEL_TRACKER.venueKeys) {
+    const venue = VENUES.find(v => v.key === key);
+    if (!venue) continue;
+    try {
+      venues.push(await baselVenue(venue));
+    } catch (e) {
+      errors.push({ key: venue.key, name: venue.name, error: e.message });
+    }
+  }
+  if (!venues.length) throw new Error('Basel tracker: no venue could be pulled');
+
+  const nights = BASEL_TRACKER.dates.map(date => {
+    const byVenue = {};
+    let revenue = 0, bookings = 0;
+    for (const v of venues) {
+      const n = v.nights.find(x => x.date === date) || { dj: 'TBD', totalRevenue: 0, bookings: 0 };
+      byVenue[v.key] = { dj: n.dj, revenue: n.totalRevenue, bookings: n.bookings };
+      revenue += n.totalRevenue;
+      bookings += n.bookings;
+    }
+    return { date, totalRevenue: round2(revenue), bookings, byVenue };
+  });
+
+  const refMap = new Map();
+  for (const v of venues) {
+    for (const r of v.referrers) {
+      if (!refMap.has(r.name)) refMap.set(r.name, { name: r.name, totalRevenue: 0, bookings: 0, byDate: {}, byVenue: {} });
+      const g = refMap.get(r.name);
+      g.totalRevenue += r.totalRevenue;
+      g.bookings += r.bookings;
+      g.byVenue[v.key] = { revenue: r.totalRevenue, bookings: r.bookings };
+      for (const [date, c] of Object.entries(r.byDate || {})) {
+        if (!g.byDate[date]) g.byDate[date] = { revenue: 0, bookings: 0 };
+        g.byDate[date].revenue += c.revenue;
+        g.byDate[date].bookings += c.bookings;
+      }
+    }
+  }
+  const referrers = [...refMap.values()].map(g => ({
+    name: g.name, totalRevenue: round2(g.totalRevenue), bookings: g.bookings,
+    byDate: roundCells(g.byDate), byVenue: roundCells(g.byVenue)
+  })).sort((a, b) => (b.totalRevenue - a.totalRevenue) || a.name.localeCompare(b.name));
+
+  return {
     updatedAt: new Date().toISOString(),
-    venue: venue.name,
+    venue: 'All Basel venues',
     label: BASEL_TRACKER.label,
     dates: BASEL_TRACKER.dates.slice(),
     methodology: 'FourVenues price · accepted + not completed',
-    totalRevenue: Math.round(nights.reduce((sum, night) => sum + night.totalRevenue, 0) * 100) / 100,
-    totalBookings: nights.reduce((sum, night) => sum + night.bookings, 0),
+    totalRevenue: round2(venues.reduce((s, v) => s + v.totalRevenue, 0)),
+    totalBookings: venues.reduce((s, v) => s + v.totalBookings, 0),
     nights,
-    referrers
+    referrers,
+    venues,
+    errors
   };
 }
 
