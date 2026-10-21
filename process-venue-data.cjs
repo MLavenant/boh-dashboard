@@ -63,7 +63,10 @@ const {
   SPECIAL_COCKTAILS,
   CLASSIC_COCKTAILS,
   classifyCocktailFamily,
+  isRawBarTicketStation,
+  normalizeVenueKey,
 } = require('./cocktail-families.cjs');
+const beverageVenueKey = normalizeVenueKey(venueArg);
 function isFood(name) {
   return isFoodStationName(name);
 }
@@ -919,17 +922,15 @@ Object.values(stationHourItems).forEach(days => {
   });
 });
 
-// ---- Beverage slice (MILA cocktails first) ----
-/** Join Bar Central KDS tickets → Special / Classic via item-details (table + time). */
-function remapBarCentralToCocktailFamilies(rawBarTickets) {
-  // Prefer Toast menu groups only for join (avoids M- food false positives)
+// ---- Beverage slice (all venues — Signature/Classic menu groups) ----
+/** Join bar KDS tickets → Special / Classic via item-details (table + time). */
+function remapBarTicketsToCocktailFamilies(rawBarTickets) {
+  // Toast menu groups only (venue rules in cocktail-families.cjs)
   const cocktailItems = itemDetails
     .map(item => {
       const name = item.menuItem || item['Menu Item'] || '';
       const group = String(item.menuGroup || item['Menu Group'] || item.group || '');
-      let fam = null;
-      if (/mila\s+bar\s*central\s+cocktails/i.test(group)) fam = SPECIAL_COCKTAILS;
-      else if (/mila\s+classic\s+cocktails/i.test(group)) fam = CLASSIC_COCKTAILS;
+      const fam = classifyCocktailFamily(group, name, beverageVenueKey);
       if (!fam) return null;
       const sent = parseDate(item.sentDate || item['Sent Date']);
       return {
@@ -1008,14 +1009,16 @@ function resolveCocktailStation(name, group) {
 }
 
 function buildBeverageSlice() {
-  if (venueArg !== 'mila') return null;
+  const supported = ['mila', 'claudie', 'casa_neos', 'ava_coconut_grove', 'ava_winter_park'];
+  if (!supported.includes(beverageVenueKey)) return null;
 
   let skippedOpenBev = 0;
   let skippedLongBev = 0;
   let skippedNonCocktail = 0;
   const rawBarTickets = tickets.filter(t => {
-    // Accept raw Bar Central KDS + already-remapped family names
-    if (!isCocktail(t['Station'])) { skippedNonCocktail++; return false; }
+    const st = String(t['Station'] || '');
+    const ok = isCocktail(st) || isRawBarTicketStation(st, beverageVenueKey);
+    if (!ok) { skippedNonCocktail++; return false; }
     const fired = parseDate(t['Fired Date']);
     const fulSecRaw = parseFulTime(t['Fulfillment Time']);
     const fulfilledAt = parseDate(t['Fulfilled Date']);
@@ -1030,11 +1033,12 @@ function buildBeverageSlice() {
     return { ...t, _fired: fired, _fulfilled: fulfilled, _fulSec: fulSec };
   }).filter(t => t._fired && t._fulSec != null && t._fulfilled);
 
-  // Split Toast Bar Central into Special / Classic via menu groups on item-details
+  // Split bar KDS into Special / Classic via Toast menu groups on item-details
   const alreadyFamily = rawBarTickets.filter(t =>
     /^(special|classic)\s+cocktails?$/i.test(String(t['Station'] || '')));
-  const barCentralOnly = rawBarTickets.filter(t => /^bar\s*central/i.test(String(t['Station'] || '')));
-  const join = remapBarCentralToCocktailFamilies(barCentralOnly);
+  const barLaneTickets = rawBarTickets.filter(t =>
+    isRawBarTicketStation(String(t['Station'] || ''), beverageVenueKey));
+  const join = remapBarTicketsToCocktailFamilies(barLaneTickets);
   const cocktailTickets = alreadyFamily.length
     ? alreadyFamily.concat(join.remapped)
     : join.remapped;
@@ -1051,7 +1055,11 @@ function buildBeverageSlice() {
     if (!bevStationAgg[st]) bevStationAgg[st] = { count: 0, totalSec: 0 };
   });
   const bevStations = Object.entries(bevStationAgg)
-    .filter(([station]) => !/^bar\s*central/i.test(station))
+    .filter(([station]) => {
+      // Never publish raw bar KDS lanes — only Special / Classic
+      if (/^(special|classic)\s+cocktails?$/i.test(station)) return true;
+      return false;
+    })
     .map(([station, d]) => ({
       station,
       count: d.count,
@@ -1183,15 +1191,13 @@ function buildBeverageSlice() {
     bevItemFul[name].n += 1;
   });
 
-  // Cocktail item volumes — only Toast cocktail groups → Special / Classic
+  // Cocktail item volumes — Toast Signature/Classic groups → Special / Classic
   const bevSummaryMap = {};
   itemDetails.forEach(item => {
     const name = item.menuItem || item['Menu Item'] || '';
     if (!name) return;
     const group = String(item['Menu Group'] || item.menuGroup || item.group || '');
-    let station = null;
-    if (/mila\s+bar\s*central\s+cocktails/i.test(group)) station = SPECIAL_COCKTAILS;
-    else if (/mila\s+classic\s+cocktails/i.test(group)) station = CLASSIC_COCKTAILS;
+    const station = classifyCocktailFamily(group, name, beverageVenueKey);
     if (!station) return;
     if (!bevSummaryMap[name]) bevSummaryMap[name] = { item: name, qty: 0, stations: [station] };
     bevSummaryMap[name].qty += item.qty || 1;
@@ -1214,27 +1220,42 @@ function buildBeverageSlice() {
     })
     .sort((a, b) => b.qty - a.qty);
 
-  // If join found no tickets but we have menu volume, keep empty station shells from summary
-  if (!cocktailTickets.length && bevSummary.length) {
+  // When bar KDS join is empty/sparse (common at AVA Winter Park), prefer menu volume shells
+  {
     const qtyBySt = {};
+    const secBySt = {};
+    const nBySt = {};
     bevSummary.forEach(r => {
       (r.stations || []).forEach(st => {
         qtyBySt[st] = (qtyBySt[st] || 0) + (r.qty || 0);
+        if (r.avg_sec > 0) {
+          secBySt[st] = (secBySt[st] || 0) + r.avg_sec * (r.qty || 1);
+          nBySt[st] = (nBySt[st] || 0) + (r.qty || 1);
+        }
       });
     });
-    bevStations.length = 0;
-    [SPECIAL_COCKTAILS, CLASSIC_COCKTAILS].forEach(st => {
-      if (qtyBySt[st]) {
+    const summaryQty = Object.values(qtyBySt).reduce((a, b) => a + b, 0);
+    const joinSparse = !cocktailTickets.length
+      || (summaryQty > 0 && cocktailTickets.length < summaryQty * 0.15);
+    if (joinSparse && summaryQty > 0) {
+      bevStations.length = 0;
+      [SPECIAL_COCKTAILS, CLASSIC_COCKTAILS].forEach(st => {
+        if (!qtyBySt[st]) return;
+        const joined = cocktailTickets.filter(t => t['Station'] === st);
+        const joinAvg = joined.length
+          ? +(joined.reduce((s, t) => s + t._fulSec, 0) / joined.length).toFixed(2)
+          : 0;
+        const fulAvg = nBySt[st] ? +(secBySt[st] / nBySt[st]).toFixed(2) : 0;
         bevStations.push({
           station: st,
           count: qtyBySt[st],
-          avg_sec: 0,
+          avg_sec: joinAvg || fulAvg || 0,
           exp_sec: 0,
           bp_tickets: null,
           bp_curve: [],
         });
-      }
-    });
+      });
+    }
   }
 
   console.log(
@@ -1250,7 +1271,7 @@ function buildBeverageSlice() {
 
   return {
     scope: 'cocktails',
-    venues: ['mila'],
+    venues: [beverageVenueKey],
     stations: bevStations.filter(s => s.count > 0 || bevSummary.some(r => (r.stations || []).includes(s.station))),
     stationDetails: bevStationDetails,
     hmFul: bevHmFul,
@@ -1266,11 +1287,11 @@ function buildBeverageSlice() {
       scope: 'cocktails',
       families: [SPECIAL_COCKTAILS, CLASSIC_COCKTAILS],
       rawKitchenRows: tickets.length,
-      barCentralTicketRows: barCentralOnly.length,
+      barLaneTicketRows: barLaneTickets.length,
       cocktailStationTicketRows: cocktailTickets.length,
       joinMatched: join.matchedTickets,
       joinUnmatchedItems: join.unmatchedItems,
-      unusedBarCentral: join.unusedBarTickets,
+      unusedBarLane: join.unusedBarTickets,
       nonCocktailExcluded: skippedNonCocktail,
       openOrUnclosed: skippedOpenBev,
       over90MinExcluded: skippedLongBev,
@@ -1339,13 +1360,34 @@ function mergePreserveStaffing(outObj, existingPath, weekKey) {
   return outObj;
 }
 
+function writeJsonAtomic(targetPath, obj) {
+  const tmp = targetPath + '.tmp-' + process.pid;
+  fs.writeFileSync(tmp, JSON.stringify(obj), 'utf8');
+  try {
+    fs.renameSync(tmp, targetPath);
+  } catch (e) {
+    try {
+      fs.copyFileSync(tmp, targetPath);
+      fs.unlinkSync(tmp);
+    } catch (e2) {
+      try { fs.unlinkSync(tmp); } catch (_) { /* ignore */ }
+      throw e2;
+    }
+  }
+}
+
 const outPath = path.join(__dirname, `${venueArg}-data.json`);
 const weekKeyForMerge = weekArg || null;
-fs.writeFileSync(outPath, JSON.stringify(mergePreserveStaffing({ ...output }, outPath, weekKeyForMerge)), 'utf8');
-console.log(`Written to ${outPath}`);
+// Week file first (authoritative for dashboard embeds); latest alias is best-effort
 if (weekArg) {
   const weekOutPath = path.join(__dirname, `${venueArg}-data-${weekArg}.json`);
-  fs.writeFileSync(weekOutPath, JSON.stringify(mergePreserveStaffing({ ...output }, weekOutPath, weekArg)), 'utf8');
+  writeJsonAtomic(weekOutPath, mergePreserveStaffing({ ...output }, weekOutPath, weekArg));
   console.log(`Written to ${weekOutPath}`);
+}
+try {
+  writeJsonAtomic(outPath, mergePreserveStaffing({ ...output }, outPath, weekKeyForMerge));
+  console.log(`Written to ${outPath}`);
+} catch (e) {
+  console.warn(`Could not write ${outPath} (file locked?): ${e.message}`);
 }
 console.log('Stations:', stations.map(s => `${s.station}(${s.count})`).join(', '));

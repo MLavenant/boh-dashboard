@@ -1456,11 +1456,9 @@ function syncAnalysisModeUi() {
     setTimeout(() => {
       if (analysisMode === 'beverage') {
         if (currentVenue === 'rdg_portfolio') {
-          hint.textContent = 'Beverage · MILA cocktails only (pick MILA)';
-        } else if (currentVenue === 'mila') {
-          hint.textContent = 'Beverage · Special + Classic Cocktails';
+          hint.textContent = 'Beverage · pick a restaurant for Special + Classic';
         } else {
-          hint.textContent = 'Beverage · MILA cocktails first';
+          hint.textContent = 'Beverage · Special + Classic Cocktails';
         }
       } else {
         hint.textContent = 'Food · BOH stations';
@@ -1475,7 +1473,7 @@ function syncAnalysisModeUi() {
     const show = analysisMode === 'beverage' && currentVenue !== 'rdg_portfolio' && !hasBeverageData(d);
     banner.style.display = show ? '' : 'none';
     if (show) {
-      banner.innerHTML = '<strong>Cocktail Beverage — MILA first.</strong> Switch location to <em>MILA</em> (or wait for cocktail data). Food mode stays unchanged for other restaurants.';
+      banner.innerHTML = '<strong>Cocktail Beverage</strong> — no Signature/Classic cocktail data for this location/week yet. Food mode is unchanged.';
     }
   }
 }
@@ -3004,7 +3002,8 @@ function renderBeverageStationsBoard() {
   const weekLabel = WEEKS[currentWeekIdx]?.label || (weekKey ? weekKey.replace('2026-', '') : '—');
   const kicker = document.getElementById('stationsDaKicker');
   const title = document.getElementById('stationsDaTitle');
-  if (kicker) kicker.textContent = weekLabel + ' · MILA cocktails';
+  const venueLabelsBev = ${JSON.stringify(VENUE_LABELS)};
+  if (kicker) kicker.textContent = weekLabel + ' · ' + (venueLabelsBev[currentVenue] || currentVenue) + ' cocktails';
   if (title) title.textContent = 'Special & Classic Cocktails';
 
   const families = stationsBoardFamilies();
@@ -5315,7 +5314,7 @@ function renderMenuItems() {
       '<tr><td colspan="9" style="text-align:center;padding:40px 20px;color:#9aa0aa;font-size:14px">' +
       (bevMode
         ? (dNow._beverageUnavailable
-          ? 'Cocktail Beverage — MILA first. Switch location to <strong>MILA</strong> to see cocktail menu items.'
+          ? 'No Signature/Classic cocktail data for this location yet.'
           : 'No cocktail menu items with volume for this week yet.')
         : 'Item fulfillment data not yet configured for this venue.<br><small style="color:#6b7280">Add a custom report ID to <code>CUSTOM_REPORT_IDS</code> in weekly-save.js to enable.</small>') +
       '</td></tr>';
