@@ -96,8 +96,18 @@ table.menu-tbl tr:hover td{background:#1e2533}
 
 /* App shell + left sidebar */
 .wrap.app-shell{max-width:none;margin:0;padding:0;display:flex;align-items:stretch;min-height:100vh}
-.app-sidebar{width:248px;flex:0 0 248px;background:#11151c;border-right:1px solid #262a33;padding:18px 14px 28px;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:20}
-.app-main{flex:1;min-width:0;padding:0 22px 64px;max-width:1400px}
+.app-sidebar{width:248px;flex:0 0 248px;background:#11151c;border-right:1px solid #262a33;padding:18px 14px 28px;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:20;transition:width 0.28s ease,flex-basis 0.28s ease,padding 0.28s ease,opacity 0.22s ease,border-color 0.22s ease}
+.wrap.app-shell.sidebar-collapsed .app-sidebar{width:0;flex-basis:0;padding:0;opacity:0;overflow:hidden;border-right-color:transparent;pointer-events:none}
+.app-main{flex:1;min-width:0;padding:0 22px 64px;max-width:1400px;position:relative;transition:max-width 0.28s ease}
+.wrap.app-shell.sidebar-collapsed .app-main{max-width:none}
+.sidebar-toggle-btn{position:fixed;top:14px;left:258px;z-index:40;width:34px;height:34px;border-radius:10px;border:1px solid #2d3448;background:#1e2533;color:#e8eaed;cursor:pointer;font:700 18px/1 inherit;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.18);transition:left 0.28s ease}
+.sidebar-toggle-btn:hover{border-color:#d9a441;color:#f5e6c8}
+.wrap.app-shell.sidebar-collapsed .sidebar-toggle-btn{left:10px}
+@media(max-width:900px){.sidebar-toggle-btn{left:10px;position:absolute}}
+body.theme-daylight .sidebar-toggle-btn{background:#fff;border-color:#d9cbb6;color:#3f2a1d}
+.sidebar-select,.sidebar-select option{color:inherit}
+body.theme-daylight .sidebar-select{color:#2c241c!important;background:#fff!important}
+body.theme-daylight .sidebar-select option{color:#2c241c;background:#fff}
 .sidebar-brand{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #262a33}
 .sidebar-brand-title{font-size:15px;font-weight:700;color:#e8eaed;letter-spacing:0.02em}
 .sidebar-brand-sub{font-size:11px;color:#9aa0aa;margin-top:4px;line-height:1.35}
@@ -774,11 +784,11 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <aside id="appSidebar" class="app-sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-title">BOH Dashboard</div>
-    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W42 · Built 2026-10-21T15:25:13.289Z</div>
+    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W42 · Built 2026-10-21T15:45:34.635Z</div>
   </div>
   <div class="sidebar-block">
     <label class="sidebar-label" for="venueSelect">Location</label>
-    <select id="venueSelect" class="sidebar-select" onchange="selectVenue(this.value)"></select>
+    <select id="venueSelect" class="sidebar-select" onchange="selectVenue(this.value)"><option value="claudie">Claudie</option><option value="casaneos">Casa Neos</option><option value="ava_cg">AVA Coconut Grove</option><option value="ava_wp">AVA Winter Park</option><option value="mila" selected>MILA</option><option value="rdg_portfolio">RDG Portfolio</option></select>
     <div id="venuePills" class="sidebar-venue-pills"></div>
   </div>
   <div class="sidebar-block">
@@ -821,6 +831,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
   </div>
 </aside>
 <main class="app-main">
+<button type="button" id="sidebarToggleBtn" class="sidebar-toggle-btn" onclick="toggleAppSidebar()" aria-label="Hide or show sidebar" title="Hide sidebar">‹</button>
 <div id="beverageEmptyBanner" role="status"></div>
 <header>
   <h1 id="dashTitle">BOH Dashboard</h1>
@@ -840,6 +851,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
   <div class="kpi"><div class="v" id="kThreshold">15 min</div><div class="l">Fulfillment target</div></div>
 </div>
 <p id="pageSummary" style="color:#9aa0aa;font-size:13px;margin:12px 0 0;line-height:1.6;max-width:780px"></p>
+<div id="beverageOverviewHost" style="display:none;margin:18px 0 8px"></div>
 
 <!-- Visual 1 -->
 <div class="card">
@@ -1169,7 +1181,14 @@ let currentWeekIdx = (() => {
   }
   return WEEKS.length ? best : 0;
 })();
-let currentVenue = 'claudie';
+let currentVenue = (() => {
+  try {
+    const saved = localStorage.getItem('boh_venue');
+    const ok = ['claudie','casaneos','ava_cg','ava_wp','mila','rdg_portfolio'];
+    if (saved && ok.includes(saved)) return saved;
+  } catch (_) { /* ignore */ }
+  return 'mila';
+})();
 let analysisMode = (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('bohAnalysisMode') === 'beverage')
   ? 'beverage'
   : 'food';
@@ -1243,14 +1262,40 @@ function setAnalysisMode(mode, btn) {
   if (typeof stationsSelectedFamily !== 'undefined') {
     stationsSelectedFamily = analysisMode === 'beverage' ? 'All' : 'Pastry';
   }
-  // Beverage: open Stations immediately so Special/Classic cards show
+  // Beverage: land on Overview (first page) with Special/Classic cards
   if (analysisMode === 'beverage' && currentVenue !== 'rdg_portfolio') {
-    const stationsBtn = document.querySelector('.tab-btn[onclick*="stations"]');
-    if (stationsBtn) switchTab('stations', stationsBtn);
-    else renderAll();
+    const overviewBtn = document.querySelector('.tab-btn[onclick*="overview"]');
+    if (overviewBtn) switchTab('overview', overviewBtn);
+    renderAll();
     return;
   }
   renderAll();
+}
+
+function toggleAppSidebar() {
+  const shell = document.querySelector('.wrap.app-shell');
+  const btn = document.getElementById('sidebarToggleBtn');
+  if (!shell) return;
+  const collapsed = shell.classList.toggle('sidebar-collapsed');
+  try { localStorage.setItem('boh_sidebar_collapsed', collapsed ? '1' : '0'); } catch (_) { /* ignore */ }
+  if (btn) {
+    btn.textContent = collapsed ? '›' : '‹';
+    btn.title = collapsed ? 'Show sidebar' : 'Hide sidebar';
+    btn.setAttribute('aria-label', collapsed ? 'Show sidebar' : 'Hide sidebar');
+  }
+}
+window.toggleAppSidebar = toggleAppSidebar;
+function restoreAppSidebarState() {
+  const shell = document.querySelector('.wrap.app-shell');
+  const btn = document.getElementById('sidebarToggleBtn');
+  if (!shell) return;
+  let collapsed = false;
+  try { collapsed = localStorage.getItem('boh_sidebar_collapsed') === '1'; } catch (_) { /* ignore */ }
+  shell.classList.toggle('sidebar-collapsed', collapsed);
+  if (btn) {
+    btn.textContent = collapsed ? '›' : '‹';
+    btn.title = collapsed ? 'Show sidebar' : 'Hide sidebar';
+  }
 }
 
 function refreshWeekDropdown() {
@@ -6405,52 +6450,71 @@ function renderKPIs() {
 // ============================================================
 // STATIONS RECAP (Overview)
 // ============================================================
+function setOverviewBeverageLayout(bevMode) {
+  const host = document.getElementById('beverageOverviewHost');
+  const kpis = document.querySelector('#tab-overview .kpis');
+  const foodCards = document.querySelectorAll('#tab-overview > .card, #tab-overview > .section-title');
+  const recapCard = document.getElementById('stationsRecapCard');
+  if (host) {
+    if (bevMode && currentVenue !== 'rdg_portfolio' && hasBeverageData(getD())) {
+      const families = (getD().stations || [])
+        .map(s => s.station)
+        .filter(s => isCocktailStation(s) && !/^bar\s*central/i.test(s));
+      const show = families.length ? families : ['Special Cocktails', 'Classic Cocktails'];
+      host.style.display = '';
+      host.innerHTML =
+        '<div class="card" style="margin:0 0 16px;padding:18px 20px">' +
+        '<h2 style="margin:0 0 6px">Special &amp; Classic Cocktails</h2>' +
+        '<p class="note" style="margin:0 0 14px">Avg fulfillment and every menu item for this week.</p>' +
+        '<div class="bev-family-grid">' + show.map(buildBeverageFamilyCardHtml).join('') + '</div></div>';
+    } else {
+      host.style.display = 'none';
+      host.innerHTML = '';
+    }
+  }
+  if (kpis) kpis.style.display = bevMode ? 'none' : '';
+  foodCards.forEach(el => {
+    if (el.id === 'stationsRecapCard' || el.id === 'beverageOverviewHost') return;
+    // Keep stations recap hidden in beverage — host already shows full cards
+    el.style.display = bevMode ? 'none' : '';
+  });
+  if (recapCard) recapCard.style.display = bevMode ? 'none' : '';
+  const pageSum = document.getElementById('pageSummary');
+  if (pageSum && bevMode) {
+    pageSum.innerHTML = 'Beverage mode · Special vs Classic cocktails for <strong>' +
+      ((typeof VENUE_LABELS !== 'undefined' && VENUE_LABELS[currentVenue]) || currentVenue) + '</strong>.';
+  }
+}
+
 function renderStationsRecap() {
   const el = document.getElementById('stationsRecap');
   if (!el) return;
   const bevMode = typeof analysisMode !== 'undefined' && analysisMode === 'beverage';
+  setOverviewBeverageLayout(bevMode);
+  if (bevMode) {
+    el.innerHTML = '';
+    return;
+  }
   const recapCard = document.getElementById('stationsRecapCard');
   if (recapCard) {
     const h2 = recapCard.querySelector('h2');
     const note = recapCard.querySelector('.note');
-    if (h2) h2.textContent = bevMode ? 'Cocktail Stations — This Week' : 'Stations Recap — This Week';
+    if (h2) h2.textContent = 'Stations Recap — This Week';
     if (note) {
-      note.textContent = bevMode
-        ? 'Special vs Classic avg fulfillment. Open Stations for the full item breakdown.'
-        : 'All food stations ranked worst → best vs target. Click a row to open Stations tab.';
+      note.textContent = 'All food stations ranked worst → best vs target. Click a row to open Stations tab.';
     }
   }
   const stations = (getD().stations || [])
     .filter(s => isFoodStation(s.station))
     .slice()
     .sort((a, b) => {
-      if (bevMode) {
-        const order = { 'Special Cocktails': 0, 'Classic Cocktails': 1 };
-        return (order[a.station] ?? 9) - (order[b.station] ?? 9);
-      }
       const ra = a.exp_sec > 0 ? a.avg_sec / a.exp_sec : -1;
       const rb = b.exp_sec > 0 ? b.avg_sec / b.exp_sec : -1;
       return rb - ra;
     });
 
   if (!stations.length) {
-    el.innerHTML = '<div style="color:#9aa0aa;padding:12px">' +
-      (bevMode ? 'No cocktail station data for this week.' : 'No food station data for this week.') +
-      '</div>';
-    return;
-  }
-
-  if (bevMode) {
-    el.innerHTML = '<div class="bev-family-grid">' +
-      stations.map(s => {
-        const items = beverageFamilyItems(s.station);
-        return '<div class="bev-family-card" style="cursor:pointer" onclick="openStationFromRecap(\'' +
-          String(s.station).replace(/'/g, '') + '\')">' +
-          '<h3>' + s.station + '</h3>' +
-          '<div class="bev-avg">' + (s.avg_sec > 0 ? fmtMin(s.avg_sec) : '—') + '</div>' +
-          '<p class="bev-meta">' + (s.count || 0).toLocaleString() + ' tickets · ' +
-          items.length + ' menu items</p></div>';
-      }).join('') + '</div>';
+    el.innerHTML = '<div style="color:#9aa0aa;padding:12px">No food station data for this week.</div>';
     return;
   }
 
@@ -6973,6 +7037,7 @@ const VENUE_LABELS = {"claudie":"Claudie","casaneos":"Casa Neos","ava_cg":"AVA C
 function selectVenue(key) {
   if (!key) return;
   currentVenue = key;
+  try { localStorage.setItem('boh_venue', key); } catch (_) { /* ignore */ }
   _serviceBreakDay = null;
   const label = key === 'rdg_portfolio' ? 'RDG Portfolio' : (VENUE_LABELS[key] || key);
   const title = document.getElementById('dashTitle');
@@ -7078,7 +7143,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   syncThemeToggleBtn();
   applyChartTheme();
+  restoreAppSidebarState();
   initVenuePills();
+  const venueSel = document.getElementById('venueSelect');
+  if (venueSel) venueSel.value = currentVenue;
   // Seed full YTD week list in the dropdown (payloads load on demand from Firebase).
   seedKnownWeeksIntoSelector();
   // Embedded fallback first, then prefer Firebase live weeks (DJ-style)
@@ -7087,6 +7155,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderAll();
   renderStationsBoard();
+  // If Beverage was last selected, land on Overview with cocktail cards
+  if (analysisMode === 'beverage' && currentVenue !== 'rdg_portfolio') {
+    const overviewBtn = document.querySelector('.tab-btn[onclick*="overview"]');
+    if (overviewBtn) switchTab('overview', overviewBtn);
+  }
   try {
     const loaded = await loadBohFromFirebase();
     if (loaded) {
