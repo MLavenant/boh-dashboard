@@ -784,7 +784,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <aside id="appSidebar" class="app-sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-title">BOH Dashboard</div>
-    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W42 · Built 2026-10-21T15:52:40.803Z</div>
+    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W42 · Built 2026-10-21T15:59:24.001Z</div>
   </div>
   <div class="sidebar-block">
     <label class="sidebar-label" for="venueSelect">Location</label>
@@ -2666,6 +2666,18 @@ function stationsBoardFamilies() {
   }
   return STATIONS_BOARD_FAMILIES.slice();
 }
+const BEV_TARGET_SEC = 5 * 60; // 5 min cocktail target
+function bevAvgColor(avgSec) {
+  if (!(avgSec > 0)) return '#9aa0aa';
+  return avgSec > BEV_TARGET_SEC ? '#ef4444' : '#16a34a';
+}
+function bevVsTargetLabel(avgSec) {
+  if (!(avgSec > 0)) return '—';
+  const diff = avgSec - BEV_TARGET_SEC;
+  if (diff > 0) return '+' + fmtMin(diff);
+  if (diff < 0) return fmtMin(-diff) + ' under';
+  return 'on target';
+}
 function beverageFamilyItems(stationName) {
   const d = getD();
   return (d.summary || [])
@@ -2676,7 +2688,13 @@ function beverageFamilyItems(stationName) {
       avg_sec: r.avg_sec != null ? r.avg_sec : 0,
     }))
     .filter(r => r.item)
-    .sort((a, b) => b.qty - a.qty);
+    // Highest avg first; items with no time sink to bottom
+    .sort((a, b) => {
+      const aa = a.avg_sec > 0 ? a.avg_sec : -1;
+      const bb = b.avg_sec > 0 ? b.avg_sec : -1;
+      if (bb !== aa) return bb - aa;
+      return b.qty - a.qty;
+    });
 }
 function buildBeverageFamilyCardHtml(stationName) {
   const d = getD();
@@ -2688,17 +2706,24 @@ function buildBeverageFamilyCardHtml(stationName) {
   );
   const tickets = st ? (st.count || 0) : items.reduce((s, r) => s + (r.qty || 0), 0);
   const avgLabel = avgSec > 0 ? fmtMin(avgSec) : '—';
-  let rows = items.map(r =>
-    '<tr><td>' + r.item + '</td>' +
-    '<td class="num">' + (r.qty || 0).toLocaleString() + '</td>' +
-    '<td class="num" style="font-weight:700">' + (r.avg_sec > 0 ? fmtMin(r.avg_sec) : '—') + '</td></tr>'
-  ).join('');
-  if (!rows) rows = '<tr><td colspan="3" style="color:#9aa0aa">No menu items this week</td></tr>';
+  const headColor = bevAvgColor(avgSec);
+  let rows = items.map(r => {
+    const col = bevAvgColor(r.avg_sec);
+    const avgTxt = r.avg_sec > 0 ? fmtMin(r.avg_sec) : '—';
+    const vsTxt = bevVsTargetLabel(r.avg_sec);
+    return '<tr><td>' + r.item + '</td>' +
+      '<td class="num">' + (r.qty || 0).toLocaleString() + '</td>' +
+      '<td class="num" style="font-weight:700;color:' + col + '">' + avgTxt + '</td>' +
+      '<td class="num" style="font-weight:600;color:' + col + '">' + vsTxt + '</td></tr>';
+  }).join('');
+  if (!rows) rows = '<tr><td colspan="4" style="color:#9aa0aa">No menu items this week</td></tr>';
   return '<div class="bev-family-card">' +
     '<h3>' + stationName + '</h3>' +
-    '<div class="bev-avg">' + avgLabel + '</div>' +
-    '<p class="bev-meta">Avg fulfillment · ' + tickets.toLocaleString() + ' tickets · ' + items.length + ' menu items</p>' +
-    '<table><thead><tr><th>Menu item</th><th style="text-align:right">Qty</th><th style="text-align:right">Avg</th></tr></thead>' +
+    '<div class="bev-avg" style="color:' + headColor + '">' + avgLabel + '</div>' +
+    '<p class="bev-meta">Avg fulfillment · target 5 min · ' + tickets.toLocaleString() +
+      ' tickets · ' + items.length + ' menu items · ranked slowest → fastest</p>' +
+    '<table><thead><tr><th>Menu item</th><th style="text-align:right">Qty</th>' +
+    '<th style="text-align:right">Avg</th><th style="text-align:right">vs 5 min</th></tr></thead>' +
     '<tbody>' + rows + '</tbody></table></div>';
 }
 function renderBeverageStationsBoard() {
