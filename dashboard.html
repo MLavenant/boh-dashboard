@@ -147,6 +147,14 @@ body.theme-daylight .mode-switch-hint{color:#7a6a58}
 .bev-family-card th{text-align:left;color:#6b7280;font-weight:600;padding:6px 4px;border-bottom:1px solid #2d3448;font-size:11px;text-transform:uppercase;letter-spacing:0.04em}
 .bev-family-card td{padding:8px 4px;border-bottom:1px solid #1e2533;color:#e8eaed}
 .bev-family-card td.num{text-align:right;font-variant-numeric:tabular-nums}
+.bev-family-card td.bev-vs-cell{min-width:120px;vertical-align:middle}
+.bev-vs-bar{position:relative;height:10px;background:#1e2533;border-radius:5px;overflow:visible}
+.bev-vs-wrap-lg .bev-vs-bar{height:12px}
+.bev-vs-fill{position:absolute;left:0;top:0;height:100%;border-radius:5px;min-width:2px}
+.bev-vs-tick{position:absolute;top:-3px;width:2px;height:16px;background:#e2706a;border-radius:1px;transform:translateX(-1px);z-index:2}
+.bev-vs-wrap-lg .bev-vs-tick{height:18px;top:-3px}
+body.theme-daylight .bev-vs-bar{background:#efe8dc}
+body.theme-daylight .bev-vs-tick{background:#b45309}
 .bev-family-card tr:last-child td{border-bottom:none}
 .bev-section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:14px 4px 8px;margin-top:8px;border-bottom:1px solid #2d3448}
 .bev-section-head .bev-sec-title{font-size:15px;font-weight:700;color:#e8eaed}
@@ -784,7 +792,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <aside id="appSidebar" class="app-sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-title">BOH Dashboard</div>
-    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W42 · Built 2026-10-21T15:59:24.001Z</div>
+    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W42 · Built 2026-10-21T16:04:25.275Z</div>
   </div>
   <div class="sidebar-block">
     <label class="sidebar-label" for="venueSelect">Location</label>
@@ -2671,12 +2679,23 @@ function bevAvgColor(avgSec) {
   if (!(avgSec > 0)) return '#9aa0aa';
   return avgSec > BEV_TARGET_SEC ? '#ef4444' : '#16a34a';
 }
-function bevVsTargetLabel(avgSec) {
-  if (!(avgSec > 0)) return '—';
+function bevVsTargetBarHtml(avgSec) {
+  // Bar scale: 0 → 7.5 min (1.5× target) so the 5-min tick sits at ~67%
+  const scaleMax = BEV_TARGET_SEC * 1.5;
+  if (!(avgSec > 0)) {
+    return '<div class="bev-vs-bar" title="No avg time"><span class="bev-vs-tick"></span></div>';
+  }
+  const pct = Math.min(100, (avgSec / scaleMax) * 100);
+  const tickPct = Math.min(100, (BEV_TARGET_SEC / scaleMax) * 100);
+  const col = bevAvgColor(avgSec);
   const diff = avgSec - BEV_TARGET_SEC;
-  if (diff > 0) return '+' + fmtMin(diff);
-  if (diff < 0) return fmtMin(-diff) + ' under';
-  return 'on target';
+  const tip = diff > 0
+    ? ('+' + fmtMin(diff) + ' over 5 min')
+    : (diff < 0 ? (fmtMin(-diff) + ' under 5 min') : 'on 5 min target');
+  return '<div class="bev-vs-bar" title="' + tip + '">' +
+    '<div class="bev-vs-fill" style="width:' + pct.toFixed(1) + '%;background:' + col + '"></div>' +
+    '<span class="bev-vs-tick" style="left:' + tickPct.toFixed(1) + '%"></span>' +
+    '</div>';
 }
 function beverageFamilyItems(stationName) {
   const d = getD();
@@ -2710,20 +2729,20 @@ function buildBeverageFamilyCardHtml(stationName) {
   let rows = items.map(r => {
     const col = bevAvgColor(r.avg_sec);
     const avgTxt = r.avg_sec > 0 ? fmtMin(r.avg_sec) : '—';
-    const vsTxt = bevVsTargetLabel(r.avg_sec);
     return '<tr><td>' + r.item + '</td>' +
       '<td class="num">' + (r.qty || 0).toLocaleString() + '</td>' +
       '<td class="num" style="font-weight:700;color:' + col + '">' + avgTxt + '</td>' +
-      '<td class="num" style="font-weight:600;color:' + col + '">' + vsTxt + '</td></tr>';
+      '<td class="bev-vs-cell">' + bevVsTargetBarHtml(r.avg_sec) + '</td></tr>';
   }).join('');
   if (!rows) rows = '<tr><td colspan="4" style="color:#9aa0aa">No menu items this week</td></tr>';
   return '<div class="bev-family-card">' +
     '<h3>' + stationName + '</h3>' +
     '<div class="bev-avg" style="color:' + headColor + '">' + avgLabel + '</div>' +
-    '<p class="bev-meta">Avg fulfillment · target 5 min · ' + tickets.toLocaleString() +
+    '<div style="margin:6px 0 10px" class="bev-vs-wrap-lg">' + bevVsTargetBarHtml(avgSec) + '</div>' +
+    '<p class="bev-meta">Avg fulfillment · target 5 min (tick) · ' + tickets.toLocaleString() +
       ' tickets · ' + items.length + ' menu items · ranked slowest → fastest</p>' +
     '<table><thead><tr><th>Menu item</th><th style="text-align:right">Qty</th>' +
-    '<th style="text-align:right">Avg</th><th style="text-align:right">vs 5 min</th></tr></thead>' +
+    '<th style="text-align:right">Avg</th><th style="text-align:right;min-width:120px">vs 5 min</th></tr></thead>' +
     '<tbody>' + rows + '</tbody></table></div>';
 }
 function renderBeverageStationsBoard() {
