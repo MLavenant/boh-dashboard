@@ -774,7 +774,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <aside id="appSidebar" class="app-sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-title">BOH Dashboard</div>
-    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W42 · Built 2026-10-21T14:40:48.392Z</div>
+    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W42 · Built 2026-10-21T15:25:13.289Z</div>
   </div>
   <div class="sidebar-block">
     <label class="sidebar-label" for="venueSelect">Location</label>
@@ -1242,6 +1242,13 @@ function setAnalysisMode(mode, btn) {
   }
   if (typeof stationsSelectedFamily !== 'undefined') {
     stationsSelectedFamily = analysisMode === 'beverage' ? 'All' : 'Pastry';
+  }
+  // Beverage: open Stations immediately so Special/Classic cards show
+  if (analysisMode === 'beverage' && currentVenue !== 'rdg_portfolio') {
+    const stationsBtn = document.querySelector('.tab-btn[onclick*="stations"]');
+    if (stationsBtn) switchTab('stations', stationsBtn);
+    else renderAll();
+    return;
   }
   renderAll();
 }
@@ -2608,7 +2615,7 @@ function stationsBoardFamilies() {
     const d = typeof getD === 'function' ? getD() : null;
     const fromData = (d && d.stations || [])
       .map(s => s.station)
-      .filter(s => isCocktailStation(s) && !/^bars*central/i.test(s));
+      .filter(s => isCocktailStation(s) && !/^bar\s*central/i.test(s));
     if (fromData.length) return fromData;
     return ['Special Cocktails', 'Classic Cocktails'];
   }
@@ -4845,9 +4852,79 @@ function renderStations() {
     if (t === 'all stations' || t === 'station fulfillment week-over-week') el.style.display = 'none';
   });
 }
+function renderBeverageMenuDirect() {
+  const menuStatsEl = document.getElementById('menuStats');
+  const menuBodyEl = document.getElementById('menuBody');
+  const bubbleCard = document.getElementById('menuBubbleCard');
+  const worstOffEl = document.getElementById('menuWorstOffenders');
+  const menuFilterBar = document.getElementById('menuStatusFilter');
+  const crossCard = document.getElementById('crossVenueItemSearchCard');
+  const searchEl = document.getElementById('menuSearch');
+  const sortBar = document.querySelector('#tab-menu .sort-btns');
+  if (bubbleCard) bubbleCard.style.display = 'none';
+  if (worstOffEl) { worstOffEl.style.display = 'none'; worstOffEl.innerHTML = ''; }
+  if (menuFilterBar) menuFilterBar.innerHTML = '';
+  if (crossCard) crossCard.style.display = 'none';
+  if (searchEl) searchEl.style.display = 'none';
+  if (sortBar) sortBar.style.display = 'none';
+
+  const d = getD();
+  const families = (d.stations || [])
+    .map(s => s.station)
+    .filter(s => isCocktailStation(s) && !/^bar\s*central/i.test(s));
+  const show = families.length ? families : ['Special Cocktails', 'Classic Cocktails'];
+
+  if (menuStatsEl) {
+    menuStatsEl.innerHTML = show.map(fam => {
+      const st = (d.stations || []).find(s => s.station === fam);
+      const avg = st && st.avg_sec > 0 ? fmtMin(st.avg_sec) : '—';
+      const n = st ? (st.count || 0) : 0;
+      return '<div class="menu-stat"><div class="v" style="color:#d9a441">' + avg + '</div><div class="l">' + fam + '</div></div>' +
+        '<div class="menu-stat"><div class="v">' + n.toLocaleString() + '</div><div class="l">' + fam.replace(/ Cocktails$/i, '') + ' tickets</div></div>';
+    }).join('');
+  }
+
+  const grid = '<div class="bev-family-grid">' + show.map(buildBeverageFamilyCardHtml).join('') + '</div>';
+  if (menuBodyEl) {
+    const table = menuBodyEl.closest('table');
+    if (table && table.parentElement) {
+      let host = document.getElementById('bevMenuDirectHost');
+      if (!host) {
+        host = document.createElement('div');
+        host.id = 'bevMenuDirectHost';
+        table.parentElement.insertBefore(host, table);
+      }
+      host.style.display = '';
+      host.innerHTML = '<p class="note" style="margin:0 0 14px">Special vs Classic — avg fulfillment and every menu item.</p>' + grid;
+      table.style.display = 'none';
+    } else {
+      menuBodyEl.innerHTML = '<tr><td colspan="9">' + grid + '</td></tr>';
+    }
+  }
+  window.applyMenuFilters = function() {};
+  window.setSort = function() {};
+  window.setMenuFilter = function() {};
+}
+
 function renderMenuItems() {
   const bevMode = typeof analysisMode !== 'undefined' && analysisMode === 'beverage';
   const dNow = getD();
+  const crossCard = document.getElementById('crossVenueItemSearchCard');
+  const searchEl = document.getElementById('menuSearch');
+  const bevHost = document.getElementById('bevMenuDirectHost');
+  const menuTable = document.querySelector('#tab-menu table');
+  if (!bevMode) {
+    if (crossCard) crossCard.style.display = '';
+    if (searchEl) searchEl.style.display = '';
+    const sortBarFood = document.querySelector('#tab-menu .sort-btns');
+    if (sortBarFood) sortBarFood.style.display = '';
+    if (bevHost) bevHost.style.display = 'none';
+    if (menuTable) menuTable.style.display = '';
+  }
+  if (bevMode) {
+    renderBeverageMenuDirect();
+    return;
+  }
   // Beverage: use cocktail summary from week payload (not food REF map)
   // Food: static REF assignment + live fulfillment
   const staticMap = getStaticItemMap();
@@ -4855,30 +4932,7 @@ function renderMenuItems() {
   const liveByName = getItemLiveByName();
 
   let SUMMARY;
-  if (bevMode) {
-    SUMMARY = (dNow.summary || []).map(d => ({
-      item: d.item || d.menuItem || '',
-      count: d.count != null ? d.count : (d.qty || 0),
-      avg_sec: d.avg_sec != null ? d.avg_sec : (d.avgFulSec || 0),
-      exp_sec: d.exp_sec || d.targetSec || 0,
-    })).filter(d => d.item);
-    // Fallback: cocktail-mapped items from static map with live qty
-    if (!SUMMARY.length && hasStatic) {
-      SUMMARY = Object.entries(staticMap).map(([item, info]) => {
-        const st = (info.stations || []).filter(isCocktailStation);
-        if (!st.length && !isAnalysisMenuItem(item, info.stations || [], null)) return null;
-        const live = liveByName[item] || {};
-        return {
-          item,
-          count: live.qty || 0,
-          avg_sec: live.avgFulSec || 0,
-          exp_sec: info.targetSec || 0,
-        };
-      }).filter(Boolean);
-    }
-    // Keep rows with volume or a measured time
-    SUMMARY = SUMMARY.filter(d => (d.count || 0) > 0 || (d.avg_sec || 0) > 0);
-  } else if (hasStatic) {
+  if (hasStatic) {
     SUMMARY = Object.entries(staticMap).map(([item, info]) => {
       const live = liveByName[item] || {};
       return {
