@@ -265,12 +265,31 @@ async function getForecastActuals({ venue = 'all', start, end } = {}) {
   };
 }
 
-/** Art Basel weekend (Friday–Sunday) across the Miami venues. */
+/** Art Basel. Beach Club and CN Lounge are Friday–Sunday. MILA Lounge is Tuesday–Sunday. */
+const BASEL_WEEKEND = ['2026-12-04', '2026-12-05', '2026-12-06'];
 const BASEL_TRACKER = {
   venueKeys: ['casa_neos_bc', 'mila_lounge', 'casa_neos_lounge'],
   label: 'Art Basel',
-  dates: ['2026-12-04', '2026-12-05', '2026-12-06']
+  dates: BASEL_WEEKEND,
+  venueDates: {
+    casa_neos_bc: BASEL_WEEKEND,
+    casa_neos_lounge: BASEL_WEEKEND,
+    mila_lounge: ['2026-12-01', '2026-12-02', '2026-12-03', '2026-12-04', '2026-12-05', '2026-12-06']
+  }
 };
+
+function baselDatesFor(venue) {
+  const custom = BASEL_TRACKER.venueDates && BASEL_TRACKER.venueDates[venue.key];
+  return (custom && custom.length) ? custom : BASEL_TRACKER.dates;
+}
+
+function baselUnionDates() {
+  const set = new Set();
+  for (const key of BASEL_TRACKER.venueKeys) {
+    for (const date of (BASEL_TRACKER.venueDates && BASEL_TRACKER.venueDates[key]) || BASEL_TRACKER.dates) set.add(date);
+  }
+  return [...set].sort();
+}
 
 function referrerDisplayName(user) {
   const profile = (user && user.profile) || {};
@@ -305,7 +324,7 @@ async function baselVenue(venue) {
   } catch (e) { /* names fall back to "Unknown referrer" */ }
   const nights = [];
   const refMap = new Map();
-  for (const date of BASEL_TRACKER.dates) {
+  for (const date of baselDatesFor(venue)) {
     const { bookings } = await listBookings(venue, { date });
     const keep = (bookings || []).filter(b => isCountableStatus(b.status || b.state));
     const djs = [...new Set(keep.map(b => String(b.event_name || '').trim()).filter(Boolean))];
@@ -336,9 +355,10 @@ async function baselVenue(venue) {
 }
 
 /**
- * Basel Fri–Sun sales per venue, same rule as forecast (accepted + not-completed price),
+ * Basel sales per venue, same rule as forecast (accepted + not-completed price),
  * plus a breakdown by FourVenues referrer (referral_id → user name). Top-level fields
  * are the all-venue rollup; `venues` holds each venue's own nights and referrers.
+ * MILA Lounge covers Tuesday–Sunday. Beach Club and CN Lounge stay Friday–Sunday.
  */
 async function getBaselTracker() {
   const venues = [];
@@ -354,11 +374,13 @@ async function getBaselTracker() {
   }
   if (!venues.length) throw new Error('Basel tracker: no venue could be pulled');
 
-  const nights = BASEL_TRACKER.dates.map(date => {
+  const dates = baselUnionDates();
+  const nights = dates.map(date => {
     const byVenue = {};
     let revenue = 0, bookings = 0;
     for (const v of venues) {
-      const n = v.nights.find(x => x.date === date) || { dj: 'TBD', totalRevenue: 0, bookings: 0 };
+      const n = v.nights.find(x => x.date === date);
+      if (!n) continue;
       byVenue[v.key] = { dj: n.dj, revenue: n.totalRevenue, bookings: n.bookings };
       revenue += n.totalRevenue;
       bookings += n.bookings;
@@ -390,7 +412,7 @@ async function getBaselTracker() {
     updatedAt: new Date().toISOString(),
     venue: 'All Basel venues',
     label: BASEL_TRACKER.label,
-    dates: BASEL_TRACKER.dates.slice(),
+    dates: dates,
     methodology: 'FourVenues price · accepted + not completed',
     totalRevenue: round2(venues.reduce((s, v) => s + v.totalRevenue, 0)),
     totalBookings: venues.reduce((s, v) => s + v.totalBookings, 0),
