@@ -56,7 +56,7 @@ if (!rollingWeeks.length) rollingWeeks = [{ label: 'W27', key: '2026-W27' }];
     const full = [];
     for (let n = 1; n <= latestNum; n++) {
       const key = year + '-W' + String(n).padStart(2, '0');
-      full.push({ label: 'W' + String(n).padStart(2, '0'), key });
+      full.push({ label: 'Week ' + String(n), key });
     }
     // Prefer discovered labels when present, but never drop early fiscal weeks.
     const byKey = new Map(full.map((w) => [w.key, w]));
