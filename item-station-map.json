@@ -2954,6 +2954,27 @@
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
+    },
+    "CL-Caramel Complimentary": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "pastry-complimentary"
+    },
+    "CL-Calisson Complimentary": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "pastry-complimentary"
+    },
+    "CL-Sweet Complimentary": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "pastry-complimentary"
     }
   },
   "casa_neos": {
@@ -7476,6 +7497,13 @@
       ],
       "targetSec": 0,
       "source": "toast-bulkeditor"
+    },
+    "ACG-Sweet Complimentary Pistachio Cookie": {
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": 0,
+      "source": "pastry-complimentary"
     }
   },
   "ava_wp": {
@@ -30992,10 +31020,11 @@
     },
     "MEV- Fruit Salad": {
       "stations": [
+        "Pastry",
         "Hot Expo"
       ],
       "targetSec": 0,
-      "source": "toast-bulkeditor"
+      "source": "pastry-override-mev-petite"
     },
     "MEV- Jamon Iberico (per person)": {
       "stations": [
@@ -31048,31 +31077,35 @@
     },
     "MEV- Mini Black Sesame Tart": {
       "stations": [
+        "Pastry",
         "Hot Expo"
       ],
       "targetSec": 0,
-      "source": "toast-bulkeditor"
+      "source": "pastry-override-mev-petite"
     },
     "MEV- Mini Chocolate Lava Cake": {
       "stations": [
+        "Pastry",
         "Hot Expo"
       ],
       "targetSec": 0,
-      "source": "toast-bulkeditor"
+      "source": "pastry-override-mev-petite"
     },
     "MEV- Mini Matcha Panacotta": {
       "stations": [
+        "Pastry",
         "Hot Expo"
       ],
       "targetSec": 0,
-      "source": "toast-bulkeditor"
+      "source": "pastry-override-mev-petite"
     },
     "MEV- Mini Passion Fruit Tart": {
       "stations": [
+        "Pastry",
         "Hot Expo"
       ],
       "targetSec": 0,
-      "source": "toast-bulkeditor"
+      "source": "pastry-override-mev-petite"
     },
     "MEV- Mushroom Hotpot": {
       "stations": [
@@ -31111,10 +31144,11 @@
     },
     "MEV- Petite Desserts (Station)": {
       "stations": [
+        "Pastry",
         "Hot Expo"
       ],
       "targetSec": 0,
-      "source": "toast-bulkeditor"
+      "source": "pastry-override-mev-petite"
     },
     "MEV- Raw Bar (per portion)": {
       "stations": [
@@ -31181,10 +31215,11 @@
     },
     "MEV- Selection of Macarons": {
       "stations": [
+        "Pastry",
         "Hot Expo"
       ],
       "targetSec": 0,
-      "source": "toast-bulkeditor"
+      "source": "pastry-override-mev-petite"
     },
     "MEV- Spicy Hamachi Maki (per piece)": {
       "stations": [
@@ -31216,10 +31251,11 @@
     },
     "MEV- Strawberry Cheesecake Shot Glass": {
       "stations": [
+        "Pastry",
         "Hot Expo"
       ],
       "targetSec": 0,
-      "source": "toast-bulkeditor"
+      "source": "pastry-override-mev-petite"
     },
     "MEV- Sweet Corn (per piece)": {
       "stations": [
