@@ -6393,13 +6393,76 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, opts) {
         const val = grid[day][hk][v.key];
         const heat = val != null && val > 0 ? columnRelativeHeat(val, vmin, vmax) : { bg: emptyBg, fg: emptyFg };
         const fg = val != null && val > 0 ? (dayTheme ? heat.fg : '#ffffff') : emptyFg;
-        html += '<td class="ps-ipsh-heat" style="background:'+heat.bg+';color:'+fg+';font-weight:700;padding:'+cellPad+';text-align:center;font-size:'+hourFont+';'+(vi===0?locSep:'')+'">'+(val != null ? val : '—')+'</td>';
+        const clickable = forScreen && val != null && val > 0;
+        const inner = clickable
+          ? '<button type="button" class="ps-ipsh-btn" data-vk="'+v.key+'" data-wk="'+weekKey+'" data-fam="'+family.replace(/"/g,'&quot;')+'" data-day="'+day+'" data-hk="'+hk+'" onclick="openPortfolioHourlyItemList(this)" title="'+short(v.key)+' · '+day.slice(0,3)+' · '+hourBandLabel(hk)+' — sold items" style="background:none;border:none;color:inherit;cursor:pointer;font:inherit;font-weight:700;padding:0;width:100%;height:100%;text-decoration:underline;text-underline-offset:2px">'+val+'</button>'
+          : (val != null ? val : '—');
+        html += '<td class="ps-ipsh-heat" style="background:'+heat.bg+';color:'+fg+';font-weight:700;padding:'+cellPad+';text-align:center;font-size:'+hourFont+';'+(vi===0?locSep:'')+'">'+inner+'</td>';
       });
     });
     html += '</tr>';
   });
   html += '</tbody></table></div></div>';
   return html;
+}
+
+/** Portfolio Stations heat cell → sold-item modal for that location × family × hour. */
+function openPortfolioHourlyItemList(btn) {
+  if (!btn || !btn.dataset) return;
+  const vk = btn.dataset.vk;
+  const wk = btn.dataset.wk;
+  const family = btn.dataset.fam;
+  const day = btn.dataset.day;
+  const hk = btn.dataset.hk;
+  const d = ALL_DATA[vk] && ALL_DATA[vk][wk];
+  if (!d) {
+    alert('No week data for ' + (vk || '?') + ' / ' + (wk || '?'));
+    return;
+  }
+  const hit = sumFamilyHourItems(family, day, hk, d.staffing, d.stationDetails || {}, null, d.stationHourItems || {});
+  closeHourlyItemList();
+  const events = hit.events || [];
+  const locMap = { claudie: 'CL', casaneos: 'CN', ava_cg: 'ACG', ava_wp: 'AWP', mila: 'MILA' };
+  const loc = locMap[vk] || vk;
+  const dayLabel = loc + ' · ' + day + ' · ' + hourBandLabel(hk);
+  const qty = events.reduce((a, e) => a + (e.q || 1), 0);
+  const noTarget = events.reduce((a, e) => a + (e.tgt ? 0 : (e.q || 1)), 0);
+  let body = '';
+  if (!events.length) {
+    body = '<p class="note">No menu-item listing for this hour (ticket-only / unmapped). Private Events &amp; Tasting items need prep-station routes.</p>';
+  } else {
+    body = '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="color:#9aa0aa;border-bottom:1px solid #262a33">'+
+      '<th style="text-align:left;padding:8px 6px">When</th>'+
+      '<th style="text-align:left;padding:8px 6px">Item</th>'+
+      '<th style="text-align:right;padding:8px 6px">Qty</th>'+
+      '<th style="text-align:left;padding:8px 6px">Station</th>'+
+      '<th style="text-align:left;padding:8px 6px">Table</th>'+
+      '<th style="text-align:left;padding:8px 6px">Target</th>'+
+      '</tr></thead><tbody>';
+    events.forEach(e => {
+      body += '<tr style="border-top:1px solid #262a33">' +
+        '<td style="padding:6px;white-space:nowrap;color:#9aa0aa">'+(e.t||'—')+'</td>' +
+        '<td style="padding:6px;color:#e8eaed">'+(e.n||'').replace(/</g,'&lt;')+'</td>' +
+        '<td style="padding:6px;text-align:right;font-weight:600">'+(e.q||1)+'</td>' +
+        '<td style="padding:6px;color:#9aa0aa">'+(e.station||'')+'</td>' +
+        '<td style="padding:6px;color:#9aa0aa">'+(e.table||'—')+'</td>' +
+        '<td style="padding:6px;color:'+(e.tgt?'#22c55e':'#f59e0b')+'">'+(e.tgt?'Yes':'No')+'</td>' +
+        '</tr>';
+    });
+    body += '</tbody></table>';
+  }
+  const modal = document.createElement('div');
+  modal.id = 'hourlyItemModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:24px';
+  modal.onclick = function(ev) { if (ev.target === modal) closeHourlyItemList(); };
+  modal.innerHTML = '<div style="background:#181b22;border:1px solid #2d3448;border-radius:12px;max-width:920px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.45)">'+
+    '<div style="padding:16px 18px;border-bottom:1px solid #262a33;display:flex;justify-content:space-between;gap:12px;align-items:flex-start">'+
+      '<div><div style="font-size:16px;font-weight:700;color:#e8eaed">Sold items — '+dayLabel+'</div>'+
+      '<div style="font-size:12px;color:#9aa0aa;margin-top:4px">'+family+
+      ' · '+qty+' items'+(noTarget ? ' · '+noTarget+' without target' : '')+'</div></div>'+
+      '<button type="button" onclick="closeHourlyItemList()" style="background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;padding:6px 12px;cursor:pointer">Close</button>'+
+    '</div><div style="padding:8px 14px 18px;overflow:auto">'+body+'</div></div>';
+  document.body.appendChild(modal);
 }
 
 /** PDF page after cover: Overview compare bar chart (items / staff-hour). */

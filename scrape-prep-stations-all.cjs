@@ -17,12 +17,27 @@ const SESSION_FILE = path.join(ROOT, 'toast-session.json');
 const MAP_FILE = path.join(ROOT, 'item-station-map.json');
 const BULK_URL = 'https://www.toasttab.com/advancedproperties/bulkeditor';
 
+/** Skip beverage / fee menus so Private Events + Tasting food still scrape. */
+function isNonFoodMenuName(n) {
+  const s = String(n || '');
+  if (/wine|liquor|beer|cocktail|mocktail|btg|bottle\s*service|water|coffee|tea\b|spirit|sake|champagne|corkage|docking|retail|na\s*beverage|open\s*bar|n\s*\/\s*a\s*bev/i.test(s) &&
+      !/food|dessert|tasting|event|brunch|dinner|lunch|private|discovery|prix|pf\b/i.test(s)) {
+    return true;
+  }
+  if (/deposit|gratuity|gift\s*card|table\s*fee|beo\s*deposit/i.test(s) && !/menu|food|dinner|brunch/i.test(s)) {
+    return true;
+  }
+  return false;
+}
+
 const VENUE_CONFIGS = {
   claudie: {
     mapKey: 'claudie',
     selectedSet: '500000037853698711',
     menuMatch(name) {
-      return /^(DINNER|LUNCH)$/i.test(clean(name));
+      const n = clean(name);
+      if (isNonFoodMenuName(n)) return false;
+      return /^(DINNER|LUNCH|EVENTS?)$/i.test(n) || /\bevents?\b|tasting|private|discovery|prix\s*fixe|\bpf\b/i.test(n);
     },
     confirmSample(sample) {
       return sample.some(s => /^(DINNER|LUNCH) @/i.test(s) && /claudie/i.test(s));
@@ -33,7 +48,9 @@ const VENUE_CONFIGS = {
     selectedSet: '500000056033936853',
     menuMatch(name) {
       const n = clean(name);
-      return /^food(\s+menu)?$/i.test(n) || n === 'Food';
+      if (isNonFoodMenuName(n)) return false;
+      return /^food(\s+menu)?$/i.test(n) || n === 'Food' ||
+        /\bevents?\b|tasting|private|discovery|brunch|dinner|lunch|prix\s*fixe|\bpf\b/i.test(n);
     },
     confirmSample(sample) {
       return sample.some(s => /coconut grove/i.test(s));
@@ -44,8 +61,8 @@ const VENUE_CONFIGS = {
     selectedSet: '500000013674501001',
     menuMatch(name) {
       const n = clean(name);
-      if (/wine|drink|bar|coffee|retail|reservation|n\s*\/\s*a bev/i.test(n)) return false;
-      return /dinner food menu|^dinner$|^lunch$|brunch menu/i.test(n);
+      if (isNonFoodMenuName(n)) return false;
+      return /dinner food menu|^dinner$|^lunch$|brunch menu|\bevents?\b|tasting|private|discovery|prix\s*fixe|\bpf\b/i.test(n);
     },
     confirmSample(sample) {
       return sample.some(s => /AVA MediterrAegean/i.test(s) && !/coconut/i.test(s));
@@ -56,7 +73,10 @@ const VENUE_CONFIGS = {
     selectedSet: '500000037911188149',
     menuMatch(name) {
       const n = clean(name);
-      return /^(C-FOOD|C-BRUNCH|AVA MediterrAegean Dinner Food Menu|AVA MM Dinner Menu|Brunch Menu|Dinner Food Menu)$/i.test(n);
+      if (isNonFoodMenuName(n)) return false;
+      // Include ala carte + Private Events / Tasting / Discovery / PF brunch packages
+      return /^(C-FOOD|C-BRUNCH)$/i.test(n) ||
+        /C-DESSERT|C-TASTING|PRIVATE\s*EVENT|TASTING\s*MENU|DISCOVERY|BRUNCH|DINNER\s*FOOD|FOOD\s*MENU|\bevents?\b|PF\s*BRUNCH|CASA\s*NEOS|PALMA|GENOA|ANTALYA|PAROS|CAPRI|MIRA|CARLA|PRIX\s*FIXE|\bPF\b/i.test(n);
     },
     confirmSample(sample) {
       return sample.some(s => /casa neos/i.test(s));
@@ -67,8 +87,11 @@ const VENUE_CONFIGS = {
     selectedSet: '500000000001501691',
     menuMatch(name) {
       const n = clean(name);
-      if (/wine|drink|bar|coffee|retail|reservation|n\s*\/\s*a bev|omakase|cocktail|spirit|sake|beer|tea\b/i.test(n)) return false;
-      return /dinner|lunch|brunch|food|^m-/i.test(n);
+      if (isNonFoodMenuName(n)) return false;
+      // Food + private events only — never Bar Central / wine (beverage scrape is separate)
+      if (/bar\s*central|wine\s*list|corkage|retail|reservation|table\s*fee/i.test(n)) return false;
+      if (/omakase|cocktail|spirit|sake|beer|tea\b/i.test(n) && !/food|dinner|lunch|brunch|tasting|event|private/i.test(n)) return false;
+      return /dinner|lunch|brunch|food|private\s*event|\bevents?\b|tasting|discovery|golden\s*hour|prix\s*fixe|\bpf\b|^m-(dinner|brunch|private)/i.test(n);
     },
     confirmSample(sample) {
       return sample.some(s => /mila/i.test(s));

@@ -639,12 +639,33 @@ Object.keys(stationDetails).forEach(st => {
 function stripName(s) {
   return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 }
+/** Strip venue/event package prefixes so TE-/PA-/CNPFB- items can inherit ala-carte routes. */
+function stripVenueItemPrefix(name) {
+  return String(name || '')
+    .replace(/^(CNPFB|CNSM|CMS|CIN|CLPF|CLIN|CLEV|CLEL|CLPF|CLR|CLK|CLE|CLL|CL|AVACGPFMS|AVACGPF|AVACG|AVAWP|ACG|AWP|PA|TE|GE|AN|PF|MB|MM|MEV|MG|MP|MILA|AOB|AEV|AMO|AM0|A|C|M)[-_\s]+/i, '')
+    .trim();
+}
 function lookupItemAssignment(menuItem) {
   let info = ITEM_ASSIGNMENTS[menuItem];
   if (!info) {
     const want = stripName(menuItem);
     const hit = Object.keys(ITEM_ASSIGNMENTS).find(k => stripName(k) === want);
     if (hit) info = ITEM_ASSIGNMENTS[hit];
+  }
+  if (!info) {
+    const base = stripVenueItemPrefix(menuItem);
+    if (base && stripName(base) !== stripName(menuItem)) {
+      const want = stripName(base);
+      const hit = Object.keys(ITEM_ASSIGNMENTS).find((k) => {
+        const kb = stripName(stripVenueItemPrefix(k));
+        return kb === want || stripName(k) === want;
+      });
+      if (hit) info = ITEM_ASSIGNMENTS[hit];
+    }
+  }
+  // Event / tasting dessert platters often only exist as package SKUs
+  if (!info && /dessert\s*platter|dessert\s*chefs?\s*choice|chefs?\s*choice.*dessert/i.test(String(menuItem || ''))) {
+    info = { stations: ['Pastry 1', 'Pastry', 'PASTRY', 'Pastry 2'], targetSec: 0, source: 'event-dessert-fallback' };
   }
   return info || null;
 }
@@ -707,12 +728,35 @@ const BEVERAGE_KEYWORDS = [
 ];
 function isBeverageItem(name) {
   const n = (name || '').toLowerCase();
-  return BEVERAGE_KEYWORDS.some(kw => n.includes(kw));
+  // Word-boundary for short tokens so "latte" does not match "platter"
+  return BEVERAGE_KEYWORDS.some((kw) => {
+    const k = String(kw || '').toLowerCase();
+    if (!k) return false;
+    if (k.length <= 5 || /^(tea|gin|rum|port|bud|gl |diet|wine|beer|soda|coke|rose|rosé|latte)$/i.test(k.trim())) {
+      try {
+        return new RegExp(`(?:^|[^a-z0-9])${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:[^a-z0-9]|$)`, 'i').test(n);
+      } catch (_) {
+        return n.includes(k);
+      }
+    }
+    return n.includes(k);
+  });
+}
+/** Foreign brand prefixes that must not count on another venue's Stations drill-down. */
+function isForeignBrandItem(name) {
+  const n = String(name || '').trim();
+  if (!n) return true;
+  // MILA M-/MB-/MM- SKUs showing up on Casa/Claudie/AVA (e.g. M-Special Occasion Scoop)
+  if (venueArg !== 'mila' && /^(M|MB|MM)[\s_-]/i.test(n)) return true;
+  // AVA A- SKUs on non-AVA venues (keep Casa AN- Antalya package prefix)
+  if (!/^ava_/i.test(venueArg) && /^A-/i.test(n)) return true;
+  return false;
 }
 /** Venue-specific menu noise — MILA MB-* market/banquet lines are out of BOH scope */
 function isExcludedMenuItem(name) {
   if (!name) return true;
   if (isBeverageItem(name)) return true;
+  if (isForeignBrandItem(name)) return true;
   if (venueArg === 'mila' && /^MB[\s_-]/i.test(String(name).trim())) return true;
   return false;
 }

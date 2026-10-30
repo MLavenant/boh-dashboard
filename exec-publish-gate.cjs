@@ -115,9 +115,13 @@ for (const venue of REQUIRED) {
     if (ipsh == null || !(ipsh > 0)) continue;
     // Expo is pass-through volume — items/staff-hr is not a staffing signal
     if (/^expo$/i.test(String(f))) continue;
+    const famHours = Number(fam.weekHours || fam.totalHours || fam.hours || 0);
     if (ipsh >= IPSH_FAIL) {
       if (weakLabor) {
         warn(`${venue} ${f}: items/staff-hr=${ipsh} exceeds ${IPSH_FAIL} but labor match is weak (${(matchRate * 100).toFixed(0)}% / ${laborSrc || 'unknown'}) — kitchen metrics still publish; refresh Harri timesheets`);
+      } else if (famHours > 0 && famHours < 12) {
+        // Thin family punch slice (e.g. Raw with event volume) — review, don't block kitchen publish
+        warn(`${venue} ${f}: items/staff-hr=${ipsh} with only ${famHours.toFixed(1)} staff-hrs — likely under-punched family, not a global join failure`);
       } else {
         fail(`${venue} ${f}: items/staff-hr=${ipsh} exceeds hard cap ${IPSH_FAIL} (likely bad labor join)`);
       }

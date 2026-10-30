@@ -41,16 +41,44 @@ const BEVERAGE_KEYWORDS = [
 function isFood(name) {
   return isFoodStationName(name);
 }
-function isExcludedMenuItem(name) {
+function isForeignBrandItem(name, venue) {
+  const n = String(name || '').trim();
+  if (!n) return true;
+  if (venue !== 'mila' && /^(M|MB|MM)[\s_-]/i.test(n)) return true;
+  if (!/^ava_/i.test(venue) && /^A-/i.test(n)) return true;
+  return false;
+}
+function isBeverageItemName(name) {
+  const n = String(name || '').toLowerCase();
+  return BEVERAGE_KEYWORDS.some((kw) => {
+    const k = String(kw || '').toLowerCase();
+    if (!k) return false;
+    // Avoid "latte" ⊆ "platter", "tea" ⊆ random tokens, etc.
+    if (k.length <= 5 || /^(latte|tea|gin|rum|port|wine|beer|soda|coke)$/i.test(k.trim())) {
+      try {
+        return new RegExp(`(?:^|[^a-z0-9])${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:[^a-z0-9]|$)`, 'i').test(n);
+      } catch (_) {
+        return n.includes(k);
+      }
+    }
+    return n.includes(k);
+  });
+}
+function isExcludedMenuItem(name, venue) {
   if (!name) return true;
-  const n = name.toLowerCase();
-  if (BEVERAGE_KEYWORDS.some((kw) => n.includes(kw))) return true;
-  if (/^MB[\s_-]/i.test(String(name).trim())) return true;
+  if (isBeverageItemName(name)) return true;
+  if (isForeignBrandItem(name, venue)) return true;
+  if (venue === 'mila' && /^MB[\s_-]/i.test(String(name).trim())) return true;
   if (/deposit|beo|gratuity|gift card/i.test(name)) return true;
   return false;
 }
 function stripName(s) {
   return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+function stripVenueItemPrefix(name) {
+  return String(name || '')
+    .replace(/^(CNPFB|CNSM|CMS|CIN|CLPF|CLIN|CLEV|CLEL|CLPF|CLR|CLK|CLE|CLL|CL|AVACGPFMS|AVACGPF|AVACG|AVAWP|ACG|AWP|PA|TE|GE|AN|PF|MB|MM|MEV|MG|MP|MILA|AOB|AEV|AMO|AM0|A|C|M)[-_\s]+/i, '')
+    .trim();
 }
 function parseDate(str) {
   if (!str) return null;
@@ -155,13 +183,31 @@ async function fetchItemDetails(venueKey) {
   throw new Error('item-details timed out');
 }
 
-function resolveAssignedStation(menuItem, assignments, stationKeys) {
+function lookupAssignment(menuItem, assignments) {
   let info = assignments[menuItem];
   if (!info) {
     const want = stripName(menuItem);
     const hit = Object.keys(assignments).find((k) => stripName(k) === want);
     if (hit) info = assignments[hit];
   }
+  if (!info) {
+    const base = stripVenueItemPrefix(menuItem);
+    if (base && stripName(base) !== stripName(menuItem)) {
+      const want = stripName(base);
+      const hit = Object.keys(assignments).find((k) => {
+        const kb = stripName(stripVenueItemPrefix(k));
+        return kb === want || stripName(k) === want;
+      });
+      if (hit) info = assignments[hit];
+    }
+  }
+  if (!info && /dessert\s*platter|dessert\s*chefs?\s*choice|chefs?\s*choice.*dessert/i.test(String(menuItem || ''))) {
+    info = { stations: ['Pastry 1', 'Pastry', 'PASTRY', 'Pastry 2'], targetSec: 0, source: 'event-dessert-fallback' };
+  }
+  return info || null;
+}
+function resolveAssignedStation(menuItem, assignments, stationKeys) {
+  let info = lookupAssignment(menuItem, assignments);
   if (!info || !Array.isArray(info.stations)) return null;
   const ranked = info.stations.filter((st) => st && isFood(st) && !/no\s*print/i.test(st));
   const cookFirst = ranked.find((st) => !/expo|pass/i.test(st));
@@ -182,12 +228,12 @@ function resolveAssignedStation(menuItem, assignments, stationKeys) {
   return best;
 }
 
-function buildStationHourItems(items, assignments, stationKeys) {
+function buildStationHourItems(items, assignments, stationKeys, venue) {
   const out = {}; // station -> day -> hour -> events[]
   let kept = 0;
   let skipped = 0;
   items.forEach((item) => {
-    if (!item.menuItem || isExcludedMenuItem(item.menuItem)) {
+    if (!item.menuItem || isExcludedMenuItem(item.menuItem, venue)) {
       skipped += item.qty || 1;
       return;
     }
@@ -205,7 +251,7 @@ function buildStationHourItems(items, assignments, stationKeys) {
     const hr = fired.getHours();
     const hrKey = `${hr}-${hr + 1}`;
     const qty = item.qty || 1;
-    const info = assignments[item.menuItem] || assignments[Object.keys(assignments).find((k) => stripName(k) === stripName(item.menuItem))] || {};
+    const info = lookupAssignment(item.menuItem, assignments) || {};
     const hasTarget = !!(info && info.targetSec > 0);
     if (!out[station]) out[station] = {};
     if (!out[station][day]) out[station][day] = {};
@@ -278,7 +324,7 @@ async function main() {
   const allMap = JSON.parse(fs.readFileSync(MAP_FILE, 'utf8'));
   const assignments = allMap[VENUE_MAP_KEY[venue] || venue] || {};
 
-  const { out, kept, skipped } = buildStationHourItems(items, assignments, stationKeys);
+  const { out, kept, skipped } = buildStationHourItems(items, assignments, stationKeys, venue);
   patchItemQty(week.stationDetails, out);
   week.stationHourItems = out;
   week.stationHourItemsMeta = {
