@@ -800,7 +800,7 @@ body.printing-portfolio #portfolioPrintRoot .portfolio-print-empty { display:non
 <aside id="appSidebar" class="app-sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-title">BOH Dashboard</div>
-    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W43 · Built 2026-10-30T20:35:01.938Z</div>
+    <div class="sidebar-brand-sub" id="dashBadge">Latest 2026-W43 · Built 2026-10-30T21:35:37.718Z</div>
   </div>
   <div class="sidebar-block">
     <label class="sidebar-label" for="venueSelect">Location</label>
@@ -3219,7 +3219,7 @@ function renderStationsBoard() {
       if (ratioHtml) {
         html += '<div style="margin:28px 0 10px;padding-top:18px;border-top:1px solid #2d3448">'+
           '<h3 style="margin:0 0 6px;font-size:16px;color:#d9a441">Ratio Fulfillment · Pastry</h3>'+
-          '<p class="note" style="margin:0 0 12px">Same hour × day × location grid. Cell = <strong>(week avg fulfillment min) × (items in hour) ÷ 60</strong> — station-hours of work (typically ~0–3).</p>'+
+          '<p class="note" style="margin:0 0 12px">Same hour × day × location grid. Cell = <strong>(week avg fulfillment min) × (items in hour) ÷ 60</strong>. Color: <span style="color:#16a34a">green &lt;1</span> · <span style="color:#eab308">yellow ~1</span> · <span style="color:#ef4444">red &gt;1</span>.</p>'+
           ratioHtml + '</div>';
       }
     }
@@ -3336,6 +3336,31 @@ function columnRelativeHeat(val, colMin, colMax) {
   const bg = t <= 0.5
     ? lerpColor(day ? '#3d9a5f' : '#22c55e', day ? '#d4a017' : '#eab308', t / 0.5)
     : lerpColor(day ? '#d4a017' : '#eab308', day ? '#c44b3f' : '#ef4444', (t - 0.5) / 0.5);
+  return { bg, fg: textFor(bg) };
+}
+
+/** Ratio Fulfillment heat: <1 green · ~1 yellow/orange · >1 red (pivot at 1.0). */
+function fulRatioHeat(val) {
+  const day = typeof isDaylightTheme === 'function' && isDaylightTheme();
+  const emptyBg = day ? '#f7f1e7' : '#13161c';
+  const emptyFg = day ? '#b5a48f' : '#4b5563';
+  const n = Number(val);
+  if (!Number.isFinite(n) || n < 0) return { bg: emptyBg, fg: emptyFg };
+  const green = day ? '#3d9a5f' : '#16a34a';
+  const yellow = day ? '#d4a017' : '#eab308';
+  const orange = day ? '#d97706' : '#f59e0b';
+  const red = day ? '#c44b3f' : '#ef4444';
+  let bg;
+  if (n < 1) {
+    // 0 → green, 1 → yellow
+    bg = lerpColor(green, yellow, Math.max(0, Math.min(1, n)));
+  } else if (n <= 1.15) {
+    // close to 1 → yellow → orange
+    bg = lerpColor(yellow, orange, (n - 1) / 0.15);
+  } else {
+    // >1 → orange → red (full red by ~2.0)
+    bg = lerpColor(orange, red, Math.max(0, Math.min(1, (n - 1.15) / 0.85)));
+  }
   return { bg, fg: textFor(bg) };
 }
 
@@ -6235,7 +6260,6 @@ function buildFamilyAllLocationsFulRatioCompareHtml(family, weekKey, venues, opt
   });
 
   const grid = {};
-  const allVals = [];
   const locCellSums = {};
   const locCellNs = {};
   let any = false;
@@ -6255,7 +6279,6 @@ function buildFamilyAllLocationsFulRatioCompareHtml(family, weekKey, venues, opt
         const ratio = Math.round((fulMin * items / 60) * 10) / 10;
         grid[day][hk][v.key] = ratio;
         any = true;
-        allVals.push(ratio);
         locCellSums[v.key] += ratio;
         locCellNs[v.key] += 1;
       });
@@ -6263,8 +6286,6 @@ function buildFamilyAllLocationsFulRatioCompareHtml(family, weekKey, venues, opt
   });
   if (!any) return '';
 
-  const vmin = allVals.length ? Math.min(...allVals) : 0;
-  const vmax = allVals.length ? Math.max(...allVals) : 0;
   const nLoc = venues.length;
   const locSep = dayTheme ? 'border-left:2px solid #d9cbb6;' : 'border-left:2px solid #3d4458;';
   const dayHeadBg = dayTheme ? '#efe8dc' : '#1e2533';
@@ -6312,7 +6333,8 @@ function buildFamilyAllLocationsFulRatioCompareHtml(family, weekKey, venues, opt
       venues.forEach((v, vi) => {
         const a = locAvgs.find(x => x.key === v.key);
         const val = a && a.ratio != null ? a.ratio : null;
-        avgRow += '<td style="background:'+avgBg+';color:'+avgFg+';font-weight:800;padding:'+cellPad+';text-align:center;font-size:'+locFont+';border-bottom:2px solid '+avgBorder+';'+(vi===0?locSep:'')+'">'+(val != null ? val : '—')+'</td>';
+        const heat = val != null ? fulRatioHeat(val) : { bg: avgBg, fg: avgFg };
+        avgRow += '<td style="background:'+heat.bg+';color:'+(val != null ? '#ffffff' : avgFg)+';font-weight:800;padding:'+cellPad+';text-align:center;font-size:'+locFont+';border-bottom:2px solid '+avgBorder+';'+(vi===0?locSep:'')+'">'+(val != null ? val : '—')+'</td>';
       });
     });
     avgRow += '</tr>';
@@ -6342,8 +6364,8 @@ function buildFamilyAllLocationsFulRatioCompareHtml(family, weekKey, venues, opt
     HOURLY_DAYS.forEach(day => {
       venues.forEach((v, vi) => {
         const val = grid[day][hk][v.key];
-        const heat = val != null && val > 0 ? columnRelativeHeat(val, vmin, vmax) : { bg: emptyBg, fg: emptyFg };
-        const fg = val != null && val > 0 ? (dayTheme ? heat.fg : '#ffffff') : emptyFg;
+        const heat = val != null ? fulRatioHeat(val) : { bg: emptyBg, fg: emptyFg };
+        const fg = val != null ? '#ffffff' : emptyFg;
         const clickable = forScreen && val != null && val > 0;
         const disp = val != null ? (Number.isInteger(val) ? String(val) : val.toFixed(1)) : '—';
         const inner = clickable
