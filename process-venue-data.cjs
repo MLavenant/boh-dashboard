@@ -771,7 +771,9 @@ function isBeverageItem(name) {
 function isForeignBrandItem(name) {
   const n = String(name || '').trim();
   if (!n) return true;
-  // MILA M-/MB-/MM- SKUs showing up on Casa/Claudie/AVA (e.g. M-Special Occasion Scoop)
+  // Casa Neos legitimately sells this dessert SKU under C-DESSERT (Toast name keeps M- prefix)
+  if (venueArg === 'casa_neos' && /^M-Special Occasion Scoop$/i.test(n)) return false;
+  // MILA M-/MB-/MM- SKUs showing up on Casa/Claudie/AVA
   if (venueArg !== 'mila' && /^(M|MB|MM)[\s_-]/i.test(n)) return true;
   // AVA A- SKUs on non-AVA venues (keep Casa AN- Antalya package prefix)
   if (!/^ava_/i.test(venueArg) && /^A-/i.test(n)) return true;

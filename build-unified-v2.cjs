@@ -21,9 +21,9 @@ let rollingWeeks = [];
 try {
   const rolling = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'rolling.json'), 'utf8'));
   rollingWeeks = (rolling.weeks || []).map((w, i) => {
-    // weekLabel is like "2026-W27" → show as "W27"
+    // weekLabel is like "2026-W27" → show as "Week 27" (clickable dropdown)
     const isoMatch = w.weekLabel && w.weekLabel.match(/W(\d+)$/);
-    const shortLabel = isoMatch ? 'W' + isoMatch[1] : ('Week ' + (i + 1));
+    const shortLabel = isoMatch ? ('Week ' + String(parseInt(isoMatch[1], 10))) : ('Week ' + (i + 1));
     return { label: shortLabel, key: w.weekLabel };
   });
   // Sort chronologically so the latest week is always last (index = length-1)
@@ -41,7 +41,7 @@ try {
   }
   rollingWeeks = [...foundWeeks]
     .sort()
-    .map((key) => ({ label: 'W' + key.slice(-2), key }));
+    .map((key) => ({ label: 'Week ' + String(parseInt(key.slice(-2), 10)), key }));
 }
 if (!rollingWeeks.length) rollingWeeks = [{ label: 'W27', key: '2026-W27' }];
 
@@ -282,7 +282,11 @@ let html = htmlPart
 <div class="card stations-da-card" id="itemsPerStaffCard" style="margin:0 0 18px">
   <div class="stations-da-head">
     <div>
-      <div class="stations-da-kicker" id="stationsDaKicker">This week</div>
+      <div class="stations-da-kicker" id="stationsDaKicker">
+        <label class="stations-week-picker-label" for="stationsWeekSelect">Week</label>
+        <select id="stationsWeekSelect" class="stations-week-select" onchange="selectWeek(this.value)" title="Select week"></select>
+        <span id="stationsDaKickerLoc" class="stations-da-kicker-loc"></span>
+      </div>
       <h2 class="stations-da-title" id="stationsDaTitle">Stations</h2>
     </div>
     <button type="button" id="portfolioStationsPdfBtn" onclick="exportPortfolioStationsPdf()" class="stations-da-pdf" style="display:none">Export PDF</button>
@@ -719,9 +723,17 @@ body.theme-daylight .sidebar-select option{color:#2c241c;background:#fff}
 .sidebar-label{display:block;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#6b7280;margin:0 0 8px}
 .sidebar-select{width:100%;padding:8px 10px;background:#1e2533;border:1px solid #2d3448;color:#e8eaed;border-radius:8px;font:13px/1.3 inherit;cursor:pointer}
 .sidebar-week{display:flex;align-items:center;gap:6px}
-.sidebar-week-select{flex:1}
+.sidebar-week-select{flex:1;appearance:auto;-webkit-appearance:menulist;cursor:pointer}
 .sidebar-week-btn{flex:0 0 auto;background:#1e2533;border:1px solid #2d3448;color:#9aa0aa;border-radius:6px;padding:7px 10px;cursor:pointer;font:13px inherit}
 .sidebar-week-btn:hover{border-color:#d9a441;color:#e8eaed}
+.stations-da-kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;font-size:12px;color:#9aa0aa}
+.stations-week-picker-label{font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#6b7280}
+.stations-week-select{min-width:118px;padding:6px 10px;background:#1e2533;border:1px solid #d9a441;color:#f5e6c8;border-radius:8px;font:700 13px/1.2 inherit;cursor:pointer;appearance:auto;-webkit-appearance:menulist}
+.stations-week-select:focus{outline:2px solid rgba(217,164,65,0.45);outline-offset:1px}
+.stations-da-kicker-loc{color:#9aa0aa}
+body.theme-daylight .stations-week-select{background:#fff;border-color:#b8860b;color:#3f2a1d}
+body.theme-daylight .stations-week-picker-label{color:#8a7a68}
+body.theme-daylight .stations-da-kicker-loc{color:#7a6a58}
 .sidebar-venue-pills{display:none}
 .mode-switch{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:0;padding:3px;background:#1e2533;border:1px solid #3d4458;border-radius:999px;overflow:hidden}
 .mode-switch-thumb{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);background:linear-gradient(135deg,#e2b65a 0%,#d9a441 100%);border-radius:999px;transition:transform 0.32s cubic-bezier(0.22,1,0.36,1);z-index:0;box-shadow:0 2px 10px rgba(217,164,65,0.28)}
@@ -786,7 +798,7 @@ body.theme-daylight .bev-section-head .bev-sec-avg{color:#5a3d28}
 /* Stations DA board */
 .stations-da-card{padding:22px 22px 18px!important}
 .stations-da-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
-.stations-da-kicker{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#9aa0aa;margin-bottom:4px}
+.stations-da-kicker{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;font-size:12px;font-weight:600;letter-spacing:0.02em;text-transform:none;color:#9aa0aa;margin-bottom:4px}
 .stations-da-title{margin:0;font-size:28px;line-height:1.15;font-weight:700;color:#e8eaed}
 .stations-da-pdf{padding:8px 14px;border-radius:999px;border:1px solid #3d4458;background:#1e2533;color:#e8eaed;cursor:pointer;font:600 12px inherit}
 .stations-da-filters{margin:0 0 16px;padding:14px 16px;background:#13161c;border:1px solid #262a33;border-radius:14px}
@@ -1541,11 +1553,13 @@ function restoreAppSidebarState() {
 }
 
 function refreshWeekDropdown() {
-  const dd = document.getElementById('weekDropdown');
-  if (!dd) return;
-  dd.innerHTML = WEEKS.map((w, i) =>
+  const opts = WEEKS.map((w, i) =>
     '<option value="' + i + '"' + (i === currentWeekIdx ? ' selected' : '') + '>' + w.label + '</option>'
   ).join('');
+  const dd = document.getElementById('weekDropdown');
+  if (dd) dd.innerHTML = opts;
+  const stationsDd = document.getElementById('stationsWeekSelect');
+  if (stationsDd) stationsDd.innerHTML = opts;
   const wpBtn = document.getElementById('weekPrev');
   const wnBtn = document.getElementById('weekNext');
   if (wpBtn) wpBtn.disabled = currentWeekIdx === 0;
@@ -1703,8 +1717,8 @@ function getD() {
 
 function weekShortLabel(weekKey) {
   const s = String(weekKey || '');
-  const i = s.lastIndexOf('W');
-  return i >= 0 ? s.slice(i) : s;
+  const m = s.match(/W(\d+)$/i);
+  return m ? ('Week ' + String(parseInt(m[1], 10))) : s;
 }
 
 function ensureWeekInList(weekKey) {
@@ -3000,10 +3014,11 @@ function renderBeverageStationsBoard() {
 
   const weekKey = WEEKS[currentWeekIdx]?.key;
   const weekLabel = WEEKS[currentWeekIdx]?.label || (weekKey ? weekKey.replace('2026-', '') : '—');
-  const kicker = document.getElementById('stationsDaKicker');
+  const kickerLoc = document.getElementById('stationsDaKickerLoc');
   const title = document.getElementById('stationsDaTitle');
   const venueLabelsBev = ${JSON.stringify(VENUE_LABELS)};
-  if (kicker) kicker.textContent = weekLabel + ' · ' + (venueLabelsBev[currentVenue] || currentVenue) + ' cocktails';
+  refreshWeekDropdown();
+  if (kickerLoc) kickerLoc.textContent = '· ' + (venueLabelsBev[currentVenue] || currentVenue) + ' cocktails';
   if (title) title.textContent = 'Special & Classic Cocktails';
 
   const families = stationsBoardFamilies();
@@ -3381,7 +3396,7 @@ function renderStationsBoard() {
 
   const weekKey = WEEKS[currentWeekIdx]?.key;
   const weekLabel = WEEKS[currentWeekIdx]?.label || (weekKey ? weekKey.replace('2026-', '') : '—');
-  const kicker = document.getElementById('stationsDaKicker');
+  const kickerLoc = document.getElementById('stationsDaKickerLoc');
   const title = document.getElementById('stationsDaTitle');
   const portfolio = currentVenue === 'rdg_portfolio';
   const labels = ${JSON.stringify(VENUE_LABELS)};
@@ -3391,7 +3406,8 @@ function renderStationsBoard() {
     stationsSelectedFamily = allFamilies.includes('Pastry') ? 'Pastry' : (allFamilies[0] || 'Saute');
   }
 
-  if (kicker) kicker.textContent = weekLabel + ' · ' + (portfolio ? 'All locations' : venueLabel);
+  refreshWeekDropdown();
+  if (kickerLoc) kickerLoc.textContent = '· ' + (portfolio ? 'All locations' : venueLabel);
   if (title) title.textContent = portfolio ? 'Overview' : 'Stations';
   if (metricBar) metricBar.style.display = 'none';
   if (pdfBtn) pdfBtn.style.display = portfolio ? '' : 'none';
@@ -3429,6 +3445,20 @@ function renderStationsBoard() {
     }
     let html = '<p class="note stations-compare-note" style="margin:0 0 14px"><strong>'+family+'</strong> · hours ↓ · days → · locations under each day (CL · CN · ACG · AWP · MILA). Values = items / staff-hour.</p>';
     html += compare || '<p class="note">No hour×day items/staff-hr for '+family+' this week.</p>';
+    if (/^pastry$/i.test(family)) {
+      let ratioHtml = '';
+      try {
+        ratioHtml = buildFamilyAllLocationsFulRatioCompareHtml(family, weekKey, venues, { forScreen: true, showAvg: true }) || '';
+      } catch (err) {
+        console.error('buildFamilyAllLocationsFulRatioCompareHtml failed', err);
+      }
+      if (ratioHtml) {
+        html += '<div style="margin:28px 0 10px;padding-top:18px;border-top:1px solid #2d3448">'+
+          '<h3 style="margin:0 0 6px;font-size:16px;color:#d9a441">Ratio Fulfillment · Pastry</h3>'+
+          '<p class="note" style="margin:0 0 12px">Same hour × day × location grid. Cell = <strong>(week avg fulfillment min) × (items in hour) ÷ 60</strong> — station-hours of work (typically ~0–3).</p>'+
+          ratioHtml + '</div>';
+      }
+    }
     tableEl.innerHTML = html;
     return;
   }
@@ -3889,7 +3919,8 @@ function sumFamilyHourItems(family, day, hourKey, staffing, stationDetails, stat
   const events = [];
   stations.forEach(st => {
     const cell = stationDetails?.[st]?.byDayHour?.[day]?.[hourKey];
-    const hourEvents = stationHourItems?.[st]?.[day]?.[hourKey] || [];
+    let hourEvents = stationHourItems?.[st]?.[day]?.[hourKey] || [];
+    if (!Array.isArray(hourEvents)) hourEvents = hourEvents.events || [];
     if (hourEvents.length) {
       hourEvents.forEach(e => {
         events.push(Object.assign({ station: st, day }, e));
@@ -6406,6 +6437,163 @@ function buildFamilyAllLocationsIpshCompareHtml(family, weekKey, venues, opts) {
   return html;
 }
 
+/**
+ * Ratio Fulfillment: same hour × day × location grid as IPSH.
+ * Cell = (week avg fulfillment minutes for the station family) × (items in that hour) ÷ 60
+ * → station-hours of work (typically ~0–3). Pastry-only on the Stations board / PDF.
+ */
+function buildFamilyAllLocationsFulRatioCompareHtml(family, weekKey, venues, opts) {
+  if (!venues || !venues.length) return '';
+  opts = opts || {};
+  const forScreen = !!opts.forScreen;
+  const forPrint = !!opts.forPrint;
+  const showAvg = !!opts.showAvg;
+  const large = !!opts.large || forPrint;
+  const dayTheme = forScreen && typeof isDaylightTheme === 'function' && isDaylightTheme();
+  const labels = ${JSON.stringify(VENUE_LABELS)};
+  const short = (k) => {
+    const l = labels[k] || k;
+    if (k === 'claudie' || l === 'Claudie') return 'CL';
+    if (k === 'casaneos' || l === 'Casa Neos') return 'CN';
+    if (k === 'ava_cg' || l === 'AVA Coconut Grove') return 'ACG';
+    if (k === 'ava_wp' || l === 'AVA Winter Park') return 'AWP';
+    if (k === 'mila' || l === 'MILA') return 'MILA';
+    return l.slice(0, 4);
+  };
+
+  const fulMinByVenue = {};
+  venues.forEach(v => {
+    const fam = ALL_DATA[v.key] && ALL_DATA[v.key][weekKey] && ALL_DATA[v.key][weekKey].staffing
+      && ALL_DATA[v.key][weekKey].staffing.byFamily
+      && ALL_DATA[v.key][weekKey].staffing.byFamily[family];
+    const sec = fam && fam.weekAvgFulSec != null ? Number(fam.weekAvgFulSec) : null;
+    fulMinByVenue[v.key] = (sec != null && sec > 0) ? (sec / 60) : null;
+  });
+
+  const grid = {};
+  const allVals = [];
+  const locCellSums = {};
+  const locCellNs = {};
+  let any = false;
+  venues.forEach(v => { locCellSums[v.key] = 0; locCellNs[v.key] = 0; });
+  HOURLY_DAYS.forEach(day => {
+    grid[day] = {};
+    HOURLY_BAND.forEach(hk => {
+      grid[day][hk] = {};
+      venues.forEach(v => {
+        const d = ALL_DATA[v.key] && ALL_DATA[v.key][weekKey];
+        if (!d) { grid[day][hk][v.key] = null; return; }
+        const fulMin = fulMinByVenue[v.key];
+        if (fulMin == null || !(fulMin > 0)) { grid[day][hk][v.key] = null; return; }
+        const bucket = sumFamilyHourItems(family, day, hk, d.staffing, d.stationDetails || {}, null, d.stationHourItems || {});
+        const items = bucket.items || 0;
+        if (!(items > 0)) { grid[day][hk][v.key] = null; return; }
+        const ratio = Math.round((fulMin * items / 60) * 10) / 10;
+        grid[day][hk][v.key] = ratio;
+        any = true;
+        allVals.push(ratio);
+        locCellSums[v.key] += ratio;
+        locCellNs[v.key] += 1;
+      });
+    });
+  });
+  if (!any) return '';
+
+  const vmin = allVals.length ? Math.min(...allVals) : 0;
+  const vmax = allVals.length ? Math.max(...allVals) : 0;
+  const nLoc = venues.length;
+  const locSep = dayTheme ? 'border-left:2px solid #d9cbb6;' : 'border-left:2px solid #3d4458;';
+  const dayHeadBg = dayTheme ? '#efe8dc' : '#1e2533';
+  const dayHeadFg = dayTheme ? '#2c241c' : '#ffffff';
+  const locHeadBg = dayTheme ? '#f7f1e7' : '#13161c';
+  const locHeadFg = dayTheme ? '#7a6a58' : '#9aa0aa';
+  const emptyBg = dayTheme ? '#f7f1e7' : '#13161c';
+  const emptyFg = dayTheme ? '#b5a48f' : '#4b5563';
+  const hourFg = dayTheme ? '#7a6a58' : '#9aa0aa';
+  const hourBg = dayTheme ? '#fffdf8' : 'transparent';
+  const cellPad = large ? '7px 5px' : '4px 3px';
+  const hourFont = large ? '13px' : '12px';
+  const locFont = large ? '11px' : '10px';
+
+  let avgRow = '';
+  let avgCaption = '';
+  if (showAvg) {
+    const locAvgs = venues.map(v => {
+      const fulMin = fulMinByVenue[v.key];
+      const n = locCellNs[v.key] || 0;
+      const ratio = n > 0 ? Math.round((locCellSums[v.key] / n) * 10) / 10 : null;
+      return {
+        key: v.key,
+        label: short(v.key),
+        fulMin: fulMin != null ? Math.round(fulMin * 10) / 10 : null,
+        ratio,
+      };
+    });
+    const overallN = locAvgs.reduce((a, x) => a + (locCellNs[x.key] || 0), 0);
+    const overallSum = locAvgs.reduce((a, x) => a + (locCellSums[x.key] || 0), 0);
+    const overall = overallN > 0 ? Math.round((overallSum / overallN) * 10) / 10 : null;
+    const avgBg = dayTheme ? '#f7f1e7' : '#1a1408';
+    const avgBorder = '#d9a441';
+    const avgFg = dayTheme ? '#2c241c' : '#f5e6c8';
+    const avgMuted = dayTheme ? '#7a6a58' : '#9aa0aa';
+    avgCaption = '<div class="ps-avg-caption" style="margin:0 0 8px;padding:8px 12px;border:1px solid '+avgBorder+';border-radius:8px;background:'+avgBg+';font-size:12px;line-height:1.4;color:'+avgFg+'">'+
+      '<strong style="color:'+avgBorder+'">Ratio Fulfillment</strong>'+
+      '<span style="color:'+avgMuted+'"> (week) — avg ful min × hour items ÷ 60</span>'+
+      '<span style="margin-left:10px;font-weight:800">RDG '+(overall != null ? overall : '—')+'</span>'+
+      locAvgs.map(a => ' · <strong>'+a.label+'</strong> '+(a.ratio != null ? a.ratio : '—')+
+        (a.fulMin != null ? ' <span style="color:'+avgMuted+';font-weight:500">('+a.fulMin+'m)</span>' : '')).join('')+
+      '</div>';
+    avgRow = '<tr class="ps-avg-row"><td style="text-align:left;white-space:nowrap;font-weight:700;color:'+avgBorder+';background:'+avgBg+';padding:'+cellPad+';font-size:'+locFont+';border-bottom:2px solid '+avgBorder+'">Week AVG</td>';
+    HOURLY_DAYS.forEach(() => {
+      venues.forEach((v, vi) => {
+        const a = locAvgs.find(x => x.key === v.key);
+        const val = a && a.ratio != null ? a.ratio : null;
+        avgRow += '<td style="background:'+avgBg+';color:'+avgFg+';font-weight:800;padding:'+cellPad+';text-align:center;font-size:'+locFont+';border-bottom:2px solid '+avgBorder+';'+(vi===0?locSep:'')+'">'+(val != null ? val : '—')+'</td>';
+      });
+    });
+    avgRow += '</tr>';
+  }
+
+  let html = '<div class="'+(forScreen ? 'ps-screen-compare' : 'ps-hourly-block')+(large ? ' ps-hourly-print-large' : '')+'">'+
+    (forScreen ? '' : '<h2 style="display:none">'+family+' · Ratio Fulfillment</h2>')+
+    avgCaption+
+    '<div style="overflow-x:auto"><table class="ps-v2-compare" style="font-size:'+hourFont+'"><thead>'+
+    '<tr><th rowspan="2" style="vertical-align:bottom;text-align:left;background:'+dayHeadBg+';color:'+hourFg+';padding:'+cellPad+';font-size:'+hourFont+'">Hour</th>';
+  HOURLY_DAYS.forEach(day => {
+    html += '<th colspan="'+nLoc+'" style="text-align:center;'+locSep+'background:'+dayHeadBg+';color:'+dayHeadFg+';font-weight:700;padding:'+cellPad+'">'+day.slice(0,3)+'</th>';
+  });
+  html += '</tr><tr>';
+  HOURLY_DAYS.forEach(() => {
+    venues.forEach((v, vi) => {
+      html += '<th style="text-align:center;font-size:'+locFont+';color:'+locHeadFg+';background:'+locHeadBg+';padding:3px 2px;'+(vi===0?locSep:'')+'">'+short(v.key)+'</th>';
+    });
+  });
+  html += '</tr></thead><tbody>';
+  html += avgRow;
+
+  HOURLY_BAND.forEach(hk => {
+    const has = HOURLY_DAYS.some(day => venues.some(v => grid[day][hk][v.key] != null));
+    if (!has) return;
+    html += '<tr><td style="text-align:left;white-space:nowrap;font-weight:600;color:'+hourFg+';background:'+hourBg+';padding:'+cellPad+';font-size:'+hourFont+'">'+hourBandLabel(hk)+'</td>';
+    HOURLY_DAYS.forEach(day => {
+      venues.forEach((v, vi) => {
+        const val = grid[day][hk][v.key];
+        const heat = val != null && val > 0 ? columnRelativeHeat(val, vmin, vmax) : { bg: emptyBg, fg: emptyFg };
+        const fg = val != null && val > 0 ? (dayTheme ? heat.fg : '#ffffff') : emptyFg;
+        const clickable = forScreen && val != null && val > 0;
+        const disp = val != null ? (Number.isInteger(val) ? String(val) : val.toFixed(1)) : '—';
+        const inner = clickable
+          ? '<button type="button" class="ps-ipsh-btn" data-vk="'+v.key+'" data-wk="'+weekKey+'" data-fam="'+family.replace(/"/g,'&quot;')+'" data-day="'+day+'" data-hk="'+hk+'" onclick="openPortfolioHourlyItemList(this)" title="'+short(v.key)+' · '+day.slice(0,3)+' · '+hourBandLabel(hk)+' — sold items" style="background:none;border:none;color:inherit;cursor:pointer;font:inherit;font-weight:700;padding:0;width:100%;height:100%;text-decoration:underline;text-underline-offset:2px">'+disp+'</button>'
+          : disp;
+        html += '<td class="ps-ipsh-heat" style="background:'+heat.bg+';color:'+fg+';font-weight:700;padding:'+cellPad+';text-align:center;font-size:'+hourFont+';'+(vi===0?locSep:'')+'">'+inner+'</td>';
+      });
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div></div>';
+  return html;
+}
+
 /** Portfolio Stations heat cell → sold-item modal for that location × family × hour. */
 function openPortfolioHourlyItemList(btn) {
   if (!btn || !btn.dataset) return;
@@ -6622,6 +6810,26 @@ function buildStationsPdfFamilyHourPageHtml(family, weekKey, weekLabel) {
     '</div>';
 }
 
+/** Pastry-only PDF: Ratio Fulfillment hour × day × location (page break). */
+function buildStationsPdfFamilyFulRatioPageHtml(family, weekKey, weekLabel) {
+  if (!/^pastry$/i.test(family)) return '';
+  const allVenues = PORTFOLIO_VENUE_KEYS.map(k => ({ key: k, label: (${JSON.stringify(VENUE_LABELS)})[k] || k }));
+  const table = buildFamilyAllLocationsFulRatioCompareHtml(family, weekKey, allVenues, {
+    forScreen: false,
+    forPrint: true,
+    showAvg: true,
+    large: true,
+  });
+  if (!table) return '';
+  const stationMap = buildFamilyStationsMapHtml(family, weekKey);
+  return '<div class="ps-print-page ps-hourly ps-hourly-large ps-ful-ratio">'+
+    '<h1>RATIO FULFILLMENT · '+String(family).toUpperCase()+'</h1>'+
+    '<p class="ps-sub">'+weekLabel+' · (week avg ful min) × (hour items) ÷ 60 · hours ↓ · days → · locations</p>'+
+    stationMap+
+    table+
+    '</div>';
+}
+
 function runStationsPdfPrint(printRoot, html) {
   printRoot.innerHTML = html;
   const cleanup = () => {
@@ -6691,7 +6899,14 @@ function exportPortfolioStationsPdf() {
     const detailPages = families.map(f => {
       const hourPage = buildStationsPdfFamilyHourPageHtml(f, weekKey, weekLabel);
       if (!hourPage) return '';
-      return buildStationDividerPageHtml(f) + hourPage;
+      let block = buildStationDividerPageHtml(f) + hourPage;
+      if (/^pastry$/i.test(f)) {
+        const ratioPage = buildStationsPdfFamilyFulRatioPageHtml(f, weekKey, weekLabel);
+        if (ratioPage) {
+          block += buildStationDividerPageHtml('Ratio Fulfillment · Pastry') + ratioPage;
+        }
+      }
+      return block;
     }).join('');
 
     runStationsPdfPrint(printRoot, chartPage + detailPages);

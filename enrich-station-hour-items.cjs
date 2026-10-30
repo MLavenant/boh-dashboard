@@ -44,6 +44,8 @@ function isFood(name) {
 function isForeignBrandItem(name, venue) {
   const n = String(name || '').trim();
   if (!n) return true;
+  // Casa Neos dessert SKU keeps M- prefix in Toast but is sold at Casa
+  if (venue === 'casa_neos' && /^M-Special Occasion Scoop$/i.test(n)) return false;
   if (venue !== 'mila' && /^(M|MB|MM)[\s_-]/i.test(n)) return true;
   if (!/^ava_/i.test(venue) && /^A-/i.test(n)) return true;
   return false;
