@@ -6564,13 +6564,32 @@ function buildFamilyAllLocationsFulRatioCompareHtml(family, weekKey, venues, opt
       locAvgs.map(a => ' · <strong>'+a.label+'</strong> '+(a.ratio != null ? a.ratio : '—')+
         (a.fulMin != null ? ' <span style="color:'+avgMuted+';font-weight:500">('+a.fulMin+'m)</span>' : '')).join('')+
       '</div>';
-    avgRow = '<tr class="ps-avg-row"><td style="text-align:left;white-space:nowrap;font-weight:700;color:'+avgBorder+';background:'+avgBg+';padding:'+cellPad+';font-size:'+locFont+';border-bottom:2px solid '+avgBorder+'">Week AVG</td>';
+    avgRow = '<tr class="ps-avg-row"><td style="text-align:left;white-space:nowrap;font-weight:700;color:'+avgBorder+';background:'+avgBg+';padding:'+cellPad+';font-size:'+locFont+';border-bottom:1px solid '+avgBorder+'">Week AVG</td>';
     HOURLY_DAYS.forEach(() => {
       venues.forEach((v, vi) => {
         const a = locAvgs.find(x => x.key === v.key);
         const val = a && a.ratio != null ? a.ratio : null;
         const heat = val != null ? fulRatioHeat(val) : { bg: avgBg, fg: avgFg };
-        avgRow += '<td style="background:'+heat.bg+';color:'+(val != null ? '#ffffff' : avgFg)+';font-weight:800;padding:'+cellPad+';text-align:center;font-size:'+locFont+';border-bottom:2px solid '+avgBorder+';'+(vi===0?locSep:'')+'">'+(val != null ? val : '—')+'</td>';
+        avgRow += '<td style="background:'+heat.bg+';color:'+(val != null ? '#ffffff' : avgFg)+';font-weight:800;padding:'+cellPad+';text-align:center;font-size:'+locFont+';border-bottom:1px solid '+avgBorder+';'+(vi===0?locSep:'')+'">'+(val != null ? val : '—')+'</td>';
+      });
+    });
+    avgRow += '</tr>';
+    // Week avg fulfillment minutes (same value under every day for that location)
+    const fulRowBg = dayTheme ? '#efe8dc' : '#141820';
+    const fulLabelFg = dayTheme ? '#7a6a58' : '#9aa0aa';
+    avgRow += '<tr class="ps-ful-avg-row"><td style="text-align:left;white-space:nowrap;font-weight:700;color:'+fulLabelFg+';background:'+fulRowBg+';padding:'+cellPad+';font-size:'+locFont+';border-bottom:2px solid '+avgBorder+'">Avg Ful (min)</td>';
+    HOURLY_DAYS.forEach(() => {
+      venues.forEach((v, vi) => {
+        const a = locAvgs.find(x => x.key === v.key);
+        const ful = a && a.fulMin != null ? a.fulMin : null;
+        let bg = fulRowBg, fg = avgFg;
+        if (ful != null) {
+          if (ful <= 10) { bg = dayTheme ? '#3d9a5f' : '#16a34a'; fg = '#ffffff'; }
+          else if (ful <= 15) { bg = dayTheme ? '#d4a017' : '#eab308'; fg = '#ffffff'; }
+          else { bg = dayTheme ? '#c44b3f' : '#ef4444'; fg = '#ffffff'; }
+        }
+        const disp = ful != null ? (Number.isInteger(ful) ? String(ful) : ful.toFixed(1)) : '—';
+        avgRow += '<td style="background:'+bg+';color:'+fg+';font-weight:800;padding:'+cellPad+';text-align:center;font-size:'+locFont+';border-bottom:2px solid '+avgBorder+';'+(vi===0?locSep:'')+'">'+disp+'</td>';
       });
     });
     avgRow += '</tr>';
