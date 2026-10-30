@@ -208,18 +208,7 @@ function lookupAssignment(menuItem, assignments) {
   }
   return info || null;
 }
-function resolveAssignedStation(menuItem, assignments, stationKeys) {
-  let info = lookupAssignment(menuItem, assignments);
-  if (!info || !Array.isArray(info.stations)) return null;
-  const ranked = info.stations.filter((st) => st && isFood(st) && !/no\s*print/i.test(st));
-  const pastryHit = ranked.find((st) => /pastry/i.test(st));
-  let assigned = null;
-  if (pastryHit && (/dessert|pastry|cake|baklava|brulee|gelato|scoop|vacherin|platter|all\s*in/i.test(String(menuItem || '')) || ranked.every((st) => /pastry|expo|pass/i.test(st)))) {
-    assigned = pastryHit;
-  } else {
-    const cookFirst = ranked.find((st) => !/expo|pass/i.test(st));
-    assigned = cookFirst || ranked[0] || null;
-  }
+function matchStationKey(assigned, stationKeys) {
   if (!assigned) return null;
   if (stationKeys.has(assigned)) return assigned;
   const want = stripName(assigned);
@@ -234,6 +223,34 @@ function resolveAssignedStation(menuItem, assignments, stationKeys) {
     }
   }
   return best;
+}
+function resolveAssignedStation(menuItem, assignments, stationKeys) {
+  let info = lookupAssignment(menuItem, assignments);
+  if (!info || !Array.isArray(info.stations)) return null;
+  const ranked = info.stations.filter((st) => st && isFood(st) && !/no\s*print/i.test(st));
+  const pastryHit = ranked.find((st) => /pastry/i.test(st));
+  let assigned = null;
+  if (pastryHit && (/dessert|pastry|cake|baklava|brulee|gelato|scoop|vacherin|platter|all\s*in|complimentary|tart|mousse|cheesecake|macaron|cookie|parfait|crema|lava|petit/i.test(String(menuItem || '')) || ranked.every((st) => /pastry|expo|pass/i.test(st)))) {
+    assigned = pastryHit;
+  } else {
+    const cookFirst = ranked.find((st) => !/expo|pass/i.test(st));
+    assigned = cookFirst || ranked[0] || null;
+  }
+  return matchStationKey(assigned, stationKeys);
+}
+/** Primary cook + every Toast Pastry route. */
+function resolveStationsForItemQty(menuItem, assignments, stationKeys) {
+  const info = lookupAssignment(menuItem, assignments);
+  if (!info || !Array.isArray(info.stations)) return [];
+  const ranked = info.stations.filter((st) => st && isFood(st) && !/no\s*print/i.test(st));
+  const names = new Set();
+  const primary = resolveAssignedStation(menuItem, assignments, stationKeys);
+  if (primary) names.add(primary);
+  ranked.filter((st) => /pastry/i.test(st)).forEach((st) => {
+    const kit = matchStationKey(st, stationKeys);
+    if (kit) names.add(kit);
+  });
+  return [...names];
 }
 
 function buildStationHourItems(items, assignments, stationKeys, venue) {
@@ -250,8 +267,8 @@ function buildStationHourItems(items, assignments, stationKeys, venue) {
       skipped += item.qty || 1;
       return;
     }
-    const station = resolveAssignedStation(item.menuItem, assignments, stationKeys);
-    if (!station) {
+    const stations = resolveStationsForItemQty(item.menuItem, assignments, stationKeys);
+    if (!stations.length) {
       skipped += item.qty || 1;
       return;
     }
@@ -261,17 +278,19 @@ function buildStationHourItems(items, assignments, stationKeys, venue) {
     const qty = item.qty || 1;
     const info = lookupAssignment(item.menuItem, assignments) || {};
     const hasTarget = !!(info && info.targetSec > 0);
-    if (!out[station]) out[station] = {};
-    if (!out[station][day]) out[station][day] = {};
-    if (!out[station][day][hrKey]) out[station][day][hrKey] = [];
-    out[station][day][hrKey].push({
-      n: item.menuItem,
-      q: qty,
-      t: fmtWhen(fired),
-      ts: fired.toISOString(),
-      tgt: hasTarget ? 1 : 0,
-      table: item.table || '',
-    });
+    for (const station of stations) {
+      if (!out[station]) out[station] = {};
+      if (!out[station][day]) out[station][day] = {};
+      if (!out[station][day][hrKey]) out[station][day][hrKey] = [];
+      out[station][day][hrKey].push({
+        n: item.menuItem,
+        q: qty,
+        t: fmtWhen(fired),
+        ts: fired.toISOString(),
+        tgt: hasTarget ? 1 : 0,
+        table: item.table || '',
+      });
+    }
     kept += qty;
   });
   // Sort each bucket by time, then drop ISO ts to shrink payload

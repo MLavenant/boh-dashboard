@@ -21451,6 +21451,12 @@
         "targetSec": 480
       },
       {
+        "menuItem": "A-Shakshuka",
+        "qty": 15,
+        "avgFulSec": 1268,
+        "targetSec": 540
+      },
+      {
         "menuItem": "A-Gelato",
         "qty": 14,
         "avgFulSec": 514,
@@ -25805,19 +25811,19 @@
             "count": 19,
             "avg_sec": 959.1,
             "exp_sec": 484.72027972027973,
-            "itemQty": 18
+            "itemQty": 22
           },
           "13-14": {
             "count": 16,
             "avg_sec": 822.1,
             "exp_sec": 484.72027972027973,
-            "itemQty": 19
+            "itemQty": 22
           },
           "14-15": {
             "count": 12,
             "avg_sec": 511.8,
             "exp_sec": 484.72027972027973,
-            "itemQty": 15
+            "itemQty": 16
           },
           "15-16": {
             "count": 4,
@@ -25865,7 +25871,7 @@
             "count": 0,
             "avg_sec": 0,
             "exp_sec": 484.72027972027973,
-            "itemQty": 10
+            "itemQty": 11
           }
         },
         "Sunday": {
@@ -25879,25 +25885,25 @@
             "count": 3,
             "avg_sec": 733.7,
             "exp_sec": 484.72027972027973,
-            "itemQty": 10
+            "itemQty": 11
           },
           "12-13": {
             "count": 19,
             "avg_sec": 879,
             "exp_sec": 484.72027972027973,
-            "itemQty": 31
+            "itemQty": 34
           },
           "13-14": {
             "count": 22,
             "avg_sec": 641.6,
             "exp_sec": 484.72027972027973,
-            "itemQty": 19
+            "itemQty": 20
           },
           "14-15": {
             "count": 6,
             "avg_sec": 928.7,
             "exp_sec": 484.72027972027973,
-            "itemQty": 11.142857142857142
+            "itemQty": 12.142857142857142
           },
           "15-16": {
             "count": 4,
@@ -54092,6 +54098,13 @@
       "Saturday": {
         "11-12": [
           {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sat 11:48a",
+            "tgt": 1,
+            "table": "300"
+          },
+          {
             "n": "A-PFB Gelato 2sc",
             "q": 1,
             "t": "Sat 11:53a",
@@ -54164,6 +54177,13 @@
         ],
         "12-13": [
           {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sat 12:00p",
+            "tgt": 1,
+            "table": "498"
+          },
+          {
             "n": "A-Melopita",
             "q": 1,
             "t": "Sat 12:00p",
@@ -54183,6 +54203,13 @@
             "t": "Sat 12:09p",
             "tgt": 1,
             "table": "401"
+          },
+          {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sat 12:14p",
+            "tgt": 1,
+            "table": "205"
           },
           {
             "n": "A-PFB Creme Brulee",
@@ -54234,6 +54261,13 @@
             "table": "208"
           },
           {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sat 12:41p",
+            "tgt": 1,
+            "table": "5"
+          },
+          {
             "n": "A-Pancakes",
             "q": 1,
             "t": "Sat 12:41p",
@@ -54276,6 +54310,13 @@
             "table": "501"
           },
           {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sat 12:51p",
+            "tgt": 1,
+            "table": "102"
+          },
+          {
             "n": "A-PFB Creme Brulee",
             "q": 1,
             "t": "Sat 12:53p",
@@ -54299,11 +54340,11 @@
             "table": "1"
           },
           {
-            "n": "A-Pancakes",
+            "n": "A-Shakshuka",
             "q": 1,
-            "t": "Sat 1:07p",
+            "t": "Sat 1:05p",
             "tgt": 1,
-            "table": "1"
+            "table": "203"
           },
           {
             "n": "A-Pancakes",
@@ -54314,6 +54355,27 @@
           },
           {
             "n": "A-Pancakes",
+            "q": 1,
+            "t": "Sat 1:07p",
+            "tgt": 1,
+            "table": "1"
+          },
+          {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sat 1:20p",
+            "tgt": 1,
+            "table": "506"
+          },
+          {
+            "n": "A-Pancakes",
+            "q": 1,
+            "t": "Sat 1:24p",
+            "tgt": 1,
+            "table": "6"
+          },
+          {
+            "n": "A-Shakshuka",
             "q": 1,
             "t": "Sat 1:24p",
             "tgt": 1,
@@ -54530,6 +54592,13 @@
             "t": "Sat 2:47p",
             "tgt": 1,
             "table": "202"
+          },
+          {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sat 2:52p",
+            "tgt": 1,
+            "table": "301"
           }
         ],
         "15-16": [
@@ -55203,6 +55272,13 @@
             "table": "208"
           },
           {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sun 11:56a",
+            "tgt": 1,
+            "table": "208"
+          },
+          {
             "n": "A-PFB Gelato 2sc",
             "q": 1,
             "t": "Sun 11:56a",
@@ -55457,6 +55533,27 @@
             "table": "503"
           },
           {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sun 12:48p",
+            "tgt": 1,
+            "table": "301"
+          },
+          {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sun 12:48p",
+            "tgt": 1,
+            "table": "301"
+          },
+          {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sun 12:50p",
+            "tgt": 1,
+            "table": "505"
+          },
+          {
             "n": "A-Pancakes",
             "q": 1,
             "t": "Sun 12:55p",
@@ -55472,6 +55569,13 @@
           }
         ],
         "13-14": [
+          {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sun 1:03p",
+            "tgt": 1,
+            "table": "600"
+          },
           {
             "n": "A-Pancakes",
             "q": 1,
@@ -55613,6 +55717,13 @@
             "t": "Sun 2:13p",
             "tgt": 1,
             "table": "504"
+          },
+          {
+            "n": "A-Shakshuka",
+            "q": 1,
+            "t": "Sun 2:27p",
+            "tgt": 1,
+            "table": "305"
           },
           {
             "n": "A-PFB Olive Oil Cake",
@@ -57847,12 +57958,12 @@
       },
       "Saturday": {
         "ticketCount": 120,
-        "itemQty": 156,
+        "itemQty": 165,
         "avgFulSec": 646.1
       },
       "Sunday": {
         "ticketCount": 94,
-        "itemQty": 124.99999999999996,
+        "itemQty": 130.99999999999994,
         "avgFulSec": 683.7
       }
     }
@@ -61907,7 +62018,7 @@
   "staffing": {
     "venue": "ava_winter_park",
     "weekLabel": "2026-W43",
-    "builtAt": "2026-10-30T18:10:46.890Z",
+    "builtAt": "2026-10-30T18:49:47.006Z",
     "matchStats": {
       "laborShiftsMatched": 69,
       "laborShiftsUnmatched": 255,
@@ -68687,12 +68798,12 @@
         "rosterCount": 3,
         "weekHeadsUnique": 2,
         "weekHours": 43.64,
-        "weekItemCount": 596,
+        "weekItemCount": 611,
         "weekTicketCount": 434,
-        "weekItemsPerHeadDay": 85.1,
-        "weekItemsPerStaffHour": 13.66,
+        "weekItemsPerHeadDay": 87.3,
+        "weekItemsPerStaffHour": 14,
         "weekServiceHours": 55,
-        "weekItemsPerServiceHour": 10.84,
+        "weekItemsPerServiceHour": 11.11,
         "weekAvgFulSec": 549.8,
         "days": {
           "Monday": {
@@ -68759,7 +68870,7 @@
               "label": "Balanced",
               "code": "in_band",
               "source": "history",
-              "nPeer": 28,
+              "nPeer": 29,
               "nHist": 10,
               "note": "vs own same-DOW history",
               "staffingRatio": 1.11
@@ -69323,14 +69434,14 @@
               ]
             },
             "ticketCount": 120,
-            "itemQty": 156,
-            "volume": 156,
+            "itemQty": 165,
+            "volume": 165,
             "volumeSource": "itemQty",
-            "itemCount": 156,
-            "itemsPerHead": 156,
+            "itemCount": 165,
+            "itemsPerHead": 165,
             "serviceHours": 10,
-            "itemsPerServiceHour": 15.6,
-            "itemsPerStaffHour": 13.83,
+            "itemsPerServiceHour": 16.5,
+            "itemsPerStaffHour": 14.63,
             "avgFulSec": 646.1,
             "qc": {
               "eligible": true,
@@ -69343,7 +69454,7 @@
               "nPeer": 44,
               "nHist": 11,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.56
+              "staffingRatio": 0.53
             }
           },
           "Sunday": {
@@ -69463,14 +69574,14 @@
               "1-2": []
             },
             "ticketCount": 94,
-            "itemQty": 124.99999999999996,
-            "volume": 124.99999999999996,
+            "itemQty": 130.99999999999994,
+            "volume": 130.99999999999994,
             "volumeSource": "itemQty",
-            "itemCount": 124.99999999999996,
-            "itemsPerHead": 125,
+            "itemCount": 130.99999999999994,
+            "itemsPerHead": 131,
             "serviceHours": 12,
-            "itemsPerServiceHour": 10.42,
-            "itemsPerStaffHour": 13.26,
+            "itemsPerServiceHour": 10.92,
+            "itemsPerStaffHour": 13.89,
             "avgFulSec": 683.7,
             "qc": {
               "eligible": true,
@@ -70230,8 +70341,8 @@
           "Pastry"
         ],
         "weekHours": 40.64,
-        "weekItems": 422,
-        "weekItemsPerHour": 10.38,
+        "weekItems": 437,
+        "weekItemsPerHour": 10.75,
         "days": {
           "Thursday": {
             "hours": 9.05,
@@ -70251,16 +70362,16 @@
           },
           "Saturday": {
             "hours": 11.28,
-            "items": 156,
-            "itemsPerHour": 13.83,
+            "items": 165,
+            "itemsPerHour": 14.63,
             "families": [
               "Pastry"
             ]
           },
           "Sunday": {
             "hours": 9.43,
-            "items": 125,
-            "itemsPerHour": 13.26,
+            "items": 131,
+            "itemsPerHour": 13.89,
             "families": [
               "Pastry"
             ]
