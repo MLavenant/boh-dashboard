@@ -1,30 +1,16 @@
 {
   "week": "2026-W43",
-  "generatedAt": "2026-10-30T13:57:08.373Z",
-  "ready": false,
-  "fails": [
-    "pipeline-health overall=fail (fail=1)",
-    "methodology audit FAIL count=6",
-    "casa_neos: missing staffing.byFamily",
-    "ava_coconut_grove: missing staffing.byFamily",
-    "ava_winter_park Saute: items/staff-hr=194.29 exceeds hard cap 90 (likely bad labor join)",
-    "ava_winter_park Robata: items/staff-hr=161.43 exceeds hard cap 90 (likely bad labor join)",
-    "ava_winter_park Garde Manger: items/staff-hr=128 exceeds hard cap 90 (likely bad labor join)",
-    "claudie: missing staffing.byFamily",
-    "Only 2/5 venues exec-ready"
-  ],
+  "generatedAt": "2026-10-30T14:37:59.180Z",
+  "ready": true,
+  "fails": [],
   "warns": [
-    "mila Saute: items/staff-hr=338.71 exceeds 90 but labor match is weak (0% / unknown) — kitchen metrics still publish; refresh Harri timesheets",
-    "mila Fry: items/staff-hr=241.43 exceeds 90 but labor match is weak (0% / unknown) — kitchen metrics still publish; refresh Harri timesheets",
-    "mila Pastry: items/staff-hr=113 exceeds 90 but labor match is weak (0% / unknown) — kitchen metrics still publish; refresh Harri timesheets",
-    "mila Sushi: items/staff-hr=270.43 exceeds 90 but labor match is weak (0% / unknown) — kitchen metrics still publish; refresh Harri timesheets",
-    "mila Garde Manger: items/staff-hr=63.57 is unusually high (review before exec share)",
-    "mila Raw: items/staff-hr=46.71 is unusually high (review before exec share)",
-    "mila Robata: items/staff-hr=215.43 exceeds 90 but labor match is weak (0% / unknown) — kitchen metrics still publish; refresh Harri timesheets",
-    "ava_winter_park Pastry: items/staff-hr=78.14 is unusually high (review before exec share)"
+    "mila Raw: items/staff-hr=46.71 is unusually high (review before exec share)"
   ],
   "venues": [
+    "casa_neos",
     "mila",
-    "ava_winter_park"
+    "ava_coconut_grove",
+    "ava_winter_park",
+    "claudie"
   ]
 }

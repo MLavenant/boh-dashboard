@@ -1,6 +1,6 @@
 /**
  * Ingest Harri "Timesheet Report - Detailed" CSV → Toast-shaped labor-{venue}.json
- * by ISO week. Used for AVA CG + Claudie (Harri time clock).
+ * by ISO week. Kitchen brands → staffing venues; lounge/MM Club brands skipped.
  *
  * Usage:
  *   node ingest-harri-timesheets.cjs <csv...> [--weeks 2026-W35,2026-W36]
@@ -20,13 +20,22 @@ const BRAND_TO_VENUE = {
   'AVA Coconut Grove': 'ava_coconut_grove',
   'AVA COCONUT GROVE': 'ava_coconut_grove',
   AVA: 'ava_coconut_grove',
+  'AVA Winter Park': 'ava_winter_park',
+  'AVA WINTER PARK': 'ava_winter_park',
   CLAUDIE: 'claudie',
   Claudie: 'claudie',
   'CASA NEOS': 'casa_neos',
   'Casa Neos': 'casa_neos',
   'Casa Neos Beach Club': 'casa_neos',
-  'CASA NEOS LOUNGE': null, // FOH / lounge — not kitchen staffing
+  MILA: 'mila',
+  Mila: 'mila',
+  // FOH / lounge / club — not kitchen staffing
+  'CASA NEOS LOUNGE': null,
   'Casa Neos Lounge': null,
+  'MM CLUB AT MILA': null,
+  'MM CLUB AT AVA': null,
+  'MM Club at MILA': null,
+  'MM Club at AVA': null,
 };
 
 function parseCsv(filePath) {
@@ -95,7 +104,11 @@ function payrollNameFromDisplay(name) {
 
 function rowToEntry(row) {
   const brand = String(row['Brand Name'] || '').trim();
-  const venue = BRAND_TO_VENUE[brand] || BRAND_TO_VENUE[brand.toUpperCase()];
+  const venue =
+    BRAND_TO_VENUE[brand] ||
+    BRAND_TO_VENUE[brand.toUpperCase()] ||
+    BRAND_TO_VENUE[brand.replace(/\s+/g, ' ')];
+  if (venue === null || venue === undefined) return null;
   if (!venue) return null;
 
   const dateRaw = String(row.Date || '').trim();

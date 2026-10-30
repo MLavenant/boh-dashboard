@@ -53,10 +53,10 @@ const VENUE_SLUG_ALIASES = {
   claudie: 'claudie',
 };
 
-/** Food-station staffing venues. Claudie + AVA CG use Harri time entries; others Toast. */
+/** Food-station staffing venues. */
 const STAFFING_VENUES = ['casa_neos', 'mila', 'ava_coconut_grove', 'ava_winter_park', 'claudie'];
 /** Venues whose labor-{venue}.json comes from Harri CSV (not Toast Partner API). */
-const HARRI_LABOR_VENUES = ['ava_coconut_grove', 'claudie', 'casa_neos'];
+const HARRI_LABOR_VENUES = ['ava_coconut_grove', 'ava_winter_park', 'claudie', 'casa_neos', 'mila'];
 
 /**
  * Normalize FTE Matrix / alias → canonical food family, or null if non-food.
