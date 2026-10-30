@@ -3467,6 +3467,13 @@
       "station": "Sautee 1"
     },
     {
+      "menuItem": "ALL IN SAVORY",
+      "qty": 8,
+      "avgFulSec": 1343,
+      "targetSec": null,
+      "station": "Cold Expo 2"
+    },
+    {
       "menuItem": "C-Parmesan Cheese",
       "qty": 8,
       "avgFulSec": 72,
@@ -3603,6 +3610,20 @@
       "menuItem": "Del Maguey Vida",
       "qty": 6,
       "avgFulSec": 124,
+      "targetSec": null,
+      "station": null
+    },
+    {
+      "menuItem": "ALL IN PASTRY",
+      "qty": 6,
+      "avgFulSec": 8472,
+      "targetSec": null,
+      "station": "Cold Expo 2"
+    },
+    {
+      "menuItem": "ALL IN DRINKS",
+      "qty": 6,
+      "avgFulSec": 16969,
       "targetSec": null,
       "station": null
     },
@@ -19216,6 +19237,20 @@
         "targetSec": null
       }
     ],
+    "Cold Expo 2": [
+      {
+        "menuItem": "ALL IN SAVORY",
+        "qty": 8,
+        "avgFulSec": 1343,
+        "targetSec": null
+      },
+      {
+        "menuItem": "ALL IN PASTRY",
+        "qty": 6,
+        "avgFulSec": 8472,
+        "targetSec": null
+      }
+    ],
     "Pastry 2": [
       {
         "menuItem": "C-French Toast",
@@ -19263,7 +19298,8 @@
           "23-24": {
             "count": 5,
             "avg_sec": 676.8,
-            "exp_sec": 514.8432055749129
+            "exp_sec": 514.8432055749129,
+            "itemQty": 2
           }
         },
         "Wednesday": {
@@ -19302,7 +19338,8 @@
           "0-1": {
             "count": 1,
             "avg_sec": 3364,
-            "exp_sec": 514.8432055749129
+            "exp_sec": 514.8432055749129,
+            "itemQty": 1
           },
           "18-19": {
             "count": 5,
@@ -19339,7 +19376,8 @@
           "0-1": {
             "count": 4,
             "avg_sec": 1100.3,
-            "exp_sec": 514.8432055749129
+            "exp_sec": 514.8432055749129,
+            "itemQty": 2
           },
           "18-19": {
             "count": 8,
@@ -19376,12 +19414,14 @@
           "0-1": {
             "count": 7,
             "avg_sec": 475.1,
-            "exp_sec": 514.8432055749129
+            "exp_sec": 514.8432055749129,
+            "itemQty": 1
           },
           "1-2": {
             "count": 1,
             "avg_sec": 2331,
-            "exp_sec": 514.8432055749129
+            "exp_sec": 514.8432055749129,
+            "itemQty": 1
           },
           "12-13": {
             "count": 7,
@@ -19411,7 +19451,8 @@
           "17-18": {
             "count": 12,
             "avg_sec": 470.4,
-            "exp_sec": 514.8432055749129
+            "exp_sec": 514.8432055749129,
+            "itemQty": 1
           },
           "18-19": {
             "count": 11,
@@ -19453,7 +19494,8 @@
           "1-2": {
             "count": 1,
             "avg_sec": 514,
-            "exp_sec": 514.8432055749129
+            "exp_sec": 514.8432055749129,
+            "itemQty": 3
           },
           "11-12": {
             "count": 2,
@@ -19488,7 +19530,8 @@
           "17-18": {
             "count": 5,
             "avg_sec": 1269.6,
-            "exp_sec": 514.8432055749129
+            "exp_sec": 514.8432055749129,
+            "itemQty": 1
           },
           "18-19": {
             "count": 13,
@@ -19518,14 +19561,16 @@
           "23-24": {
             "count": 7,
             "avg_sec": 355.1,
-            "exp_sec": 514.8432055749129
+            "exp_sec": 514.8432055749129,
+            "itemQty": 1
           }
         },
         "Monday": {
           "0-1": {
             "count": 1,
             "avg_sec": 930,
-            "exp_sec": 514.8432055749129
+            "exp_sec": 514.8432055749129,
+            "itemQty": 1
           }
         }
       },
@@ -65438,6 +65483,138 @@
         ]
       }
     },
+    "Cold Expo 2": {
+      "Tuesday": {
+        "23-24": [
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Tue 11:39p",
+            "tgt": 0,
+            "table": "101"
+          },
+          {
+            "n": "ALL IN PASTRY",
+            "q": 1,
+            "t": "Tue 11:58p",
+            "tgt": 0,
+            "table": "101"
+          }
+        ]
+      },
+      "Thursday": {
+        "0-1": [
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Thu 12:09a",
+            "tgt": 0,
+            "table": ""
+          }
+        ]
+      },
+      "Friday": {
+        "0-1": [
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Fri 12:30a",
+            "tgt": 0,
+            "table": ""
+          },
+          {
+            "n": "ALL IN PASTRY",
+            "q": 1,
+            "t": "Fri 12:36a",
+            "tgt": 0,
+            "table": ""
+          }
+        ]
+      },
+      "Saturday": {
+        "0-1": [
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Sat 12:54a",
+            "tgt": 0,
+            "table": "101"
+          }
+        ],
+        "1-2": [
+          {
+            "n": "ALL IN PASTRY",
+            "q": 1,
+            "t": "Sat 1:30a",
+            "tgt": 0,
+            "table": "101"
+          }
+        ],
+        "17-18": [
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Sat 5:01p",
+            "tgt": 0,
+            "table": "101"
+          }
+        ]
+      },
+      "Sunday": {
+        "1-2": [
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Sun 1:07a",
+            "tgt": 0,
+            "table": "701T"
+          },
+          {
+            "n": "ALL IN PASTRY",
+            "q": 1,
+            "t": "Sun 1:42a",
+            "tgt": 0,
+            "table": "701T"
+          },
+          {
+            "n": "ALL IN PASTRY",
+            "q": 1,
+            "t": "Sun 1:44a",
+            "tgt": 0,
+            "table": "101"
+          }
+        ],
+        "17-18": [
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Sun 5:16p",
+            "tgt": 0,
+            "table": "208"
+          }
+        ],
+        "23-24": [
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Sun 11:59p",
+            "tgt": 0,
+            "table": "701T"
+          }
+        ]
+      },
+      "Monday": {
+        "0-1": [
+          {
+            "n": "ALL IN PASTRY",
+            "q": 1,
+            "t": "Mon 12:27a",
+            "tgt": 0,
+            "table": "701T"
+          }
+        ]
+      }
+    },
     "Pastry 2": {
       "Saturday": {
         "11-12": [
@@ -65625,7 +65802,7 @@
     "Cold Expo 2": {
       "Tuesday": {
         "ticketCount": 60,
-        "itemQty": 0,
+        "itemQty": 2,
         "avgFulSec": 546
       },
       "Wednesday": {
@@ -65635,27 +65812,27 @@
       },
       "Thursday": {
         "ticketCount": 85,
-        "itemQty": 0,
+        "itemQty": 1,
         "avgFulSec": 467.9
       },
       "Friday": {
         "ticketCount": 137,
-        "itemQty": 0,
+        "itemQty": 2,
         "avgFulSec": 390.9
       },
       "Saturday": {
         "ticketCount": 264,
-        "itemQty": 0,
+        "itemQty": 3,
         "avgFulSec": 450.2
       },
       "Sunday": {
         "ticketCount": 196,
-        "itemQty": 0,
+        "itemQty": 5,
         "avgFulSec": 461.3
       },
       "Monday": {
         "ticketCount": 1,
-        "itemQty": 0,
+        "itemQty": 1,
         "avgFulSec": 930
       }
     },
@@ -66665,6 +66842,32 @@
       "targetSec": 120,
       "avgFulSec": null,
       "count": 0
+    },
+    {
+      "menuItem": "ALL IN PASTRY",
+      "station": "Cold Expo 2",
+      "stations": [
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Hot expo 2",
+        "Hot Expo 1"
+      ],
+      "targetSec": null,
+      "avgFulSec": 8472,
+      "count": 6
+    },
+    {
+      "menuItem": "ALL IN SAVORY",
+      "station": "Cold Expo 2",
+      "stations": [
+        "Cold Expo 2",
+        "Cold Expo 1",
+        "Hot expo 2",
+        "Hot Expo 1"
+      ],
+      "targetSec": null,
+      "avgFulSec": 1343,
+      "count": 8
     },
     {
       "menuItem": "C-Add-on Black Truffle",
@@ -69937,8 +70140,8 @@
     "orderCount": 1868,
     "uniqueTickets": 8226,
     "stationFireCount": 8226,
-    "itemDetailSkuCount": 356,
-    "itemQtyTotal": 11703,
+    "itemDetailSkuCount": 359,
+    "itemQtyTotal": 11723,
     "fulfillmentAdjustSec": 5,
     "concurrencyUnit": "production_station_fire",
     "concurrencyExcludeExpo": true,
@@ -71645,7 +71848,7 @@
   "staffing": {
     "venue": "casa_neos",
     "weekLabel": "2026-W43",
-    "builtAt": "2026-10-30T17:29:05.173Z",
+    "builtAt": "2026-10-30T18:10:40.245Z",
     "matchStats": {
       "laborShiftsMatched": 176,
       "laborShiftsUnmatched": 535,
@@ -85800,12 +86003,12 @@
         "rosterCount": 1,
         "weekHeadsUnique": 2,
         "weekHours": 41.56,
-        "weekItemCount": 2747,
+        "weekItemCount": 237,
         "weekTicketCount": 2747,
-        "weekItemsPerHeadDay": 392.4,
-        "weekItemsPerStaffHour": 66.1,
+        "weekItemsPerHeadDay": 33.9,
+        "weekItemsPerStaffHour": 5.7,
         "weekServiceHours": 58,
-        "weekItemsPerServiceHour": 47.36,
+        "weekItemsPerServiceHour": 4.09,
         "weekAvgFulSec": 493.5,
         "days": {
           "Monday": {
@@ -85855,14 +86058,14 @@
               "1-2": []
             },
             "ticketCount": 4,
-            "itemQty": 0,
-            "volume": 4,
-            "volumeSource": "ticketCount",
-            "itemCount": 4,
-            "itemsPerHead": 4,
+            "itemQty": 1,
+            "volume": 1,
+            "volumeSource": "itemQty",
+            "itemCount": 1,
+            "itemsPerHead": 1,
             "serviceHours": 1,
-            "itemsPerServiceHour": 4,
-            "itemsPerStaffHour": 4,
+            "itemsPerServiceHour": 1,
+            "itemsPerStaffHour": 1,
             "avgFulSec": 930,
             "qc": {
               "eligible": false,
@@ -85960,18 +86163,18 @@
               "1-2": []
             },
             "ticketCount": 207,
-            "itemQty": 0,
-            "volume": 207,
-            "volumeSource": "ticketCount",
-            "itemCount": 207,
-            "itemsPerHead": 207,
+            "itemQty": 2,
+            "volume": 2,
+            "volumeSource": "itemQty",
+            "itemCount": 2,
+            "itemsPerHead": 2,
             "serviceHours": 6,
-            "itemsPerServiceHour": 34.5,
-            "itemsPerStaffHour": 46.52,
+            "itemsPerServiceHour": 0.33,
+            "itemsPerStaffHour": 0.45,
             "avgFulSec": 541,
             "qc": {
-              "eligible": true,
-              "denyReason": null
+              "eligible": false,
+              "denyReason": "Volume < 25"
             },
             "signal": {
               "label": "Attribution caution",
@@ -86149,18 +86352,18 @@
               "1-2": []
             },
             "ticketCount": 273,
-            "itemQty": 0,
-            "volume": 273,
-            "volumeSource": "ticketCount",
-            "itemCount": 273,
-            "itemsPerHead": 273,
+            "itemQty": 1,
+            "volume": 1,
+            "volumeSource": "itemQty",
+            "itemCount": 1,
+            "itemsPerHead": 1,
             "serviceHours": 8,
-            "itemsPerServiceHour": 34.13,
-            "itemsPerStaffHour": 43.47,
+            "itemsPerServiceHour": 0.13,
+            "itemsPerStaffHour": 0.16,
             "avgFulSec": 481.2,
             "qc": {
-              "eligible": true,
-              "denyReason": null
+              "eligible": false,
+              "denyReason": "Volume < 25"
             },
             "signal": {
               "label": "Attribution caution",
@@ -86275,18 +86478,18 @@
               "1-2": []
             },
             "ticketCount": 505,
-            "itemQty": 0,
-            "volume": 505,
-            "volumeSource": "ticketCount",
-            "itemCount": 505,
-            "itemsPerHead": 505,
+            "itemQty": 2,
+            "volume": 2,
+            "volumeSource": "itemQty",
+            "itemCount": 2,
+            "itemsPerHead": 2,
             "serviceHours": 7,
-            "itemsPerServiceHour": 72.14,
-            "itemsPerStaffHour": 72.66,
+            "itemsPerServiceHour": 0.29,
+            "itemsPerStaffHour": 0.29,
             "avgFulSec": 473.7,
             "qc": {
-              "eligible": true,
-              "denyReason": null
+              "eligible": false,
+              "denyReason": "Volume < 25"
             },
             "signal": {
               "label": "Attribution caution",
@@ -86422,18 +86625,18 @@
               "1-2": []
             },
             "ticketCount": 873,
-            "itemQty": 0,
-            "volume": 873,
-            "volumeSource": "ticketCount",
-            "itemCount": 873,
-            "itemsPerHead": 873,
+            "itemQty": 3,
+            "volume": 3,
+            "volumeSource": "itemQty",
+            "itemCount": 3,
+            "itemsPerHead": 3,
             "serviceHours": 15,
-            "itemsPerServiceHour": 58.2,
-            "itemsPerStaffHour": 80.46,
+            "itemsPerServiceHour": 0.2,
+            "itemsPerStaffHour": 0.28,
             "avgFulSec": 513.4,
             "qc": {
-              "eligible": true,
-              "denyReason": null
+              "eligible": false,
+              "denyReason": "Volume < 25"
             },
             "signal": {
               "label": "Attribution caution",
@@ -86576,18 +86779,18 @@
               "1-2": []
             },
             "ticketCount": 662,
-            "itemQty": 0,
-            "volume": 662,
-            "volumeSource": "ticketCount",
-            "itemCount": 662,
-            "itemsPerHead": 662,
+            "itemQty": 5,
+            "volume": 5,
+            "volumeSource": "itemQty",
+            "itemCount": 5,
+            "itemsPerHead": 5,
             "serviceHours": 15,
-            "itemsPerServiceHour": 44.13,
-            "itemsPerStaffHour": 60.02,
+            "itemsPerServiceHour": 0.33,
+            "itemsPerStaffHour": 0.45,
             "avgFulSec": 468.4,
             "qc": {
-              "eligible": true,
-              "denyReason": null
+              "eligible": false,
+              "denyReason": "Volume < 25"
             },
             "signal": {
               "label": "Attribution caution",
@@ -87978,58 +88181,6 @@
     },
     "players": [
       {
-        "label": "Tanisha F.",
-        "position": "Expo",
-        "families": [
-          "Expo"
-        ],
-        "weekHours": 39.56,
-        "weekItems": 2520,
-        "weekItemsPerHour": 63.7,
-        "days": {
-          "Tuesday": {
-            "hours": 4.45,
-            "items": 207,
-            "itemsPerHour": 46.52,
-            "families": [
-              "Expo"
-            ]
-          },
-          "Thursday": {
-            "hours": 6.28,
-            "items": 273,
-            "itemsPerHour": 43.47,
-            "families": [
-              "Expo"
-            ]
-          },
-          "Friday": {
-            "hours": 6.95,
-            "items": 505,
-            "itemsPerHour": 72.66,
-            "families": [
-              "Expo"
-            ]
-          },
-          "Saturday": {
-            "hours": 10.85,
-            "items": 873,
-            "itemsPerHour": 80.46,
-            "families": [
-              "Expo"
-            ]
-          },
-          "Sunday": {
-            "hours": 11.03,
-            "items": 662,
-            "itemsPerHour": 60.02,
-            "families": [
-              "Expo"
-            ]
-          }
-        }
-      },
-      {
         "label": "Beatriz C.",
         "position": "Raw",
         "families": [
@@ -88304,12 +88455,12 @@
           "Sushi"
         ],
         "weekHours": 0,
-        "weekItems": 316,
+        "weekItems": 313,
         "weekItemsPerHour": null,
         "days": {
           "Monday": {
             "hours": 0,
-            "items": 30,
+            "items": 27,
             "itemsPerHour": null,
             "families": [
               "Prep",
@@ -89870,6 +90021,58 @@
             "itemsPerHour": 2.29,
             "families": [
               "Robata"
+            ]
+          }
+        }
+      },
+      {
+        "label": "Tanisha F.",
+        "position": "Expo",
+        "families": [
+          "Expo"
+        ],
+        "weekHours": 39.56,
+        "weekItems": 13,
+        "weekItemsPerHour": 0.33,
+        "days": {
+          "Tuesday": {
+            "hours": 4.45,
+            "items": 2,
+            "itemsPerHour": 0.45,
+            "families": [
+              "Expo"
+            ]
+          },
+          "Thursday": {
+            "hours": 6.28,
+            "items": 1,
+            "itemsPerHour": 0.16,
+            "families": [
+              "Expo"
+            ]
+          },
+          "Friday": {
+            "hours": 6.95,
+            "items": 2,
+            "itemsPerHour": 0.29,
+            "families": [
+              "Expo"
+            ]
+          },
+          "Saturday": {
+            "hours": 10.85,
+            "items": 3,
+            "itemsPerHour": 0.28,
+            "families": [
+              "Expo"
+            ]
+          },
+          "Sunday": {
+            "hours": 11.03,
+            "items": 5,
+            "itemsPerHour": 0.45,
+            "families": [
+              "Expo"
             ]
           }
         }

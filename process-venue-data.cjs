@@ -673,6 +673,11 @@ function resolveAssignedStation(menuItem) {
   const info = lookupItemAssignment(menuItem);
   if (!info || !Array.isArray(info.stations)) return null;
   const ranked = info.stations.filter(st => st && isFood(st) && !/no\s*print/i.test(st));
+  // Prefer Pastry when Toast routes the item there (course fires / dessert SKUs often list Expo+Pastry)
+  const pastryHit = ranked.find(st => /pastry/i.test(st));
+  if (pastryHit && (/dessert|pastry|cake|baklava|brulee|gelato|scoop|vacherin|platter|all\s*in/i.test(String(menuItem || '')) || ranked.every(st => /pastry|expo|pass/i.test(st)))) {
+    return pastryHit;
+  }
   const cookFirst = ranked.find(st => !/expo|pass/i.test(st));
   return cookFirst || ranked[0] || null;
 }
@@ -723,11 +728,11 @@ const BEVERAGE_KEYWORDS = [
   'espresso', 'coffee', 'latte', 'cappuccino', 'tea', 'barista', 'americano',
   // Wine list prefixes used at these venues
   'gl ', 'benoit', 'chauveau', 'et fill',
-  // Modifier/combo items that aren't real dishes
-  'all in savory', 'all in dessert', 'all in ',
 ];
 function isBeverageItem(name) {
   const n = (name || '').toLowerCase();
+  // Kitchen course-fire messages ("ALL IN PASTRY / Dessert") are food KDS fires — never treat as beverage
+  if (/^all\s*in\b/i.test(String(name || '').trim())) return false;
   // Word-boundary for short tokens so "latte" does not match "platter"
   return BEVERAGE_KEYWORDS.some((kw) => {
     const k = String(kw || '').toLowerCase();

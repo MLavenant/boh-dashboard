@@ -49,6 +49,8 @@ function isForeignBrandItem(name, venue) {
   return false;
 }
 function isBeverageItemName(name) {
+  // Kitchen course-fire messages are food KDS fires
+  if (/^all\s*in\b/i.test(String(name || '').trim())) return false;
   const n = String(name || '').toLowerCase();
   return BEVERAGE_KEYWORDS.some((kw) => {
     const k = String(kw || '').toLowerCase();
@@ -210,8 +212,14 @@ function resolveAssignedStation(menuItem, assignments, stationKeys) {
   let info = lookupAssignment(menuItem, assignments);
   if (!info || !Array.isArray(info.stations)) return null;
   const ranked = info.stations.filter((st) => st && isFood(st) && !/no\s*print/i.test(st));
-  const cookFirst = ranked.find((st) => !/expo|pass/i.test(st));
-  let assigned = cookFirst || ranked[0] || null;
+  const pastryHit = ranked.find((st) => /pastry/i.test(st));
+  let assigned = null;
+  if (pastryHit && (/dessert|pastry|cake|baklava|brulee|gelato|scoop|vacherin|platter|all\s*in/i.test(String(menuItem || '')) || ranked.every((st) => /pastry|expo|pass/i.test(st)))) {
+    assigned = pastryHit;
+  } else {
+    const cookFirst = ranked.find((st) => !/expo|pass/i.test(st));
+    assigned = cookFirst || ranked[0] || null;
+  }
   if (!assigned) return null;
   if (stationKeys.has(assigned)) return assigned;
   const want = stripName(assigned);

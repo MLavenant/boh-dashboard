@@ -3394,6 +3394,20 @@
       "station": "Sushi Bar"
     },
     {
+      "menuItem": "ALL IN SAVORY",
+      "qty": 6,
+      "avgFulSec": 757,
+      "targetSec": null,
+      "station": "Sushi Bar"
+    },
+    {
+      "menuItem": "ALL IN PASTRY",
+      "qty": 6,
+      "avgFulSec": 19451,
+      "targetSec": null,
+      "station": "Pastry"
+    },
+    {
       "menuItem": "MG-Wagyu Gyoza",
       "qty": 6,
       "avgFulSec": 516,
@@ -3525,6 +3539,20 @@
       "avgFulSec": 646,
       "targetSec": null,
       "station": "Crudo"
+    },
+    {
+      "menuItem": "ALL IN COFFEE",
+      "qty": 5,
+      "avgFulSec": null,
+      "targetSec": null,
+      "station": "Saute 1"
+    },
+    {
+      "menuItem": "ALL IN BAR",
+      "qty": 5,
+      "avgFulSec": 41513,
+      "targetSec": null,
+      "station": "Hot Expo"
     },
     {
       "menuItem": "M-Hirame Sashimi",
@@ -18039,6 +18067,12 @@
         "targetSec": null
       },
       {
+        "menuItem": "ALL IN BAR",
+        "qty": 5,
+        "avgFulSec": 41513,
+        "targetSec": null
+      },
+      {
         "menuItem": "Clase Azul Añejo",
         "qty": 4,
         "avgFulSec": 33519,
@@ -18534,6 +18568,12 @@
       },
       {
         "menuItem": "Giulia Negri Serredenari Barolo",
+        "qty": 5,
+        "avgFulSec": null,
+        "targetSec": null
+      },
+      {
+        "menuItem": "ALL IN COFFEE",
         "qty": 5,
         "avgFulSec": null,
         "targetSec": null
@@ -19183,6 +19223,12 @@
         "targetSec": null
       },
       {
+        "menuItem": "ALL IN SAVORY",
+        "qty": 6,
+        "avgFulSec": 757,
+        "targetSec": null
+      },
+      {
         "menuItem": "MEV-Sushi Selection Laurel",
         "qty": 6,
         "avgFulSec": 274,
@@ -19538,6 +19584,12 @@
         "menuItem": "M-IN Dessert Selection",
         "qty": 8,
         "avgFulSec": 849,
+        "targetSec": null
+      },
+      {
+        "menuItem": "ALL IN PASTRY",
+        "qty": 6,
+        "avgFulSec": 19451,
         "targetSec": null
       }
     ],
@@ -20040,7 +20092,7 @@
             "count": 3,
             "avg_sec": 626.3,
             "exp_sec": 0,
-            "itemQty": 13
+            "itemQty": 14
           },
           "17-18": {
             "count": 0,
@@ -20170,7 +20222,7 @@
             "count": 26,
             "avg_sec": 443,
             "exp_sec": 0,
-            "itemQty": 8
+            "itemQty": 9
           },
           "18-19": {
             "count": 86,
@@ -20220,7 +20272,7 @@
             "count": 31,
             "avg_sec": 476.9,
             "exp_sec": 0,
-            "itemQty": 35
+            "itemQty": 36
           },
           "17-18": {
             "count": 10,
@@ -20276,7 +20328,7 @@
             "count": 16,
             "avg_sec": 569.4,
             "exp_sec": 0,
-            "itemQty": 8
+            "itemQty": 9
           },
           "17-18": {
             "count": 10,
@@ -20338,7 +20390,7 @@
             "count": 17,
             "avg_sec": 426.3,
             "exp_sec": 0,
-            "itemQty": 2
+            "itemQty": 3
           },
           "12-13": {
             "count": 4,
@@ -21746,7 +21798,8 @@
           "0-1": {
             "count": 1,
             "avg_sec": 158,
-            "exp_sec": 0
+            "exp_sec": 0,
+            "itemQty": 1
           },
           "18-19": {
             "count": 5,
@@ -21796,7 +21849,7 @@
             "count": 3,
             "avg_sec": 669,
             "exp_sec": 0,
-            "itemQty": 2
+            "itemQty": 3
           },
           "18-19": {
             "count": 19,
@@ -21846,7 +21899,7 @@
             "count": 14,
             "avg_sec": 634,
             "exp_sec": 0,
-            "itemQty": 15
+            "itemQty": 16
           },
           "17-18": {
             "count": 1,
@@ -21908,7 +21961,7 @@
             "count": 5,
             "avg_sec": 864.8,
             "exp_sec": 0,
-            "itemQty": 4
+            "itemQty": 5
           },
           "17-18": {
             "count": 1,
@@ -21970,7 +22023,7 @@
             "count": 10,
             "avg_sec": 532.7,
             "exp_sec": 0,
-            "itemQty": 10
+            "itemQty": 11
           },
           "18-19": {
             "count": 17,
@@ -22020,7 +22073,7 @@
             "count": 3,
             "avg_sec": 437.3,
             "exp_sec": 0,
-            "itemQty": 2
+            "itemQty": 3
           }
         }
       },
@@ -22890,7 +22943,7 @@
             "count": 3,
             "avg_sec": 803,
             "exp_sec": 0,
-            "itemQty": 2
+            "itemQty": 3
           },
           "18-19": {
             "count": 1,
@@ -22945,7 +22998,7 @@
             "count": 7,
             "avg_sec": 366.1,
             "exp_sec": 0,
-            "itemQty": 8
+            "itemQty": 9
           },
           "18-19": {
             "count": 3,
@@ -23001,7 +23054,7 @@
             "count": 13,
             "avg_sec": 421.2,
             "exp_sec": 0,
-            "itemQty": 14
+            "itemQty": 15
           },
           "1-2": {
             "count": 1,
@@ -23069,7 +23122,7 @@
             "count": 10,
             "avg_sec": 321.2,
             "exp_sec": 0,
-            "itemQty": 9
+            "itemQty": 10
           },
           "17-18": {
             "count": 1,
@@ -23131,7 +23184,7 @@
             "count": 12,
             "avg_sec": 341,
             "exp_sec": 0,
-            "itemQty": 16
+            "itemQty": 17
           },
           "18-19": {
             "count": 1,
@@ -23180,7 +23233,7 @@
             "count": 13,
             "avg_sec": 421.7,
             "exp_sec": 0,
-            "itemQty": 16
+            "itemQty": 17
           }
         }
       },
@@ -23318,7 +23371,7 @@
             "count": 6,
             "avg_sec": 383.5,
             "exp_sec": 0,
-            "itemQty": 2
+            "itemQty": 3
           },
           "18-19": {
             "count": 2,
@@ -23368,7 +23421,7 @@
             "count": 6,
             "avg_sec": 405.3,
             "exp_sec": 0,
-            "itemQty": 1
+            "itemQty": 2
           },
           "17-18": {
             "count": 1,
@@ -23424,7 +23477,7 @@
             "count": 3,
             "avg_sec": 691.7,
             "exp_sec": 0,
-            "itemQty": 2
+            "itemQty": 3
           },
           "17-18": {
             "count": 1,
@@ -23486,7 +23539,7 @@
             "count": 3,
             "avg_sec": 294.3,
             "exp_sec": 0,
-            "itemQty": 1
+            "itemQty": 2
           },
           "18-19": {
             "count": 8,
@@ -23553,7 +23606,8 @@
           "0-1": {
             "count": 1,
             "avg_sec": 1081,
-            "exp_sec": 0
+            "exp_sec": 0,
+            "itemQty": 1
           },
           "21-22": {
             "count": 0,
@@ -26399,6 +26453,13 @@
             "t": "Mon 12:22a",
             "tgt": 0,
             "table": "906"
+          },
+          {
+            "n": "ALL IN BAR",
+            "q": 1,
+            "t": "Mon 12:28a",
+            "tgt": 0,
+            "table": "64"
           }
         ]
       },
@@ -28801,6 +28862,13 @@
             "t": "Thu 12:44a",
             "tgt": 0,
             "table": "53"
+          },
+          {
+            "n": "ALL IN BAR",
+            "q": 1,
+            "t": "Thu 12:55a",
+            "tgt": 0,
+            "table": "70"
           }
         ],
         "16-17": [
@@ -30653,6 +30721,13 @@
             "t": "Fri 12:45a",
             "tgt": 0,
             "table": "3000"
+          },
+          {
+            "n": "ALL IN BAR",
+            "q": 1,
+            "t": "Fri 12:50a",
+            "tgt": 0,
+            "table": "79"
           },
           {
             "n": "Del Maguey Vida",
@@ -32850,6 +32925,13 @@
             "t": "Sat 1:18a",
             "tgt": 0,
             "table": "700"
+          },
+          {
+            "n": "ALL IN BAR",
+            "q": 1,
+            "t": "Sat 1:37a",
+            "tgt": 0,
+            "table": "75"
           }
         ],
         "16-17": [
@@ -34797,6 +34879,13 @@
             "t": "Sun 1:26a",
             "tgt": 0,
             "table": "101"
+          },
+          {
+            "n": "ALL IN BAR",
+            "q": 1,
+            "t": "Sun 1:42a",
+            "tgt": 0,
+            "table": "75"
           }
         ],
         "11-12": [
@@ -37747,6 +37836,15 @@
             "tgt": 0,
             "table": "700"
           }
+        ],
+        "0-1": [
+          {
+            "n": "ALL IN COFFEE",
+            "q": 1,
+            "t": "Mon 12:28a",
+            "tgt": 0,
+            "table": "64"
+          }
         ]
       },
       "Tuesday": {
@@ -38865,6 +38963,13 @@
             "t": "Thu 12:29a",
             "tgt": 0,
             "table": "601"
+          },
+          {
+            "n": "ALL IN COFFEE",
+            "q": 1,
+            "t": "Thu 12:55a",
+            "tgt": 0,
+            "table": "70"
           }
         ],
         "16-17": [
@@ -39506,6 +39611,13 @@
             "t": "Fri 12:09a",
             "tgt": 0,
             "table": "602"
+          },
+          {
+            "n": "ALL IN COFFEE",
+            "q": 1,
+            "t": "Fri 12:50a",
+            "tgt": 0,
+            "table": "79"
           }
         ],
         "17-18": [
@@ -40240,6 +40352,13 @@
             "t": "Sat 1:12a",
             "tgt": 0,
             "table": "3001"
+          },
+          {
+            "n": "ALL IN COFFEE",
+            "q": 1,
+            "t": "Sat 1:37a",
+            "tgt": 0,
+            "table": "75"
           }
         ],
         "16-17": [
@@ -40948,6 +41067,13 @@
             "t": "Sun 1:08a",
             "tgt": 0,
             "table": "404"
+          },
+          {
+            "n": "ALL IN COFFEE",
+            "q": 1,
+            "t": "Sun 1:42a",
+            "tgt": 0,
+            "table": "75"
           }
         ],
         "12-13": [
@@ -67633,6 +67759,15 @@
         ]
       },
       "Wednesday": {
+        "0-1": [
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Wed 12:11a",
+            "tgt": 0,
+            "table": "108"
+          }
+        ],
         "15-16": [
           {
             "n": "MEV-Sushi Selection",
@@ -68468,6 +68603,13 @@
             "t": "Thu 12:22a",
             "tgt": 0,
             "table": "201"
+          },
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Thu 12:41a",
+            "tgt": 0,
+            "table": "70"
           }
         ],
         "16-17": [
@@ -70061,6 +70203,13 @@
             "t": "Fri 12:32a",
             "tgt": 0,
             "table": "604"
+          },
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Fri 12:50a",
+            "tgt": 0,
+            "table": "79"
           },
           {
             "n": "M-Sushi Rice (side)",
@@ -72281,6 +72430,13 @@
             "t": "Sat 1:06a",
             "tgt": 0,
             "table": "10"
+          },
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Sat 1:16a",
+            "tgt": 0,
+            "table": "75"
           }
         ],
         "16-17": [
@@ -74494,6 +74650,13 @@
             "t": "Sun 1:26a",
             "tgt": 0,
             "table": "74"
+          },
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Sun 1:30a",
+            "tgt": 0,
+            "table": "75"
           }
         ],
         "17-18": [
@@ -75807,6 +75970,13 @@
             "t": "Mon 12:00a",
             "tgt": 0,
             "table": "70"
+          },
+          {
+            "n": "ALL IN SAVORY",
+            "q": 1,
+            "t": "Mon 12:11a",
+            "tgt": 0,
+            "table": "64"
           }
         ]
       }
@@ -85664,6 +85834,13 @@
             "t": "Wed 12:23a",
             "tgt": 0,
             "table": "400"
+          },
+          {
+            "n": "ALL IN PASTRY",
+            "q": 1,
+            "t": "Wed 12:27a",
+            "tgt": 0,
+            "table": "605"
           }
         ],
         "15-16": [
@@ -86305,6 +86482,13 @@
             "t": "Thu 12:54a",
             "tgt": 0,
             "table": "108"
+          },
+          {
+            "n": "ALL IN PASTRY",
+            "q": 1,
+            "t": "Thu 12:55a",
+            "tgt": 0,
+            "table": "70"
           }
         ],
         "16-17": [
@@ -87018,6 +87202,13 @@
             "t": "Fri 12:53a",
             "tgt": 0,
             "table": "102"
+          },
+          {
+            "n": "ALL IN PASTRY",
+            "q": 1,
+            "t": "Fri 12:54a",
+            "tgt": 0,
+            "table": "79"
           },
           {
             "n": "M-MILA Chocolate Lava Cake",
@@ -88050,6 +88241,13 @@
             "t": "Sat 1:28a",
             "tgt": 0,
             "table": "700"
+          },
+          {
+            "n": "ALL IN PASTRY",
+            "q": 1,
+            "t": "Sat 1:37a",
+            "tgt": 0,
+            "table": "75"
           }
         ],
         "16-17": [
@@ -89241,6 +89439,13 @@
             "t": "Sun 1:38a",
             "tgt": 0,
             "table": "101"
+          },
+          {
+            "n": "ALL IN PASTRY",
+            "q": 1,
+            "t": "Sun 1:42a",
+            "tgt": 0,
+            "table": "75"
           }
         ],
         "17-18": [
@@ -90041,6 +90246,13 @@
             "t": "Mon 12:26a",
             "tgt": 0,
             "table": "301"
+          },
+          {
+            "n": "ALL IN PASTRY",
+            "q": 1,
+            "t": "Mon 12:28a",
+            "tgt": 0,
+            "table": "64"
           },
           {
             "n": "M-Cakeage Fee",
@@ -94592,7 +94804,7 @@
     "Hot Expo": {
       "Monday": {
         "ticketCount": 12,
-        "itemQty": 5333,
+        "itemQty": 5334,
         "avgFulSec": 1213.8
       },
       "Tuesday": {
@@ -94607,22 +94819,22 @@
       },
       "Thursday": {
         "ticketCount": 716,
-        "itemQty": 316,
+        "itemQty": 317,
         "avgFulSec": 421.7
       },
       "Friday": {
         "ticketCount": 869,
-        "itemQty": 359,
+        "itemQty": 360,
         "avgFulSec": 392.1
       },
       "Saturday": {
         "ticketCount": 941,
-        "itemQty": 383,
+        "itemQty": 384,
         "avgFulSec": 455.6
       },
       "Sunday": {
         "ticketCount": 745,
-        "itemQty": 564,
+        "itemQty": 565,
         "avgFulSec": 460.8
       }
     },
@@ -94745,32 +94957,32 @@
       },
       "Wednesday": {
         "ticketCount": 83,
-        "itemQty": 126,
+        "itemQty": 127,
         "avgFulSec": 555.7
       },
       "Thursday": {
         "ticketCount": 144,
-        "itemQty": 286,
+        "itemQty": 287,
         "avgFulSec": 802.7
       },
       "Friday": {
         "ticketCount": 195,
-        "itemQty": 333,
+        "itemQty": 334,
         "avgFulSec": 715
       },
       "Saturday": {
         "ticketCount": 210,
-        "itemQty": 337,
+        "itemQty": 338,
         "avgFulSec": 625
       },
       "Sunday": {
         "ticketCount": 166,
-        "itemQty": 272,
+        "itemQty": 273,
         "avgFulSec": 600.4
       },
       "Monday": {
         "ticketCount": 3,
-        "itemQty": 2,
+        "itemQty": 3,
         "avgFulSec": 437.3
       }
     },
@@ -94856,32 +95068,32 @@
       },
       "Wednesday": {
         "ticketCount": 74,
-        "itemQty": 90,
+        "itemQty": 91,
         "avgFulSec": 261.6
       },
       "Thursday": {
         "ticketCount": 76,
-        "itemQty": 118,
+        "itemQty": 119,
         "avgFulSec": 390.3
       },
       "Friday": {
         "ticketCount": 104,
-        "itemQty": 136,
+        "itemQty": 137,
         "avgFulSec": 304.7
       },
       "Saturday": {
         "ticketCount": 137,
-        "itemQty": 197,
+        "itemQty": 198,
         "avgFulSec": 328.9
       },
       "Sunday": {
         "ticketCount": 126,
-        "itemQty": 152,
+        "itemQty": 153,
         "avgFulSec": 306.9
       },
       "Monday": {
         "ticketCount": 13,
-        "itemQty": 16,
+        "itemQty": 17,
         "avgFulSec": 421.7
       }
     },
@@ -94898,27 +95110,27 @@
       },
       "Thursday": {
         "ticketCount": 82,
-        "itemQty": 111,
+        "itemQty": 112,
         "avgFulSec": 356.7
       },
       "Friday": {
         "ticketCount": 81,
-        "itemQty": 104,
+        "itemQty": 105,
         "avgFulSec": 373.6
       },
       "Saturday": {
         "ticketCount": 86,
-        "itemQty": 122,
+        "itemQty": 123,
         "avgFulSec": 397.2
       },
       "Sunday": {
         "ticketCount": 86,
-        "itemQty": 119,
+        "itemQty": 120,
         "avgFulSec": 372.4
       },
       "Monday": {
         "ticketCount": 1,
-        "itemQty": 1,
+        "itemQty": 2,
         "avgFulSec": 1081
       }
     },
@@ -96872,6 +97084,16 @@
       "targetSec": null,
       "avgFulSec": null,
       "count": 0
+    },
+    {
+      "menuItem": "ALL IN BAR",
+      "station": "Hot Expo",
+      "stations": [
+        "Hot Expo"
+      ],
+      "targetSec": null,
+      "avgFulSec": 41513,
+      "count": 5
     },
     {
       "menuItem": "Amabuki TASTE",
@@ -107004,6 +107226,16 @@
       "count": 0
     },
     {
+      "menuItem": "ALL IN PASTRY",
+      "station": "Pastry",
+      "stations": [
+        "Pastry"
+      ],
+      "targetSec": null,
+      "avgFulSec": 19451,
+      "count": 6
+    },
+    {
       "menuItem": "Brunch Mother day Dessert",
       "station": "Pastry",
       "stations": [
@@ -108321,6 +108553,16 @@
       "targetSec": null,
       "avgFulSec": null,
       "count": 0
+    },
+    {
+      "menuItem": "ALL IN COFFEE",
+      "station": "Saute 1",
+      "stations": [
+        "Saute 1"
+      ],
+      "targetSec": null,
+      "avgFulSec": null,
+      "count": 5
     },
     {
       "menuItem": "Alvaro Palacio Finca Dofi (Magnum)",
@@ -114955,6 +115197,25 @@
       "count": 0
     },
     {
+      "menuItem": "ALL IN SAVORY",
+      "station": "Sushi Bar",
+      "stations": [
+        "Sushi Bar",
+        "Saute 1",
+        "Garde Manger",
+        "Saute 2",
+        "Tempura",
+        "Cold Expo",
+        "Robata (2)",
+        "Robata",
+        "Crudo",
+        "Hot Expo"
+      ],
+      "targetSec": null,
+      "avgFulSec": 757,
+      "count": 6
+    },
+    {
       "menuItem": "Cm 4pc Spicy Tuna",
       "station": "Sushi Bar",
       "stations": [
@@ -116552,8 +116813,8 @@
     "orderCount": 2603,
     "uniqueTickets": 13775,
     "stationFireCount": 13775,
-    "itemDetailSkuCount": 500,
-    "itemQtyTotal": 20415,
+    "itemDetailSkuCount": 504,
+    "itemQtyTotal": 20437,
     "fulfillmentAdjustSec": 5,
     "concurrencyUnit": "production_station_fire",
     "concurrencyExcludeExpo": true,
@@ -118783,7 +119044,7 @@
   "staffing": {
     "venue": "mila",
     "weekLabel": "2026-W43",
-    "builtAt": "2026-10-30T17:29:09.899Z",
+    "builtAt": "2026-10-30T18:10:44.811Z",
     "matchStats": {
       "laborShiftsMatched": 135,
       "laborShiftsUnmatched": 461,
@@ -118832,12 +119093,12 @@
         "rosterCount": 8,
         "weekHeadsUnique": 6,
         "weekHours": 244.97,
-        "weekItemCount": 2385,
+        "weekItemCount": 2390,
         "weekTicketCount": 1831,
-        "weekItemsPerHeadDay": 82.2,
-        "weekItemsPerStaffHour": 9.74,
+        "weekItemsPerHeadDay": 82.4,
+        "weekItemsPerStaffHour": 9.76,
         "weekServiceHours": 49,
-        "weekItemsPerServiceHour": 48.67,
+        "weekItemsPerServiceHour": 48.78,
         "weekAvgFulSec": 494.1,
         "days": {
           "Monday": {
@@ -119097,14 +119358,14 @@
               "1-2": []
             },
             "ticketCount": 3,
-            "itemQty": 3,
-            "volume": 3,
+            "itemQty": 4,
+            "volume": 4,
             "volumeSource": "itemQty",
-            "itemCount": 3,
-            "itemsPerHead": 0.8,
+            "itemCount": 4,
+            "itemsPerHead": 1,
             "serviceHours": 1,
-            "itemsPerServiceHour": 3,
-            "itemsPerStaffHour": 0.11,
+            "itemsPerServiceHour": 4,
+            "itemsPerStaffHour": 0.15,
             "avgFulSec": 817.7,
             "qc": {
               "eligible": false,
@@ -120048,14 +120309,14 @@
               ]
             },
             "ticketCount": 319,
-            "itemQty": 448,
-            "volume": 448,
+            "itemQty": 449,
+            "volume": 449,
             "volumeSource": "itemQty",
-            "itemCount": 448,
-            "itemsPerHead": 149.3,
+            "itemCount": 449,
+            "itemsPerHead": 149.7,
             "serviceHours": 7,
-            "itemsPerServiceHour": 64,
-            "itemsPerStaffHour": 16.97,
+            "itemsPerServiceHour": 64.14,
+            "itemsPerStaffHour": 17.01,
             "avgFulSec": 493.6,
             "qc": {
               "eligible": true,
@@ -120455,14 +120716,14 @@
               ]
             },
             "ticketCount": 322,
-            "itemQty": 406,
-            "volume": 406,
+            "itemQty": 407,
+            "volume": 407,
             "volumeSource": "itemQty",
-            "itemCount": 406,
-            "itemsPerHead": 81.2,
+            "itemCount": 407,
+            "itemsPerHead": 81.4,
             "serviceHours": 8,
-            "itemsPerServiceHour": 50.75,
-            "itemsPerStaffHour": 8.88,
+            "itemsPerServiceHour": 50.88,
+            "itemsPerStaffHour": 8.9,
             "avgFulSec": 442.4,
             "qc": {
               "eligible": true,
@@ -120797,14 +121058,14 @@
               ]
             },
             "ticketCount": 413,
-            "itemQty": 527,
-            "volume": 527,
+            "itemQty": 528,
+            "volume": 528,
             "volumeSource": "itemQty",
-            "itemCount": 527,
-            "itemsPerHead": 131.8,
+            "itemCount": 528,
+            "itemsPerHead": 132,
             "serviceHours": 9,
-            "itemsPerServiceHour": 58.56,
-            "itemsPerStaffHour": 14.18,
+            "itemsPerServiceHour": 58.67,
+            "itemsPerStaffHour": 14.21,
             "avgFulSec": 537.7,
             "qc": {
               "eligible": true,
@@ -120817,7 +121078,7 @@
               "nPeer": 44,
               "nHist": 10,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.98
+              "staffingRatio": 0.95
             }
           },
           "Sunday": {
@@ -121114,14 +121375,14 @@
               "1-2": []
             },
             "ticketCount": 302,
-            "itemQty": 376,
-            "volume": 376,
+            "itemQty": 377,
+            "volume": 377,
             "volumeSource": "itemQty",
-            "itemCount": 376,
-            "itemsPerHead": 94,
+            "itemCount": 377,
+            "itemsPerHead": 94.3,
             "serviceHours": 10,
-            "itemsPerServiceHour": 37.6,
-            "itemsPerStaffHour": 11.24,
+            "itemsPerServiceHour": 37.7,
+            "itemsPerStaffHour": 11.27,
             "avgFulSec": 463.8,
             "qc": {
               "eligible": true,
@@ -123360,12 +123621,12 @@
         "rosterCount": 6,
         "weekHeadsUnique": 5,
         "weekHours": 163.9,
-        "weekItemCount": 833,
+        "weekItemCount": 839,
         "weekTicketCount": 614,
-        "weekItemsPerHeadDay": 46.3,
-        "weekItemsPerStaffHour": 5.08,
+        "weekItemsPerHeadDay": 46.6,
+        "weekItemsPerStaffHour": 5.12,
         "weekServiceHours": 46,
-        "weekItemsPerServiceHour": 18.11,
+        "weekItemsPerServiceHour": 18.24,
         "weekAvgFulSec": 320.8,
         "days": {
           "Monday": {
@@ -123551,14 +123812,14 @@
               "1-2": []
             },
             "ticketCount": 13,
-            "itemQty": 16,
-            "volume": 16,
+            "itemQty": 17,
+            "volume": 17,
             "volumeSource": "itemQty",
-            "itemCount": 16,
-            "itemsPerHead": 8,
+            "itemCount": 17,
+            "itemsPerHead": 8.5,
             "serviceHours": 1,
-            "itemsPerServiceHour": 16,
-            "itemsPerStaffHour": 0.93,
+            "itemsPerServiceHour": 17,
+            "itemsPerStaffHour": 0.99,
             "avgFulSec": 421.7,
             "qc": {
               "eligible": false,
@@ -124039,14 +124300,14 @@
               ]
             },
             "ticketCount": 74,
-            "itemQty": 90,
-            "volume": 90,
+            "itemQty": 91,
+            "volume": 91,
             "volumeSource": "itemQty",
-            "itemCount": 90,
-            "itemsPerHead": 45,
+            "itemCount": 91,
+            "itemsPerHead": 45.5,
             "serviceHours": 7,
-            "itemsPerServiceHour": 12.86,
-            "itemsPerStaffHour": 5.34,
+            "itemsPerServiceHour": 13,
+            "itemsPerStaffHour": 5.4,
             "avgFulSec": 261.6,
             "qc": {
               "eligible": true,
@@ -124251,14 +124512,14 @@
               ]
             },
             "ticketCount": 76,
-            "itemQty": 118,
-            "volume": 118,
+            "itemQty": 119,
+            "volume": 119,
             "volumeSource": "itemQty",
-            "itemCount": 118,
-            "itemsPerHead": 59,
+            "itemCount": 119,
+            "itemsPerHead": 59.5,
             "serviceHours": 7,
-            "itemsPerServiceHour": 16.86,
-            "itemsPerStaffHour": 6.15,
+            "itemsPerServiceHour": 17,
+            "itemsPerStaffHour": 6.2,
             "avgFulSec": 390.3,
             "qc": {
               "eligible": true,
@@ -124530,14 +124791,14 @@
               ]
             },
             "ticketCount": 104,
-            "itemQty": 136,
-            "volume": 136,
+            "itemQty": 137,
+            "volume": 137,
             "volumeSource": "itemQty",
-            "itemCount": 136,
-            "itemsPerHead": 45.3,
+            "itemCount": 137,
+            "itemsPerHead": 45.7,
             "serviceHours": 8,
-            "itemsPerServiceHour": 17,
-            "itemsPerStaffHour": 4.74,
+            "itemsPerServiceHour": 17.13,
+            "itemsPerStaffHour": 4.77,
             "avgFulSec": 304.7,
             "qc": {
               "eligible": true,
@@ -124803,14 +125064,14 @@
               ]
             },
             "ticketCount": 137,
-            "itemQty": 197,
-            "volume": 197,
+            "itemQty": 198,
+            "volume": 198,
             "volumeSource": "itemQty",
-            "itemCount": 197,
-            "itemsPerHead": 65.7,
+            "itemCount": 198,
+            "itemsPerHead": 66,
             "serviceHours": 9,
-            "itemsPerServiceHour": 21.89,
-            "itemsPerStaffHour": 6.86,
+            "itemsPerServiceHour": 22,
+            "itemsPerStaffHour": 6.89,
             "avgFulSec": 328.9,
             "qc": {
               "eligible": true,
@@ -125054,14 +125315,14 @@
               "1-2": []
             },
             "ticketCount": 126,
-            "itemQty": 152,
-            "volume": 152,
+            "itemQty": 153,
+            "volume": 153,
             "volumeSource": "itemQty",
-            "itemCount": 152,
-            "itemsPerHead": 50.7,
+            "itemCount": 153,
+            "itemsPerHead": 51,
             "serviceHours": 8,
-            "itemsPerServiceHour": 19,
-            "itemsPerStaffHour": 5.91,
+            "itemsPerServiceHour": 19.13,
+            "itemsPerStaffHour": 5.95,
             "avgFulSec": 306.9,
             "qc": {
               "eligible": true,
@@ -125084,12 +125345,12 @@
         "rosterCount": 12,
         "weekHeadsUnique": 9,
         "weekHours": 295.27,
-        "weekItemCount": 1622,
+        "weekItemCount": 1628,
         "weekTicketCount": 924,
-        "weekItemsPerHeadDay": 46.3,
-        "weekItemsPerStaffHour": 5.49,
+        "weekItemsPerHeadDay": 46.5,
+        "weekItemsPerStaffHour": 5.51,
         "weekServiceHours": 46,
-        "weekItemsPerServiceHour": 35.26,
+        "weekItemsPerServiceHour": 35.39,
         "weekAvgFulSec": 673.6,
         "days": {
           "Monday": {
@@ -125317,14 +125578,14 @@
               "1-2": []
             },
             "ticketCount": 3,
-            "itemQty": 2,
-            "volume": 2,
+            "itemQty": 3,
+            "volume": 3,
             "volumeSource": "itemQty",
-            "itemCount": 2,
-            "itemsPerHead": 0.5,
+            "itemCount": 3,
+            "itemsPerHead": 0.8,
             "serviceHours": 1,
-            "itemsPerServiceHour": 2,
-            "itemsPerStaffHour": 0.09,
+            "itemsPerServiceHour": 3,
+            "itemsPerStaffHour": 0.14,
             "avgFulSec": 437.3,
             "qc": {
               "eligible": false,
@@ -126020,14 +126281,14 @@
               "1-2": []
             },
             "ticketCount": 83,
-            "itemQty": 126,
-            "volume": 126,
+            "itemQty": 127,
+            "volume": 127,
             "volumeSource": "itemQty",
-            "itemCount": 126,
-            "itemsPerHead": 31.5,
+            "itemCount": 127,
+            "itemsPerHead": 31.8,
             "serviceHours": 7,
-            "itemsPerServiceHour": 18,
-            "itemsPerStaffHour": 3.46,
+            "itemsPerServiceHour": 18.14,
+            "itemsPerStaffHour": 3.49,
             "avgFulSec": 555.7,
             "qc": {
               "eligible": true,
@@ -126422,14 +126683,14 @@
               ]
             },
             "ticketCount": 144,
-            "itemQty": 286,
-            "volume": 286,
+            "itemQty": 287,
+            "volume": 287,
             "volumeSource": "itemQty",
-            "itemCount": 286,
-            "itemsPerHead": 57.2,
+            "itemCount": 287,
+            "itemsPerHead": 57.4,
             "serviceHours": 7,
-            "itemsPerServiceHour": 40.86,
-            "itemsPerStaffHour": 6.28,
+            "itemsPerServiceHour": 41,
+            "itemsPerStaffHour": 6.31,
             "avgFulSec": 802.7,
             "qc": {
               "eligible": true,
@@ -126848,14 +127109,14 @@
               ]
             },
             "ticketCount": 195,
-            "itemQty": 333,
-            "volume": 333,
+            "itemQty": 334,
+            "volume": 334,
             "volumeSource": "itemQty",
-            "itemCount": 333,
-            "itemsPerHead": 66.6,
+            "itemCount": 334,
+            "itemsPerHead": 66.8,
             "serviceHours": 8,
-            "itemsPerServiceHour": 41.63,
-            "itemsPerStaffHour": 6.73,
+            "itemsPerServiceHour": 41.75,
+            "itemsPerStaffHour": 6.75,
             "avgFulSec": 715,
             "qc": {
               "eligible": true,
@@ -127381,14 +127642,14 @@
               ]
             },
             "ticketCount": 210,
-            "itemQty": 337,
-            "volume": 337,
+            "itemQty": 338,
+            "volume": 338,
             "volumeSource": "itemQty",
-            "itemCount": 337,
-            "itemsPerHead": 48.1,
+            "itemCount": 338,
+            "itemsPerHead": 48.3,
             "serviceHours": 9,
-            "itemsPerServiceHour": 37.44,
-            "itemsPerStaffHour": 5.26,
+            "itemsPerServiceHour": 37.56,
+            "itemsPerStaffHour": 5.28,
             "avgFulSec": 625,
             "qc": {
               "eligible": true,
@@ -127401,7 +127662,7 @@
               "nPeer": 11,
               "nHist": 8,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.46
+              "staffingRatio": 1.43
             }
           },
           "Sunday": {
@@ -127691,14 +127952,14 @@
               "1-2": []
             },
             "ticketCount": 166,
-            "itemQty": 272,
-            "volume": 272,
+            "itemQty": 273,
+            "volume": 273,
             "volumeSource": "itemQty",
-            "itemCount": 272,
-            "itemsPerHead": 54.4,
+            "itemCount": 273,
+            "itemsPerHead": 54.6,
             "serviceHours": 8,
-            "itemsPerServiceHour": 34,
-            "itemsPerStaffHour": 7.11,
+            "itemsPerServiceHour": 34.13,
+            "itemsPerStaffHour": 7.13,
             "avgFulSec": 600.4,
             "qc": {
               "eligible": true,
@@ -131456,12 +131717,12 @@
         "rosterCount": 0,
         "weekHeadsUnique": 1,
         "weekHours": 7,
-        "weekItemCount": 8891,
+        "weekItemCount": 8896,
         "weekTicketCount": 6265,
-        "weekItemsPerHeadDay": 1270.1,
-        "weekItemsPerStaffHour": 1270.14,
+        "weekItemsPerHeadDay": 1270.9,
+        "weekItemsPerStaffHour": 1270.86,
         "weekServiceHours": 54,
-        "weekItemsPerServiceHour": 164.65,
+        "weekItemsPerServiceHour": 164.74,
         "weekAvgFulSec": 484.2,
         "days": {
           "Monday": {
@@ -131511,14 +131772,14 @@
               "1-2": []
             },
             "ticketCount": 18,
-            "itemQty": 5697,
-            "volume": 5697,
+            "itemQty": 5698,
+            "volume": 5698,
             "volumeSource": "itemQty",
-            "itemCount": 5697,
-            "itemsPerHead": 5697,
+            "itemCount": 5698,
+            "itemsPerHead": 5698,
             "serviceHours": 4,
-            "itemsPerServiceHour": 1424.25,
-            "itemsPerStaffHour": 5697,
+            "itemsPerServiceHour": 1424.5,
+            "itemsPerStaffHour": 5698,
             "avgFulSec": 1103.7,
             "qc": {
               "eligible": true,
@@ -131721,14 +131982,14 @@
               "1-2": []
             },
             "ticketCount": 1045,
-            "itemQty": 393,
-            "volume": 393,
+            "itemQty": 394,
+            "volume": 394,
             "volumeSource": "itemQty",
-            "itemCount": 393,
-            "itemsPerHead": 393,
+            "itemCount": 394,
+            "itemsPerHead": 394,
             "serviceHours": 7,
-            "itemsPerServiceHour": 56.14,
-            "itemsPerStaffHour": 393,
+            "itemsPerServiceHour": 56.29,
+            "itemsPerStaffHour": 394,
             "avgFulSec": 488.4,
             "qc": {
               "eligible": true,
@@ -131791,14 +132052,14 @@
               "1-2": []
             },
             "ticketCount": 1243,
-            "itemQty": 387,
-            "volume": 387,
+            "itemQty": 388,
+            "volume": 388,
             "volumeSource": "itemQty",
-            "itemCount": 387,
-            "itemsPerHead": 387,
+            "itemCount": 388,
+            "itemsPerHead": 388,
             "serviceHours": 8,
-            "itemsPerServiceHour": 48.38,
-            "itemsPerStaffHour": 387,
+            "itemsPerServiceHour": 48.5,
+            "itemsPerStaffHour": 388,
             "avgFulSec": 457.4,
             "qc": {
               "eligible": true,
@@ -131861,14 +132122,14 @@
               "1-2": []
             },
             "ticketCount": 1365,
-            "itemQty": 451,
-            "volume": 451,
+            "itemQty": 452,
+            "volume": 452,
             "volumeSource": "itemQty",
-            "itemCount": 451,
-            "itemsPerHead": 451,
+            "itemCount": 452,
+            "itemsPerHead": 452,
             "serviceHours": 9,
-            "itemsPerServiceHour": 50.11,
-            "itemsPerStaffHour": 451,
+            "itemsPerServiceHour": 50.22,
+            "itemsPerStaffHour": 452,
             "avgFulSec": 485.6,
             "qc": {
               "eligible": true,
@@ -131931,14 +132192,14 @@
               "1-2": []
             },
             "ticketCount": 1067,
-            "itemQty": 1479,
-            "volume": 1479,
+            "itemQty": 1480,
+            "volume": 1480,
             "volumeSource": "itemQty",
-            "itemCount": 1479,
-            "itemsPerHead": 1479,
+            "itemCount": 1480,
+            "itemsPerHead": 1480,
             "serviceHours": 10,
-            "itemsPerServiceHour": 147.9,
-            "itemsPerStaffHour": 1479,
+            "itemsPerServiceHour": 148,
+            "itemsPerStaffHour": 1480,
             "avgFulSec": 490.6,
             "qc": {
               "eligible": true,
@@ -131966,12 +132227,12 @@
           "Raw"
         ],
         "weekHours": 0,
-        "weekItems": 9718,
+        "weekItems": 9723,
         "weekItemsPerHour": null,
         "days": {
           "Monday": {
             "hours": 0,
-            "items": 5699,
+            "items": 5700,
             "itemsPerHour": null,
             "families": [
               "Raw",
@@ -131998,7 +132259,7 @@
           },
           "Thursday": {
             "hours": 0,
-            "items": 564,
+            "items": 565,
             "itemsPerHour": null,
             "families": [
               "Raw",
@@ -132007,7 +132268,7 @@
           },
           "Friday": {
             "hours": 0,
-            "items": 575,
+            "items": 576,
             "itemsPerHour": null,
             "families": [
               "Raw",
@@ -132016,7 +132277,7 @@
           },
           "Saturday": {
             "hours": 0,
-            "items": 621,
+            "items": 622,
             "itemsPerHour": null,
             "families": [
               "Raw",
@@ -132025,7 +132286,7 @@
           },
           "Sunday": {
             "hours": 0,
-            "items": 1580,
+            "items": 1581,
             "itemsPerHour": null,
             "families": [
               "Raw",
@@ -132345,8 +132606,8 @@
           "Saute"
         ],
         "weekHours": 41.72,
-        "weekItems": 461,
-        "weekItemsPerHour": 11.06,
+        "weekItems": 462,
+        "weekItemsPerHour": 11.08,
         "days": {
           "Tuesday": {
             "hours": 7.95,
@@ -132366,8 +132627,8 @@
           },
           "Thursday": {
             "hours": 8.6,
-            "items": 149,
-            "itemsPerHour": 17.36,
+            "items": 150,
+            "itemsPerHour": 17.4,
             "families": [
               "Saute"
             ]
@@ -132375,7 +132636,7 @@
           "Friday": {
             "hours": 8.92,
             "items": 81,
-            "itemsPerHour": 9.1,
+            "itemsPerHour": 9.13,
             "families": [
               "Saute"
             ]
@@ -132383,7 +132644,7 @@
           "Sunday": {
             "hours": 7.92,
             "items": 94,
-            "itemsPerHour": 11.87,
+            "itemsPerHour": 11.9,
             "families": [
               "Saute"
             ]
@@ -132397,13 +132658,13 @@
           "Saute"
         ],
         "weekHours": 42.14,
-        "weekItems": 422,
-        "weekItemsPerHour": 10.01,
+        "weekItems": 423,
+        "weekItemsPerHour": 10.03,
         "days": {
           "Monday": {
             "hours": 7.05,
             "items": 1,
-            "itemsPerHour": 0.11,
+            "itemsPerHour": 0.14,
             "families": [
               "Saute"
             ]
@@ -132418,8 +132679,8 @@
           },
           "Thursday": {
             "hours": 9.8,
-            "items": 149,
-            "itemsPerHour": 15.24,
+            "items": 150,
+            "itemsPerHour": 15.27,
             "families": [
               "Saute"
             ]
@@ -132427,7 +132688,7 @@
           "Friday": {
             "hours": 8.68,
             "items": 81,
-            "itemsPerHour": 9.35,
+            "itemsPerHour": 9.38,
             "families": [
               "Saute"
             ]
@@ -132435,7 +132696,7 @@
           "Saturday": {
             "hours": 8.23,
             "items": 132,
-            "itemsPerHour": 16.01,
+            "itemsPerHour": 16.04,
             "families": [
               "Saute"
             ]
@@ -132449,13 +132710,13 @@
           "Saute"
         ],
         "weekHours": 39.98,
-        "weekItems": 386,
-        "weekItemsPerHour": 9.65,
+        "weekItems": 387,
+        "weekItemsPerHour": 9.67,
         "days": {
           "Monday": {
             "hours": 6.32,
             "items": 1,
-            "itemsPerHour": 0.12,
+            "itemsPerHour": 0.16,
             "families": [
               "Saute"
             ]
@@ -132471,7 +132732,7 @@
           "Friday": {
             "hours": 8.63,
             "items": 81,
-            "itemsPerHour": 9.41,
+            "itemsPerHour": 9.43,
             "families": [
               "Saute"
             ]
@@ -132479,7 +132740,7 @@
           "Saturday": {
             "hours": 9.08,
             "items": 132,
-            "itemsPerHour": 14.51,
+            "itemsPerHour": 14.54,
             "families": [
               "Saute"
             ]
@@ -132487,7 +132748,7 @@
           "Sunday": {
             "hours": 7.95,
             "items": 94,
-            "itemsPerHour": 11.82,
+            "itemsPerHour": 11.86,
             "families": [
               "Saute"
             ]
@@ -132501,13 +132762,13 @@
           "Saute"
         ],
         "weekHours": 43.9,
-        "weekItems": 386,
-        "weekItemsPerHour": 8.79,
+        "weekItems": 387,
+        "weekItemsPerHour": 8.81,
         "days": {
           "Monday": {
             "hours": 6.5,
             "items": 1,
-            "itemsPerHour": 0.12,
+            "itemsPerHour": 0.15,
             "families": [
               "Saute"
             ]
@@ -132523,7 +132784,7 @@
           "Friday": {
             "hours": 10.03,
             "items": 81,
-            "itemsPerHour": 8.1,
+            "itemsPerHour": 8.12,
             "families": [
               "Saute"
             ]
@@ -132531,7 +132792,7 @@
           "Saturday": {
             "hours": 10,
             "items": 132,
-            "itemsPerHour": 13.18,
+            "itemsPerHour": 13.2,
             "families": [
               "Saute"
             ]
@@ -132539,7 +132800,7 @@
           "Sunday": {
             "hours": 8.9,
             "items": 94,
-            "itemsPerHour": 10.56,
+            "itemsPerHour": 10.59,
             "families": [
               "Saute"
             ]
@@ -132553,8 +132814,8 @@
           "Saute"
         ],
         "weekHours": 33.49,
-        "weekItems": 367,
-        "weekItemsPerHour": 10.97,
+        "weekItems": 368,
+        "weekItemsPerHour": 10.98,
         "days": {
           "Tuesday": {
             "hours": 7.97,
@@ -132574,8 +132835,8 @@
           },
           "Thursday": {
             "hours": 8,
-            "items": 149,
-            "itemsPerHour": 18.67,
+            "items": 150,
+            "itemsPerHour": 18.71,
             "families": [
               "Saute"
             ]
@@ -132583,7 +132844,7 @@
           "Friday": {
             "hours": 9.45,
             "items": 81,
-            "itemsPerHour": 8.59,
+            "itemsPerHour": 8.61,
             "families": [
               "Saute"
             ]
@@ -132597,13 +132858,13 @@
           "Saute"
         ],
         "weekHours": 43.74,
-        "weekItems": 363,
-        "weekItemsPerHour": 8.3,
+        "weekItems": 364,
+        "weekItemsPerHour": 8.32,
         "days": {
           "Monday": {
             "hours": 7.17,
             "items": 1,
-            "itemsPerHour": 0.1,
+            "itemsPerHour": 0.14,
             "families": [
               "Saute"
             ]
@@ -132627,7 +132888,7 @@
           "Saturday": {
             "hours": 9.85,
             "items": 132,
-            "itemsPerHour": 13.38,
+            "itemsPerHour": 13.4,
             "families": [
               "Saute"
             ]
@@ -132635,7 +132896,7 @@
           "Sunday": {
             "hours": 8.68,
             "items": 94,
-            "itemsPerHour": 10.83,
+            "itemsPerHour": 10.86,
             "families": [
               "Saute"
             ]
@@ -132649,29 +132910,29 @@
           "Pastry"
         ],
         "weekHours": 46.45,
-        "weekItems": 266,
-        "weekItemsPerHour": 5.72,
+        "weekItems": 268,
+        "weekItemsPerHour": 5.76,
         "days": {
           "Wednesday": {
             "hours": 8.43,
-            "items": 45,
-            "itemsPerHour": 5.34,
+            "items": 46,
+            "itemsPerHour": 5.4,
             "families": [
               "Pastry"
             ]
           },
           "Thursday": {
             "hours": 9.53,
-            "items": 59,
-            "itemsPerHour": 6.19,
+            "items": 60,
+            "itemsPerHour": 6.24,
             "families": [
               "Pastry"
             ]
           },
           "Friday": {
             "hours": 10.22,
-            "items": 45,
-            "itemsPerHour": 4.44,
+            "items": 46,
+            "itemsPerHour": 4.47,
             "families": [
               "Pastry"
             ]
@@ -132679,7 +132940,7 @@
           "Saturday": {
             "hours": 10.22,
             "items": 66,
-            "itemsPerHour": 6.43,
+            "itemsPerHour": 6.46,
             "families": [
               "Pastry"
             ]
@@ -132687,7 +132948,7 @@
           "Sunday": {
             "hours": 8.05,
             "items": 51,
-            "itemsPerHour": 6.29,
+            "itemsPerHour": 6.34,
             "families": [
               "Pastry"
             ]
@@ -132701,13 +132962,13 @@
           "Sushi"
         ],
         "weekHours": 37.43,
-        "weekItems": 227,
-        "weekItemsPerHour": 6.06,
+        "weekItems": 228,
+        "weekItemsPerHour": 6.09,
         "days": {
           "Monday": {
             "hours": 5.13,
             "items": 1,
-            "itemsPerHour": 0.1,
+            "itemsPerHour": 0.15,
             "families": [
               "Sushi"
             ]
@@ -132715,7 +132976,7 @@
           "Thursday": {
             "hours": 8.28,
             "items": 57,
-            "itemsPerHour": 6.91,
+            "itemsPerHour": 6.93,
             "families": [
               "Sushi"
             ]
@@ -132723,7 +132984,7 @@
           "Friday": {
             "hours": 8.47,
             "items": 67,
-            "itemsPerHour": 7.86,
+            "itemsPerHour": 7.89,
             "families": [
               "Sushi"
             ]
@@ -132731,15 +132992,15 @@
           "Saturday": {
             "hours": 9.02,
             "items": 48,
-            "itemsPerHour": 5.34,
+            "itemsPerHour": 5.35,
             "families": [
               "Sushi"
             ]
           },
           "Sunday": {
             "hours": 6.53,
-            "items": 54,
-            "itemsPerHour": 8.33,
+            "items": 55,
+            "itemsPerHour": 8.36,
             "families": [
               "Sushi"
             ]
@@ -132753,13 +133014,13 @@
           "Sushi"
         ],
         "weekHours": 37,
-        "weekItems": 227,
-        "weekItemsPerHour": 6.13,
+        "weekItems": 228,
+        "weekItemsPerHour": 6.16,
         "days": {
           "Monday": {
             "hours": 5.32,
             "items": 1,
-            "itemsPerHour": 0.09,
+            "itemsPerHour": 0.14,
             "families": [
               "Sushi"
             ]
@@ -132767,7 +133028,7 @@
           "Thursday": {
             "hours": 7.88,
             "items": 57,
-            "itemsPerHour": 7.26,
+            "itemsPerHour": 7.28,
             "families": [
               "Sushi"
             ]
@@ -132775,7 +133036,7 @@
           "Friday": {
             "hours": 9.48,
             "items": 67,
-            "itemsPerHour": 7.03,
+            "itemsPerHour": 7.05,
             "families": [
               "Sushi"
             ]
@@ -132783,15 +133044,15 @@
           "Saturday": {
             "hours": 6.35,
             "items": 48,
-            "itemsPerHour": 7.58,
+            "itemsPerHour": 7.6,
             "families": [
               "Sushi"
             ]
           },
           "Sunday": {
             "hours": 7.97,
-            "items": 54,
-            "itemsPerHour": 6.83,
+            "items": 55,
+            "itemsPerHour": 6.85,
             "families": [
               "Sushi"
             ]
@@ -132805,13 +133066,13 @@
           "Sushi"
         ],
         "weekHours": 42.68,
-        "weekItems": 226,
-        "weekItemsPerHour": 5.3,
+        "weekItems": 227,
+        "weekItemsPerHour": 5.32,
         "days": {
           "Thursday": {
             "hours": 10.45,
             "items": 57,
-            "itemsPerHour": 5.47,
+            "itemsPerHour": 5.49,
             "families": [
               "Sushi"
             ]
@@ -132819,7 +133080,7 @@
           "Friday": {
             "hours": 11.75,
             "items": 67,
-            "itemsPerHour": 5.67,
+            "itemsPerHour": 5.69,
             "families": [
               "Sushi"
             ]
@@ -132827,15 +133088,15 @@
           "Saturday": {
             "hours": 11.73,
             "items": 48,
-            "itemsPerHour": 4.1,
+            "itemsPerHour": 4.12,
             "families": [
               "Sushi"
             ]
           },
           "Sunday": {
             "hours": 8.75,
-            "items": 54,
-            "itemsPerHour": 6.22,
+            "items": 55,
+            "itemsPerHour": 6.24,
             "families": [
               "Sushi"
             ]
@@ -132849,13 +133110,13 @@
           "Pastry"
         ],
         "weekHours": 46.45,
-        "weekItems": 211,
-        "weekItemsPerHour": 4.54,
+        "weekItems": 213,
+        "weekItemsPerHour": 4.57,
         "days": {
           "Monday": {
             "hours": 8.02,
-            "items": 8,
-            "itemsPerHour": 1,
+            "items": 9,
+            "itemsPerHour": 1.06,
             "families": [
               "Pastry"
             ]
@@ -132870,8 +133131,8 @@
           },
           "Friday": {
             "hours": 10.17,
-            "items": 45,
-            "itemsPerHour": 4.46,
+            "items": 46,
+            "itemsPerHour": 4.49,
             "families": [
               "Pastry"
             ]
@@ -132879,7 +133140,7 @@
           "Saturday": {
             "hours": 10.18,
             "items": 66,
-            "itemsPerHour": 6.45,
+            "itemsPerHour": 6.48,
             "families": [
               "Pastry"
             ]
@@ -132887,7 +133148,7 @@
           "Sunday": {
             "hours": 8.85,
             "items": 51,
-            "itemsPerHour": 5.73,
+            "itemsPerHour": 5.76,
             "families": [
               "Pastry"
             ]
@@ -132902,7 +133163,7 @@
         ],
         "weekHours": 36.38,
         "weekItems": 209,
-        "weekItemsPerHour": 5.73,
+        "weekItemsPerHour": 5.75,
         "days": {
           "Tuesday": {
             "hours": 8.48,
@@ -132915,7 +133176,7 @@
           "Wednesday": {
             "hours": 8.73,
             "items": 32,
-            "itemsPerHour": 3.61,
+            "itemsPerHour": 3.64,
             "families": [
               "Sushi"
             ]
@@ -132923,7 +133184,7 @@
           "Thursday": {
             "hours": 9.5,
             "items": 57,
-            "itemsPerHour": 6.02,
+            "itemsPerHour": 6.04,
             "families": [
               "Sushi"
             ]
@@ -132931,7 +133192,7 @@
           "Friday": {
             "hours": 9.67,
             "items": 67,
-            "itemsPerHour": 6.89,
+            "itemsPerHour": 6.91,
             "families": [
               "Sushi"
             ]
@@ -132945,8 +133206,8 @@
           "Sushi"
         ],
         "weekHours": 39.14,
-        "weekItems": 199,
-        "weekItemsPerHour": 5.1,
+        "weekItems": 200,
+        "weekItemsPerHour": 5.11,
         "days": {
           "Tuesday": {
             "hours": 7.87,
@@ -132959,7 +133220,7 @@
           "Wednesday": {
             "hours": 10.92,
             "items": 32,
-            "itemsPerHour": 2.88,
+            "itemsPerHour": 2.91,
             "families": [
               "Sushi"
             ]
@@ -132967,7 +133228,7 @@
           "Friday": {
             "hours": 10.12,
             "items": 67,
-            "itemsPerHour": 6.58,
+            "itemsPerHour": 6.6,
             "families": [
               "Sushi"
             ]
@@ -132975,7 +133236,7 @@
           "Saturday": {
             "hours": 10.23,
             "items": 48,
-            "itemsPerHour": 4.71,
+            "itemsPerHour": 4.72,
             "families": [
               "Sushi"
             ]
@@ -132989,8 +133250,8 @@
           "Pastry"
         ],
         "weekHours": 35.98,
-        "weekItems": 196,
-        "weekItemsPerHour": 5.45,
+        "weekItems": 197,
+        "weekItemsPerHour": 5.48,
         "days": {
           "Tuesday": {
             "hours": 9.05,
@@ -133002,16 +133263,16 @@
           },
           "Wednesday": {
             "hours": 8.43,
-            "items": 45,
-            "itemsPerHour": 5.34,
+            "items": 46,
+            "itemsPerHour": 5.4,
             "families": [
               "Pastry"
             ]
           },
           "Thursday": {
             "hours": 9.67,
-            "items": 59,
-            "itemsPerHour": 6.1,
+            "items": 60,
+            "itemsPerHour": 6.15,
             "families": [
               "Pastry"
             ]
@@ -133019,7 +133280,7 @@
           "Sunday": {
             "hours": 8.83,
             "items": 51,
-            "itemsPerHour": 5.74,
+            "itemsPerHour": 5.78,
             "families": [
               "Pastry"
             ]
@@ -133033,8 +133294,8 @@
           "Sushi"
         ],
         "weekHours": 32.27,
-        "weekItems": 187,
-        "weekItemsPerHour": 5.8,
+        "weekItems": 188,
+        "weekItemsPerHour": 5.82,
         "days": {
           "Tuesday": {
             "hours": 7.47,
@@ -133047,7 +133308,7 @@
           "Wednesday": {
             "hours": 7.72,
             "items": 32,
-            "itemsPerHour": 4.08,
+            "itemsPerHour": 4.11,
             "families": [
               "Sushi"
             ]
@@ -133055,15 +133316,15 @@
           "Saturday": {
             "hours": 9.08,
             "items": 48,
-            "itemsPerHour": 5.3,
+            "itemsPerHour": 5.32,
             "families": [
               "Sushi"
             ]
           },
           "Sunday": {
             "hours": 8,
-            "items": 54,
-            "itemsPerHour": 6.8,
+            "items": 55,
+            "itemsPerHour": 6.83,
             "families": [
               "Sushi"
             ]
@@ -133077,13 +133338,13 @@
           "Sushi"
         ],
         "weekHours": 29.9,
-        "weekItems": 159,
-        "weekItemsPerHour": 5.32,
+        "weekItems": 160,
+        "weekItemsPerHour": 5.34,
         "days": {
           "Monday": {
             "hours": 5.53,
             "items": 1,
-            "itemsPerHour": 0.09,
+            "itemsPerHour": 0.14,
             "families": [
               "Sushi"
             ]
@@ -133099,7 +133360,7 @@
           "Thursday": {
             "hours": 9.4,
             "items": 57,
-            "itemsPerHour": 6.09,
+            "itemsPerHour": 6.11,
             "families": [
               "Sushi"
             ]
@@ -133107,7 +133368,7 @@
           "Saturday": {
             "hours": 6.45,
             "items": 48,
-            "itemsPerHour": 7.46,
+            "itemsPerHour": 7.49,
             "families": [
               "Sushi"
             ]
@@ -133121,13 +133382,13 @@
           "Sushi"
         ],
         "weekHours": 33.45,
-        "weekItems": 133,
-        "weekItemsPerHour": 3.99,
+        "weekItems": 134,
+        "weekItemsPerHour": 4.01,
         "days": {
           "Monday": {
             "hours": 5.65,
             "items": 1,
-            "itemsPerHour": 0.09,
+            "itemsPerHour": 0.13,
             "families": [
               "Sushi"
             ]
@@ -133143,7 +133404,7 @@
           "Wednesday": {
             "hours": 9.02,
             "items": 32,
-            "itemsPerHour": 3.49,
+            "itemsPerHour": 3.52,
             "families": [
               "Sushi"
             ]
@@ -133151,7 +133412,7 @@
           "Saturday": {
             "hours": 11.15,
             "items": 48,
-            "itemsPerHour": 4.32,
+            "itemsPerHour": 4.33,
             "families": [
               "Sushi"
             ]
@@ -133269,13 +133530,13 @@
           "Pastry"
         ],
         "weekHours": 16.65,
-        "weekItems": 111,
-        "weekItemsPerHour": 6.67,
+        "weekItems": 112,
+        "weekItemsPerHour": 6.71,
         "days": {
           "Friday": {
             "hours": 8.33,
-            "items": 45,
-            "itemsPerHour": 5.44,
+            "items": 46,
+            "itemsPerHour": 5.48,
             "families": [
               "Pastry"
             ]
@@ -133283,7 +133544,7 @@
           "Saturday": {
             "hours": 8.32,
             "items": 66,
-            "itemsPerHour": 7.89,
+            "itemsPerHour": 7.93,
             "families": [
               "Pastry"
             ]
@@ -133393,13 +133654,13 @@
           "Sushi"
         ],
         "weekHours": 7.02,
-        "weekItems": 54,
-        "weekItemsPerHour": 7.75,
+        "weekItems": 55,
+        "weekItemsPerHour": 7.78,
         "days": {
           "Sunday": {
             "hours": 7.02,
-            "items": 54,
-            "itemsPerHour": 7.75,
+            "items": 55,
+            "itemsPerHour": 7.78,
             "families": [
               "Sushi"
             ]
@@ -133413,13 +133674,13 @@
           "Pastry"
         ],
         "weekHours": 18.37,
-        "weekItems": 49,
-        "weekItemsPerHour": 2.69,
+        "weekItems": 50,
+        "weekItemsPerHour": 2.71,
         "days": {
           "Monday": {
             "hours": 9.15,
-            "items": 8,
-            "itemsPerHour": 0.87,
+            "items": 9,
+            "itemsPerHour": 0.93,
             "families": [
               "Pastry"
             ]
