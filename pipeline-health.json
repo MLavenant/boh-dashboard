@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T14:25:35.013Z",
+  "generatedAt": "2026-11-02T15:43:25.994Z",
   "latestWeek": "2026-W44",
   "availableWeeks": [
     "2026-W44",
@@ -21,10 +21,10 @@
   ],
   "schedule": {
     "exists": true,
-    "status": "Ready",
-    "nextRun": "11/2/2026 10:30:00 AM",
-    "lastRun": "10/26/2026 10:30:00 AM",
-    "lastResult": "1",
+    "status": "Running",
+    "nextRun": "11/9/2026 10:30:00 AM",
+    "lastRun": "11/2/2026 10:30:00 AM",
+    "lastResult": "267009",
     "startTime": "10:30:00 AM",
     "days": "MON",
     "scheduleType": "Weekly",
@@ -87,20 +87,20 @@
   "files": {
     "dashboardHtml": {
       "path": "C:\\Cursor\\boh-rdg-publish\\dashboard.html",
-      "mtime": "2026-11-02T13:57:07.133Z",
-      "size": 33586841,
+      "mtime": "2026-11-02T15:37:46.444Z",
+      "size": 34123701,
       "rows": null
     },
     "rolling": {
       "path": "C:\\Cursor\\boh-rdg-publish\\data\\rolling.json",
-      "mtime": "2026-11-02T13:55:50.847Z",
+      "mtime": "2026-11-02T15:36:50.402Z",
       "size": 3639,
       "rows": 1
     },
     "sessionToast": {
       "path": "C:\\Cursor\\boh-rdg-publish\\toast-session.json",
-      "mtime": "2026-11-02T13:50:08.093Z",
-      "size": 49844,
+      "mtime": "2026-11-02T15:30:40.404Z",
+      "size": 52315,
       "rows": 2
     },
     "sessionOT": {
@@ -129,7 +129,7 @@
           "message": "21,608 tickets",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\kitchen-timing-claudie.json",
-            "mtime": "2026-11-02T13:50:49.940Z",
+            "mtime": "2026-11-02T15:31:12.976Z",
             "size": 9534472,
             "rows": 21608
           }
@@ -142,7 +142,7 @@
           "message": "8,852 item rows",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\item-details-claudie.json",
-            "mtime": "2026-11-02T13:53:05.391Z",
+            "mtime": "2026-11-02T15:33:30.453Z",
             "size": 2914089,
             "rows": 8852
           }
@@ -155,7 +155,7 @@
           "message": "446 items",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\item-fulfillment-claudie.json",
-            "mtime": "2026-11-02T13:54:42.629Z",
+            "mtime": "2026-11-02T15:35:57.487Z",
             "size": 42050,
             "rows": 446
           }
@@ -165,12 +165,12 @@
           "source": "OpenTable",
           "label": "Covers Export",
           "status": "pass",
-          "message": "540 covers",
+          "message": "541 covers",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\covers-claudie.json",
-            "mtime": "2026-11-02T13:55:43.119Z",
-            "size": 97466,
-            "rows": 540
+            "mtime": "2026-11-02T15:37:54.391Z",
+            "size": 97961,
+            "rows": 541
           }
         },
         {
@@ -181,7 +181,7 @@
           "message": "13 stations, curve=62, BP=53",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\claudie-data-2026-W44.json",
-            "mtime": "2026-11-02T14:25:19.111Z",
+            "mtime": "2026-11-02T15:42:59.844Z",
             "size": 738896,
             "rows": 13
           }
@@ -220,7 +220,7 @@
           "message": "8 food families · matched 83 · BOH match 92%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\staffing-claudie.json",
-            "mtime": "2026-11-02T14:24:40.909Z",
+            "mtime": "2026-11-02T15:42:52.962Z",
             "size": 294470,
             "rows": 12
           }
@@ -233,7 +233,7 @@
           "message": "BOH match 97.4% · coverage 100% · conflicts 23",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\staffing-balance-claudie.json",
-            "mtime": "2026-11-02T14:24:43.236Z",
+            "mtime": "2026-11-02T15:42:55.242Z",
             "size": 81665,
             "rows": 12
           }
@@ -258,7 +258,7 @@
           "message": "11,602 tickets",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\kitchen-timing-casa_neos.json",
-            "mtime": "2026-11-02T13:51:43.790Z",
+            "mtime": "2026-11-02T15:32:05.490Z",
             "size": 4976432,
             "rows": 11602
           }
@@ -271,7 +271,7 @@
           "message": "10,074 item rows",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\item-details-casa_neos.json",
-            "mtime": "2026-11-02T13:53:45.854Z",
+            "mtime": "2026-11-02T15:34:08.871Z",
             "size": 3347918,
             "rows": 10074
           }
@@ -284,7 +284,7 @@
           "message": "387 items",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\item-fulfillment-casa_neos.json",
-            "mtime": "2026-11-02T13:55:11.420Z",
+            "mtime": "2026-11-02T15:36:29.745Z",
             "size": 36046,
             "rows": 387
           }
@@ -297,7 +297,7 @@
           "message": "551 covers",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\covers-casa_neos.json",
-            "mtime": "2026-11-02T13:55:45.349Z",
+            "mtime": "2026-11-02T15:37:56.557Z",
             "size": 100208,
             "rows": 551
           }
@@ -310,8 +310,8 @@
           "message": "31 stations, curve=84, BP=21",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\casa_neos-data-2026-W44.json",
-            "mtime": "2026-11-02T14:25:22.398Z",
-            "size": 748860,
+            "mtime": "2026-11-02T15:42:44.348Z",
+            "size": 1688822,
             "rows": 31
           }
         },
@@ -349,7 +349,7 @@
           "message": "10 food families · matched 89 · BOH match 100%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\staffing-casa_neos.json",
-            "mtime": "2026-11-02T14:24:29.660Z",
+            "mtime": "2026-11-02T15:42:44.480Z",
             "size": 345531,
             "rows": 12
           }
@@ -362,7 +362,7 @@
           "message": "BOH match 100.0% · coverage 67% · conflicts 45",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\staffing-balance-casa_neos.json",
-            "mtime": "2026-11-02T14:24:42.209Z",
+            "mtime": "2026-11-02T15:42:54.335Z",
             "size": 96628,
             "rows": 12
           }
@@ -387,7 +387,7 @@
           "message": "7,238 tickets",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\kitchen-timing-ava_coconut_grove.json",
-            "mtime": "2026-11-02T13:51:05.600Z",
+            "mtime": "2026-11-02T15:31:28.809Z",
             "size": 3355337,
             "rows": 7238
           }
@@ -400,7 +400,7 @@
           "message": "5,691 item rows",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\item-details-ava_coconut_grove.json",
-            "mtime": "2026-11-02T13:53:58.505Z",
+            "mtime": "2026-11-02T15:34:31.226Z",
             "size": 1851252,
             "rows": 5691
           }
@@ -413,7 +413,7 @@
           "message": "361 items",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\item-fulfillment-ava_coconut_grove.json",
-            "mtime": "2026-11-02T13:55:13.472Z",
+            "mtime": "2026-11-02T15:36:31.853Z",
             "size": 34192,
             "rows": 361
           }
@@ -426,7 +426,7 @@
           "message": "345 covers",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\covers-ava_coconut_grove.json",
-            "mtime": "2026-11-02T13:55:46.148Z",
+            "mtime": "2026-11-02T15:37:58.395Z",
             "size": 62842,
             "rows": 345
           }
@@ -439,7 +439,7 @@
           "message": "14 stations, curve=65, BP=11",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\ava_coconut_grove-data-2026-W44.json",
-            "mtime": "2026-11-02T14:25:24.246Z",
+            "mtime": "2026-11-02T15:43:11.663Z",
             "size": 588472,
             "rows": 14
           }
@@ -478,7 +478,7 @@
           "message": "9 food families · matched 48 · BOH match 98%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\staffing-ava_coconut_grove.json",
-            "mtime": "2026-11-02T14:24:35.638Z",
+            "mtime": "2026-11-02T15:42:49.301Z",
             "size": 230873,
             "rows": 12
           }
@@ -491,7 +491,7 @@
           "message": "BOH match 100.0% · coverage 96% · conflicts 17",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\staffing-balance-ava_coconut_grove.json",
-            "mtime": "2026-11-02T14:24:42.871Z",
+            "mtime": "2026-11-02T15:42:54.748Z",
             "size": 60955,
             "rows": 12
           }
@@ -516,7 +516,7 @@
           "message": "7,558 tickets",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\kitchen-timing-ava_winter_park.json",
-            "mtime": "2026-11-02T13:51:21.223Z",
+            "mtime": "2026-11-02T15:31:42.857Z",
             "size": 3292535,
             "rows": 7558
           }
@@ -529,7 +529,7 @@
           "message": "6,873 item rows",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\item-details-ava_winter_park.json",
-            "mtime": "2026-11-02T13:54:11.289Z",
+            "mtime": "2026-11-02T15:34:57.509Z",
             "size": 2235961,
             "rows": 6873
           }
@@ -542,7 +542,7 @@
           "message": "147 items",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\item-fulfillment-ava_winter_park.json",
-            "mtime": "2026-11-02T13:55:01.646Z",
+            "mtime": "2026-11-02T15:36:19.024Z",
             "size": 13813,
             "rows": 147
           }
@@ -555,7 +555,7 @@
           "message": "454 covers",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\covers-ava_winter_park.json",
-            "mtime": "2026-11-02T13:55:47.646Z",
+            "mtime": "2026-11-02T15:38:03.236Z",
             "size": 82463,
             "rows": 454
           }
@@ -568,7 +568,7 @@
           "message": "9 stations, curve=79, BP=13",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\ava_winter_park-data-2026-W44.json",
-            "mtime": "2026-11-02T14:25:26.735Z",
+            "mtime": "2026-11-02T15:43:16.244Z",
             "size": 571342,
             "rows": 9
           }
@@ -607,7 +607,7 @@
           "message": "7 food families · matched 37 · BOH match 95%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\staffing-ava_winter_park.json",
-            "mtime": "2026-11-02T14:24:37.650Z",
+            "mtime": "2026-11-02T15:42:50.485Z",
             "size": 185067,
             "rows": 12
           }
@@ -620,7 +620,7 @@
           "message": "BOH match 96.6% · coverage 68% · conflicts 2",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\staffing-balance-ava_winter_park.json",
-            "mtime": "2026-11-02T14:24:43.011Z",
+            "mtime": "2026-11-02T15:42:55.015Z",
             "size": 49179,
             "rows": 12
           }
@@ -645,7 +645,7 @@
           "message": "18,054 tickets",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\kitchen-timing-mila.json",
-            "mtime": "2026-11-02T13:52:24.825Z",
+            "mtime": "2026-11-02T15:32:48.708Z",
             "size": 7818605,
             "rows": 18054
           }
@@ -658,7 +658,7 @@
           "message": "15,679 item rows",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\item-details-mila.json",
-            "mtime": "2026-11-02T13:54:39.813Z",
+            "mtime": "2026-11-02T15:35:54.191Z",
             "size": 5156657,
             "rows": 15679
           }
@@ -671,7 +671,7 @@
           "message": "539 items",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\item-fulfillment-mila.json",
-            "mtime": "2026-11-02T13:54:58.855Z",
+            "mtime": "2026-11-02T15:36:15.451Z",
             "size": 51249,
             "rows": 539
           }
@@ -684,7 +684,7 @@
           "message": "869 covers",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\covers-mila.json",
-            "mtime": "2026-11-02T13:55:50.387Z",
+            "mtime": "2026-11-02T15:38:06.873Z",
             "size": 158236,
             "rows": 869
           }
@@ -697,7 +697,7 @@
           "message": "12 stations, curve=65, BP=none",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\mila-data-2026-W44.json",
-            "mtime": "2026-11-02T14:25:32.121Z",
+            "mtime": "2026-11-02T15:43:22.767Z",
             "size": 1427426,
             "rows": 12
           }
@@ -736,7 +736,7 @@
           "message": "9 food families · matched 71 · BOH match 95%",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\staffing-mila.json",
-            "mtime": "2026-11-02T14:24:32.651Z",
+            "mtime": "2026-11-02T15:42:47.966Z",
             "size": 308027,
             "rows": 12
           }
@@ -749,7 +749,7 @@
           "message": "BOH match 96.4% · coverage 55% · conflicts 0",
           "meta": {
             "path": "C:\\Cursor\\boh-rdg-publish\\data\\2026-W44\\staffing-balance-mila.json",
-            "mtime": "2026-11-02T14:24:42.612Z",
+            "mtime": "2026-11-02T15:42:54.599Z",
             "size": 74882,
             "rows": 12
           }
