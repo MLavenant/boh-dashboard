@@ -310,7 +310,7 @@ function buildPublicPlayers(byFamily) {
 
 /** Jobs that should join to Viktor food-station families (excludes dish/receiver support). */
 const FOOD_STATION_JOB_RE =
-  /line cook|cook,\s*line|cook,\s*prep|cook,\s*pastry|cook,\s*garde|prep cook|cdp|chef de partie|pastry|sushi|robata|saute|sauté|fry|garde|expo|food expeditor|pizza|tempura|maki|grill|plancha|butcher|crudo|\braw\b|chef|culinary|training\s*boh|training\s*-\s*boh|rdgu-boh|temp (line|cdp|pastry|prep)/i;
+  /line cook|cook,\s*line|cook,\s*prep|cook,\s*pastry|cook,\s*garde|prep cook|cdp|chef de partie|pastry|sushi|robata|saute|sauté|fry|garde|expo|food expeditor|pizza|tempura|maki|grill|plancha|butcher|crudo|\braw\b|hot\s*line|raw\s*bar|chef|culinary|training\s*boh|training\s*-\s*boh|rdgu-boh|temp (line|cdp|pastry|prep)|\bmm\s*-\s*(hot|sushi|prep|garde|raw|pastry|fry|expo)/i;
 
 function isFoodStationJobName(jobName) {
   const j = String(jobName || '');

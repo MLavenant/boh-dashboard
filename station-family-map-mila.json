@@ -3,13 +3,13 @@
   "description": "Maps Toast prep-station names → FTE Matrix station families for staffing join.",
   "families": {
     "Saute": {
-      "match": ["saute"]
+      "match": ["saute", "sauteed", "hot line", "hot"]
     },
     "Fry": {
       "match": ["tempura", "fry"]
     },
     "Garde Manger": {
-      "match": ["garde manger"]
+      "match": ["garde manger", "pantry", "salad"]
     },
     "Raw": {
       "match": ["crudo", "raw"]
@@ -21,10 +21,10 @@
       "match": ["robata", "grill"]
     },
     "Pastry": {
-      "match": ["pastry"]
+      "match": ["pastry", "2f-passion", "2f-gelato", "2f passion", "2f gelato", "gelato", "passion"]
     },
     "Expo": {
-      "match": ["expo", "hot expo", "cold expo"]
+      "match": ["expo", "hot expo", "cold expo", "mm to"]
     },
     "Pizza": {
       "match": ["pizza"]

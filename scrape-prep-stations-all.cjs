@@ -97,6 +97,36 @@ const VENUE_CONFIGS = {
       return sample.some(s => /mila/i.test(s));
     },
   },
+  /** MM Club at MILA — pastry 2F-Passion / 2F-Gelato + club food → mila map. */
+  mm_mila: {
+    mapKey: 'mila',
+    outSuffix: 'mm_mila',
+    selectedSet: '500000020878616311',
+    menuMatch(name) {
+      const n = clean(name);
+      if (isNonFoodMenuName(n)) return false;
+      if (/bar\s*central|wine\s*list|corkage|retail|reservation|table\s*fee|cocktail|spirit|sake|beer/i.test(n)
+          && !/food|dinner|dessert|pastry|gelato/i.test(n)) return false;
+      return /dinner|lunch|brunch|food|private\s*event|\bevents?\b|tasting|dessert|pastry|gelato|passion|mm\s*club|prix\s*fixe|\bpf\b|^m-/i.test(n);
+    },
+    confirmSample(sample) {
+      return sample.some(s => /mm\s*club|mila/i.test(s));
+    },
+  },
+  /** Casa Neos Lounge food → casa_neos map (Pastry Lounge, etc.). */
+  casa_neos_lounge: {
+    mapKey: 'casa_neos',
+    outSuffix: 'lounge',
+    selectedSet: '500000060638376351',
+    menuMatch(name) {
+      const n = clean(name);
+      if (isNonFoodMenuName(n)) return false;
+      return /food|dinner|brunch|lunch|dessert|pastry|lounge|private|tasting|event|prix|pf\b|casa/i.test(n);
+    },
+    confirmSample(sample) {
+      return sample.some(s => /lounge|casa\s*neos/i.test(s));
+    },
+  },
   /** MILA cocktail Beverage mode — M-BAR CENTRAL cocktail groups only. */
   mila_beverage: {
     mapKey: 'mila',

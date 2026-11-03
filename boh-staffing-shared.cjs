@@ -29,7 +29,8 @@ const CODE_TO_VENUE = {
 
 /**
  * Viktor Ops FTE export (People tab) location label → BOH long slug.
- * MILA 2F + 3F both roll into mila. Lounge/Commissary ignored for kitchen staffing.
+ * MILA 2F + 3F both roll into mila. Harri MM Club at MILA / Casa Neos Lounge
+ * labor consolidates into mila / casa_neos (Toast kitchen satellites likewise).
  */
 const LOCATION_TO_VENUE = {
   'CASA NEOS': 'casa_neos',

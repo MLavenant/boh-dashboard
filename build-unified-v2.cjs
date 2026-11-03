@@ -1902,8 +1902,14 @@ function isFoodStation(name) {
   // Prep is not shown on Stations (exec line-production views only)
   if (/\\bprep\\b/.test(n) || n === 'back kitchen') return false;
   if (/\\bsushi\\s*bar\\b/.test(n) || /\\braw\\s*bar\\b/.test(n)) return true;
+  if (/^2f[-\\s]?(passion|gelato)\\b/.test(n) || /\\b(2f[-\\s]?passion|2f[-\\s]?gelato)\\b/.test(n)) return true;
   if (/(^|[^a-z])bar([^a-z]|$)/i.test(n)) return false;
-  return !['champagne','wine','btg','pos','barista','somm','water','service','beach','btl','drink','no print','lounge'].some(p => n.includes(p));
+  // Casa Lounge / MM Club cook lanes keep "Lounge" in the KDS name
+  if (/\\blounge\\b/.test(n)) {
+    if (/\\b(pos|only|service\\s*printer|wine|somm|barista|drink|runner|server|host)\\b/.test(n)) return false;
+    return /\\b(pastry|gelato|passion|saute|sauteed|fry|garde|maki|meat|fish|raw|expo|paella|cold|hot|pizza|sushi|robata|prep|pantry|salad|crudo|food)\\b/.test(n);
+  }
+  return !['champagne','wine','btg','pos','barista','somm','water','service','beach','btl','drink','no print'].some(p => n.includes(p));
 }
 /** Strip venue menu prefixes so C-Tomahawk / CL-Tomahawk / ACG-Tomahawk share one base. */
 const VENUE_ITEM_PREFIX_RE = /^(AVACGPFMS|AVACGPF|AVACG|ACG|CLPFL|CLIN|CLEV|CLEL|CLPF|CLR|CLK|CLE|CLL|CL|CNSM|CMS|CSM|CIN|CE|CN|C|AVAWP|AWP|AOB|AEV|AMO|AM0|A|MEV|MG|MP|MILA|MM|M)[-_\\s]+/i;

@@ -292,7 +292,9 @@ async function fetchKitchenTiming(venueKey) {
 
 // ── Item Details (toplevelitemselections) fetch ─────────────────────────────
 
-const ITEM_DETAILS_VENUES = ['claudie', 'casa_neos', 'ava_coconut_grove', 'ava_winter_park', 'mila'];
+const ITEM_DETAILS_VENUES = [
+  'claudie', 'casa_neos', 'casa_neos_lounge', 'ava_coconut_grove', 'ava_winter_park', 'mila', 'mm_mila',
+];
 const ITEM_DETAILS_ENDPOINT = '/restaurants/admin/reports/menu/toplevelitemselections';
 
 async function fetchItemDetails(venueKey) {

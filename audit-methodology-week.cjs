@@ -204,7 +204,7 @@ const summary = {
     'Labor: Toast Partner API for MILA/AVA WP; Harri CSV for Claudie/AVA CG/Casa Neos',
     'FTE roster (Viktor) → name match → station family',
     'items/staff-hr = day volume ÷ concurrent staff hours (punch overlap)',
-    'Harri lounge brands excluded from kitchen labor',
+    'Harri MM Club at MILA + Casa Neos Lounge labor consolidates into parent kitchens',
     'Non-Claudie: clock-ins 5:00–9:59 ET excluded from staffing any day (prep); Claudie keeps all punches',
   ],
 };

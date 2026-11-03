@@ -1,6 +1,7 @@
 /**
  * Ingest Harri "Timesheet Report - Detailed" CSV → Toast-shaped labor-{venue}.json
- * by ISO week. Kitchen brands → staffing venues; lounge/MM Club brands skipped.
+ * by ISO week. Kitchen brands → staffing venues.
+ * MM Club at MILA → mila; Casa Neos Lounge → casa_neos. MM Club at AVA skipped.
  *
  * Usage:
  *   node ingest-harri-timesheets.cjs <csv...> [--weeks 2026-W35,2026-W36]
@@ -29,12 +30,13 @@ const BRAND_TO_VENUE = {
   'Casa Neos Beach Club': 'casa_neos',
   MILA: 'mila',
   Mila: 'mila',
-  // FOH / lounge / club — not kitchen staffing
-  'CASA NEOS LOUNGE': null,
-  'Casa Neos Lounge': null,
-  'MM CLUB AT MILA': null,
+  // Satellite kitchens consolidate into parent BOH venues
+  'CASA NEOS LOUNGE': 'casa_neos',
+  'Casa Neos Lounge': 'casa_neos',
+  'MM CLUB AT MILA': 'mila',
+  'MM Club at MILA': 'mila',
+  // AVA club still out of scope for kitchen staffing join
   'MM CLUB AT AVA': null,
-  'MM Club at MILA': null,
   'MM Club at AVA': null,
 };
 

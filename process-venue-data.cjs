@@ -41,8 +41,35 @@ if (fs.existsSync(coversPath)) {
   console.warn(`No covers file for ${venueArg} (${weekDir}) — continuing with empty covers`);
 }
 
-const tickets = ktRaw.tickets || ktRaw;
+/** Satellite Toast kitchens consolidated into the parent venue view + staffing. */
+const KITCHEN_SATELLITES = {
+  mila: ['mm_mila'],
+  casa_neos: ['casa_neos_lounge'],
+};
+
+const _ktTickets = Array.isArray(ktRaw.tickets) ? ktRaw.tickets : (Array.isArray(ktRaw) ? ktRaw : []);
+let tickets = [..._ktTickets];
 const covers = coversRaw.covers || coversRaw || [];
+const satelliteSources = [];
+
+for (const sat of KITCHEN_SATELLITES[venueArg] || []) {
+  const satKt = path.join(DATA_DIR, `kitchen-timing-${sat}.json`);
+  if (!fs.existsSync(satKt)) {
+    console.warn(`No kitchen-timing-${sat}.json — skip satellite merge`);
+    continue;
+  }
+  try {
+    const satRaw = JSON.parse(fs.readFileSync(satKt, 'utf8'));
+    const satTickets = satRaw.tickets || [];
+    for (const t of satTickets) {
+      tickets.push({ ...t, _satellite: sat, Location: t.Location || sat });
+    }
+    satelliteSources.push({ venue: sat, tickets: satTickets.length });
+    console.log(`Merged ${satTickets.length} kitchen tickets from ${sat}`);
+  } catch (e) {
+    console.warn(`Could not merge kitchen-timing-${sat}:`, e.message);
+  }
+}
 
 // Load item details if available
 const itemDetailsPath = path.join(DATA_DIR, `item-details-${venueArg}.json`);
@@ -55,6 +82,21 @@ if (fs.existsSync(itemDetailsPath)) {
   } catch(e) { console.warn('Could not load item details:', e.message); }
 } else {
   console.log(`No item-details-${venueArg}.json found, skipping menu item volumes`);
+}
+
+for (const sat of KITCHEN_SATELLITES[venueArg] || []) {
+  const satItemsPath = path.join(DATA_DIR, `item-details-${sat}.json`);
+  if (!fs.existsSync(satItemsPath)) continue;
+  try {
+    const idRaw = JSON.parse(fs.readFileSync(satItemsPath, 'utf8'));
+    const satItems = idRaw.items || [];
+    for (const it of satItems) {
+      itemDetails.push({ ...it, _satellite: sat });
+    }
+    console.log(`Merged ${satItems.length} item-details rows from ${sat}`);
+  } catch (e) {
+    console.warn(`Could not merge item-details-${sat}:`, e.message);
+  }
 }
 
 // ---- Station filter (shared; keeps Sushi Bar, drops FOH bars) ----
@@ -673,9 +715,9 @@ function resolveAssignedStation(menuItem) {
   const info = lookupItemAssignment(menuItem);
   if (!info || !Array.isArray(info.stations)) return null;
   const ranked = info.stations.filter(st => st && isFood(st) && !/no\s*print/i.test(st));
-  // Prefer Pastry when Toast routes the item there (course fires / dessert SKUs often list Expo+Pastry)
-  const pastryHit = ranked.find(st => /pastry/i.test(st));
-  if (pastryHit && (/dessert|pastry|cake|baklava|brulee|gelato|scoop|vacherin|platter|all\s*in|complimentary|tart|mousse|cheesecake|macaron|cookie|parfait|crema|lava|petit/i.test(String(menuItem || '')) || ranked.every(st => /pastry|expo|pass/i.test(st)))) {
+  // Prefer Pastry when Toast routes the item there (incl. MM Club 2F-Passion / 2F-Gelato)
+  const pastryHit = ranked.find(st => /pastry|2f[-\s]?passion|2f[-\s]?gelato|\bgelato\b/i.test(st));
+  if (pastryHit && (/dessert|pastry|cake|baklava|brulee|gelato|scoop|vacherin|platter|all\s*in|complimentary|tart|mousse|cheesecake|macaron|cookie|parfait|crema|lava|petit|passion/i.test(String(menuItem || '')) || ranked.every(st => /pastry|gelato|passion|expo|pass|2f/i.test(st)))) {
     return pastryHit;
   }
   const cookFirst = ranked.find(st => !/expo|pass/i.test(st));
@@ -689,7 +731,7 @@ function resolveStationsForItemQty(menuItem) {
   const names = new Set();
   const primary = resolveAssignedStation(menuItem);
   if (primary) names.add(primary);
-  ranked.filter((st) => /pastry/i.test(st)).forEach((st) => names.add(st));
+  ranked.filter((st) => /pastry|2f[-\s]?passion|2f[-\s]?gelato|\bgelato\b/i.test(st)).forEach((st) => names.add(st));
   const out = [];
   const seen = new Set();
   for (const name of names) {
@@ -1404,6 +1446,7 @@ const output = {
   assignmentData,
   ticketSummary: {
     rawKitchenRows: tickets.length,
+    satellites: satelliteSources,
     nonFoodExcluded: skippedNonFood,
     openOrUnclosed: skippedOpen,
     over90MinExcluded: skippedLong,
