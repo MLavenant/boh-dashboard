@@ -77,22 +77,25 @@ function stripDiacritics(s) {
 }
 
 function loadNameAliases() {
-  const p = path.join(ROOT, 'data', 'fte', 'name-aliases.json');
-  if (!fs.existsSync(p)) return new Map();
-  try {
-    const j = loadJson(p);
-    const map = new Map();
-    const src = j.aliases || j;
-    for (const [from, to] of Object.entries(src)) {
-      if (from.startsWith('_')) continue;
-      const f = String(from || '').trim().toLowerCase();
-      const t = String(to || '').trim();
-      if (f && t) map.set(f, t);
-    }
-    return map;
-  } catch (_) {
-    return new Map();
+  const map = new Map();
+  const paths = [
+    path.join(ROOT, 'name-aliases.json'),
+    path.join(ROOT, 'data', 'fte', 'name-aliases.json'),
+  ];
+  for (const p of paths) {
+    if (!fs.existsSync(p)) continue;
+    try {
+      const j = loadJson(p);
+      const src = j.aliases || j;
+      for (const [from, to] of Object.entries(src)) {
+        if (from.startsWith('_')) continue;
+        const f = String(from || '').trim().toLowerCase();
+        const t = String(to || '').trim();
+        if (f && t) map.set(f, t);
+      }
+    } catch (_) { /* ignore bad alias file */ }
   }
+  return map;
 }
 
 function applyAlias(raw, aliases) {
@@ -162,10 +165,13 @@ function clockInHourNy(inDate) {
 /**
  * Exclude prep clock-ins (5am–10am, any day) from staffing totals for every
  * location except Claudie (Claudie keeps all punches).
+ * Pastry cooks routinely start before 10am for production — keep those punches.
  */
 function shouldExcludeEarlyClockIn(venue, entry) {
   if (!entry) return false;
   if (String(venue) === 'claudie') return false;
+  const job = String(entry.jobName || '');
+  if (/pastry/i.test(job)) return false;
   const h = clockInHourNy(entry.inDate);
   if (h == null) return false;
   return h >= EARLY_CLOCKIN_EXCLUDE_START && h < EARLY_CLOCKIN_EXCLUDE_END;
@@ -972,7 +978,7 @@ function buildVenue(venueRaw, weekLabel) {
       earlyClockInExcludeRule:
         venue === 'claudie'
           ? 'Claudie: keep all punches (no 5–10am filter)'
-          : 'Non-Claudie: exclude punches with clock-in 5:00–9:59 ET (any day)',
+          : 'Non-Claudie: exclude punches with clock-in 5:00–9:59 ET (any day), except Pastry jobs',
     },
     guestsSeated: venueData.guestsSeated || null,
     toastStationFamily,

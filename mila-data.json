@@ -150320,22 +150320,22 @@
   "staffing": {
     "venue": "mila",
     "weekLabel": "2026-W44",
-    "builtAt": "2026-11-05T14:06:48.158Z",
+    "builtAt": "2026-11-05T14:44:47.027Z",
     "matchStats": {
-      "laborShiftsMatched": 177,
+      "laborShiftsMatched": 182,
       "laborShiftsUnmatched": 716,
-      "rosterUnused": 18,
+      "rosterUnused": 17,
       "rosterTotal": 60,
-      "matchRate": 0.198,
+      "matchRate": 0.203,
       "bohLaborShiftsUnmatched": 7,
-      "bohMatchRate": 0.962,
-      "rosterCoverage": 0.7,
+      "bohMatchRate": 0.963,
+      "rosterCoverage": 0.717,
       "noStationPeopleCount": 2,
-      "excludedEarlyClockIns": 181,
-      "excludedEarlyHours": 1549.84,
-      "excludedEarlyWeekdayClockIns": 181,
-      "excludedEarlyWeekdayHours": 1549.84,
-      "earlyClockInExcludeRule": "Non-Claudie: exclude punches with clock-in 5:00–9:59 ET (any day)"
+      "excludedEarlyClockIns": 176,
+      "excludedEarlyHours": 1503.37,
+      "excludedEarlyWeekdayClockIns": 176,
+      "excludedEarlyWeekdayHours": 1503.37,
+      "earlyClockInExcludeRule": "Non-Claudie: exclude punches with clock-in 5:00–9:59 ET (any day), except Pastry jobs"
     },
     "guestsSeated": {
       "total": 3170,
@@ -154872,19 +154872,19 @@
       "Pastry": {
         "family": "Pastry",
         "rosterCount": 6,
-        "weekHeadsUnique": 4,
-        "weekHours": 153.53,
+        "weekHeadsUnique": 5,
+        "weekHours": 200,
         "weekItemCount": 1767,
         "weekTicketCount": 620,
-        "weekItemsPerHeadDay": 110.4,
-        "weekItemsPerStaffHour": 11.51,
+        "weekItemsPerHeadDay": 84.1,
+        "weekItemsPerStaffHour": 8.84,
         "weekServiceHours": 47,
         "weekItemsPerServiceHour": 37.6,
         "weekAvgFulSec": 321.2,
         "days": {
           "Monday": {
-            "heads": 3,
-            "hours": 27.56,
+            "heads": 4,
+            "hours": 36.66,
             "staff": [
               {
                 "label": "Karla V.",
@@ -154909,16 +154909,24 @@
                 "sourceLocations": [
                   "MILA"
                 ]
+              },
+              {
+                "label": "Danielys D.",
+                "hours": 9.1,
+                "position": "Pastry",
+                "sourceLocations": [
+                  "MILA"
+                ]
               }
             ],
             "headsByHour": {
-              "10-11": 0,
-              "11-12": 0,
-              "12-13": 0,
-              "13-14": 0,
-              "14-15": 0,
-              "15-16": 1,
-              "16-17": 3,
+              "10-11": 1,
+              "11-12": 1,
+              "12-13": 1,
+              "13-14": 1,
+              "14-15": 1,
+              "15-16": 2,
+              "16-17": 4,
               "17-18": 3,
               "18-19": 3,
               "19-20": 3,
@@ -154930,12 +154938,53 @@
               "1-2": 3
             },
             "staffByHour": {
-              "10-11": [],
-              "11-12": [],
-              "12-13": [],
-              "13-14": [],
-              "14-15": [],
+              "10-11": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:00a",
+                  "out": "4:06p"
+                }
+              ],
+              "11-12": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:00a",
+                  "out": "4:06p"
+                }
+              ],
+              "12-13": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:00a",
+                  "out": "4:06p"
+                }
+              ],
+              "13-14": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:00a",
+                  "out": "4:06p"
+                }
+              ],
+              "14-15": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:00a",
+                  "out": "4:06p"
+                }
+              ],
               "15-16": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:00a",
+                  "out": "4:06p"
+                },
                 {
                   "label": "Eden N.",
                   "position": "Pastry",
@@ -154944,6 +154993,12 @@
                 }
               ],
               "16-17": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:00a",
+                  "out": "4:06p"
+                },
                 {
                   "label": "Dubelys M.",
                   "position": "Pastry",
@@ -155149,10 +155204,10 @@
             "volume": 167,
             "volumeSource": "itemQty",
             "itemCount": 167,
-            "itemsPerHead": 55.7,
+            "itemsPerHead": 41.8,
             "serviceHours": 7,
             "itemsPerServiceHour": 23.86,
-            "itemsPerStaffHour": 6.06,
+            "itemsPerStaffHour": 4.56,
             "avgFulSec": 341.1,
             "qc": {
               "eligible": true,
@@ -155165,12 +155220,12 @@
               "nPeer": 32,
               "nHist": 11,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.03
+              "staffingRatio": 1.38
             }
           },
           "Tuesday": {
-            "heads": 3,
-            "hours": 27.85,
+            "heads": 4,
+            "hours": 37.52,
             "staff": [
               {
                 "label": "Karla V.",
@@ -155195,16 +155250,24 @@
                 "sourceLocations": [
                   "MILA"
                 ]
+              },
+              {
+                "label": "Danielys D.",
+                "hours": 9.67,
+                "position": "Pastry",
+                "sourceLocations": [
+                  "MILA"
+                ]
               }
             ],
             "headsByHour": {
-              "10-11": 0,
-              "11-12": 0,
-              "12-13": 0,
-              "13-14": 0,
-              "14-15": 0,
-              "15-16": 2,
-              "16-17": 3,
+              "10-11": 1,
+              "11-12": 1,
+              "12-13": 1,
+              "13-14": 1,
+              "14-15": 1,
+              "15-16": 3,
+              "16-17": 4,
               "17-18": 3,
               "18-19": 3,
               "19-20": 3,
@@ -155216,12 +155279,53 @@
               "1-2": 3
             },
             "staffByHour": {
-              "10-11": [],
-              "11-12": [],
-              "12-13": [],
-              "13-14": [],
-              "14-15": [],
+              "10-11": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:03a",
+                  "out": "4:43p"
+                }
+              ],
+              "11-12": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:03a",
+                  "out": "4:43p"
+                }
+              ],
+              "12-13": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:03a",
+                  "out": "4:43p"
+                }
+              ],
+              "13-14": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:03a",
+                  "out": "4:43p"
+                }
+              ],
+              "14-15": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:03a",
+                  "out": "4:43p"
+                }
+              ],
               "15-16": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:03a",
+                  "out": "4:43p"
+                },
                 {
                   "label": "Eden N.",
                   "position": "Pastry",
@@ -155236,6 +155340,12 @@
                 }
               ],
               "16-17": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:03a",
+                  "out": "4:43p"
+                },
                 {
                   "label": "Dubelys M.",
                   "position": "Pastry",
@@ -155441,23 +155551,23 @@
             "volume": 134,
             "volumeSource": "itemQty",
             "itemCount": 134,
-            "itemsPerHead": 44.7,
+            "itemsPerHead": 33.5,
             "serviceHours": 8,
             "itemsPerServiceHour": 16.75,
-            "itemsPerStaffHour": 4.81,
+            "itemsPerStaffHour": 3.57,
             "avgFulSec": 300,
             "qc": {
               "eligible": true,
               "denyReason": null
             },
             "signal": {
-              "label": "Balanced",
-              "code": "in_band",
+              "label": "Likely overstaffed",
+              "code": "overstaffed_slack",
               "source": "history",
               "nPeer": 45,
               "nHist": 10,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.25
+              "staffingRatio": 1.67
             }
           },
           "Wednesday": {
@@ -155884,8 +155994,8 @@
             }
           },
           "Friday": {
-            "heads": 2,
-            "hours": 19.9,
+            "heads": 3,
+            "hours": 27.65,
             "staff": [
               {
                 "label": "Walfer C.",
@@ -155902,14 +156012,22 @@
                 "sourceLocations": [
                   "MILA"
                 ]
+              },
+              {
+                "label": "Danielys D.",
+                "hours": 7.75,
+                "position": "Pastry",
+                "sourceLocations": [
+                  "MILA"
+                ]
               }
             ],
             "headsByHour": {
-              "10-11": 0,
-              "11-12": 0,
-              "12-13": 0,
-              "13-14": 0,
-              "14-15": 0,
+              "10-11": 1,
+              "11-12": 1,
+              "12-13": 1,
+              "13-14": 1,
+              "14-15": 1,
               "15-16": 0,
               "16-17": 2,
               "17-18": 2,
@@ -155923,11 +156041,46 @@
               "1-2": 2
             },
             "staffByHour": {
-              "10-11": [],
-              "11-12": [],
-              "12-13": [],
-              "13-14": [],
-              "14-15": [],
+              "10-11": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:04a",
+                  "out": "2:49p"
+                }
+              ],
+              "11-12": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:04a",
+                  "out": "2:49p"
+                }
+              ],
+              "12-13": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:04a",
+                  "out": "2:49p"
+                }
+              ],
+              "13-14": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:04a",
+                  "out": "2:49p"
+                }
+              ],
+              "14-15": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:04a",
+                  "out": "2:49p"
+                }
+              ],
               "15-16": [],
               "16-17": [
                 {
@@ -156075,10 +156228,10 @@
             "volume": 248,
             "volumeSource": "itemQty",
             "itemCount": 248,
-            "itemsPerHead": 124,
+            "itemsPerHead": 82.7,
             "serviceHours": 9,
             "itemsPerServiceHour": 27.56,
-            "itemsPerStaffHour": 12.46,
+            "itemsPerStaffHour": 8.97,
             "avgFulSec": 309.7,
             "qc": {
               "eligible": true,
@@ -156091,12 +156244,12 @@
               "nPeer": 48,
               "nHist": 12,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.36
+              "staffingRatio": 0.55
             }
           },
           "Saturday": {
-            "heads": 2,
-            "hours": 20.54,
+            "heads": 3,
+            "hours": 30.77,
             "staff": [
               {
                 "label": "Walfer C.",
@@ -156113,17 +156266,25 @@
                 "sourceLocations": [
                   "MILA"
                 ]
+              },
+              {
+                "label": "Danielys D.",
+                "hours": 10.23,
+                "position": "Pastry",
+                "sourceLocations": [
+                  "MILA"
+                ]
               }
             ],
             "headsByHour": {
-              "10-11": 0,
-              "11-12": 0,
-              "12-13": 0,
-              "13-14": 0,
-              "14-15": 0,
-              "15-16": 1,
-              "16-17": 2,
-              "17-18": 2,
+              "10-11": 1,
+              "11-12": 1,
+              "12-13": 1,
+              "13-14": 1,
+              "14-15": 1,
+              "15-16": 2,
+              "16-17": 3,
+              "17-18": 3,
               "18-19": 2,
               "19-20": 2,
               "20-21": 2,
@@ -156134,12 +156295,53 @@
               "1-2": 2
             },
             "staffByHour": {
-              "10-11": [],
-              "11-12": [],
-              "12-13": [],
-              "13-14": [],
-              "14-15": [],
+              "10-11": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:05a",
+                  "out": "5:19p"
+                }
+              ],
+              "11-12": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:05a",
+                  "out": "5:19p"
+                }
+              ],
+              "12-13": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:05a",
+                  "out": "5:19p"
+                }
+              ],
+              "13-14": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:05a",
+                  "out": "5:19p"
+                }
+              ],
+              "14-15": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:05a",
+                  "out": "5:19p"
+                }
+              ],
               "15-16": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:05a",
+                  "out": "5:19p"
+                },
                 {
                   "label": "Karla V.",
                   "position": "Pastry",
@@ -156148,6 +156350,12 @@
                 }
               ],
               "16-17": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:05a",
+                  "out": "5:19p"
+                },
                 {
                   "label": "Karla V.",
                   "position": "Pastry",
@@ -156162,6 +156370,12 @@
                 }
               ],
               "17-18": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "7:05a",
+                  "out": "5:19p"
+                },
                 {
                   "label": "Karla V.",
                   "position": "Pastry",
@@ -156293,10 +156507,10 @@
             "volume": 255,
             "volumeSource": "itemQty",
             "itemCount": 255,
-            "itemsPerHead": 127.5,
+            "itemsPerHead": 85,
             "serviceHours": 9,
             "itemsPerServiceHour": 28.33,
-            "itemsPerStaffHour": 12.41,
+            "itemsPerStaffHour": 8.29,
             "avgFulSec": 304.9,
             "qc": {
               "eligible": true,
@@ -156309,12 +156523,12 @@
               "nPeer": 48,
               "nHist": 12,
               "note": "vs own same-DOW history",
-              "staffingRatio": 0.45
+              "staffingRatio": 0.68
             }
           },
           "Sunday": {
-            "heads": 2,
-            "hours": 21.42,
+            "heads": 3,
+            "hours": 31.14,
             "staff": [
               {
                 "label": "Walfer C.",
@@ -156331,16 +156545,24 @@
                 "sourceLocations": [
                   "MILA"
                 ]
+              },
+              {
+                "label": "Danielys D.",
+                "hours": 9.72,
+                "position": "Pastry",
+                "sourceLocations": [
+                  "MILA"
+                ]
               }
             ],
             "headsByHour": {
-              "10-11": 0,
-              "11-12": 0,
-              "12-13": 0,
-              "13-14": 0,
-              "14-15": 2,
-              "15-16": 2,
-              "16-17": 2,
+              "10-11": 1,
+              "11-12": 1,
+              "12-13": 1,
+              "13-14": 1,
+              "14-15": 3,
+              "15-16": 3,
+              "16-17": 3,
               "17-18": 2,
               "18-19": 2,
               "19-20": 2,
@@ -156352,11 +156574,45 @@
               "1-2": 2
             },
             "staffByHour": {
-              "10-11": [],
-              "11-12": [],
-              "12-13": [],
-              "13-14": [],
+              "10-11": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "6:57a",
+                  "out": "4:40p"
+                }
+              ],
+              "11-12": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "6:57a",
+                  "out": "4:40p"
+                }
+              ],
+              "12-13": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "6:57a",
+                  "out": "4:40p"
+                }
+              ],
+              "13-14": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "6:57a",
+                  "out": "4:40p"
+                }
+              ],
               "14-15": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "6:57a",
+                  "out": "4:40p"
+                },
                 {
                   "label": "Karla V.",
                   "position": "Pastry",
@@ -156372,6 +156628,12 @@
               ],
               "15-16": [
                 {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "6:57a",
+                  "out": "4:40p"
+                },
+                {
                   "label": "Karla V.",
                   "position": "Pastry",
                   "in": "2:37p",
@@ -156385,6 +156647,12 @@
                 }
               ],
               "16-17": [
+                {
+                  "label": "Danielys D.",
+                  "position": "Pastry",
+                  "in": "6:57a",
+                  "out": "4:40p"
+                },
                 {
                   "label": "Karla V.",
                   "position": "Pastry",
@@ -156530,10 +156798,10 @@
             "volume": 147,
             "volumeSource": "itemQty",
             "itemCount": 147,
-            "itemsPerHead": 73.5,
+            "itemsPerHead": 49,
             "serviceHours": 8,
             "itemsPerServiceHour": 18.38,
-            "itemsPerStaffHour": 6.86,
+            "itemsPerStaffHour": 4.72,
             "avgFulSec": 342.2,
             "qc": {
               "eligible": true,
@@ -156546,7 +156814,7 @@
               "nPeer": 48,
               "nHist": 12,
               "note": "vs own same-DOW history",
-              "staffingRatio": 1.11
+              "staffingRatio": 1.67
             }
           }
         }
@@ -166560,58 +166828,6 @@
         }
       },
       {
-        "label": "Walfer C.",
-        "position": "Pastry",
-        "families": [
-          "Pastry"
-        ],
-        "weekHours": 48.51,
-        "weekItems": 733,
-        "weekItemsPerHour": 15.11,
-        "days": {
-          "Wednesday": {
-            "hours": 8.2,
-            "items": 309,
-            "itemsPerHour": 37.62,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Thursday": {
-            "hours": 9.52,
-            "items": 100,
-            "itemsPerHour": 10.45,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Friday": {
-            "hours": 9.95,
-            "items": 124,
-            "itemsPerHour": 12.46,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Saturday": {
-            "hours": 10.22,
-            "items": 128,
-            "itemsPerHour": 12.48,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Sunday": {
-            "hours": 10.62,
-            "items": 74,
-            "itemsPerHour": 6.92,
-            "families": [
-              "Pastry"
-            ]
-          }
-        }
-      },
-      {
         "label": "Miguel G.",
         "position": "Fry",
         "families": [
@@ -166711,6 +166927,58 @@
             "itemsPerHour": 27.3,
             "families": [
               "Fry"
+            ]
+          }
+        }
+      },
+      {
+        "label": "Walfer C.",
+        "position": "Pastry",
+        "families": [
+          "Pastry"
+        ],
+        "weekHours": 48.51,
+        "weekItems": 625,
+        "weekItemsPerHour": 12.88,
+        "days": {
+          "Wednesday": {
+            "hours": 8.2,
+            "items": 309,
+            "itemsPerHour": 37.62,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Thursday": {
+            "hours": 9.52,
+            "items": 100,
+            "itemsPerHour": 10.45,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Friday": {
+            "hours": 9.95,
+            "items": 83,
+            "itemsPerHour": 8.31,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Saturday": {
+            "hours": 10.22,
+            "items": 85,
+            "itemsPerHour": 8.32,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Sunday": {
+            "hours": 10.62,
+            "items": 49,
+            "itemsPerHour": 4.61,
+            "families": [
+              "Pastry"
             ]
           }
         }
@@ -166916,66 +167184,6 @@
         }
       },
       {
-        "label": "Karla V.",
-        "position": "Pastry",
-        "families": [
-          "Pastry"
-        ],
-        "weekHours": 59.34,
-        "weekItems": 525,
-        "weekItemsPerHour": 8.84,
-        "days": {
-          "Monday": {
-            "hours": 9.28,
-            "items": 56,
-            "itemsPerHour": 6,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Tuesday": {
-            "hours": 9.32,
-            "items": 45,
-            "itemsPerHour": 4.79,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Thursday": {
-            "hours": 9.67,
-            "items": 100,
-            "itemsPerHour": 10.29,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Friday": {
-            "hours": 9.95,
-            "items": 124,
-            "itemsPerHour": 12.46,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Saturday": {
-            "hours": 10.32,
-            "items": 128,
-            "itemsPerHour": 12.35,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Sunday": {
-            "hours": 10.8,
-            "items": 74,
-            "itemsPerHour": 6.81,
-            "families": [
-              "Pastry"
-            ]
-          }
-        }
-      },
-      {
         "label": "Ingrid F.",
         "position": "Raw",
         "families": [
@@ -167036,42 +167244,6 @@
         }
       },
       {
-        "label": "Eden N.",
-        "position": "Pastry",
-        "families": [
-          "Pastry"
-        ],
-        "weekHours": 27.5,
-        "weekItems": 409,
-        "weekItemsPerHour": 14.87,
-        "days": {
-          "Monday": {
-            "hours": 9.33,
-            "items": 56,
-            "itemsPerHour": 5.97,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Tuesday": {
-            "hours": 9.3,
-            "items": 45,
-            "itemsPerHour": 4.8,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Wednesday": {
-            "hours": 8.87,
-            "items": 309,
-            "itemsPerHour": 34.78,
-            "families": [
-              "Pastry"
-            ]
-          }
-        }
-      },
-      {
         "label": "Roberto S.",
         "position": "Robata",
         "families": [
@@ -167116,6 +167288,66 @@
         }
       },
       {
+        "label": "Karla V.",
+        "position": "Pastry",
+        "families": [
+          "Pastry"
+        ],
+        "weekHours": 59.34,
+        "weekItems": 391,
+        "weekItemsPerHour": 6.6,
+        "days": {
+          "Monday": {
+            "hours": 9.28,
+            "items": 42,
+            "itemsPerHour": 4.5,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Tuesday": {
+            "hours": 9.32,
+            "items": 34,
+            "itemsPerHour": 3.59,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Thursday": {
+            "hours": 9.67,
+            "items": 100,
+            "itemsPerHour": 10.29,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Friday": {
+            "hours": 9.95,
+            "items": 83,
+            "itemsPerHour": 8.31,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Saturday": {
+            "hours": 10.32,
+            "items": 85,
+            "itemsPerHour": 8.24,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Sunday": {
+            "hours": 10.8,
+            "items": 49,
+            "itemsPerHour": 4.54,
+            "families": [
+              "Pastry"
+            ]
+          }
+        }
+      },
+      {
         "label": "Luis P.",
         "position": "Saute",
         "families": [
@@ -167155,6 +167387,42 @@
             "itemsPerHour": 8.92,
             "families": [
               "Saute"
+            ]
+          }
+        }
+      },
+      {
+        "label": "Eden N.",
+        "position": "Pastry",
+        "families": [
+          "Pastry"
+        ],
+        "weekHours": 27.5,
+        "weekItems": 384,
+        "weekItemsPerHour": 13.95,
+        "days": {
+          "Monday": {
+            "hours": 9.33,
+            "items": 42,
+            "itemsPerHour": 4.47,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Tuesday": {
+            "hours": 9.3,
+            "items": 34,
+            "itemsPerHour": 3.6,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Wednesday": {
+            "hours": 8.87,
+            "items": 309,
+            "itemsPerHour": 34.78,
+            "families": [
+              "Pastry"
             ]
           }
         }
@@ -167423,6 +167691,58 @@
             "itemsPerHour": 5.3,
             "families": [
               "Sushi"
+            ]
+          }
+        }
+      },
+      {
+        "label": "Danielys D.",
+        "position": "Pastry",
+        "families": [
+          "Pastry"
+        ],
+        "weekHours": 46.47,
+        "weekItems": 292,
+        "weekItemsPerHour": 6.28,
+        "days": {
+          "Monday": {
+            "hours": 9.1,
+            "items": 42,
+            "itemsPerHour": 4.59,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Tuesday": {
+            "hours": 9.67,
+            "items": 34,
+            "itemsPerHour": 3.46,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Friday": {
+            "hours": 7.75,
+            "items": 83,
+            "itemsPerHour": 10.67,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Saturday": {
+            "hours": 10.23,
+            "items": 85,
+            "itemsPerHour": 8.31,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Sunday": {
+            "hours": 9.72,
+            "items": 49,
+            "itemsPerHour": 5.04,
+            "families": [
+              "Pastry"
             ]
           }
         }
@@ -168332,34 +168652,6 @@
         }
       },
       {
-        "label": "Dubelys M.",
-        "position": "Pastry",
-        "families": [
-          "Pastry"
-        ],
-        "weekHours": 18.18,
-        "weekItems": 100,
-        "weekItemsPerHour": 5.52,
-        "days": {
-          "Monday": {
-            "hours": 8.95,
-            "items": 56,
-            "itemsPerHour": 6.22,
-            "families": [
-              "Pastry"
-            ]
-          },
-          "Tuesday": {
-            "hours": 9.23,
-            "items": 45,
-            "itemsPerHour": 4.84,
-            "families": [
-              "Pastry"
-            ]
-          }
-        }
-      },
-      {
         "label": "Gustavo G.",
         "position": "Garde Manger",
         "families": [
@@ -168391,6 +168683,34 @@
             "itemsPerHour": 3.22,
             "families": [
               "Garde Manger"
+            ]
+          }
+        }
+      },
+      {
+        "label": "Dubelys M.",
+        "position": "Pastry",
+        "families": [
+          "Pastry"
+        ],
+        "weekHours": 18.18,
+        "weekItems": 75,
+        "weekItemsPerHour": 4.14,
+        "days": {
+          "Monday": {
+            "hours": 8.95,
+            "items": 42,
+            "itemsPerHour": 4.66,
+            "families": [
+              "Pastry"
+            ]
+          },
+          "Tuesday": {
+            "hours": 9.23,
+            "items": 34,
+            "itemsPerHour": 3.63,
+            "families": [
+              "Pastry"
             ]
           }
         }
