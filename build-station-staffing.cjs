@@ -165,13 +165,10 @@ function clockInHourNy(inDate) {
 /**
  * Exclude prep clock-ins (5am–10am, any day) from staffing totals for every
  * location except Claudie (Claudie keeps all punches).
- * Pastry cooks routinely start before 10am for production — keep those punches.
  */
 function shouldExcludeEarlyClockIn(venue, entry) {
   if (!entry) return false;
   if (String(venue) === 'claudie') return false;
-  const job = String(entry.jobName || '');
-  if (/pastry/i.test(job)) return false;
   const h = clockInHourNy(entry.inDate);
   if (h == null) return false;
   return h >= EARLY_CLOCKIN_EXCLUDE_START && h < EARLY_CLOCKIN_EXCLUDE_END;
@@ -978,7 +975,7 @@ function buildVenue(venueRaw, weekLabel) {
       earlyClockInExcludeRule:
         venue === 'claudie'
           ? 'Claudie: keep all punches (no 5–10am filter)'
-          : 'Non-Claudie: exclude punches with clock-in 5:00–9:59 ET (any day), except Pastry jobs',
+          : 'Non-Claudie: exclude punches with clock-in 5:00–9:59 ET (any day)',
     },
     guestsSeated: venueData.guestsSeated || null,
     toastStationFamily,
