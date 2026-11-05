@@ -34,6 +34,7 @@ const CODE_TO_VENUE = {
  */
 const LOCATION_TO_VENUE = {
   'CASA NEOS': 'casa_neos',
+  'CASA NEOS LOUNGE': 'casa_neos',
   'AVA WP': 'ava_winter_park',
   'AVA CG': 'ava_coconut_grove',
   'MILA 3F': 'mila',
@@ -41,6 +42,14 @@ const LOCATION_TO_VENUE = {
   MILA: 'mila',
   CLAUDIE: 'claudie',
   Claudie: 'claudie',
+};
+
+/** Display label for consolidated satellite kitchens / FTE floors. */
+const LOCATION_DISPLAY = {
+  'MILA 2F': 'MILA 2F (MM Club)',
+  'MILA 3F': 'MILA 3F',
+  'CASA NEOS LOUNGE': 'Casa Neos Lounge',
+  'CASA NEOS': 'Casa Neos',
 };
 
 /** Short alias → long slug used by venue week JSON filenames. */

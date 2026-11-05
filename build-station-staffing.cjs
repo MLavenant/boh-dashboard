@@ -628,6 +628,7 @@ function buildVenue(venueRaw, weekLabel) {
         payrollName: e.payrollName,
         hours: 0,
         jobs: new Set(),
+        sourceLocations: new Set(),
         punches: [],
       });
     }
@@ -636,11 +637,16 @@ function buildVenue(venueRaw, weekLabel) {
     if (e.jobName) row.jobs.add(e.jobName);
     if (!row.employeeName && e.employeeName) row.employeeName = e.employeeName;
     if (!row.payrollName && e.payrollName) row.payrollName = e.payrollName;
+    if (e.sourceLocation || e.brand) {
+      if (!row.sourceLocations) row.sourceLocations = new Set();
+      row.sourceLocations.add(e.sourceLocation || e.brand);
+    }
     row.punches.push({
       inDate: e.inDate || null,
       outDate: e.outDate || null,
       hours: e.hours || 0,
       jobName: e.jobName || '',
+      sourceLocation: e.sourceLocation || e.brand || null,
     });
   }
 
@@ -693,6 +699,8 @@ function buildVenue(venueRaw, weekLabel) {
       jobs,
       punches: shift.punches || [],
       nameMatchScore: hit.score,
+      sourceLocations: [...(shift.sourceLocations || [])],
+      rosterLocation: best.location || null,
     });
   }
 
@@ -747,6 +755,9 @@ function buildVenue(venueRaw, weekLabel) {
     if (cell.names.some((n) => n.name === m.rosterName || n.name === m.employeeName)) {
       const existing = cell.names.find((n) => n.name === m.rosterName || n.name === m.employeeName);
       existing.hours = +((existing.hours || 0) + m.hours).toFixed(2);
+      const locs = new Set([...(existing.sourceLocations || []), ...(m.sourceLocations || [])]);
+      existing.sourceLocations = [...locs];
+      if (!existing.rosterLocation && m.rosterLocation) existing.rosterLocation = m.rosterLocation;
       cell.hours = +cell.names.reduce((s, n) => s + (n.hours || 0), 0).toFixed(2);
       continue;
     }
@@ -756,6 +767,8 @@ function buildVenue(venueRaw, weekLabel) {
       hours: m.hours,
       position: m.position,
       jobs: m.jobs,
+      sourceLocations: m.sourceLocations || [],
+      rosterLocation: m.rosterLocation || null,
     });
     cell.heads = cell.names.length;
     cell.hours = +cell.names.reduce((s, n) => s + (n.hours || 0), 0).toFixed(2);
@@ -992,12 +1005,28 @@ function buildVenue(venueRaw, weekLabel) {
     };
     for (const day of DAYS) {
       const cell = data.days[day];
-      // Public staff list: short labels only (First L.) — enough to see who was on
-      const staff = (cell.names || []).map((n) => ({
-        label: shortStaffLabel(n.toastName || n.name || ''),
-        hours: n.hours != null ? n.hours : null,
-        position: n.position || '',
-      }));
+      // Public staff list: short labels only (First L.) — enough to see who was on.
+      // Tag lounge / MM Club punches so consolidated venues stay auditable.
+      const staff = (cell.names || []).map((n) => {
+        const locs = n.sourceLocations || [];
+        const rosterLoc = n.rosterLocation || '';
+        const locHint = locs.find((l) => /2f|mm club|lounge/i.test(String(l)))
+          || (/2f|lounge/i.test(rosterLoc) ? rosterLoc : null);
+        const base = shortStaffLabel(n.toastName || n.name || '');
+        let locTag = '';
+        if (locHint) {
+          if (/2f|mm club/i.test(String(locHint))) locTag = ' · 2F';
+          else if (/lounge/i.test(String(locHint))) locTag = ' · Lounge';
+        } else if (/2f/i.test(rosterLoc)) {
+          locTag = ' · 2F';
+        }
+        return {
+          label: base + locTag,
+          hours: n.hours != null ? n.hours : null,
+          position: n.position || '',
+          sourceLocations: locs.length ? locs : undefined,
+        };
+      });
       publicByFamily[family].days[day] = {
         heads: cell.heads,
         hours: cell.hours,

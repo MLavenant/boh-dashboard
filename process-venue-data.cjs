@@ -745,8 +745,9 @@ function resolveStationsForItemQty(menuItem) {
 }
 function resolveKitchenStation(assignedName) {
   if (!assignedName) return null;
+  const cleaned = String(assignedName || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
   const keys = Object.keys(stationDetailsOut);
-  const want = stripName(assignedName);
+  const want = stripName(cleaned);
   for (const k of keys) {
     if (stripName(k) === want) return k;
   }
@@ -759,7 +760,21 @@ function resolveKitchenStation(assignedName) {
       bestLen = Math.min(kn.length, want.length);
     }
   }
-  return best;
+  if (best) return best;
+  // Prep-map pastry lanes (2F-Passion / 2F-Gelato / Pastry Lounge) may have sales
+  // without a matching KDS station name in kitchen-timing — keep them as logical stations.
+  if (/pastry|2f[-\s]?passion|2f[-\s]?gelato|\bgelato\b/i.test(cleaned) && isFood(cleaned)) {
+    if (!stationDetailsOut[cleaned]) {
+      stationDetailsOut[cleaned] = {
+        byDayHour: {},
+        count: 0,
+        avg_sec: 0,
+        source: 'prep-map-only',
+      };
+    }
+    return cleaned;
+  }
+  return null;
 }
 
 
@@ -1042,6 +1057,31 @@ Object.values(stationHourItems).forEach(days => {
     });
   });
 });
+
+// Surface prep-map-only pastry lanes (2F-Passion / 2F-Gelato / Pastry Lounge) on Stations
+// even when Toast KDS never fired under that exact station name.
+for (const stName of Object.keys(stationHourItems)) {
+  if (!/pastry|2f[-\s]?passion|2f[-\s]?gelato/i.test(stName)) continue;
+  let itemQty = 0;
+  for (const dayMap of Object.values(stationHourItems[stName] || {})) {
+    for (const arr of Object.values(dayMap || {})) {
+      for (const e of arr || []) itemQty += e.q || 1;
+    }
+  }
+  if (!stationDetailsOut[stName]) {
+    stationDetailsOut[stName] = { byDayHour: {}, count: 0, avg_sec: 0, source: 'prep-map-only' };
+  }
+  stationDetailsOut[stName].itemQty = itemQty;
+  if (!stations.some((s) => s.station === stName)) {
+    stations.push({
+      station: stName,
+      count: itemQty,
+      avg_sec: 0,
+      exp_sec: derivedStationTargets[stName] || deriveStationTarget(stName) || 0,
+      source: 'prep-map-only',
+    });
+  }
+}
 
 // ---- Beverage slice (all venues — Signature/Classic menu groups) ----
 /** Join bar KDS tickets → Special / Classic via item-details (table + time). */

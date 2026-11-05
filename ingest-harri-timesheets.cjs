@@ -140,6 +140,12 @@ function rowToEntry(row) {
   const weekLabel = isoWeekLabel(date);
   if (!weekLabel) return null;
 
+  const brandLabel =
+    /MM\s*CLUB\s*AT\s*MILA/i.test(brand) ? 'MILA 2F (MM Club)'
+      : /CASA\s*NEOS\s*LOUNGE/i.test(brand) ? 'Casa Neos Lounge'
+        : /MM\s*CLUB\s*AT\s*AVA/i.test(brand) ? 'MM Club at AVA'
+          : brand;
+
   return {
     venue,
     weekLabel,
@@ -156,6 +162,8 @@ function rowToEntry(row) {
       outDate,
       hours: +hours.toFixed(3),
       source: 'harri',
+      brand,
+      sourceLocation: brandLabel,
     },
   };
 }
