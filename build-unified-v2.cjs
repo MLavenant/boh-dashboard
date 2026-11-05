@@ -6756,12 +6756,40 @@ function captureStationsCompareChartPng(weekKey) {
       categoryPercentage: 0.62,
       skipNull: true,
     }));
+    // High-contrast labels for PDF print (cream fill + dark halo — readable on every venue color)
+    const pdfBarValueLabels = {
+      id: 'pdfPortfolioBarValueLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets.forEach((ds, di) => {
+          const meta = chart.getDatasetMeta(di);
+          if (!meta || meta.hidden) return;
+          meta.data.forEach((el, i) => {
+            const raw = ds.data[i];
+            if (raw == null || !(Number(raw) > 0)) return;
+            const props = el.getProps(['x', 'y'], true);
+            const label = String(Math.round(Number(raw)));
+            ctx.save();
+            ctx.font = '700 11px ui-sans-serif, system-ui, sans-serif';
+            ctx.fillStyle = '#fff8e7';
+            ctx.strokeStyle = 'rgba(13,17,23,0.92)';
+            ctx.lineWidth = 3.5;
+            ctx.lineJoin = 'round';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.strokeText(label, props.x, props.y - 3);
+            ctx.fillText(label, props.x, props.y - 3);
+            ctx.restore();
+          });
+        });
+      },
+    };
     const chart = new Chart(canvas, {
       data: { labels: families, datasets: ipshBars },
       options: {
         responsive: false,
         animation: false,
-        layout: { padding: { top: 28, bottom: 8, left: 8, right: 8 } },
+        layout: { padding: { top: 36, bottom: 8, left: 8, right: 8 } },
         plugins: {
           legend: { position: 'bottom', labels: { boxWidth: 12, color: '#e8eaed', font: { size: 12 }, padding: 14 } },
         },
@@ -6775,10 +6803,11 @@ function captureStationsCompareChartPng(weekKey) {
             title: { display: true, text: 'Items / staff-hour', color: '#d9a441', font: { size: 13, weight: '600' } },
             ticks: { color: '#9aa0aa', font: { size: 11 } },
             grid: { color: 'rgba(255,255,255,0.08)' },
-            grace: '8%',
+            grace: '12%',
           },
         },
       },
+      plugins: [pdfBarValueLabels],
     });
     const img = chart.toBase64Image('image/png', 1);
     chart.destroy();
