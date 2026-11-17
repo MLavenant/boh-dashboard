@@ -422,10 +422,11 @@ function resolveAttempt(et) {
     attempt
   };
 
-  /* Local Outlook: poll a few minutes for FV after the 9:00 cloud retry starts. */
-  if (!fvOk && VIA === 'outlook' && !isFinal) {
-    const deadline = Date.now() + 8 * 60 * 1000;
-    log('FourVenues not ready — polling up to 8 minutes…');
+  /* The only automatic pull is 9:30 ET. The 9:00 pass waits for that retry.
+     The 9:30 pass waits for the pull that just started, then sends. */
+  if (!fvOk && VIA === 'outlook' && isFinal) {
+    const deadline = Date.now() + 12 * 60 * 1000;
+    log('Waiting up to 12 minutes for the 9:30 FourVenues pull…');
     while (Date.now() < deadline) {
       await new Promise(r => setTimeout(r, 30000));
       try { fv = await fbGet('/rdg/scrapeStatus/fourvenues'); } catch (_) {}

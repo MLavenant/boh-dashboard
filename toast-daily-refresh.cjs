@@ -1,6 +1,5 @@
 /**
- * Daily Toast refresh — also runs FourVenues first so both stay in sync
- * even when only this Task Scheduler job fires.
+ * Daily Toast refresh. FourVenues is not called here.
  * Schedule: daily ~8:30–9:15 AM America/New_York
  */
 'use strict';
@@ -21,21 +20,8 @@ function run(script, label) {
 }
 
 (async () => {
-  log('=== Daily FourVenues + Toast refresh Starting ===');
-  let fvOk = true;
+  log('=== Daily Toast refresh Starting ===');
   let toastOk = true;
-
-  try {
-    run('fv-refresh-api.cjs', 'FourVenues Integrations API → Firebase');
-  } catch (e) {
-    fvOk = false;
-    log('ERROR FourVenues: ' + String(e.message || e).split('\n')[0]);
-    try {
-      execSync(`node "${path.join(ROOT, 'fb-scrape-status.cjs')}" fourvenues fail "Daily FourVenues job failed"`, {
-        stdio: 'inherit', cwd: ROOT, shell: true
-      });
-    } catch (_) {}
-  }
 
   try {
     run('toast-bs-update.cjs', 'Toast BS Actual update');
@@ -54,7 +40,6 @@ function run(script, label) {
     log('Status write error: ' + String(e.message || e).split('\n')[0]);
   }
 
-  const ok = fvOk && toastOk;
-  log(ok ? '=== Daily refresh Complete ===' : '=== Daily refresh Finished WITH ERRORS ===');
-  process.exit(ok ? 0 : 1);
+  log(toastOk ? '=== Daily refresh Complete ===' : '=== Daily refresh Finished WITH ERRORS ===');
+  process.exit(toastOk ? 0 : 1);
 })();

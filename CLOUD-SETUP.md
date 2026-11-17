@@ -11,7 +11,7 @@ GitHub Actions **`schedule:` crons are often hours late**. Do not rely on them f
 |----------|---------|------|--------|
 | **1 – Primary** | External cron → `workflow_dispatch` | **8:25 AM America/New_York** | Laptop off; runners start in ~1–2 min |
 | **2 – Secondary** | Windows Task on this PC | **8:25** dispatch + **8:30** local refresh | Punctual when PC is on/awake |
-| **3 – Retry** | Same dispatch again | **9:00** and **9:30 AM ET** | If morning failed, retry; success clears Sanity RED. If still failing after 9:30, Sanity stays RED. |
+| **3 – FourVenues** | Same dispatch again | **9:30 AM ET** | The only automatic FourVenues API pull. 8:25 and 9:00 do not call it. |
 | **4 – Backup** | GitHub `schedule:` in `rdg-daily.yml` | Late morning / afternoon | Catch-up only |
 
 ## Punctual primary: cron-job.org → workflow_dispatch
@@ -40,9 +40,9 @@ One-time setup (free tier is enough):
      ```
 4. Save. Expected response: **HTTP 204** (empty body).
 5. Duplicate the same job twice more for retries:
-   - **Title:** `RDG Daily Dispatch 900 ET` — schedule **09:00** America/New_York — same URL/headers/body
-   - **Title:** `RDG Daily Dispatch 930 ET` — schedule **09:30** America/New_York — same URL/headers/body  
-   Re-running after a success is harmless; after a failure it clears Sanity RED when the retry succeeds. If still failing after 9:30, Sanity stays **RED**.
+   - **Title:** `RDG Daily Dispatch 900 ET` — schedule **09:00** America/New_York — Toast only. Body `{"ref":"main","inputs":{"job":"toast","fv":"auto"}}`
+   - **Title:** `RDG Daily Dispatch 930 ET` — schedule **09:30** America/New_York — body `{"ref":"main","inputs":{"job":"both","fv":"auto"}}`  
+   8:25 and 9:00 start Toast. They do not call FourVenues. 9:30 is the one automatic FourVenues pull. A second 9:30 dispatch the same day does not call the API again.
 6. Optional test from this PC (uses your logged-in `gh`):
    ```powershell
    powershell -ExecutionPolicy Bypass -File C:\Users\MatthiasLavenant\Documents\boh-dashboard\trigger-rdg-daily-dispatch.ps1
@@ -61,7 +61,7 @@ powershell -ExecutionPolicy Bypass -File C:\Users\MatthiasLavenant\Documents\boh
 
 Uses existing task name slots (new names are often blocked by corporate policy):
 - `RDG-Toast-BS-Daily` → `workflow_dispatch` at **8:25**
-- `RDG DJ FourVenues Daily 830` → local `rdg-morning-refresh.cjs` at **8:30**  
+- `RDG DJ FourVenues Daily 830` → local Toast at **8:30**. It does not call FourVenues.  
   (wake to run, allow battery, do not stop on battery)
 
 Logs: `boh-dashboard\logs\`.
@@ -73,8 +73,10 @@ Secrets: `TOAST_CLIENT_ID`, `TOAST_API_SECRET`, `RDG_DJ_TOKEN`.
 
 ## FourVenues (Integrations API)
 
+One automatic pull at **9:30 AM ET**. The 8:25, 9:00, GitHub backup, and afternoon jobs do not call FourVenues. A manual pull is `fv=now` (from chat, or `node trigger-rdg-daily-dispatch.cjs fourvenues now`).
+
 ```
-workflow_dispatch / schedule
+9:30 workflow_dispatch, or fv=now
   → FourVenues Integrations API (X-Api-Key)
   → bookings price (accepted + not-completed)
   → Firebase forecastLive → Dashboard
@@ -88,8 +90,8 @@ No Outlook, Graph, Playwright, or `FV_SESSION_B64`. Same metric as Sales Overvie
 
 | Time (ET) | Behavior |
 |-----------|----------|
-| **9:00** | Cloud FV/Toast retry + local Outlook send if FourVenues OK (polls ~8 min). |
-| **9:30** | Retry once. If still cannot send → **one** alert to `matthias@rivieradininggroup.com` via Outlook. |
+| **9:00** | Toast retry. Forecast email waits, because FourVenues has not pulled yet. |
+| **9:30** | FourVenues pull, then local Outlook send. If the pull is still not OK after the wait → **one** alert to `matthias@rivieradininggroup.com`. |
 | Lock | Firebase `rdg/scrapeStatus/forecastEmail` — max **one** flash email per Miami day. |
 
 Install / refresh tasks:

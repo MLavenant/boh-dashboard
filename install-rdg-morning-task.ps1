@@ -4,7 +4,7 @@
 
   Corporate PCs may block *new* task names. This script reuses the existing slots:
     - RDG-Toast-BS-Daily          → 8:25 AM  workflow_dispatch (cloud, punctual)
-    - RDG DJ FourVenues Daily 830 → 8:30 AM  local FV + Toast → Firebase
+    - RDG DJ FourVenues Daily 830 → 8:30 AM  local Toast only. FourVenues is 9:30 ET or manual.
 
   Both: wake to run, allow battery, do not stop on battery.
 
@@ -28,11 +28,11 @@ powercfg /change hibernate-timeout-ac 0 2>$null
 powercfg /SETACVALUEINDEX SCHEME_CURRENT SUB_SLEEP RTCWAKE 1 2>$null
 powercfg /SETACTIVE SCHEME_CURRENT 2>$null
 
-$dispatchTr = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$DispatchPs1`" -Job both"
+$dispatchTr = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$DispatchPs1`" -Job toast"
 $morningTr  = "cmd.exe /c `"$MorningBat`""
 $Retry900Ps1 = Join-Path $Root 'trigger-rdg-retry-and-forecast-email.ps1'
 $Retry930Ps1 = Join-Path $Root 'trigger-rdg-retry-and-forecast-email.ps1'
-$retry900Tr = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$Retry900Ps1`" -Attempt 900 -Job both"
+$retry900Tr = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$Retry900Ps1`" -Attempt 900 -Job toast"
 $retry930Tr = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$Retry930Ps1`" -Attempt 930 -Job both"
 
 function Ensure-DailyTask {
