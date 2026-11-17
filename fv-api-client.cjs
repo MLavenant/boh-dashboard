@@ -301,10 +301,16 @@ function referrerDisplayName(user) {
 
 function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
 
-function addCell(map, key, price) {
+/** One reservation can hold several spaces, named in space_name and separated by commas ("51, 52, 53" = 3 tables). Dollars stay the reservation price. */
+function bookingTables(b) {
+  const parts = String((b && b.space_name) || '').split(',').map(s => s.trim()).filter(Boolean);
+  return parts.length || 1;
+}
+
+function addCell(map, key, price, tables) {
   if (!map[key]) map[key] = { revenue: 0, bookings: 0 };
   map[key].revenue += price;
-  map[key].bookings += 1;
+  map[key].bookings += tables;
 }
 
 function roundCells(map) {
@@ -329,17 +335,20 @@ async function baselVenue(venue) {
     const keep = (bookings || []).filter(b => isCountableStatus(b.status || b.state));
     const djs = [...new Set(keep.map(b => String(b.event_name || '').trim()).filter(Boolean))];
     let revenue = 0;
+    let tables = 0;
     for (const b of keep) {
       const price = Number(b.price) || 0;
+      const nTables = bookingTables(b);
       revenue += price;
+      tables += nTables;
       const name = b.referral_id ? (names.get(b.referral_id) || 'Unknown referrer') : 'No referrer';
       if (!refMap.has(name)) refMap.set(name, { name, totalRevenue: 0, bookings: 0, byDate: {} });
       const group = refMap.get(name);
       group.totalRevenue += price;
-      group.bookings += 1;
-      addCell(group.byDate, date, price);
+      group.bookings += nTables;
+      addCell(group.byDate, date, price, nTables);
     }
-    nights.push({ date, dj: djs.join(' / ') || 'TBD', totalRevenue: round2(revenue), bookings: keep.length });
+    nights.push({ date, dj: djs.join(' / ') || 'TBD', totalRevenue: round2(revenue), bookings: tables });
   }
   const referrers = [...refMap.values()].map(g => ({
     name: g.name, totalRevenue: round2(g.totalRevenue), bookings: g.bookings, byDate: roundCells(g.byDate)
