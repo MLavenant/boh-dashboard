@@ -1,0 +1,26 @@
+name: Basel Tracker
+
+# FourVenues Art Basel sales only. Does not refresh forecast or Toast.
+on:
+  workflow_dispatch:
+
+jobs:
+  basel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: npm ci || npm install
+
+      - name: FourVenues Basel tracker only
+        env:
+          FV_API_KEY_MILA: ${{ secrets.FV_API_KEY_MILA }}
+          FV_API_KEY_CASA_NEOS: ${{ secrets.FV_API_KEY_CASA_NEOS }}
+          FV_API_KEY_CASA_NEOS_BC: ${{ secrets.FV_API_KEY_CASA_NEOS_BC }}
+        run: node fv-refresh-basel.cjs
