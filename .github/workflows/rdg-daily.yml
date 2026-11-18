@@ -130,8 +130,6 @@ jobs:
           TOAST_CLIENT_ID: ${{ secrets.TOAST_CLIENT_ID }}
           TOAST_API_SECRET: ${{ secrets.TOAST_API_SECRET }}
           DASHBOARD_PATH: ${{ github.workspace }}/rdg-dj/index.html
-          DASHBOARD_DIR: ${{ github.workspace }}/rdg-dj
-          TOAST_LOOKBACK_DAYS: "60"
         run: node toast-bs-cloud.cjs
 
       - name: Mark Toast failed if job crashed before status write
