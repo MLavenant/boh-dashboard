@@ -92,11 +92,10 @@ function loadScheduledShowDates(dates) {
     set.add(venue + "|" + d);
   }
   try {
-    const bakedPath = path.join(
-      process.env.DASHBOARD_DIR || "C:\\Users\\MatthiasLavenant\\Documents\\rdg-dj-dashboard",
-      "data",
-      "sched-baked.js"
-    );
+    const dashDir = process.env.DASHBOARD_DIR
+      || (DASHBOARD_PATH ? path.dirname(DASHBOARD_PATH) : "")
+      || "C:\\Users\\MatthiasLavenant\\Documents\\rdg-dj-dashboard";
+    const bakedPath = path.join(dashDir, "data", "sched-baked.js");
     if (fs.existsSync(bakedPath)) {
       const code = fs.readFileSync(bakedPath, "utf8");
       const m = code.match(/var SCHED\s*=\s*(\[[\s\S]*?\]);/);
@@ -550,7 +549,7 @@ function updateSchedInHtml(html, salesByVenueDate) {
 
   let showDates = loadScheduledShowDates(dates);
   showDates = await loadFirebaseShowDates(dates, showDates);
-  log(`Scheduled show-day overrides: ${[...showDates].filter(k => /2026-09-0[67]/.test(k)).join(", ") || "(none in Labor Day window)"}`);
+  log(`Calendar show nights in lookback: ${showDates.size}`);
 
   for (let i = 0; i < venueKeys.length; i++) {
     const vk = venueKeys[i];
