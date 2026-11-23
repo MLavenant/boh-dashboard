@@ -1,9 +1,12 @@
 {
-  "week": "2026-W44",
-  "generatedAt": "2026-11-05T14:05:13.528Z",
+  "week": "2026-W47",
+  "generatedAt": "2026-11-23T20:35:51.040Z",
   "ready": true,
   "fails": [],
-  "warns": [],
+  "warns": [
+    "pipeline-health overall=warn",
+    "claudie Fry: items/staff-hr=66.21 is unusually high (review before exec share)"
+  ],
   "venues": [
     "casa_neos",
     "mila",
