@@ -595,6 +595,8 @@ function updateSchedInHtml(html, salesByVenueDate) {
   /* Merge day totals into prior history (don't wipe older nights).
      Never clobber a positive prior with 0 from a partial/skipped day. */
   const byVenueDate = Object.assign({}, prevByVenue);
+  const FREEZE_DAYS = Math.max(1, Number(process.env.TOAST_FREEZE_DAYS || 3) || 3);
+  const freezeBefore = shift(miamiToday(), -FREEZE_DAYS);
   for (const vk of venueKeys) {
     const label = BS_CONFIG[vk].label;
     const merged = Object.assign({}, prevByVenue[label] || {});
@@ -603,6 +605,8 @@ function updateSchedInHtml(html, salesByVenueDate) {
       const next = +incoming[date];
       const prev = merged[date];
       if ((!isFinite(next) || next === 0) && prev != null && +prev > 0) return;
+      /* Posted nights are frozen: once a night is older than FREEZE_DAYS and has a saved total, it never changes. */
+      if (prev != null && +prev > 0 && date < freezeBefore) return;
       merged[date] = incoming[date];
     });
     byVenueDate[label] = merged;
@@ -625,7 +629,10 @@ function updateSchedInHtml(html, salesByVenueDate) {
     const nights = allNights[vk] || {};
     Object.keys(nights).forEach(date => {
       const row = nights[date];
-      vipEvents[eventKey(row.venue, date)] = row;
+      const ek = eventKey(row.venue, date);
+      /* Same freeze rule for per-night VIP tiers. */
+      if (vipEvents[ek] && vipEvents[ek].tierSummary && date < freezeBefore) return;
+      vipEvents[ek] = row;
       vipNightCount++;
     });
   }
@@ -642,7 +649,21 @@ function updateSchedInHtml(html, salesByVenueDate) {
   /* Week rollups for VIP week totals. */
   const weekTiers = Object.assign({}, prevWeekTiers);
   for (const vk of venueKeys) {
-    const rolled = rollupWeekTiers(vk, allNights[vk] || {});
+    /* Roll weeks up from the full saved history (not just this run), so older weeks never shrink to a partial sum. */
+    const label = BS_CONFIG[vk].label;
+    const hist = {};
+    Object.keys(vipEvents).forEach(k => {
+      const e = vipEvents[k];
+      if (e && e.venue === label && e.date) hist[e.date] = e;
+    });
+    const hd = Object.keys(hist).sort();
+    if (hd.length) {
+      /* Skip the first partial week of the history. */
+      let start = hd[0];
+      while (new Date(start + 'T12:00:00').getDay() !== 1) start = shift(start, 1);
+      Object.keys(hist).forEach(d => { if (d < start) delete hist[d]; });
+    }
+    const rolled = rollupWeekTiers(vk, hist);
     Object.assign(weekTiers, rolled);
   }
   const weekCode = await fbPut("/rdg/vipTierActuals", weekTiers);
