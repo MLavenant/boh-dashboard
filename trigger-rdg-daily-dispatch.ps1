@@ -15,6 +15,8 @@
 param(
   [ValidateSet('both', 'fourvenues', 'toast')]
   [string]$Job = 'both',
+  [ValidateSet('auto', 'now')]
+  [string]$Fv = 'auto',
   [string]$Repo = 'MLavenant/boh-dashboard',
   [string]$Workflow = 'RDG Daily Forecast + Toast'
 )
@@ -24,7 +26,7 @@ $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 Write-Host "[$ts] Dispatching '$Workflow' job=$Job -> $Repo"
 
 if (Get-Command gh -ErrorAction SilentlyContinue) {
-  gh workflow run $Workflow --repo $Repo -f "job=$Job"
+  gh workflow run $Workflow --repo $Repo -f "job=$Job" -f "fv=$Fv"
   if ($LASTEXITCODE -ne 0) { throw "gh workflow run failed (exit $LASTEXITCODE)" }
   Write-Host "[$ts] OK - workflow_dispatch accepted. Runners should start within ~1-2 minutes."
   exit 0
@@ -41,7 +43,7 @@ $wfFile = 'rdg-daily.yml'
 $uri = "https://api.github.com/repos/$Repo/actions/workflows/$wfFile/dispatches"
 $body = @{
   ref = 'main'
-  inputs = @{ job = $Job }
+  inputs = @{ job = $Job; fv = $Fv }
 } | ConvertTo-Json -Depth 5
 
 $headers = @{

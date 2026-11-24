@@ -3,19 +3,21 @@
  * Prefer trigger-rdg-daily-dispatch.ps1 when on Windows; this is for cron/Node hosts.
  *
  * Env: GH_TOKEN or GITHUB_TOKEN (fine-scoped: actions:write + repo)
- * Usage: node trigger-rdg-daily-dispatch.cjs [both|fourvenues|toast]
+ * Usage: node trigger-rdg-daily-dispatch.cjs [both|fourvenues|toast] [auto|now]
  */
 'use strict';
 
 const https = require('https');
 
 const JOB = process.argv[2] || 'both';
+const FV = process.argv[3] || 'auto';
 const REPO = process.env.RDG_DISPATCH_REPO || 'MLavenant/boh-dashboard';
 const TOKEN = process.env.GH_TOKEN || process.env.GITHUB_TOKEN;
 const ALLOWED = new Set(['both', 'fourvenues', 'toast']);
+const FV_ALLOWED = new Set(['auto', 'now']);
 
-if (!ALLOWED.has(JOB)) {
-  console.error('Usage: node trigger-rdg-daily-dispatch.cjs [both|fourvenues|toast]');
+if (!ALLOWED.has(JOB) || !FV_ALLOWED.has(FV)) {
+  console.error('Usage: node trigger-rdg-daily-dispatch.cjs [both|fourvenues|toast] [auto|now]');
   process.exit(1);
 }
 if (!TOKEN) {
@@ -25,7 +27,7 @@ if (!TOKEN) {
 
 const body = JSON.stringify({
   ref: 'main',
-  inputs: { job: JOB }
+  inputs: { job: JOB, fv: FV }
 });
 
 const req = https.request(

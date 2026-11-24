@@ -5,9 +5,9 @@ name: RDG Daily Forecast + Toast
 # Toast BS: Wed–Sun (Mon/Tue skipped)
 #
 # TIMING: GitHub schedule crons are often HOURS late — do not treat them as 8:30 AM.
-# Primary on-time trigger = workflow_dispatch at ~8:25 AM ET
-#   (cron-job.org + Windows task "RDG Daily Cloud Dispatch 825" — see CLOUD-SETUP.md).
-# schedule: below is LATE BACKUP / catch-up only.
+# FourVenues API runs once, at 9:30 AM ET, from the 9:30 workflow_dispatch.
+# A manual pull sets input fv=now. Scheduled crons do not call FourVenues.
+# schedule: below is Toast backup / afternoon settlement only.
 
 on:
   schedule:
@@ -28,10 +28,18 @@ on:
           - both
           - fourvenues
           - toast
+      fv:
+        description: "Fourvenues: auto is 9:30 ET only; now pulls immediately"
+        required: false
+        default: auto
+        type: choice
+        options:
+          - auto
+          - now
 
 jobs:
   fourvenues-forecast:
-    if: github.event_name == 'schedule' || github.event.inputs.job == 'both' || github.event.inputs.job == 'fourvenues'
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'both' || github.event.inputs.job == 'fourvenues')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -50,6 +58,7 @@ jobs:
           FV_API_KEY_MILA: ${{ secrets.FV_API_KEY_MILA }}
           FV_API_KEY_CASA_NEOS: ${{ secrets.FV_API_KEY_CASA_NEOS }}
           FV_API_KEY_CASA_NEOS_BC: ${{ secrets.FV_API_KEY_CASA_NEOS_BC }}
+          FV_RUN: ${{ github.event.inputs.fv || 'auto' }}
         run: node fv-refresh-api.cjs
 
       - name: Mark FourVenues failed if job crashed before status write

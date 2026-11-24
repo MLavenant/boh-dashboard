@@ -1,5 +1,5 @@
 @echo off
-REM 8:30 AM local backup: FourVenues (Integrations API) then Toast BS → Firebase
+REM 8:30 AM local Toast only. FourVenues runs at 9:30 ET, or when started manually.
 set ROOT=%~dp0
 cd /d "%ROOT%"
 if not exist "%ROOT%logs" mkdir "%ROOT%logs"

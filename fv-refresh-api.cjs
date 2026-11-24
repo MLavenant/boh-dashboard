@@ -11,6 +11,9 @@
  *
  * Usage:
  *   node fv-refresh-api.cjs
+ *
+ * Automatic pulls run only inside the 9:30 AM ET window, and only once that day.
+ * FV_RUN=now pulls immediately. That is the manual path.
  */
 'use strict';
 
@@ -201,8 +204,77 @@ function buildLivePayload(forecastRows, period) {
   return { livePayload, eventCount, revenueSum };
 }
 
+function miamiMinutes() {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+  }).formatToParts(new Date());
+  const hour = Number(parts.find(p => p.type === 'hour').value);
+  const minute = Number(parts.find(p => p.type === 'minute').value);
+  return hour * 60 + minute;
+}
+
+function pullMode() {
+  const raw = String(process.env.FV_RUN || 'auto').trim().toLowerCase();
+  if (raw === 'now' || raw === 'force' || raw === '1') return 'now';
+  return 'auto';
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function allowPull() {
+  if (pullMode() === 'now') return { ok: true, why: 'manual' };
+  const mins = miamiMinutes();
+  if (mins < (9 * 60 + 25) || mins > (9 * 60 + 50)) {
+    return { ok: false, why: 'Outside 9:30 ET. No Fourvenues call.' };
+  }
+  try {
+    const today = miamiToday();
+    const [st, lock] = await Promise.all([
+      fbGetRetry('/rdg/scrapeStatus/fourvenues'),
+      fbGetRetry('/rdg/scrapeStatus/fourvenuesLock')
+    ]);
+    if (lock && lock.miamiDay === today) {
+      return { ok: false, why: 'Fourvenues already pulled today. No second call.' };
+    }
+    if (st && st.miamiDay === today && st.ok === true) {
+      return { ok: false, why: 'Fourvenues already pulled today. No second call.' };
+    }
+  } catch (e) {
+    log('Could not read the last pull status. Continuing the 9:30 pull. ' + (e.message || e));
+  }
+  return { ok: true, why: '9:30' };
+}
+
+async function claimPull(why) {
+  const token = Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+  await fbPutRetry('/rdg/scrapeStatus/fourvenuesLock', {
+    token,
+    miamiDay: miamiToday(),
+    startedAt: new Date().toISOString(),
+    why
+  });
+  await sleep(2000);
+  const lock = await fbGetRetry('/rdg/scrapeStatus/fourvenuesLock');
+  return !!(lock && lock.token === token);
+}
+
 (async () => {
   log('=== FourVenues Forecast via Integrations API ===');
+  const gate = await allowPull();
+  if (!gate.ok) {
+    log(gate.why);
+    return;
+  }
+  log('Pull reason: ' + gate.why);
+  if (gate.why !== 'manual') {
+    const won = await claimPull(gate.why);
+    if (!won) {
+      log('Another 9:30 pull already started. No second Fourvenues call.');
+      return;
+    }
+  }
   const ready = venuesWithKeys({ includeOptional: false });
   log(`API keys present: ${ready.map(v => v.key).join(', ') || '(none)'}`);
   if (!ready.length) {
@@ -275,7 +347,7 @@ function buildLivePayload(forecastRows, period) {
     pacing,
     period: pulled.period,
     errors: pulled.errors || [],
-    schedule: 'Punctual dispatch ~8:25 ET · GitHub schedule = late backup · retries 9:00/9:30',
+    schedule: 'One automatic pull at 9:30 ET. Any other pull is manual.',
     what: 'FourVenues Integrations API (accepted + not-completed price) → Firebase forecastLive'
   });
   log(`Firebase scrapeStatus/fourvenues HTTP ${statusCode}`);
