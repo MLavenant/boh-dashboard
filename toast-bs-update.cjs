@@ -61,7 +61,9 @@ function miamiToday() {
 
 function getRelevantDates() {
   const todayStr = miamiToday();
-  const lookback = Math.max(1, Math.min(90, Number(process.env.TOAST_LOOKBACK_DAYS || 30) || 30));
+  /* Daily runs use 30 days. A manual backfill can raise the cap with TOAST_LOOKBACK_MAX. */
+  const lookbackMax = Math.max(90, Math.min(400, Number(process.env.TOAST_LOOKBACK_MAX || 90) || 90));
+  const lookback = Math.max(1, Math.min(lookbackMax, Number(process.env.TOAST_LOOKBACK_DAYS || 30) || 30));
   const dates = [];
   for (let i = lookback - 1; i >= 0; i--) dates.push(shift(todayStr, -i));
   return dates;
