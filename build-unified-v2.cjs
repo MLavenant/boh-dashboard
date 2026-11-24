@@ -2710,7 +2710,7 @@ function renderServiceBreakTimeline() {
         ctx.stroke();
         ctx.setLineDash([]);
         ctx.fillStyle = '#e2706a';
-        ctx.font = '11px sans-serif';
+        ctx.font = 'bold 13px sans-serif';
         ctx.fillText(thr + ' min', a.left + 4, yThr - 4);
         ctx.restore();
       }
@@ -2757,21 +2757,33 @@ function renderServiceBreakTimeline() {
       interaction: { mode: 'index', intersect: false },
       scales: chartScalesNoVerticalGrid(
         {
-          title: { display: true, text: 'Time of day (1-min)' },
+          title: { display: true, text: 'Time of day (1-min)', font: { size: 14, weight: '600' } },
           ticks: {
             maxRotation: 0,
             autoSkip: false,
+            font: { size: 13, weight: '600' },
             callback(val, idx) {
               if (idx % step !== 0) return '';
               return labels[idx];
             },
           },
         },
-        { position: 'left', title: { display: true, text: 'Concurrent tickets open' }, min: 0 },
-        { position: 'right', title: { display: true, text: 'Avg fulfillment (min)' }, min: 0, suggestedMax: Math.max(22, thr + 4) }
+        {
+          position: 'left',
+          title: { display: true, text: 'Concurrent tickets open', font: { size: 14, weight: '600' } },
+          ticks: { font: { size: 13, weight: '600' } },
+          min: 0,
+        },
+        {
+          position: 'right',
+          title: { display: true, text: 'Avg fulfillment (min)', font: { size: 14, weight: '600' } },
+          ticks: { font: { size: 13, weight: '600' } },
+          min: 0,
+          suggestedMax: Math.max(22, thr + 4),
+        }
       ),
       plugins: {
-        legend: { position: 'top', labels: { boxWidth: 12 } },
+        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 13 } } },
         tooltip: {
           callbacks: {
             title(items) {
