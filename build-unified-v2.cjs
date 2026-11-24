@@ -690,7 +690,7 @@ html = html.replace(
   <div id="serviceBreakDayPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
   <div id="serviceBreakDayAvg" style="display:flex;flex-wrap:wrap;gap:18px 28px;align-items:baseline;margin:0 0 14px;padding:12px 14px;border-radius:10px;border:1px solid #2d3448;background:#161a22"></div>
   <div id="serviceBreakFulTable" style="overflow-x:auto;max-height:360px;margin:0 0 16px"></div>
-  <canvas id="cServiceBreak" style="max-height:420px"></canvas>
+  <div style="height:520px;position:relative"><canvas id="cServiceBreak"></canvas></div>
   <div class="legend">
     <span><span class="sw" style="background:#5aa9e6"></span>Concurrent station tickets open</span>
     <span><span class="sw" style="background:#d9a441"></span>Avg fulfillment of open tickets (min)</span>
@@ -2710,7 +2710,7 @@ function renderServiceBreakTimeline() {
         ctx.stroke();
         ctx.setLineDash([]);
         ctx.fillStyle = '#e2706a';
-        ctx.font = 'bold 13px sans-serif';
+        ctx.font = 'bold 15px sans-serif';
         ctx.fillText(thr + ' min', a.left + 4, yThr - 4);
         ctx.restore();
       }
@@ -2754,14 +2754,18 @@ function renderServiceBreakTimeline() {
       ],
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
+      layout: { padding: { top: 8, right: 8, bottom: 4, left: 4 } },
       scales: chartScalesNoVerticalGrid(
         {
-          title: { display: true, text: 'Time of day (1-min)', font: { size: 14, weight: '600' } },
+          title: { display: true, text: 'Time of day (1-min)', font: { size: 18, weight: '700' }, padding: { top: 10 } },
           ticks: {
             maxRotation: 0,
             autoSkip: false,
-            font: { size: 13, weight: '600' },
+            font: { size: 16, weight: '700' },
+            padding: 8,
             callback(val, idx) {
               if (idx % step !== 0) return '';
               return labels[idx];
@@ -2770,20 +2774,20 @@ function renderServiceBreakTimeline() {
         },
         {
           position: 'left',
-          title: { display: true, text: 'Concurrent tickets open', font: { size: 14, weight: '600' } },
-          ticks: { font: { size: 13, weight: '600' } },
+          title: { display: true, text: 'Concurrent tickets open', font: { size: 18, weight: '700' }, padding: { bottom: 8 } },
+          ticks: { font: { size: 16, weight: '700' }, padding: 8 },
           min: 0,
         },
         {
           position: 'right',
-          title: { display: true, text: 'Avg fulfillment (min)', font: { size: 14, weight: '600' } },
-          ticks: { font: { size: 13, weight: '600' } },
+          title: { display: true, text: 'Avg fulfillment (min)', font: { size: 18, weight: '700' }, padding: { bottom: 8 } },
+          ticks: { font: { size: 16, weight: '700' }, padding: 8 },
           min: 0,
           suggestedMax: Math.max(22, thr + 4),
         }
       ),
       plugins: {
-        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 13 } } },
+        legend: { position: 'top', labels: { boxWidth: 14, font: { size: 14, weight: '600' } } },
         tooltip: {
           callbacks: {
             title(items) {
