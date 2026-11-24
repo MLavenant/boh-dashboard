@@ -668,10 +668,10 @@ html = html.replace(
   '</div>\n<p id="pageSummary" style="color:#9aa0aa;font-size:13px;margin:12px 0 0;line-height:1.6;max-width:780px"></p>\n<div id="beverageOverviewHost" style="display:none;margin:18px 0 8px"></div>\n\n<!-- Visual 1 -->'
 );
 
-// Insert staffing table + Visual 1B (1-min service break) after Visual 1
-html = html.replace(
-  '<!-- Visual 2+3 -->',
-  `<!-- Overview: Staffing Performance (per location) — primary staffing view -->
+// Insert staffing table + Visual 1B after Visual 1.
+// Anchor on <!-- Visual 2 --> (Visual 2+3 is rewritten earlier in this build).
+{
+  const svcBreakBlock = `<!-- Overview: Staffing Performance (per location) — primary staffing view -->
 <div class="card" id="overviewStaffingCard" style="display:none;margin-bottom:14px">
   <h2>Staffing Performance by Station Family</h2>
   <p class="note">Per location. Volume = food item quantity. Main readouts: <strong style="color:#d9a441">items / person</strong> and <strong>fulfillment</strong>.</p>
@@ -683,11 +683,13 @@ html = html.replace(
   <p class="note" style="margin:0"><strong>Items / staff by day &amp; hour</strong> is on the <button type="button" onclick="switchTab('stations', document.querySelector('.tab-btn[onclick*=stations]'))" style="background:none;border:none;color:#d9a441;cursor:pointer;font:inherit;padding:0;text-decoration:underline">Stations</button> tab — pick a station family for Mon→Sun plus hourly detail.</p>
 </div>
 
-<!-- Service Break Timeline (1-min) -->
+<!-- Service Break Timeline (1-min) + 5-min ful table -->
 <div class="card" id="serviceBreakCard">
-  <h2>Visual 1B — Service Break Timeline (1-min)</h2>
-  <p class="note">X-axis = clock time (1-minute steps). Blue bars = <strong>concurrent production tickets open</strong> (Saute, Pastry, Fry…; Expo excluded). Gold line = <strong>avg fulfillment of those open tickets</strong>. Red = minutes where that avg &gt; 15 min.</p>
-  <div id="serviceBreakDayPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
+  <h2>Visual 1B — Avg Fulfillment by Time</h2>
+  <p class="note">Pick a day. Top number = day average fulfillment of open production tickets (Expo excluded). Table = <strong>5-minute</strong> buckets; chart below = same series at <strong>1-minute</strong> resolution. Red = avg &gt; 15 min.</p>
+  <div id="serviceBreakDayPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
+  <div id="serviceBreakDayAvg" style="display:flex;flex-wrap:wrap;gap:18px 28px;align-items:baseline;margin:0 0 14px;padding:12px 14px;border-radius:10px;border:1px solid #2d3448;background:#161a22"></div>
+  <div id="serviceBreakFulTable" style="overflow-x:auto;max-height:360px;margin:0 0 16px"></div>
   <canvas id="cServiceBreak" style="max-height:420px"></canvas>
   <div class="legend">
     <span><span class="sw" style="background:#5aa9e6"></span>Concurrent station tickets open</span>
@@ -697,8 +699,17 @@ html = html.replace(
   <div class="annotation-box" id="serviceBreakNote">Select a day to see minute-by-minute kitchen pressure.</div>
 </div>
 
-<!-- Visual 2+3 -->`
-);
+`;
+  if (html.includes('id="serviceBreakCard"')) {
+    // already present
+  } else if (html.includes('<!-- Visual 2 -->')) {
+    html = html.replace('<!-- Visual 2 -->', svcBreakBlock + '<!-- Visual 2 -->');
+  } else if (html.includes('<!-- Visual 2+3 -->')) {
+    html = html.replace('<!-- Visual 2+3 -->', svcBreakBlock + '<!-- Visual 2+3 -->');
+  } else {
+    console.warn('WARN: could not insert Visual 1B service-break card');
+  }
+}
 
 // Add venue pill styles + new UI styles
 html = html.replace('</style>', `
@@ -2504,8 +2515,107 @@ function renderHourProfile() {
 
 // ============================================================
 // Service Break Timeline (1-min concurrent open tickets + avg ful)
+// + 5-min avg fulfillment table with day selector
 // ============================================================
 let _serviceBreakDay = null;
+const SERVICE_BREAK_TABLE_BUCKET_MIN = 5;
+
+function aggregateServiceBreakBuckets(series, thr, bucketMin) {
+  const labels = series.labels || [];
+  const conc = series.conc || [];
+  const ful = series.ful || [];
+  const rows = [];
+  for (let i = 0; i < labels.length; i += bucketMin) {
+    const end = Math.min(labels.length, i + bucketMin);
+    let sumFul = 0, nFul = 0, sumConc = 0, nConc = 0, broken = 0, active = 0;
+    for (let j = i; j < end; j++) {
+      const c = conc[j] || 0;
+      sumConc += c;
+      nConc++;
+      if (c > 0) active++;
+      if (ful[j] != null) {
+        sumFul += ful[j];
+        nFul++;
+        if (ful[j] > thr) broken++;
+      }
+    }
+    if (!active && !nFul) continue;
+    rows.push({
+      time: labels[i],
+      timeEnd: labels[end - 1],
+      avgConc: nConc ? +(sumConc / nConc).toFixed(1) : 0,
+      avgFul: nFul ? +(sumFul / nFul).toFixed(2) : null,
+      brokenMins: broken,
+      activeMins: active,
+    });
+  }
+  return rows;
+}
+
+function dayAvgFulfillment(series) {
+  const ful = (series && series.ful) || [];
+  let sum = 0, n = 0;
+  for (let i = 0; i < ful.length; i++) {
+    if (ful[i] == null) continue;
+    sum += ful[i];
+    n++;
+  }
+  return n ? { avg: sum / n, minutes: n } : { avg: null, minutes: 0 };
+}
+
+function renderServiceBreakFulTable(series, thr) {
+  const host = document.getElementById('serviceBreakFulTable');
+  const avgEl = document.getElementById('serviceBreakDayAvg');
+  if (!host) return;
+  const dayAvg = dayAvgFulfillment(series);
+  const avgColor = dayAvg.avg == null ? '#9aa0aa' : (dayAvg.avg > thr ? '#ef4444' : (dayAvg.avg > thr - 3 ? '#f59e0b' : '#22c55e'));
+  if (avgEl) {
+    avgEl.innerHTML =
+      '<div><div style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#9aa0aa;margin-bottom:4px">Day avg fulfillment</div>' +
+      '<div style="font-size:28px;font-weight:800;color:' + avgColor + ';line-height:1.1">' +
+      (dayAvg.avg != null ? dayAvg.avg.toFixed(1) + ' <span style="font-size:16px;font-weight:600">min</span>' : '—') +
+      '</div></div>' +
+      '<div style="font-size:13px;color:#9aa0aa">Open-ticket avg across <strong style="color:#e8eaed">' + dayAvg.minutes + '</strong> active minutes · ' +
+      '<strong style="color:#e8eaed">' + (series.ticketCount || 0).toLocaleString() + '</strong> tickets · broke <strong style="color:' +
+      ((series.brokenMinutes || 0) > 0 ? '#ef4444' : '#e8eaed') + '">' + (series.brokenMinutes || 0) + 'm</strong></div>';
+  }
+  const rows = aggregateServiceBreakBuckets(series, thr, SERVICE_BREAK_TABLE_BUCKET_MIN);
+  if (!rows.length) {
+    host.innerHTML = '<div style="color:#9aa0aa;padding:8px 0">No timed fulfillment samples for this day.</div>';
+    return;
+  }
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+  html += '<thead><tr style="border-bottom:1px solid #2d3448;color:#9aa0aa;text-align:left">';
+  html += '<th style="padding:8px 10px">Time (' + SERVICE_BREAK_TABLE_BUCKET_MIN + '-min)</th>';
+  html += '<th style="padding:8px 10px;text-align:right">Avg concurrent</th>';
+  html += '<th style="padding:8px 10px;text-align:right">Avg fulfillment</th>';
+  html += '<th style="padding:8px 10px;text-align:right">vs 15 min</th>';
+  html += '<th style="padding:8px 10px">Status</th>';
+  html += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    const over = r.avgFul != null && r.avgFul > thr;
+    const watch = r.avgFul != null && r.avgFul > thr - 3 && !over;
+    const fulColor = r.avgFul == null ? '#9aa0aa' : (over ? '#ef4444' : (watch ? '#f59e0b' : '#22c55e'));
+    const vs = r.avgFul == null ? '—' : ((r.avgFul - thr >= 0 ? '+' : '') + (r.avgFul - thr).toFixed(1) + ' min');
+    const badge = r.avgFul == null
+      ? '<span style="color:#9aa0aa">—</span>'
+      : (over
+        ? '<span style="color:#ef4444">🔴 BREAKING</span>'
+        : (watch ? '<span style="color:#f59e0b">⚠️ WATCH</span>' : '<span style="color:#22c55e">✅ OK</span>'));
+    const timeLabel = r.time === r.timeEnd ? r.time : (r.time + '–' + r.timeEnd);
+    html += '<tr style="border-bottom:1px solid #1e2533' + (over ? ';background:rgba(226,112,106,0.08)' : '') + '">';
+    html += '<td style="padding:8px 10px;font-weight:600;color:#e8eaed;white-space:nowrap">' + timeLabel + '</td>';
+    html += '<td style="padding:8px 10px;text-align:right;color:#9aa0aa">' + r.avgConc + '</td>';
+    html += '<td style="padding:8px 10px;text-align:right;font-weight:700;color:' + fulColor + '">' +
+      (r.avgFul != null ? r.avgFul.toFixed(1) + ' min' : '—') + '</td>';
+    html += '<td style="padding:8px 10px;text-align:right;color:' + fulColor + '">' + vs + '</td>';
+    html += '<td style="padding:8px 10px">' + badge + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  host.innerHTML = html;
+}
+
 function renderServiceBreakTimeline() {
   const card = document.getElementById('serviceBreakCard');
   const canvas = document.getElementById('cServiceBreak');
@@ -2513,7 +2623,7 @@ function renderServiceBreakTimeline() {
   const note = document.getElementById('serviceBreakNote');
   const existing = Chart.getChart('cServiceBreak');
   if (existing) existing.destroy();
-  if (!card || !canvas) return;
+  if (!card) return;
 
   if (currentVenue === 'rdg_portfolio') {
     card.style.display = 'none';
@@ -2528,6 +2638,10 @@ function renderServiceBreakTimeline() {
 
   if (!days.length) {
     if (pillsEl) pillsEl.innerHTML = '';
+    const avgEl = document.getElementById('serviceBreakDayAvg');
+    const tableEl = document.getElementById('serviceBreakFulTable');
+    if (avgEl) avgEl.innerHTML = '';
+    if (tableEl) tableEl.innerHTML = '';
     if (note) note.textContent = 'No 1-min break timeline yet — reprocess this venue week to enable.';
     return;
   }
@@ -2561,6 +2675,8 @@ function renderServiceBreakTimeline() {
 
   const series = byDay[_serviceBreakDay];
   const thr = (timeline && timeline.thresholdMin) || getThreshold();
+  renderServiceBreakFulTable(series, thr);
+  if (!canvas) return;
   const labels = series.labels;
   const conc = series.conc;
   const ful = series.ful;
