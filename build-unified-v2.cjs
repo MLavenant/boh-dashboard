@@ -2717,6 +2717,11 @@ function renderServiceBreakTimeline() {
     }
   };
 
+  const dayTheme = typeof isDaylightTheme === 'function' && isDaylightTheme();
+  const fulLineColor = dayTheme ? '#5a3d28' : '#d9a441';
+  const fulSw = card.querySelector('.legend .sw[style*="d9a441"], .legend .sw[style*="5a3d28"]');
+  if (fulSw) fulSw.style.background = fulLineColor;
+
   new Chart(canvas, {
     data: {
       labels,
@@ -2736,12 +2741,12 @@ function renderServiceBreakTimeline() {
           type: 'line',
           label: 'Avg fulfillment of open tickets (min)',
           data: ful,
-          borderColor: '#d9a441',
+          borderColor: fulLineColor,
           backgroundColor: 'rgba(217,164,65,0)',
           tension: 0.15,
           pointRadius: 0,
           pointHoverRadius: 3,
-          borderWidth: 2,
+          borderWidth: dayTheme ? 2.5 : 2,
           yAxisID: 'y1',
           order: 1,
           spanGaps: true,
