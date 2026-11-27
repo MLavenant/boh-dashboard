@@ -307,6 +307,22 @@ function bookingTables(b) {
   return parts.length || 1;
 }
 
+/**
+ * Sales channel from FourVenues' booking.source (web | pro) and whether a referrer is credited.
+ *   direct   = web, no referrer (guest booked online on their own)
+ *   webRef   = web, with a referrer
+ *   pro      = created in FourVenues PRO, with a referrer
+ *   proNoRef = created in FourVenues PRO, no referrer
+ *   other    = source missing or unknown
+ */
+function bookingChannel(b) {
+  const src = String((b && b.source) || '').toLowerCase().trim();
+  const hasRef = !!(b && b.referral_id);
+  if (src === 'web') return hasRef ? 'webRef' : 'direct';
+  if (src === 'pro') return hasRef ? 'pro' : 'proNoRef';
+  return 'other';
+}
+
 function addCell(map, key, price, tables) {
   if (!map[key]) map[key] = { revenue: 0, bookings: 0 };
   map[key].revenue += price;
@@ -329,6 +345,7 @@ async function baselVenue(venue) {
     }
   } catch (e) { /* names fall back to "Unknown referrer" */ }
   const nights = [];
+  const channels = {};
   const refMap = new Map();
   for (const date of baselDatesFor(venue)) {
     const { bookings } = await listBookings(venue, { date });
@@ -347,6 +364,7 @@ async function baselVenue(venue) {
       group.totalRevenue += price;
       group.bookings += nTables;
       addCell(group.byDate, date, price, nTables);
+      addCell(channels, bookingChannel(b), price, nTables);
     }
     nights.push({ date, dj: djs.join(' / ') || 'TBD', totalRevenue: round2(revenue), bookings: tables });
   }
@@ -359,7 +377,8 @@ async function baselVenue(venue) {
     totalRevenue: round2(nights.reduce((s, n) => s + n.totalRevenue, 0)),
     totalBookings: nights.reduce((s, n) => s + n.bookings, 0),
     nights,
-    referrers
+    referrers,
+    channels: roundCells(channels)
   };
 }
 
@@ -417,6 +436,15 @@ async function getBaselTracker() {
     byDate: roundCells(g.byDate), byVenue: roundCells(g.byVenue)
   })).sort((a, b) => (b.totalRevenue - a.totalRevenue) || a.name.localeCompare(b.name));
 
+  const channelMap = {};
+  for (const v of venues) {
+    for (const [k, c] of Object.entries(v.channels || {})) {
+      if (!channelMap[k]) channelMap[k] = { revenue: 0, bookings: 0 };
+      channelMap[k].revenue += c.revenue;
+      channelMap[k].bookings += c.bookings;
+    }
+  }
+
   return {
     updatedAt: new Date().toISOString(),
     venue: 'All Basel venues',
@@ -427,6 +455,7 @@ async function getBaselTracker() {
     totalBookings: venues.reduce((s, v) => s + v.totalBookings, 0),
     nights,
     referrers,
+    channels: roundCells(channelMap),
     venues,
     errors
   };
