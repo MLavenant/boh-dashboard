@@ -1,0 +1,29 @@
+name: Basel Source Probe
+
+# One-off: FourVenues booking fields / channel breakdown for Art Basel. Remove after use.
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Probe booking fields
+        env:
+          FV_API_KEY_MILA: ${{ secrets.FV_API_KEY_MILA }}
+          FV_API_KEY_CASA_NEOS: ${{ secrets.FV_API_KEY_CASA_NEOS }}
+          FV_API_KEY_CASA_NEOS_BC: ${{ secrets.FV_API_KEY_CASA_NEOS_BC }}
+        run: node basel-source-probe.cjs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: basel-bookings-sanitized
+          path: basel-bookings-sanitized.json
+          retention-days: 1
